@@ -1,0 +1,35 @@
+{
+    "database" : {
+        "protocol" : "pg",
+        "user" :     "bodega",
+        "password" : "bodega",
+        "host" :     "localhost",
+        "name" :     "bodega"
+    },
+    "prefix" : "/bodega/v1/json/",
+    "service" : {
+        "smtp" : {
+            "host" : "mail.example.org",
+            "port" : "465",
+            "useSSL" : "true",
+            "user" : "user@example.org",
+            "pass" : "sample"
+        },
+        "email" : "Name <returnaddress@example.org>"
+    },
+    "storageSystem": "localStorage",
+    "s3" : {
+        "key" : "",
+        "secret" : "",
+        "bucket" : ""
+    },
+    "localStorage": {
+        "basePath": "/content/"
+    },
+    "stripe" : {
+        "testSecretKey" : "",
+        "liveSecretKey" : ""
+    },
+    "pointConversionRate": 110,
+    "port" : 3000
+}

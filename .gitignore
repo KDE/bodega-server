@@ -1,0 +1,6 @@
+qtcreator-build
+webv2/content/*/*
+webv2/public/images/*/*/*
+assetimporters/kdeartwork-wallpapers/wallpapersSvn/
+server/config.json
+server/node_modules

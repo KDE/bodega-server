@@ -1,0 +1,7 @@
+Process for populating the db:
+
+* Grab the catalog from: http://www.gutenberg.org/feeds/catalog.rdf.bz2
+* Decompress it
+* run `gutimport <path to catalog.rdf> <optional path to download images into>`
+* run `coverProcessing.sh <path to downloaded images> <path to webv2/public/images/>`
+

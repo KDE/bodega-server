@@ -1,0 +1,31 @@
+{
+    "predef": [
+        "app",
+        "it",
+        "console",
+        "describe",
+        "before",
+        "after"
+    ],
+
+    "node" : true,
+    "es5" : true,
+    // Require use strict pragma  in every file.
+    "strict"        : false,
+    // Allow global "use strict" (also enables 'strict').
+    "globalstrict"  : false,
+
+
+    // Likely error causes
+    "bitwise" : true,  // Prohibit bitwise operators
+    "curly"   : true,  // Require {} for every new block or scope.
+    "eqeqeq"  : true,  // Prohibit the use of == and != in favor of === and !==
+    "latedef" : true,  // Prohibit variable use before definition.
+    "noarg"   : true,  // Prohibit use of `arguments.caller` and `arguments.callee`.
+    "trailing": true,  // Prohibit trailing whitespace (for multistr)
+    "undef"   : true,  // Require all non-global variables be declared before they are used.
+
+    // Style
+    "newcap": true, // Require capitalization of all constructor functions e.g. `new F()`.
+    "multistr": true // Allow multiline strings for SQL queries
+}

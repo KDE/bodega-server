@@ -1,0 +1,54 @@
+Now
+===
+* Jade templated HTML page in lib/db/confirm.js for account activation
+
+* list of featured apps
+
+* errors audit
+- the language of the some the errors is quite primitive and should be
+   audited
+
+* ability to upload assets
+- and edit them (at least changelog)
+
+Later
+=====
+* stream uploads
+- express.js uses connect which uses node-formidable which doesn't
+   allow streaming files and always saves them to a temporary file,
+   there's a few bugs about supporting streaming in the formidable bug
+   tracker we need to stay on top of that or implement it ourselves
+* ability to sort by various parameters
+    * created date - changelog or tag?
+    * name
+    * number of downloads
+* identify the language of an asset (e.g. book only in latin or german)
+* searching in other languages (new search idx table)
+* robust rankings
+- we could use wilson score to measure them,
+   http://www.evanmiller.org/how-not-to-sort-by-average-rating.html ,
+   e.g.
+js:
+function measureScore(positive, total) {
+   if (total === 0) {
+      return 0;
+   }
+   //the z score refers to a confidence.
+   // computed according to the P-value of integral of a normal
+   // distribution over (-Infty, x]. with the formula
+   // z = Statistics2.pnormaldist(1 - (1-confidence)/2)
+   // Uses 1.96 for a confidence level of 0.95
+   var z = 1.96;
+   var phat = 1.0 * positive/total;
+   return (phat + z*z/(2*total) - z * Math.sqrt(
+     (phat*(1-phat)+z*z/(4*total))/total))/(1+z*z/total);
+}
+sql:
+SELECT asset, ((positive + 1.9208) / (positive + negative) -
+   1.96 * SQRT((positive * negative) / (positive + negative) + 0.9604) /
+   (positive + negative)) / (1 + 3.8416 / (positive + negative))
+   AS ci_lower_bound FROM rankings ORDER BY ci_lower_bound DESC;
+- we could also replace positive with # of favorites and total with #
+   of downloads, which would equal to 'best applications'
+* forums or other ways of letting content creators communicate with
+   users

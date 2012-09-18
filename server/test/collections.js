@@ -1,0 +1,319 @@
+var server = require('../app.js');
+var utils = require('./support/http');
+
+describe('Collections', function(){
+    var cookie;
+    var collectionId;
+    var collectionName = 'favorites1';
+    var assets = [4, 34, 36, 38];
+    var assetsToRemove = [4, 34];
+    var numCollections = 0;
+    describe('without authentication', function(){
+        it('shouldnt allow listing collections', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/list',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.headers.should.have.property('set-cookie');
+                    res.body.should.have.property('authStatus', false);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type',
+                                                        'Unauthorized');
+                    done();
+                });
+        });
+        it('shouldnt allow creating collections', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/create?name=\'hello\'',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.headers.should.have.property('set-cookie');
+                    res.body.should.have.property('authStatus', false);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type',
+                                                        'Unauthorized');
+                    done();
+                });
+        });
+        it('shouldnt allow deleting collections', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/delete?name=\'hello\'',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.headers.should.have.property('set-cookie');
+                    res.body.should.have.property('authStatus', false);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type',
+                                                        'Unauthorized');
+                    done();
+                });
+        });
+    });
+    describe('authenticate', function(){
+        it('should succeed', function(done){
+            var expected = {
+                "userId": 2,
+                "device":"VIVALDI-1",
+                "authStatus":true,
+                "points" : 10000,
+                "imageUrls": {
+                    "tiny":"http://0.0.0.0:3000/images/22",
+                    "small":"http://0.0.0.0:3000/images/32",
+                    "medium":"http://0.0.0.0:3000/images/64",
+                    "large":"http://0.0.0.0:3000/images/128",
+                    "huge":"http://0.0.0.0:3000/images/512",
+                    "previews":"http://0.0.0.0:3000/images/previews"
+                }
+            };
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.headers.should.have.property('set-cookie');
+                    cookie = res.headers['set-cookie'];
+                    res.body.should.have.property('authStatus', true);
+                    done();
+                });
+        });
+    });
+
+    describe('After authentication', function(){
+        it('should create', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/create?name='+collectionName,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('collections');
+                    res.body.collections.length.should.be.equal(1);
+                    res.body.collections[0].should.have.property('name', collectionName);
+                    done();
+                },
+                cookie);
+        });
+        it('should list', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/list',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('collections');
+                    res.body.collections.length.should.be.above(0);
+                    numCollections = res.body.collections.length;
+                    var collections = res.body.collections;
+                    for (var i = 0; i < numCollections; ++i) {
+                        collections[i].should.have.property('id');
+                        if (collections[i].name === collectionName) {
+                            collections[i].should.have.property('name', collectionName);
+                            collections[i].should.have.property('public', false);
+                            collections[i].should.have.property('wishlist', false);
+                            collectionId = res.body.collections[i].id;
+                        }
+                    }
+                    done();
+                },
+                cookie);
+        });
+
+        it('should allow adding assets', function(done){
+            var addedAssets = 0;
+            /*jshint loopfunc:true */
+            for (var i = 0; i < assets.length; ++i) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/collections/addAsset?collectionId=' +
+                        collectionId+'&assetId=' + assets[i],
+                    function(res) {
+                        res.should.have.status(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json; charset=utf-8');
+                        res.body.should.have.property('authStatus', true);
+                        res.body.should.have.property('collection');
+                        res.body.collection.should.have.property('id', collectionId);
+                        res.body.collection.should.have.property('name', collectionName);
+                        res.body.collection.should.have.property('public', false);
+                        res.body.collection.should.have.property('wishlist', false);
+                        ++addedAssets;
+                        if (addedAssets === assets.length) {
+                            done();
+                        }
+                    },
+                    cookie);
+            }
+        });
+
+        it('should list added assets', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/listAssets?collectionId='+collectionId,
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('collection');
+                    res.body.collection.should.have.property('id', collectionId);
+                    res.body.collection.should.have.property('name', collectionName);
+                    res.body.collection.should.have.property('assets');
+                    res.body.collection.assets.length.should.be.equal(4);
+                    done();
+                },
+                cookie);
+        });
+
+        it('should allow removing 2 assets', function(done){
+            var removedAssets = 0;
+            /*jshint loopfunc:true */
+            for (var i = 0; i < assetsToRemove.length; ++i) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/collections/removeAsset?collectionId=' +
+                        collectionId+'&assetId=' + assetsToRemove[i],
+                    function(res) {
+                        res.should.have.status(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json; charset=utf-8');
+                        res.body.should.have.property('authStatus', true);
+                        res.body.should.have.property('collection');
+                        res.body.collection.should.have.property('id', collectionId);
+                        res.body.collection.should.have.property('name', collectionName);
+                        res.body.collection.should.have.property('public', false);
+                        res.body.collection.should.have.property('wishlist', false);
+                        ++removedAssets;
+                        if (removedAssets === assetsToRemove.length) {
+                            done();
+                        }
+                    },
+                    cookie);
+            }
+        });
+
+        it('should list assets after removal', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/listAssets?collectionId='+collectionId,
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('collection');
+                    res.body.collection.should.have.property('id', collectionId);
+                    res.body.collection.should.have.property('name', collectionName);
+                    res.body.collection.should.have.property('assets');
+                    res.body.collection.assets.length.should.be.equal(2);
+                    done();
+                },
+                cookie);
+        });
+
+        it('should allow readding assets', function(done){
+            var addedAssets = 0;
+            /*jshint loopfunc:true */
+            for (var i = 0; i < assetsToRemove.length; ++i) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/collections/addAsset?collectionId=' +
+                        collectionId+'&assetId=' + assetsToRemove[i],
+                    function(res) {
+                        res.should.have.status(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json; charset=utf-8');
+                        res.body.should.have.property('authStatus', true);
+                        res.body.should.have.property('collection');
+                        res.body.collection.should.have.property('id', collectionId);
+                        res.body.collection.should.have.property('name', collectionName);
+                        res.body.collection.should.have.property('public', false);
+                        res.body.collection.should.have.property('wishlist', false);
+                        ++addedAssets;
+                        if (addedAssets === assetsToRemove.length) {
+                            done();
+                        }
+                    },
+                    cookie);
+            }
+        });
+
+        it('should list assets after readding', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/listAssets?collectionId='+collectionId,
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('collection');
+                    res.body.collection.should.have.property('id', collectionId);
+                    res.body.collection.should.have.property('name', collectionName);
+                    res.body.collection.should.have.property('assets');
+                    res.body.collection.assets.length.should.be.equal(4);
+                    done();
+                },
+                cookie);
+        });
+
+        it('should allow deletion of a collection', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/delete?collectionId='+collectionId,
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    done();
+                },
+                cookie);
+        });
+
+        it('should not list collection after deletion', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/collections/list',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('collections');
+                    res.body.collections.length.should.be.equal(numCollections - 1);
+                    done();
+                },
+                cookie);
+        });
+    });
+});
