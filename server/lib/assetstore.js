@@ -32,8 +32,8 @@ var AssetStore = (function() {
             }
 
             var stream = fs.createReadStream(path);
-            res.header('Content-Length', stat.size);
-            res.header('Content-Type', mime.lookup(stream.path));
+            res.getHeader('Content-Length', stat.size);
+            res.getHeader('Content-Type', mime.lookup(stream.path));
             res.attachment(filename);
 
             stream.on('error', fn)
@@ -97,16 +97,16 @@ var AssetStore = (function() {
             //console.log("headers: ", downRes.headers);
 
             if (downRes.statusCode !== 200 ||
-                !downRes.header('Content-Length') ||
-                !downRes.header('Content-Type')) {
+                !downRes.getHeader('Content-Length') ||
+                !downRes.getHeader('Content-Type')) {
                 fn(new Error("File is unavailable. Please try again later."));
                 return;
             }
 
-            res.header('Content-Length',
-                       downRes.header('Content-Length'));
-            res.header('Content-Type',
-                       downRes.header('Content-Type'));
+            res.getHeader('Content-Length',
+                       downRes.getHeader('Content-Length'));
+            res.getHeader('Content-Type',
+                       downRes.getHeader('Content-Type'));
             res.attachment(filename);
 
             downRes.on('data', function(data) {
@@ -144,16 +144,16 @@ var AssetStore = (function() {
             //console.log("statusCode: ", downRes.statusCode);
             //console.log("headers: ", downRes.headers);
 
-            if (!downRes.headers('Content-Length') ||
-                !downRes.headers('Content-Type')) {
+            if (!downRes.getHeader('Content-Length') ||
+                !downRes.getHeader('Content-Type')) {
                 fn(new Error("File is unavailable. Please try again later."));
                 return;
             }
 
-            res.header('Content-Length',
-                       downRes.header('Content-Length'));
-            res.header('Content-Type',
-                       downRes.header('Content-Type'));
+            res.getHeader('Content-Length',
+                       downRes.getHeader('Content-Length'));
+            res.getHeader('Content-Type',
+                       downRes.getHeader('Content-Type'));
             res.attachment(filename);
 
             downRes.on('data', function(data) {
