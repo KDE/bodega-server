@@ -250,7 +250,7 @@ void Database::writeChannels(const Catalog &catalog)
     m_extraChannelIds.insert(QLatin1String("Books"), booksChannel);
 
     QSqlQuery query;
-    query.prepare("update channels set image = 'gutenberg/default-book.png' where id = :channelId;");
+    query.prepare("update channels set image = 'default/book.png' where id = :channelId;");
     query.bindValue(":channelid", booksChannel);
     if (!query.exec()) {
         showError(query);
@@ -664,7 +664,7 @@ int Database::writeBookAsset(const Ebook &book, QSqlQuery &query)
     Gutenberg::File coverFile = book.coverImage();
     QString cover = QFileInfo(coverFile.url.path()).fileName();
     if (cover.isEmpty()) {
-        cover = QLatin1String("default-book.png");
+        cover = QLatin1String("default/book.png");
     }
 
     cover.prepend("gutenberg/");
