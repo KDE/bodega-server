@@ -2,7 +2,7 @@
 
 printUsage()
 {
-    echo "Usage: $0 <public path of the bodega server webv2 directory (absolute)>"
+    echo "Usage: $0 <public path of the bodega server server directory (absolute)>"
     exit 1
 }
 
