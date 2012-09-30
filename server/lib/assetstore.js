@@ -144,8 +144,8 @@ var AssetStore = (function() {
             //console.log("statusCode: ", downRes.statusCode);
             //console.log("headers: ", downRes.headers);
 
-            if (!downRes.header('Content-Length') ||
-                !downRes.header('Content-Type')) {
+            if (!downRes.headers('Content-Length') ||
+                !downRes.headers('Content-Type')) {
                 fn(new Error("File is unavailable. Please try again later."));
                 return;
             }
