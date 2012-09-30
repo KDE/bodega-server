@@ -179,7 +179,7 @@ void Database::writeChannels(const Catalog &catalog)
     m_extraChannelIds.insert(QLatin1String("Wallpapers"), wallpapersChannel);
 
     QSqlQuery query;
-    query.prepare("update channels set image = 'kdeartwork/default-wallpaper.png' where id = :channelId;");
+    query.prepare("update channels set image = 'default/wallpaper.png' where id = :channelId;");
     query.bindValue(":channelid", wallpapersChannel);
     if (!query.exec()) {
         showError(query);
