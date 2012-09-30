@@ -38,8 +38,12 @@ do
         zip --exclude='*.svn*' -r $dest/content/wallpapers/$d.wallpaper *
         for i in 22 32 64 128 256 512
         do
-            convert ./contents/screenshot.png -quality 80 -resize ${i}x${i} $dest/public/images/$i/kdeartwork/$d.jpg;
-            convert ./contents/screenshot.jpg -quality 80 -resize ${i}x${i} $dest/public/images/$i/kdeartwork/$d.jpg;
+	    suffix='jpg';
+	    if [ -e ./contents/screenshot.png ]
+            then
+                suffix='png'
+            fi
+            convert ./contents/screenshot.$suffix -quality 80 -resize ${i}x${i} $dest/public/images/$i/kdeartwork/$d.jpg;
         done
         cd ..
     fi
