@@ -35,11 +35,11 @@ for d in *
 do
     if [ -d $d ]; then
         cd $d
-        zip --exclude='*.svn*' -r $dest/wallpapers/$d.wallpaper *
+        zip --exclude='*.svn*' -r $dest/content/wallpapers/$d.wallpaper *
         for i in 22 32 64 128 256 512
         do
-            convert ./contents/screenshot.png -quality 80 -resize ${i}x${i} $dest/images/$i/kdeartwork/$d.jpg;
-            convert ./contents/screenshot.jpg -quality 80 -resize ${i}x${i} $dest/images/$i/kdeartwork/$d.jpg;
+            convert ./contents/screenshot.png -quality 80 -resize ${i}x${i} $dest/public/images/$i/kdeartwork/$d.jpg;
+            convert ./contents/screenshot.jpg -quality 80 -resize ${i}x${i} $dest/public/images/$i/kdeartwork/$d.jpg;
         done
         cd ..
     fi
