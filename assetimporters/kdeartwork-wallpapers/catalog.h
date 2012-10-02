@@ -6,6 +6,11 @@
 
 struct Wallpaper
 {
+    QString installPath() const
+    {
+        return "wallpapers/" + path + ".wallpaper";
+    }
+
     QString pluginName;
     QString name;
     QString author;
