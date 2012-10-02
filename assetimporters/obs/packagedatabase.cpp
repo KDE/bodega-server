@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QTime>
 #include <QSqlQuery>
+#include <QVariant>
 
 PackageDatabase::PackageDatabase(const QString &channelsCatalogPath,
                                  const QString &packageCatalogPath,
