@@ -55,7 +55,8 @@ private:
     int tagId(int tagTypeId, const QString &text,
               QHash<QString, int> *cache);
 
-    int writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query);
+    int findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query);
+    int writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, int assetId = 0);
     void writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId);
     void writeChannelTags();
     int createLicenseId();

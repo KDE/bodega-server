@@ -112,8 +112,20 @@ void Database::writeWallpapers(const Catalog &catalog)
 
     int wallpapersChannel = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
 
-    QSqlQuery query;
-    query.prepare("insert into assets "
+    QSqlQuery checkIfExists;
+    checkIfExists.prepare("select id from assets where (path = :path and "
+                          "id in (select asset from channelassets where channel = " +
+                          QString::number(wallpapersChannel) + "));");
+
+    QSqlQuery updateQuery;
+    updateQuery.prepare("update assets "
+                  "set name = :name, license = :license, author = :author,"
+                  "version = :version, externid = :externid, image = :image "
+                  "where id = :id "
+                  "returning id;");
+
+    QSqlQuery insertQuery;
+    insertQuery.prepare("insert into assets "
                   "(name, license, author, version, path, externid, image) "
                   "values "
                   "(:name, :license, :author, :version, :path, :externid, :image) "
@@ -121,27 +133,19 @@ void Database::writeWallpapers(const Catalog &catalog)
 
     for (itr = wallpapers.constBegin(); itr != wallpapers.constEnd(); ++itr) {
         const Wallpaper &wallpaper = *itr;
-        int assetId = writeWallpaperAsset(wallpaper, query);
-        if (!assetId) {
-            QSqlDatabase::database().rollback();
-            return;
+        int assetId = findWallpaperAsset(wallpaper, checkIfExists);
+        if (assetId) {
+            writeWallpaperAsset(wallpaper, updateQuery, assetId);
+        } else {
+            assetId = writeWallpaperAsset(wallpaper, insertQuery);
+
+            if (!assetId) {
+                QSqlDatabase::database().rollback();
+                return;
+            }
         }
 
         writeWallpaperAssetTags(wallpaper, assetId);
-        QSqlQuery channelassetQuery;
-        channelassetQuery.prepare("insert into channelassets "
-                        "(channel, asset) "
-                        "values "
-                        "(:channelid, :assetid);");
-
-        channelassetQuery.bindValue(":channelid", wallpapersChannel);
-        channelassetQuery.bindValue(":assetid", assetId);
-
-        if (!channelassetQuery.exec()) {
-            showError(channelassetQuery);
-            QSqlDatabase::database().rollback();
-            return;
-        }
 
         ++numWallpapersWritten;
         if (numWallpapersWritten - lastReport > reportIncrement) {
@@ -499,25 +503,48 @@ int Database::tagId(int tagTypeId, const QString &text,
     return (*cache)[text];
 }
 
-int Database::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query)
+int Database::findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query)
+{
+    query.bindValue(":path", wallpaper.installPath());
+    if (!query.exec()) {
+        qDebug() << "Tried to do: " << query.lastQuery();
+        showError(query);
+        return 0;
+    }
+
+    if (!query.first()) {
+        return 0;
+    }
+
+    QVariant res = query.value(0);
+    return res.toInt();
+}
+
+int Database::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, int assetId)
 {
     query.bindValue(":name", wallpaper.name);
     query.bindValue(":license", m_licenseId);
     query.bindValue(":author", m_partnerId);
     query.bindValue(":version", QLatin1String("1.0"));
-    query.bindValue(":path", "wallpapers/" + wallpaper.path + ".wallpaper");
+    query.bindValue(":path", wallpaper.installPath());
     query.bindValue(":externid", wallpaper.pluginName);
     query.bindValue(":image", "kdeartwork/" + wallpaper.path + ".jpg");
     // XXX figure out what to do about descriptions
     //query.bindValue(":description",);
 
+    if (assetId > 0) {
+        query.bindValue(":id", assetId);
+    }
+
     if (!query.exec()) {
         showError(query);
         return 0;
     }
+
     if (!query.first()) {
         return 0;
     }
+
     QVariant res = query.value(0);
     //qDebug()<<"Last id"<<res;
     return res.toInt();
@@ -526,20 +553,23 @@ int Database::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query)
 void Database::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
 {
     QSqlQuery query;
+    query.prepare("delete from assetTags where asset = :assetId");
+    query.bindValue(":assetId", assetId);
+    query.exec();
+
     query.prepare("insert into assetTags "
                   "(asset, tag) "
                   "values "
                   "(:assetId, :tagId);");
 
     query.bindValue(":assetId", assetId);
-    query.bindValue(":tagId", this->authorId(wallpaper.author));
+    query.bindValue(":tagId", authorId(wallpaper.author));
     if (!query.exec()) {
         showError(query);
     }
 
     query.bindValue(":assetId", assetId);
-    int mimetypeId = tagId(m_mimetypeTagId,
-                           wallpaper.mimeType,  &m_mimetypeIds);
+    const int mimetypeId = tagId(m_mimetypeTagId, wallpaper.mimeType, &m_mimetypeIds);
     query.bindValue(":tagId", mimetypeId);
     if (!query.exec()) {
         showError(query);
@@ -548,22 +578,28 @@ void Database::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
 
 void Database::writeChannelTags()
 {
+    const int mimetypeId = tagId(m_mimetypeTagId, Catalog::c_mimeType,  &m_mimetypeIds);
+    const int wallpapersChannel = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
+
     QSqlQuery query;
+    query.prepare("select * from channelTags where channel = :channel and tag = :tagId;");
+    query.bindValue(":channelId", wallpapersChannel);
+    query.bindValue(":tagId", mimetypeId);
+    if (query.exec() && query.first()) {
+        // tag already exists, don't make it again
+        return;
+    }
+
     query.prepare("insert into channelTags "
                   "(channel, tag) "
                   "values "
                   "(:channelId, :tagId);");
-
-    int mimetypeId = tagId(m_mimetypeTagId,
-                           Catalog::c_mimeType,  &m_mimetypeIds);
-    int wallpapersChannel = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
 
     query.bindValue(":channelId", wallpapersChannel);
     query.bindValue(":tagId", mimetypeId);
     if (!query.exec()) {
         showError(query);
     }
-
 }
 
 int Database::showError(const QSqlQuery &query) const
