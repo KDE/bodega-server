@@ -285,7 +285,7 @@ DROP TRIGGER IF EXISTS trg_ct_processNewAsset ON assets;
 CREATE TRIGGER trg_ct_processNewAsset BEFORE INSERT ON assets
 FOR EACH ROW EXECUTE PROCEDURE ct_processNewAsset();
 
-create function affiliatePerson(firstname text, lastname text, email text,
+CREATE OR REPLACE function affiliatePerson(firstname text, lastname text, email text,
                                 partnername text, prole text)
 returns void
 AS
