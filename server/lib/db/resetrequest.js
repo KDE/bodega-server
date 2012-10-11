@@ -12,7 +12,7 @@ function sendResetEmail(db, req, res, args)
  \n\
  In order to reset your password visit the following link:\n\
  \n\
- http://#{host}#{prefix}/participant/resetPassword?code=#{code}&id=#{userId}&email=#{userEmail}\n \
+ http://#{host}#{prefix}participant/resetPassword?code=#{code}&id=#{userId}&email=#{userEmail}\n \
  \n\
  The request came from #{address}.\n\
  \n\
