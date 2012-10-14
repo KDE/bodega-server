@@ -15,7 +15,7 @@ module.exports = function(db, req, res) {
         res.render('registrationconfirmation.jade',
         { layout: false,
           title: 'Account activation failed!',
-          message: 'Activation parameters missing'
+          message: 'Activation parameters missing',
           success: false
         });
         return;
