@@ -1,0 +1,16 @@
+html
+  head
+    title Make Play Live New Account Registration
+    link(rel="stylesheet", href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css")
+    script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js')
+
+  body
+    .page-header
+      h1 #{title}
+    if success === true
+      .alert.alert-success.success
+        | #{message}
+    else
+      .alert.alert-error.error
+        | #{message}
+

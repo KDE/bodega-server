@@ -33,8 +33,13 @@ module.exports = function(db, req, res) {
                 errors.report('NoMatch', req, res);
                 return;
             }
-            json.message = "Registration successful!";
-            res.json(json);
+            res.render(
+                'registrationconfirmation.jade',
+                { layout: false,
+                  title: 'Account created!',
+                  message: 'Your new Make·Play·Live account "' + args.userId + '"has been created, and you may now log in with your username and password.',
+                  success: true
+                });
         });
 
 };
