@@ -33,13 +33,16 @@ module.exports = function(db, req, res) {
                 errors.report('NoMatch', req, res);
                 return;
             }
+
+            db.query('select email from people where id = $1;', [args.userId],
+            function(err, result) {
             res.render(
                 'registrationconfirmation.jade',
                 { layout: false,
-                  title: 'Account created!',
-                  message: 'Your new Make·Play·Live account "' + args.userId + '"has been created, and you may now log in with your username and password.',
+                  title: 'Success!',
+                  message: 'A new Make·Play·Live account for ' + result.rows[0].email + ' has been created. You may now log in.',
                   success: true
                 });
+            });
         });
-
 };
