@@ -12,7 +12,12 @@ module.exports = function(db, req, res) {
 
     if (!args.code || !args.userId) {
         //"Missing confirmation code or user id.",
-        errors.report('MissingParameters', req, res);
+        res.render('registrationconfirmation.jade',
+        { layout: false,
+          title: 'Account activation failed!',
+          message: 'Activation parameters missing'
+          success: false
+        });
         return;
     }
 
