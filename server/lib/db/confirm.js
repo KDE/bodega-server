@@ -33,7 +33,7 @@ module.exports = function(db, req, res) {
                 res.render('registrationconfirmation.jade',
                 { layout: false,
                   title: 'Account request not found!',
-                  message: 'The account activation request "' + args.userId + ': ' + args.code + '" could not be found.'
+                  message: 'The account activation request "' + args.userId + ': ' + args.code + '" could not be found.',
                   success: false
                 });
                 return;
