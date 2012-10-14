@@ -30,14 +30,18 @@ module.exports = function(db, req, res) {
             if (!result.rows || result.rows.length !== 1 ||
                 !result.rows[0].activated) {
                 //"Unable to confirm user. Check the activation code.",
-                errors.report('NoMatch', req, res);
+                res.render('registrationconfirmation.jade',
+                { layout: false,
+                  title: 'Account request not found!',
+                  message: 'The account activation request "' args.userId + ': ' + args.code '" could not be found'
+                  success: false
+                });
                 return;
             }
 
             db.query('select email from people where id = $1;', [args.userId],
             function(err, result) {
-            res.render(
-                'registrationconfirmation.jade',
+            res.render('registrationconfirmation.jade',
                 { layout: false,
                   title: 'Success!',
                   message: 'A new Make·Play·Live account for ' + result.rows[0].email + ' has been created. You may now log in.',
