@@ -25,6 +25,12 @@ module.exports = function(db, req, res) {
             };
             if (err) {
                 errors.report('Database', req, res, err);
+                res.render('registrationconfirmation.jade',
+                { layout: false,
+                  title: 'Account activation failed!',
+                  message: 'Activation for ID ' + args.userId + ' failed with code "' + args.code + '" because: ' + err.message,
+                  success: false
+                });
                 return;
             }
             if (!result.rows || result.rows.length !== 1 ||
@@ -32,7 +38,7 @@ module.exports = function(db, req, res) {
                 //"Unable to confirm user. Check the activation code.",
                 res.render('registrationconfirmation.jade',
                 { layout: false,
-                  title: 'Account request not found!',
+                  title: 'Account activation request not found!',
                   message: 'The account activation request "' + args.userId + ': ' + args.code + '" could not be found.',
                   success: false
                 });
