@@ -144,15 +144,17 @@ void Catalog::removeNonEpubBooks()
             ++itr;
         }
     }
-    qDebug()<<"Number of non epub and copyrighted ebooks = "<<numRemoved;
+    qDebug() << "Number of non epub and copyrighted ebooks = " << numRemoved;
 }
 
 void Catalog::dumpDebugInfo()
 {
     QHash<QString, Ebook> books = ebooks();
 
-    qDebug()<<"========== number of books = "<<books.count();
-    qDebug()<<"---------- Num authors = "<< m_authors.count();
+    qDebug() << "========== Parse Results ==========";
+    qDebug() << "Number of books:" << books.count();
+    qDebug() << "Number of authors:" << m_authors.count();
+    qDebug() << "===================================";
 
     int i = 0;
 #if 0
