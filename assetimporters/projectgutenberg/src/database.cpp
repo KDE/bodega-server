@@ -286,19 +286,25 @@ void Database::writeChannels(const Catalog &catalog)
 
 void Database::writeDeviceChannels(const Catalog &catalog)
 {
-    QSqlQuery query;
-
-    query.prepare("insert into deviceChannels (device, channel) "
+    QSqlQuery checkQuery;
+    checkQuery.prepare("select channel from deviceChannels where device = 'VIVALDI-1' and channel = :channelId");
+    QSqlQuery writeQuery;
+    writeQuery.prepare("insert into deviceChannels (device, channel) "
                   "values ('VIVALDI-1', :channelId);");
 
     QHash<QString, int>::const_iterator itr;
     for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
          ++itr) {
-        int channelId = itr.value();
+        const int channelId = itr.value();
 
-        query.bindValue(":channelId", channelId);
-        if (!query.exec()) {
-            showError(query);
+        checkQuery.bindValue(":channelId", channelId);
+        if (checkQuery.exec() && checkQuery.size() > 0) {
+            continue;
+        }
+
+        writeQuery.bindValue(":channelId", channelId);
+        if (!writeQuery.exec()) {
+            showError(writeQuery);
             return;
         }
     }
@@ -306,11 +312,16 @@ void Database::writeDeviceChannels(const Catalog &catalog)
     for (itr = m_extraChannelIds.constBegin();
          itr != m_extraChannelIds.constEnd();
          ++itr) {
-        int channelId = itr.value();
+        const int channelId = itr.value();
 
-        query.bindValue(":channelId", channelId);
-        if (!query.exec()) {
-            showError(query);
+        checkQuery.bindValue(":channelId", channelId);
+        if (checkQuery.exec() && checkQuery.size() > 0) {
+            continue;
+        }
+
+        writeQuery.bindValue(":channelId", channelId);
+        if (!writeQuery.exec()) {
+            showError(writeQuery);
             return;
         }
     }
