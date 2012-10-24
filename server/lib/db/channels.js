@@ -22,13 +22,13 @@ var lister = require('../lister.js');
 module.exports = function(db, req, res) {
     /*jshint multistr:true */
     var listTopChannelsQuery =
-        "SELECT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
+        "SELECT DISTINCT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
          LEFT JOIN deviceChannels d \
          ON (c.id = d.channel) where d.device = $1 and c.parent IS NULL \
          ORDER BY c.name LIMIT $2 OFFSET $3";
     /*jshint multistr:true */
     var listParentChannelsQuery =
-        "SELECT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
+        "SELECT DISTINCT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
          LEFT JOIN deviceChannels d \
          ON (c.id = d.channel) where d.device = $1 and c.parent = $2 \
          ORDER BY c.name LIMIT $3 OFFSET $4";
