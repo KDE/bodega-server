@@ -174,7 +174,6 @@ void Database::writeCategoryTags(const Catalog &catalog)
 void Database::writeBooks(const Catalog &catalog)
 {
     QTime time;
-
     time.start();
 
     bool transaction = QSqlDatabase::database().transaction();
@@ -183,9 +182,9 @@ void Database::writeBooks(const Catalog &catalog)
         qWarning()<<"Couldn't initiate transaction!";
     }
 
-
     QHash<QString, Ebook> books = catalog.ebooks();
     QHash<QString, Ebook>::const_iterator itr;
+    int numSkipped = 0;
     int numBooksWritten = 0;
     // report progress every 5%
     const int reportIncrement = books.count() / 20.;
@@ -207,18 +206,27 @@ void Database::writeBooks(const Catalog &catalog)
 
     for (itr = books.constBegin(); itr != books.constEnd(); ++itr) {
         const Ebook &book = *itr;
-        int assetId = writeBookAsset(book, query);
-        if (!assetId) {
-            QSqlDatabase::database().rollback();
-            return;
+
+        if (bookAssetQuery(book)) {
+            // already in the database
+            ++numSkipped;
+        } else {
+            // not yet in the db, so put it there now
+            int assetId = writeBookAsset(book, query);
+            if (!assetId) {
+                QSqlDatabase::database().rollback();
+                return;
+            }
+            writeBookAssetTags(book, assetId);
+            ++numBooksWritten;
         }
-        writeBookAssetTags(book, assetId);
-        ++numBooksWritten;
-        if (numBooksWritten - lastReport > reportIncrement) {
-            double written = numBooksWritten;
+
+        int booksProcessed = numBooksWritten + numSkipped;
+        if (booksProcessed - lastReport > reportIncrement) {
+            double written = booksProcessed;
             int percent = (written/books.count()) * 100;
-            qDebug()<<"Written "<< percent << "%...";
-            lastReport = numBooksWritten;
+            qDebug() << "Written "<< percent << "%...";
+            lastReport = booksProcessed;
         }
     }
 
@@ -227,14 +235,14 @@ void Database::writeBooks(const Catalog &catalog)
         showError(registerJobQuery);
     }
 
-    bool commit = QSqlDatabase::database().commit();
-    if (!commit) {
-        qWarning()<<"Couldn't commit db data!";
+    if (!QSqlDatabase::database().commit()) {
+        qWarning() << "Couldn't commit db data!";
     }
 
     int elapsed = time.elapsed();
 
-    qDebug()<<"Writing took "<<elapsed / 1000. << " secs.";
+    qDebug()<< "Writing took "<< elapsed / 1000. << " secs. Inserted"
+            << numBooksWritten << "and skipped" << numSkipped;
 }
 
 
