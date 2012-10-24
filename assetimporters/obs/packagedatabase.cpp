@@ -43,7 +43,7 @@ void PackageDatabase::writePackages()
     int lastReport = 0;
 
     QSqlQuery registerJobQuery;
-    registerJobQuery.prepare("update batchJobsInProgress set doWork = :working where job = 'kdeartwork'");
+    registerJobQuery.prepare("update batchJobsInProgress set doWork = :working where job = 'obs'");
     registerJobQuery.bindValue(":working", true);
     if (!registerJobQuery.exec()) {
         showError(registerJobQuery);
