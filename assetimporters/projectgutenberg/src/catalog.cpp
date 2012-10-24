@@ -229,7 +229,9 @@ FileFetcher::FileFetcher(const Catalog &catalog, QObject *parent)
       m_coversIt(m_coversToDownload),
       m_progress(m_coversToDownload.count())
 {
-    qDebug() << "About to download" << m_progress << "covers .. this could take a while";
+    if (m_progress > 0) {
+        qDebug() << "About to download" << m_progress << "covers .. this could take a while";
+    }
 }
 
 void FileFetcher::fetchCovers()
