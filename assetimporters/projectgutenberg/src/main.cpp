@@ -17,12 +17,14 @@ int main(int argc, char **argv)
     Gutenberg::Catalog catalog = Gutenberg::Parser::parse(QString::fromLatin1(argv[1]));
     catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
 
-    //TODO: make the write delete the data based on a command line switch
     Gutenberg::Database::write(catalog, false);
 
-    Gutenberg::FileFetcher *fetcher = new Gutenberg::FileFetcher(catalog);
-    QObject::connect(fetcher, SIGNAL(coversFetched()), &app, SLOT(quit()));
-    QTimer::singleShot(0, fetcher, SLOT(fetchCovers()));
+    if (argc > 2) {
+        // only fetch if we were given a cache dir
+        Gutenberg::FileFetcher *fetcher = new Gutenberg::FileFetcher(catalog);
+        QObject::connect(fetcher, SIGNAL(coversFetched()), &app, SLOT(quit()));
+        QTimer::singleShot(0, fetcher, SLOT(fetchCovers()));
 
-    return app.exec();
+        return app.exec();
+    }
 }
