@@ -259,6 +259,6 @@ app.get('/images/*', function(req, res) {
 });
 
 //NOTE: Always has to be the last route
-app.get('*', function(req, res) {
+app.get('/', function(req, res) {
     res.render('index.jade',{});
 });

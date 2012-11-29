@@ -61,6 +61,10 @@ app.configure(function() {
                               store: new RedisStore() }));
     app.use(app.router);
     app.set('views', __dirname + '/views');
+
+    app.use(function(req, res, next) {
+        res.render('404.jade', {});
+    });
 });
 
 app.configure('development', function() {
@@ -87,7 +91,6 @@ if (fs.existsSync('cert/key.pem')) {
     console.log("WARNING: Setting up server with no ssl!");
     http.createServer(app).listen(app.config.port);
 }
-//});
 
 console.log("Bodega server listening on port %d in %s mode",
             app.config.port, app.settings.env);
