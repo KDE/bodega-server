@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -152,6 +152,8 @@ function performCardUpdate(db, req, res, next)
                 next();
             });
         });
+    } else {
+        next();
     }
 }
 
