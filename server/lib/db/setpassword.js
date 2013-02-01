@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -20,11 +20,6 @@ var errors = require('../errors.js');
 var BCrypt = require('bcrypt');
 
 module.exports = function(db, req, res) {
-    if (!req.session.authorized) {
-        //console.log("not authorized");
-        return;
-    }
-
     //console.log("gonna try for " + req.query.newPassword);
     if (!req.query.newPassword) {
         //"Password can not be empty.",

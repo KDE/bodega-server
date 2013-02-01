@@ -214,13 +214,13 @@ app.get(serverPath('participant/resetPassword'), function(req, res) {
                });
 });
 
-app.get(serverPath('participant/changePassword'),
+app.get(serverPath('participant/changePassword'), isAuthorized,
     function(req, res) {
         app.db.setPassword(req, res);
     }
 );
 
-app.get(serverPath('participant/changeAccountDetails'),
+app.get(serverPath('participant/changeAccountDetails'), isAuthorized,
     function(req, res) {
         app.db.changeAccountDetails(req, res);
     }

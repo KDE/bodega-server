@@ -197,11 +197,6 @@ module.exports.deletePaymentMethod = function(db, req, res) {
 };
 
 module.exports.changeDetails = function(db, req, res) {
-    if (!req.session.authorized) {
-        //console.log("not authorized");
-        return;
-    }
-
     //Execute updates serially
     series([
         performEmailUpdate,
