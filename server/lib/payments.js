@@ -33,13 +33,14 @@ function perr(name, descr)
 
 function stripeErrorConvert(stripeErr, defaultError)
 {
-    if (stripeErr.response.error) {
-        if (stripeErr.response.error.type === 'invalid_request_error') {
+    if (stripeErr) {
+        if (stripeErr.name === 'invalid_request_error') {
             return perr(defaultError, stripeErr.response.error.message);
-        } else if (stripeErr.response.error.type === 'api_error') {
+        } else if (stripeErr.name === 'api_error') {
             return perr(defaultError, stripeErr.response.error.message);
-        } else if (stripeErr.response.error.type === 'card_error') {
-            switch (stripeErr.response.error.code) {
+        } else if (stripeErr.name === 'card_error') {
+            var code = stripeErr.code ? stripeErr.code : '';
+            switch (code) {
             case 'card_declined':
                 return perr('CardDeclined');
             case 'incorrect_number':
