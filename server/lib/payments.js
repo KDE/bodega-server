@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -35,9 +35,9 @@ function stripeErrorConvert(stripeErr, defaultError)
 {
     if (stripeErr) {
         if (stripeErr.name === 'invalid_request_error') {
-            return perr(defaultError, stripeErr.response.error.message);
+            return perr(defaultError, stripeErr.message);
         } else if (stripeErr.name === 'api_error') {
-            return perr(defaultError, stripeErr.response.error.message);
+            return perr(defaultError, stripeErr.message);
         } else if (stripeErr.name === 'card_error') {
             var code = stripeErr.code ? stripeErr.code : '';
             switch (code) {
