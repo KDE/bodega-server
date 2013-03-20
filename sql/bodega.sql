@@ -43,7 +43,8 @@ create table people
     points       int         not null default 0 constraint ct_personPoints check (points > -1),
     earnedPoints int         not null default 0 constraint ct_personEarnedPoints check (points > -1),
     owedPoints   int         not null default 0 constraint ct_personOwedPoints check (points > -1),
-    active       bool        not null default false
+    active       bool        not null default false,
+    created      timestamp   default(current_timestamp)
 );
 
 -- index for login checks
