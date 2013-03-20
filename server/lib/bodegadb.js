@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -50,12 +50,13 @@ var BodegaDb = (function() {
     }
 
     BodegaDb.prototype.dbQuery = function (func, req, res) {
-        pg.connect(connectionString, function(err, client) {
+        pg.connect(connectionString, function(err, client, done) {
             if (err === null) {
                 func(client, req, res);
             } else {
                 errors.report('Database', req, res, err);
             }
+            done();
         });
     };
 
