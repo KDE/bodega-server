@@ -39,7 +39,7 @@ DECLARE
 BEGIN
     DELETE FROM actionConfCodes WHERE person = activatePerson AND action = 'ACTIVATE'
                                                               AND code = checkCode
-                                                              AND issued > current_timestamp - '2 days'::interval;
+                                                              AND issued > current_timestamp - '7 days'::interval;
     IF NOT FOUND THEN
         RETURN FALSE;
     END IF;
