@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ Database::Database(const QString &channelsCatalogPath)
       m_contributorTagId(0),
       m_createdTagId(0),
       m_mimetypeTagId(0),
-      m_channelsCatalog(ChannelsCatalog(channelsCatalogPath))
+      m_channelsCatalog(channelsCatalogPath)
 {
     //FIXME: fix to LGPL
     m_licenseId = 2;
