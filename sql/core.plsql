@@ -7,7 +7,7 @@ BEGIN
     NEW.fullName = NEW.firstName || '' '' || NEW.lastName;
     RETURN NEW;
 END;
-' LANGUAGE 'PLPGSQL';
+' LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_generateFullName ON people;
 CREATE TRIGGER trg_ct_generateFullName BEFORE UPDATE OR INSERT ON people
@@ -33,7 +33,7 @@ BEGIN
 
     RETURN NEW;
 END;
-' LANGUAGE 'PLPGSQL';
+' LANGUAGE 'plpgsql';
 
 
 -- TRIGGER function to ensure channel parents remain coherent due to parent-child relationships between channels
@@ -42,7 +42,7 @@ BEGIN
     UPDATE channels SET partner = NEW.partner WHERE parent = NEW.id;
     RETURN NEW;
 END;
-' LANGUAGE 'PLPGSQL';
+' LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_checkChannelParent ON channels;
 CREATE TRIGGER trg_ct_checkChannelParent BEFORE UPDATE OR INSERT ON channels
@@ -67,7 +67,7 @@ BEGIN
     END LOOP;
     RETURN TRUE;
 END;
-' LANGUAGE 'PLPGSQL';
+' LANGUAGE 'plpgsql';
 
 --        ct_associateAssetWithParentChannel(parent, alteredAsset);
 -- TRIGGER functions to associate channels and assets when the tags change
@@ -105,7 +105,7 @@ BEGIN
         RETURN NEW;
     END IF;
 END;
-' LANGUAGE 'PLPGSQL';
+' LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION ct_test() RETURNS bool AS $$
 DECLARE
@@ -114,7 +114,7 @@ BEGIN
     select into go dowork from test where what = 'updateassetcount';
     return go;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_associateAssetWithChannels ON assetTags;
 CREATE TRIGGER trg_ct_associateAssetWithChannels AFTER INSERT OR UPDATE OR DELETE ON assetTags
@@ -156,7 +156,7 @@ BEGIN
         RETURN NEW;
     END IF;
 END;
-' LANGUAGE 'PLPGSQL';
+' LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_associateChannelWithAssets ON channelTags;
 CREATE TRIGGER trg_ct_associateChannelWithAssets AFTER INSERT OR UPDATE OR DELETE ON channelTags
@@ -189,7 +189,7 @@ BEGIN
 
     RETURN price;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- updates prices in stores when the store markup changes
 CREATE OR REPLACE FUNCTION ct_updateStorePrices() RETURNS TRIGGER AS $$
@@ -242,7 +242,7 @@ BEGIN
         INSERT INTO assetPrices (asset, device, points) VALUES (assetId, deviceRec.partNumber, ct_calcPoints(basePrice, deviceRec.flatMarkup, deviceRec.markup, deviceRec.minMarkup, deviceRec.maxMarkup));
     END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- TRIGGER function to create changelog entries automatically and update prices
 CREATE OR REPLACE FUNCTION ct_processUpdatedAsset() RETURNS TRIGGER AS $$
@@ -266,7 +266,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION ct_processNewAsset() RETURNS TRIGGER AS $$
 DECLARE
@@ -275,7 +275,7 @@ BEGIN
     NEW.file = substring(NEW.path FROM '[^/]*$');
     RETURN NEW;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_processUpdatedAsset ON assets;
 CREATE TRIGGER trg_ct_processUpdatedAsset BEFORE UPDATE ON assets

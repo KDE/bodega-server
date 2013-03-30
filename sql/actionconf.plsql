@@ -29,7 +29,7 @@ BEGIN
     INSERT INTO actionConfCodes (person, action, code) VALUES (activatePerson, 'ACTIVATE',  code);
     RETURN code;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- activates an account if the conf code matches
 -- PARAMETERS: int person, text code
@@ -47,7 +47,7 @@ BEGIN
     UPDATE people SET active = TRUE WHERE id = activatePerson;
     RETURN FOUND;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- for password reset
 -- PARAMETERS: int person
@@ -61,7 +61,7 @@ BEGIN
     INSERT INTO actionConfCodes (person, action, code) VALUES (resetPerson, 'PASSRESET', code);
     return code;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- resets a password if the conf code matches
 -- PARAMETERS: int person, text new password, text code
@@ -81,6 +81,6 @@ BEGIN
     UPDATE people SET password = newPassword WHERE id = resetPerson;
     RETURN FOUND;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 

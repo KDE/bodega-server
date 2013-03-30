@@ -21,7 +21,7 @@ BEGIN
 
     RETURN price;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- try to purchase
 -- PARAMETERS: int person, int asset
@@ -75,7 +75,7 @@ BEGIN
     INSERT INTO purchases (person, email, device, asset, name, points, toParticipant, toStore) VALUES (who, purchaserEmail, fromDevice, what, assetInfo.name, price, assetInfo.basePrice, storeEarns);
     RETURN 0;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- check if download is allowed
 -- PARAMETERS: int person, int asset
@@ -105,7 +105,7 @@ BEGIN
 
     RETURN TRUE;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- registers a download
 -- PARAMETERS: int person, int asset, inet from
@@ -119,7 +119,7 @@ BEGIN
         INSERT INTO downloads (asset, person, address, title, version) VALUES (what, who, fromWhere, asset.name, asset.version);
     END IF;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- adds points
 -- PARAMETERS: int person, int numberOfPoints, text comment
@@ -136,7 +136,7 @@ BEGIN
 
     RETURN rv;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- redeem a points code
 -- PARAMETERS: text code
@@ -160,7 +160,7 @@ BEGIN
 
     RETURN pointsTransfered;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
 
 -- creates points codes
 -- PARAMETERS: int number of codes to create, amount of points for each code, timestamp expiration date
@@ -176,4 +176,4 @@ BEGIN
         END IF;
     END LOOP;
 END;
-$$ LANGUAGE 'PLPGSQL';
+$$ LANGUAGE 'plpgsql';
