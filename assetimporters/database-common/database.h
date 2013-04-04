@@ -27,8 +27,8 @@ protected:
                   int parentId=0);
     void writeChannels();
 
-    int partnerQuery() const;
-    int languageQuery(const QString &lang) const;
+    virtual int partnerQuery() = 0;
+    virtual int languageQuery(const QString &lang) = 0;
     int authorQuery(const QString &author) const;
     int contributorQuery(const QString &author) const;
     int tagQuery(int tagTypeId, const QString &text) const;

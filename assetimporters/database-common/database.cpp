@@ -516,6 +516,14 @@ void Database::writeChannelTags(const QString &name, const QString &mimeType, co
     }
 }
 
+int Database::partnerQuery() {
+    return 0;
+}
+
+int Database::languageQuery(const QString &lang) {
+    return 0;
+}
+
 int Database::showError(const QSqlQuery &query) const
 {
     QSqlError error = query.lastError();

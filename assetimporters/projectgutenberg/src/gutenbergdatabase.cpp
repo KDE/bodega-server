@@ -42,12 +42,6 @@ GutenbergDatabase::GutenbergDatabase(const QString &channelPath)
       m_createdTagId(0),
       m_mimetypeTagId(0)
 {
-    //db.setHostName("localhost");
-    m_db.setDatabaseName("bodega");
-    m_db.setUserName("bodega");
-    m_db.setPassword("bodega");
-    bool ok = m_db.open();
-    qDebug()<<"db opened = "<<ok;
 }
 
 void GutenbergDatabase::writeInit(bool clearOldData)
@@ -327,139 +321,6 @@ void GutenbergDatabase::writeDeviceChannels(const Catalog &catalog)
     }
 }
 
-int GutenbergDatabase::partnerQuery() const
-{
-    QSqlQuery query;
-    if (!query.exec("select id from partners "
-                    "where name='Project Gutenberg';")) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
-
-int GutenbergDatabase::languageQuery(const QString &lang) const
-{
-    QSqlQuery query;
-    query.prepare("select id from languages where code=:lang;");
-    query.bindValue(":lang", lang);
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
-
-int GutenbergDatabase::authorQuery(const QString &author) const
-{
-    return tagQuery(m_authorTagId, author);
-}
-
-int GutenbergDatabase::contributorQuery(const QString &author) const
-{
-    return tagQuery(m_contributorTagId, author);
-}
-
-int GutenbergDatabase::tagQuery(int tagTypeId, const QString &text) const
-{
-    QSqlQuery query;
-    query.prepare("select id from tags where partner=:partner "
-                  "and type=:type "
-                  " and title=:text;");
-
-    query.bindValue(":partner", m_partnerId);
-    query.bindValue(":type", tagTypeId);
-    query.bindValue(":author", text);
-
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
-
-int GutenbergDatabase::tagTypeQuery(const QString &type) const
-{
-    QSqlQuery query;
-    query.prepare("select id from tagTypes where type=:type;");
-    query.bindValue(":type", type);
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
-
-int GutenbergDatabase::channelQuery(const QString &channel,
-                           int parentId) const
-{
-    QSqlQuery query;
-    QString queryText =
-        QString::fromLatin1("select id from channels where "
-                            "name=:name and partner=:partnerId");
-
-    if (parentId) {
-        queryText += QLatin1String(" and parent=:parentId;");
-        query.prepare(queryText);
-        query.bindValue(":parentId", parentId);
-    } else {
-        query.prepare(queryText);
-        queryText += QLatin1String(";");
-    }
-    query.bindValue(":name", channel);
-    query.bindValue(":partnerId", m_partnerId);
-
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    //qDebug()<<"chennel = "<<channel<<" is "<<res;
-    return res.toInt();
-}
-
-int GutenbergDatabase::categoryQuery(const QString &name) const
-{
-    QSqlQuery query;
-
-    query.prepare("select id from tags where partner=:partnerId and "
-                  "type=:typeId and title=:title;");
-
-    query.bindValue(":partnerId", m_partnerId);
-    query.bindValue(":typeId", m_categoryTagId);
-    query.bindValue(":title", name);
-
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    //qDebug()<<"chennel = "<<channel<<" is "<<res;
-    return res.toInt();
-}
-
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
 {
     QSqlQuery query;
@@ -478,195 +339,6 @@ int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
     }
     QVariant res = query.value(0);
     return res.toInt();
-}
-
-
-int GutenbergDatabase::tagTypeCreate(const QString &type)
-{
-    QSqlQuery query;
-    query.prepare("insert into tagTypes "
-                  "(type) "
-                  "values (:type);");
-    query.bindValue(":type", type);
-    if (!query.exec()) {
-        showError(query);
-        QSqlDatabase::database().rollback();
-        return 0;
-    }
-
-    return tagTypeQuery(type);
-}
-
-int GutenbergDatabase::channelCreate(const QString &name,
-                            const QString &description,
-                            int parentId)
-{
-    QSqlQuery query;
-    if (parentId) {
-        query.prepare("insert into channels "
-                      "(partner, active, parent, name, description) "
-                      "values "
-                      "(:partner, :active, :parent, :name, :description) "
-                      "returning id;");
-        query.bindValue(":parent", parentId);
-    } else {
-        query.prepare("insert into channels "
-                      "(partner, active, name, description) "
-                      "values "
-                      "(:partner, :active, :name, :description) "
-                      "returning id;");
-    }
-
-    query.bindValue(":partner", m_partnerId);
-    query.bindValue(":active", true);
-    query.bindValue(":name", name);
-    query.bindValue(":description", description);
-
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
-
-int GutenbergDatabase::categoryCreate(const QString &name)
-{
-    QSqlQuery query;
-
-    query.prepare("insert into tags "
-                  "(partner, type, title) "
-                  "values "
-                  "(:partner, :type, :title) "
-                  "returning id;");
-
-    query.bindValue(":partner", m_partnerId);
-    query.bindValue(":type", m_categoryTagId);
-    query.bindValue(":title", name);
-
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
-
-int GutenbergDatabase::authorTagId()
-{
-    int tagId= tagTypeQuery(QLatin1String("author"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("author"));
-    }
-    return tagId;
-}
-
-int GutenbergDatabase::categoryTagTypeId()
-{
-    int tagId= tagTypeQuery(QLatin1String("category"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("category"));
-    }
-    return tagId;
-}
-
-int GutenbergDatabase::contributorTagId()
-{
-    int tagId= tagTypeQuery(QLatin1String("contributor"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("contributor"));
-    }
-    return tagId;
-}
-
-int GutenbergDatabase::createdTagId()
-{
-    int tagId= tagTypeQuery(QLatin1String("created"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("created"));
-    }
-    return tagId;
-}
-
-int GutenbergDatabase::mimetypeTagId()
-{
-    int tagId= tagTypeQuery(QLatin1String("mimetype"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("mimetype"));
-    }
-    return tagId;
-}
-
-int GutenbergDatabase::channelId(const QString &name,
-                        const QString &description,
-                        int parentId )
-{
-    int channelId = channelQuery(name, parentId);
-    if (!channelId) {
-        channelId = channelCreate(name, description, parentId);
-    }
-    return channelId;
-}
-
-int GutenbergDatabase::categoryId(const QString &name)
-{
-    int catId = categoryQuery(name);
-    if (!catId) {
-        catId = categoryCreate(name);
-    }
-    return catId;
-}
-
-int GutenbergDatabase::authorId(const QString &author)
-{
-    return tagId(m_authorTagId, author, &m_authorIds);
-}
-
-int GutenbergDatabase::contributorId(const QString &contributor)
-{
-    return tagId(m_contributorTagId, contributor, &m_contributorIds);
-}
-
-int GutenbergDatabase::tagId(int tagTypeId, const QString &text,
-                    QHash<QString, int> *cache)
-{
-    Q_ASSERT(cache);
-
-    if (cache->contains(text)) {
-        return (*cache)[text];
-    }
-
-    int tagId = tagQuery(tagTypeId, text);
-    if (!tagId) {
-        QSqlQuery query;
-        query.prepare("insert into tags "
-                      "(partner, type, title) "
-                      "values (:partner, :type, :title) "
-                      "returning id;");
-        query.bindValue(":partner", m_partnerId);
-        query.bindValue(":type", tagTypeId);
-        query.bindValue(":title", text);
-
-        if (!query.exec()) {
-            showError(query);
-            return 0;
-        }
-        if (!query.first()) {
-            return 0;
-        }
-        QVariant res = query.value(0);
-        (*cache)[text] = res.toInt();
-    } else {
-        (*cache)[text] = tagId;
-    }
-
-    return (*cache)[text];
 }
 
 int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
@@ -767,13 +439,13 @@ void GutenbergDatabase::writeChannelTags()
 {
     QSqlQuery query;
     query.prepare("insert into channelTags "
-                  "(channel, tag) "
-                  "values "
-                  "(:channelId, :tagId);");
+              "(channel, tag) "
+              "values "
+              "(:channelId, :tagId);");
 
     QHash<QString, int>::const_iterator itr;
     for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
-         ++itr) {
+        ++itr) {
         Q_ASSERT(m_categoryTagIds.contains(itr.key()));
         int categoryTagId = m_categoryTagIds[itr.key()];
         Q_ASSERT(categoryTagId);
@@ -783,10 +455,38 @@ void GutenbergDatabase::writeChannelTags()
         if (!query.exec()) {
             showError(query);
         }
-
-
     }
+}
 
+int GutenbergDatabase::partnerQuery()
+{
+    QSqlQuery query;
+    if (!query.exec("select id from partners "
+                    "where name='Project Gutenberg';")) {
+        showError(query);
+        return 0;
+    }
+    if (!query.first()) {
+        return 0;
+    }
+    QVariant res = query.value(0);
+    return res.toInt();
+}
+
+int GutenbergDatabase::languageQuery(const QString &lang)
+{
+    QSqlQuery query;
+    query.prepare("select id from languages where code=:lang;");
+    query.bindValue(":lang", lang);
+    if (!query.exec()) {
+        showError(query);
+        return 0;
+    }
+    if (!query.first()) {
+        return 0;
+    }
+    QVariant res = query.value(0);
+    return res.toInt();
 }
 
 int GutenbergDatabase::createLicenseId()
@@ -822,12 +522,16 @@ int GutenbergDatabase::createLicenseId()
     return res.toInt();
 }
 
-int GutenbergDatabase::showError(const QSqlQuery &query) const
+int GutenbergDatabase::categoryId(const QString &name)
 {
-    QSqlError error = query.lastError();
-    qDebug() << Q_FUNC_INFO << "QPSQL Error: " << error.databaseText() << error.driverText();
-    qDebug() << "Query was "<< query.executedQuery();
-    qDebug() << "last was "<< query.lastQuery();
-    qDebug() << "bound = "<<query.boundValues();
+    int catId = categoryQuery(name);
+    if (!catId) {
+        catId = categoryCreate(name);
+    }
+    return catId;
 }
 
+int GutenbergDatabase::contributorId(const QString &contributor)
+{
+    return tagId(m_contributorTagId, contributor, &m_contributorIds);
+}
