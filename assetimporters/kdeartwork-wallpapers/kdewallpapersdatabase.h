@@ -22,7 +22,7 @@ private:
     int findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query);
     int writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, int assetId = 0);
     void writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId);
-    void writeChannelTags();
+    void writeWallpapersChannelTags();
 
 private:
     int m_partnerId;

@@ -255,29 +255,9 @@ void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int
     }
 }
 
-void WallpapersDatabase::writeChannelTags()
+void WallpapersDatabase::writeWallpapersChannelTags()
 {
-    const int mimetypeId = tagId(m_mimetypeTagId, Catalog::c_mimeType,  &m_mimetypeIds);
-    const int wallpapersChannel = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
+    Database::writeChannelTags(QLatin1String("Wallpapers"), Catalog::c_mimeType, QLatin1String("Wallpapers"));
 
-    QSqlQuery query;
-    query.prepare("select * from channelTags where channel = :channel and tag = :tagId;");
-    query.bindValue(":channelId", wallpapersChannel);
-    query.bindValue(":tagId", mimetypeId);
-    if (query.exec() && query.first()) {
-        // tag already exists, don't make it again
-        return;
-    }
-
-    query.prepare("insert into channelTags "
-                  "(channel, tag) "
-                  "values "
-                  "(:channelId, :tagId);");
-
-    query.bindValue(":channelId", wallpapersChannel);
-    query.bindValue(":tagId", mimetypeId);
-    if (!query.exec()) {
-        showError(query);
-    }
 }
 
