@@ -1,5 +1,5 @@
 #include "catalog.h"
-#include "database.h"
+#include "gutenbergdatabase.h"
 #include "parser.h"
 
 #include <QtCore>
@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 {
     if (argc < 2) {
         qWarning() << "Usage:";
-        qWarning() << "\t" << argv[0] << "catalog.rdf [imageCacheDir]";
+        qWarning() << "\t" << argv[0] << "<Channels descriptor ini file> catalog.rdf [imageCacheDir]";
         return 0;
     }
 
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
     Gutenberg::Catalog catalog = Gutenberg::Parser::parse(QString::fromLatin1(argv[1]));
     catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
 
-    Gutenberg::Database::write(catalog, false);
+    Gutenberg::GutenbergDatabase::write(argv[1], catalog, false);
 
     if (argc > 2) {
         // only fetch if we were given a cache dir

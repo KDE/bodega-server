@@ -1,8 +1,9 @@
-#ifndef DATABASE_H
-#define DATABASE_H
+#ifndef GUTENBERGDATABASE_H
+#define GUTENBERGDATABASE_H
 
 #include "catalog.h"
 #include "lcc.h"
+#include "../../database-common/database.h"
 
 #include <QSqlDatabase>
 
@@ -10,13 +11,13 @@ namespace Gutenberg
 {
 
 
-class Database
+class GutenbergDatabase : public Database
 {
 public:
-    static void write(const Catalog &catalog, bool clearOldData);
+    static void write(const QString &channelPath, const Catalog &catalog, bool clearOldData);
 
 private:
-    Database();
+    GutenbergDatabase(const QString &channelPath);
 
     void writeInit(bool clearOldData);
     void writeLanguages(const Catalog &catalog);

@@ -1,4 +1,4 @@
-#include "database.h"
+#include "gutenbergdatabase.h"
 
 #include "lcc.h"
 
@@ -15,9 +15,9 @@
 using namespace Gutenberg;
 
 
-void Database::write(const Catalog &catalog, bool clearOldData)
+void GutenbergDatabase::write(const QString &channelPath, const Catalog &catalog, bool clearOldData)
 {
-    Database db;
+    GutenbergDatabase db(channelPath);
 
     Q_ASSERT(catalog.isCompiled());
     if (!catalog.isCompiled()) {
@@ -32,8 +32,8 @@ void Database::write(const Catalog &catalog, bool clearOldData)
     db.writeDeviceChannels(catalog);
 }
 
-Database::Database()
-    : m_db(QSqlDatabase::addDatabase("QPSQL")),
+GutenbergDatabase::GutenbergDatabase(const QString &channelPath)
+    : Database(channelPath),
       m_partnerId(0),
       m_authorTagId(0),
       m_categoryTagId(0),
@@ -50,7 +50,7 @@ Database::Database()
     qDebug()<<"db opened = "<<ok;
 }
 
-void Database::writeInit(bool clearOldData)
+void GutenbergDatabase::writeInit(bool clearOldData)
 {
     QSqlDatabase::database().transaction();
 
@@ -122,7 +122,7 @@ void Database::writeInit(bool clearOldData)
     QSqlDatabase::database().commit();
 }
 
-void Database::writeLanguages(const Catalog &catalog)
+void GutenbergDatabase::writeLanguages(const Catalog &catalog)
 {
     QStringList langs = catalog.languages();
 
@@ -159,7 +159,7 @@ void Database::writeLanguages(const Catalog &catalog)
 }
 
 
-void Database::writeCategoryTags(const Catalog &catalog)
+void GutenbergDatabase::writeCategoryTags(const Catalog &catalog)
 {
     const QHash<LCC::Category, QString> map = LCC::categoryMap();
     QHash<LCC::Category, QString>::const_iterator itr;
@@ -171,7 +171,7 @@ void Database::writeCategoryTags(const Catalog &catalog)
 }
 
 
-void Database::writeBooks(const Catalog &catalog)
+void GutenbergDatabase::writeBooks(const Catalog &catalog)
 {
     QTime time;
     time.start();
@@ -246,7 +246,7 @@ void Database::writeBooks(const Catalog &catalog)
 }
 
 
-void Database::writeChannels(const Catalog &catalog)
+void GutenbergDatabase::writeChannels(const Catalog &catalog)
 {
     QSqlDatabase::database().transaction();
 
@@ -284,7 +284,7 @@ void Database::writeChannels(const Catalog &catalog)
     QSqlDatabase::database().commit();
 }
 
-void Database::writeDeviceChannels(const Catalog &catalog)
+void GutenbergDatabase::writeDeviceChannels(const Catalog &catalog)
 {
     QSqlQuery checkQuery;
     checkQuery.prepare("select channel from deviceChannels where device = 'VIVALDI-1' and channel = :channelId");
@@ -327,7 +327,7 @@ void Database::writeDeviceChannels(const Catalog &catalog)
     }
 }
 
-int Database::partnerQuery() const
+int GutenbergDatabase::partnerQuery() const
 {
     QSqlQuery query;
     if (!query.exec("select id from partners "
@@ -342,7 +342,7 @@ int Database::partnerQuery() const
     return res.toInt();
 }
 
-int Database::languageQuery(const QString &lang) const
+int GutenbergDatabase::languageQuery(const QString &lang) const
 {
     QSqlQuery query;
     query.prepare("select id from languages where code=:lang;");
@@ -358,17 +358,17 @@ int Database::languageQuery(const QString &lang) const
     return res.toInt();
 }
 
-int Database::authorQuery(const QString &author) const
+int GutenbergDatabase::authorQuery(const QString &author) const
 {
     return tagQuery(m_authorTagId, author);
 }
 
-int Database::contributorQuery(const QString &author) const
+int GutenbergDatabase::contributorQuery(const QString &author) const
 {
     return tagQuery(m_contributorTagId, author);
 }
 
-int Database::tagQuery(int tagTypeId, const QString &text) const
+int GutenbergDatabase::tagQuery(int tagTypeId, const QString &text) const
 {
     QSqlQuery query;
     query.prepare("select id from tags where partner=:partner "
@@ -390,7 +390,7 @@ int Database::tagQuery(int tagTypeId, const QString &text) const
     return res.toInt();
 }
 
-int Database::tagTypeQuery(const QString &type) const
+int GutenbergDatabase::tagTypeQuery(const QString &type) const
 {
     QSqlQuery query;
     query.prepare("select id from tagTypes where type=:type;");
@@ -406,7 +406,7 @@ int Database::tagTypeQuery(const QString &type) const
     return res.toInt();
 }
 
-int Database::channelQuery(const QString &channel,
+int GutenbergDatabase::channelQuery(const QString &channel,
                            int parentId) const
 {
     QSqlQuery query;
@@ -437,7 +437,7 @@ int Database::channelQuery(const QString &channel,
     return res.toInt();
 }
 
-int Database::categoryQuery(const QString &name) const
+int GutenbergDatabase::categoryQuery(const QString &name) const
 {
     QSqlQuery query;
 
@@ -460,7 +460,7 @@ int Database::categoryQuery(const QString &name) const
     return res.toInt();
 }
 
-int Database::bookAssetQuery(const Ebook &book) const
+int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
 {
     QSqlQuery query;
     query.prepare("select id from assets where "
@@ -481,7 +481,7 @@ int Database::bookAssetQuery(const Ebook &book) const
 }
 
 
-int Database::tagTypeCreate(const QString &type)
+int GutenbergDatabase::tagTypeCreate(const QString &type)
 {
     QSqlQuery query;
     query.prepare("insert into tagTypes "
@@ -497,7 +497,7 @@ int Database::tagTypeCreate(const QString &type)
     return tagTypeQuery(type);
 }
 
-int Database::channelCreate(const QString &name,
+int GutenbergDatabase::channelCreate(const QString &name,
                             const QString &description,
                             int parentId)
 {
@@ -533,7 +533,7 @@ int Database::channelCreate(const QString &name,
     return res.toInt();
 }
 
-int Database::categoryCreate(const QString &name)
+int GutenbergDatabase::categoryCreate(const QString &name)
 {
     QSqlQuery query;
 
@@ -558,7 +558,7 @@ int Database::categoryCreate(const QString &name)
     return res.toInt();
 }
 
-int Database::authorTagId()
+int GutenbergDatabase::authorTagId()
 {
     int tagId= tagTypeQuery(QLatin1String("author"));
     if (!tagId) {
@@ -567,7 +567,7 @@ int Database::authorTagId()
     return tagId;
 }
 
-int Database::categoryTagTypeId()
+int GutenbergDatabase::categoryTagTypeId()
 {
     int tagId= tagTypeQuery(QLatin1String("category"));
     if (!tagId) {
@@ -576,7 +576,7 @@ int Database::categoryTagTypeId()
     return tagId;
 }
 
-int Database::contributorTagId()
+int GutenbergDatabase::contributorTagId()
 {
     int tagId= tagTypeQuery(QLatin1String("contributor"));
     if (!tagId) {
@@ -585,7 +585,7 @@ int Database::contributorTagId()
     return tagId;
 }
 
-int Database::createdTagId()
+int GutenbergDatabase::createdTagId()
 {
     int tagId= tagTypeQuery(QLatin1String("created"));
     if (!tagId) {
@@ -594,7 +594,7 @@ int Database::createdTagId()
     return tagId;
 }
 
-int Database::mimetypeTagId()
+int GutenbergDatabase::mimetypeTagId()
 {
     int tagId= tagTypeQuery(QLatin1String("mimetype"));
     if (!tagId) {
@@ -603,7 +603,7 @@ int Database::mimetypeTagId()
     return tagId;
 }
 
-int Database::channelId(const QString &name,
+int GutenbergDatabase::channelId(const QString &name,
                         const QString &description,
                         int parentId )
 {
@@ -614,7 +614,7 @@ int Database::channelId(const QString &name,
     return channelId;
 }
 
-int Database::categoryId(const QString &name)
+int GutenbergDatabase::categoryId(const QString &name)
 {
     int catId = categoryQuery(name);
     if (!catId) {
@@ -623,17 +623,17 @@ int Database::categoryId(const QString &name)
     return catId;
 }
 
-int Database::authorId(const QString &author)
+int GutenbergDatabase::authorId(const QString &author)
 {
     return tagId(m_authorTagId, author, &m_authorIds);
 }
 
-int Database::contributorId(const QString &contributor)
+int GutenbergDatabase::contributorId(const QString &contributor)
 {
     return tagId(m_contributorTagId, contributor, &m_contributorIds);
 }
 
-int Database::tagId(int tagTypeId, const QString &text,
+int GutenbergDatabase::tagId(int tagTypeId, const QString &text,
                     QHash<QString, int> *cache)
 {
     Q_ASSERT(cache);
@@ -669,7 +669,7 @@ int Database::tagId(int tagTypeId, const QString &text,
     return (*cache)[text];
 }
 
-int Database::writeBookAsset(const Ebook &book, QSqlQuery &query)
+int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 {
     Gutenberg::File epubFile = book.epubFile();
     QFileInfo fi(epubFile.url.path());
@@ -702,7 +702,7 @@ int Database::writeBookAsset(const Ebook &book, QSqlQuery &query)
     return res.toInt();
 }
 
-void Database::writeBookAssetTags(const Ebook &book, int assetId)
+void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
 {
     QSqlQuery query;
     query.prepare("insert into assetTags "
@@ -763,7 +763,7 @@ void Database::writeBookAssetTags(const Ebook &book, int assetId)
     }
 }
 
-void Database::writeChannelTags()
+void GutenbergDatabase::writeChannelTags()
 {
     QSqlQuery query;
     query.prepare("insert into channelTags "
@@ -789,7 +789,7 @@ void Database::writeChannelTags()
 
 }
 
-int Database::createLicenseId()
+int GutenbergDatabase::createLicenseId()
 {
     QSqlQuery query;
     if (!query.exec("select id from licenses where name = 'Project Gutenberg License';")) {
@@ -822,7 +822,7 @@ int Database::createLicenseId()
     return res.toInt();
 }
 
-int Database::showError(const QSqlQuery &query) const
+int GutenbergDatabase::showError(const QSqlQuery &query) const
 {
     QSqlError error = query.lastError();
     qDebug() << Q_FUNC_INFO << "QPSQL Error: " << error.databaseText() << error.driverText();
