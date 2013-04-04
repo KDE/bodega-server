@@ -17,8 +17,6 @@ private:
     void writeLanguages(const Catalog &catalog);
     void writeCategoryTags(const Catalog &catalog);
     void writeWallpapers(const Catalog &catalog);
-    void writeChannels(const Catalog &catalog);
-    void writeDeviceChannels(const Catalog &catalog);
 
 private:
     int findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query);

@@ -153,7 +153,6 @@ void Database::writeDeviceChannels()
     }
 }
 
-
 int Database::authorQuery(const QString &author) const
 {
     return tagQuery(m_authorTagId, author);

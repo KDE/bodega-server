@@ -35,8 +35,8 @@ void WallpapersDatabase::write(const QString &channelPath, const QString &catalo
     Catalog catalog(catalogPath);
     db.writeInit(clearOldData);
     db.writeWallpapers(catalog);
-    db.writeChannels(catalog);
-    db.writeDeviceChannels(catalog);
+    db.writeChannels();
+    db.writeDeviceChannels();
 }
 
 WallpapersDatabase::WallpapersDatabase(const QString& channelPath)
@@ -180,64 +180,6 @@ void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
     int elapsed = time.elapsed();
 
     qDebug()<<"Writing took "<<elapsed / 1000. << " secs.";
-}
-
-void WallpapersDatabase::writeChannels(const Catalog &catalog)
-{
-    QSqlDatabase::database().transaction();
-
-    int wallpapersChannel = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
-    if (!wallpapersChannel) {
-        QSqlDatabase::database().rollback();
-        return;
-    }
-    m_extraChannelIds.insert(QLatin1String("Wallpapers"), wallpapersChannel);
-
-    QSqlQuery query;
-    query.prepare("update channels set image = 'default/wallpaper.png' where id = :channelId;");
-    query.bindValue(":channelid", wallpapersChannel);
-    if (!query.exec()) {
-        showError(query);
-        QSqlDatabase::database().rollback();
-        return;
-    }
-
-    writeChannelTags();
-
-    QSqlDatabase::database().commit();
-}
-
-void WallpapersDatabase::writeDeviceChannels(const Catalog &catalog)
-{
-    QSqlQuery query;
-
-    query.prepare("insert into deviceChannels (device, channel) "
-                  "values ('VIVALDI-1', :channelId);");
-
-
-    QHash<QString, int>::const_iterator itr;
-    for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
-         ++itr) {
-        int channelId = itr.value();
-
-        query.bindValue(":channelId", channelId);
-        if (!query.exec()) {
-            showError(query);
-            return;
-        }
-    }
-
-    for (itr = m_extraChannelIds.constBegin();
-         itr != m_extraChannelIds.constEnd();
-         ++itr) {
-        int channelId = itr.value();
-
-        query.bindValue(":channelId", channelId);
-        if (!query.exec()) {
-            showError(query);
-            return;
-        }
-    }
 }
 
 int WallpapersDatabase::findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query)
