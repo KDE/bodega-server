@@ -492,9 +492,9 @@ void Database::writeChannelTags(const QString &name, const QString &mimeType, co
 
     int mimetypeId = tagId(m_mimetypeTagId,
                            mimeType,  &m_mimetypeIds);
-    int wallpapersChannel = channelId(name, description);
+    int channel = channelId(name, description);
 
-    query.bindValue(":channelId", wallpapersChannel);
+    query.bindValue(":channelId", channel);
     query.bindValue(":tagId", mimetypeId);
     if (!query.exec()) {
         showError(query);
