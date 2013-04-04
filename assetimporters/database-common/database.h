@@ -26,7 +26,6 @@ protected:
                   int parentId=0);
     void writeChannels();
 
-private:
     int partnerQuery() const;
     int languageQuery(const QString &lang) const;
     int authorQuery(const QString &author) const;
@@ -37,14 +36,12 @@ private:
                      int parentId) const;
     int categoryQuery(const QString &name) const;
 
-private:
     int tagTypeCreate(const QString &type);
     int channelCreate(const QString &name,
                       const QString &description,
                       int parentId=0);
     int categoryCreate(const QString &name);
 
-private:
     int authorTagId();
     int categoryTagTypeId();
     int contributorTagId();
