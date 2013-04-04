@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 {
     if (argc < 2) {
         qWarning() << "Usage:";
-        qWarning() << "\t"<< argv[0] << "uncompressed wallpapers dir";
+        qWarning() << "\t"<< argv[0] << "<Channels descriptor ini file> <uncompressed wallpapers dir>";
         exit(1);
     }
 
