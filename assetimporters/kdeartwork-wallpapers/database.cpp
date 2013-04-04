@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -29,9 +29,9 @@
 
 #include <QDebug>
 
-void Database::write(const Catalog &catalog, bool clearOldData)
+void WallpapersDatabase::write(const Catalog &catalog, bool clearOldData)
 {
-    Database db;
+    WallpapersDatabase db;
 
     db.writeInit(clearOldData);
     db.writeWallpapers(catalog);
@@ -39,7 +39,7 @@ void Database::write(const Catalog &catalog, bool clearOldData)
     db.writeDeviceChannels(catalog);
 }
 
-Database::Database()
+WallpapersDatabase::WallpapersDatabase()
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
       m_authorTagId(0),
@@ -61,7 +61,7 @@ Database::Database()
     qDebug()<<"db opened = "<<ok;
 }
 
-void Database::writeInit(bool clearOldData)
+void WallpapersDatabase::writeInit(bool clearOldData)
 {
     QSqlDatabase::database().transaction();
 /*
@@ -100,7 +100,7 @@ void Database::writeInit(bool clearOldData)
 
 
 
-void Database::writeWallpapers(const Catalog &catalog)
+void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
 {
     QTime time;
 
@@ -188,7 +188,7 @@ void Database::writeWallpapers(const Catalog &catalog)
     qDebug()<<"Writing took "<<elapsed / 1000. << " secs.";
 }
 
-void Database::writeChannels(const Catalog &catalog)
+void WallpapersDatabase::writeChannels(const Catalog &catalog)
 {
     QSqlDatabase::database().transaction();
 
@@ -213,7 +213,7 @@ void Database::writeChannels(const Catalog &catalog)
     QSqlDatabase::database().commit();
 }
 
-void Database::writeDeviceChannels(const Catalog &catalog)
+void WallpapersDatabase::writeDeviceChannels(const Catalog &catalog)
 {
     QSqlQuery query;
 
@@ -247,12 +247,12 @@ void Database::writeDeviceChannels(const Catalog &catalog)
 }
 
 
-int Database::authorQuery(const QString &author) const
+int WallpapersDatabase::authorQuery(const QString &author) const
 {
     return tagQuery(m_authorTagId, author);
 }
 
-int Database::tagQuery(int tagTypeId, const QString &text) const
+int WallpapersDatabase::tagQuery(int tagTypeId, const QString &text) const
 {
     QSqlQuery query;
     query.prepare("select id from tags where partner=:partner "
@@ -274,7 +274,7 @@ int Database::tagQuery(int tagTypeId, const QString &text) const
     return res.toInt();
 }
 
-int Database::tagTypeQuery(const QString &type) const
+int WallpapersDatabase::tagTypeQuery(const QString &type) const
 {
     QSqlQuery query;
     query.prepare("select id from tagTypes where type=:type;");
@@ -290,7 +290,7 @@ int Database::tagTypeQuery(const QString &type) const
     return res.toInt();
 }
 
-int Database::channelQuery(const QString &channel,
+int WallpapersDatabase::channelQuery(const QString &channel,
                            int parentId) const
 {
     QSqlQuery query;
@@ -321,7 +321,7 @@ int Database::channelQuery(const QString &channel,
     return res.toInt();
 }
 
-int Database::categoryQuery(const QString &name) const
+int WallpapersDatabase::categoryQuery(const QString &name) const
 {
     QSqlQuery query;
 
@@ -344,7 +344,7 @@ int Database::categoryQuery(const QString &name) const
     return res.toInt();
 }
 
-int Database::tagTypeCreate(const QString &type)
+int WallpapersDatabase::tagTypeCreate(const QString &type)
 {
     QSqlQuery query;
     query.prepare("insert into tagTypes "
@@ -360,7 +360,7 @@ int Database::tagTypeCreate(const QString &type)
     return tagTypeQuery(type);
 }
 
-int Database::channelCreate(const QString &name,
+int WallpapersDatabase::channelCreate(const QString &name,
                             const QString &description,
                             int parentId)
 {
@@ -396,7 +396,7 @@ int Database::channelCreate(const QString &name,
     return res.toInt();
 }
 
-int Database::categoryCreate(const QString &name)
+int WallpapersDatabase::categoryCreate(const QString &name)
 {
     QSqlQuery query;
 
@@ -421,7 +421,7 @@ int Database::categoryCreate(const QString &name)
     return res.toInt();
 }
 
-int Database::authorTagId()
+int WallpapersDatabase::authorTagId()
 {
     int tagId= tagTypeQuery(QLatin1String("author"));
     if (!tagId) {
@@ -430,7 +430,7 @@ int Database::authorTagId()
     return tagId;
 }
 
-int Database::categoryTagTypeId()
+int WallpapersDatabase::categoryTagTypeId()
 {
     int tagId= tagTypeQuery(QLatin1String("category"));
     if (!tagId) {
@@ -439,7 +439,7 @@ int Database::categoryTagTypeId()
     return tagId;
 }
 
-int Database::contributorTagId()
+int WallpapersDatabase::contributorTagId()
 {
     int tagId= tagTypeQuery(QLatin1String("contributor"));
     if (!tagId) {
@@ -448,7 +448,7 @@ int Database::contributorTagId()
     return tagId;
 }
 
-int Database::createdTagId()
+int WallpapersDatabase::createdTagId()
 {
     int tagId= tagTypeQuery(QLatin1String("created"));
     if (!tagId) {
@@ -457,7 +457,7 @@ int Database::createdTagId()
     return tagId;
 }
 
-int Database::mimetypeTagId()
+int WallpapersDatabase::mimetypeTagId()
 {
     int tagId= tagTypeQuery(QLatin1String("mimetype"));
     if (!tagId) {
@@ -466,7 +466,7 @@ int Database::mimetypeTagId()
     return tagId;
 }
 
-int Database::channelId(const QString &name,
+int WallpapersDatabase::channelId(const QString &name,
                         const QString &description,
                         int parentId )
 {
@@ -478,13 +478,13 @@ int Database::channelId(const QString &name,
     return channelId;
 }
 
-int Database::authorId(const QString &author)
+int WallpapersDatabase::authorId(const QString &author)
 {
     return tagId(m_authorTagId, author, &m_authorIds);
 }
 
 
-int Database::tagId(int tagTypeId, const QString &text,
+int WallpapersDatabase::tagId(int tagTypeId, const QString &text,
                     QHash<QString, int> *cache)
 {
     Q_ASSERT(cache);
@@ -520,7 +520,7 @@ int Database::tagId(int tagTypeId, const QString &text,
     return (*cache)[text];
 }
 
-int Database::findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query)
+int WallpapersDatabase::findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query)
 {
     query.bindValue(":path", wallpaper.installPath());
     if (!query.exec()) {
@@ -537,7 +537,7 @@ int Database::findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query)
     return res.toInt();
 }
 
-int Database::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, int assetId)
+int WallpapersDatabase::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, int assetId)
 {
     query.bindValue(":name", wallpaper.name);
     query.bindValue(":license", m_licenseId);
@@ -567,7 +567,7 @@ int Database::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, 
     return res.toInt();
 }
 
-void Database::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
+void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
 {
     QSqlQuery query;
     query.prepare("delete from assetTags where asset = :assetId");
@@ -593,7 +593,7 @@ void Database::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
     }
 }
 
-void Database::writeChannelTags()
+void WallpapersDatabase::writeChannelTags()
 {
     const int mimetypeId = tagId(m_mimetypeTagId, Catalog::c_mimeType,  &m_mimetypeIds);
     const int wallpapersChannel = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
@@ -619,7 +619,7 @@ void Database::writeChannelTags()
     }
 }
 
-int Database::showError(const QSqlQuery &query) const
+int WallpapersDatabase::showError(const QSqlQuery &query) const
 {
     QSqlError error = query.lastError();
     qDebug() << Q_FUNC_INFO << "QPSQL Error: " << error.databaseText() << error.driverText();

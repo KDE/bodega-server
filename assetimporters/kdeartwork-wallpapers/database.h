@@ -5,13 +5,13 @@
 
 #include <QSqlDatabase>
 
-class Database
+class WallpapersDatabase
 {
 public:
     static void write(const Catalog &catalog, bool clearOldData);
 
 private:
-    Database();
+    WallpapersDatabase();
 
     void writeInit(bool clearOldData);
     void writeLanguages(const Catalog &catalog);

@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -32,5 +32,5 @@ int main(int argc, char **argv)
     Catalog catalog(argv[1]);
 
     //TODO: make the write delete the data based on a command line switch
-    Database::write(catalog, false);
+    WallpapersDatabase::write(catalog, false);
 }
