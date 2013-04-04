@@ -489,17 +489,25 @@ void Database::writeChannelTags(const QString &name, const QString &mimeType, co
                   "(channel, tag) "
                   "values "
                   "(:channelId, :tagId);");
-
     int mimetypeId = tagId(m_mimetypeTagId,
                            mimeType,  &m_mimetypeIds);
     int channel = channelId(name, description);
+
+    QSqlQuery checkQuery;
+    query.prepare("select * from channelTags where channel = :channel and tag = :tagId;");
+    query.bindValue(":channelId", channel);
+    query.bindValue(":tagId", mimetypeId);
+
+    if (checkQuery.exec() && checkQuery.first()) {
+        // tag already exists, don't make it again
+        return;
+    }
 
     query.bindValue(":channelId", channel);
     query.bindValue(":tagId", mimetypeId);
     if (!query.exec()) {
         showError(query);
     }
-
 }
 
 int Database::showError(const QSqlQuery &query) const
