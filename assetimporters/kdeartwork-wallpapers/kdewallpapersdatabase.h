@@ -1,17 +1,17 @@
-#ifndef DATABASE_H
-#define DATABASE_H
+#ifndef WALLPAPERSDATABASE_H
+#define WALLPAPERSDATABASE_H
 
 #include "catalog.h"
-
+#include "../database-common/database.h"
 #include <QSqlDatabase>
 
-class WallpapersDatabase
+class WallpapersDatabase : public Database
 {
 public:
-    static void write(const Catalog &catalog, bool clearOldData);
+    static void write(const QString &channelPath, const QString &catalogPath, bool clearOldData);
 
 private:
-    WallpapersDatabase();
+    WallpapersDatabase(const QString& channelPath);
 
     void writeInit(bool clearOldData);
     void writeLanguages(const Catalog &catalog);
@@ -63,7 +63,6 @@ private:
     int showError(const QSqlQuery &query) const;
 
 private:
-    QSqlDatabase m_db;
     int m_partnerId;
     int m_authorTagId;
     int m_categoryTagId;
@@ -79,6 +78,5 @@ private:
     QHash<QString, int> m_mimetypeIds;
     QHash<QString, int> m_createdIds;
 };
-
 
 #endif

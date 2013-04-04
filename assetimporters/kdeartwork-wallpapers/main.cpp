@@ -15,11 +15,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "database.h"
-#include "catalog.h"
+#include "kdewallpapersdatabase.h"
 
 #include <QtCore>
-
 
 int main(int argc, char **argv)
 {
@@ -29,8 +27,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    Catalog catalog(argv[1]);
-
     //TODO: make the write delete the data based on a command line switch
-    WallpapersDatabase::write(catalog, false);
+    WallpapersDatabase::write(argv[1], argv[2], false);
 }

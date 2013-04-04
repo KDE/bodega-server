@@ -15,8 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "database.h"
-
+#include "kdewallpapersdatabase.h"
 
 #include <QFileInfo>
 #include <QHash>
@@ -29,36 +28,31 @@
 
 #include <QDebug>
 
-void WallpapersDatabase::write(const Catalog &catalog, bool clearOldData)
+void WallpapersDatabase::write(const QString &channelPath, const QString &catalogPath, bool clearOldData)
 {
-    WallpapersDatabase db;
+    WallpapersDatabase db(channelPath);
 
+    Catalog catalog(catalogPath);
     db.writeInit(clearOldData);
     db.writeWallpapers(catalog);
     db.writeChannels(catalog);
     db.writeDeviceChannels(catalog);
 }
 
-WallpapersDatabase::WallpapersDatabase()
-    : m_db(QSqlDatabase::addDatabase("QPSQL")),
-      m_partnerId(0),
-      m_authorTagId(0),
-      m_categoryTagId(0),
-      m_licenseId(0),
-      m_contributorTagId(0),
-      m_createdTagId(0),
-      m_mimetypeTagId(0)
+WallpapersDatabase::WallpapersDatabase(const QString& channelPath)
+    : Database(channelPath),
+    m_partnerId(0),
+    m_authorTagId(0),
+    m_categoryTagId(0),
+    m_licenseId(0),
+    m_contributorTagId(0),
+    m_createdTagId(0),
+    m_mimetypeTagId(0)
 {
     //FIXME: fix to LGPL
     m_licenseId = 2;
     //Fix to KDE
     m_partnerId = 1;
-    //db.setHostName("localhost");
-    m_db.setDatabaseName("bodega");
-    m_db.setUserName("bodega");
-    m_db.setPassword("bodega");
-    bool ok = m_db.open();
-    qDebug()<<"db opened = "<<ok;
 }
 
 void WallpapersDatabase::writeInit(bool clearOldData)

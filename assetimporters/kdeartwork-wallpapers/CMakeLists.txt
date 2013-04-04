@@ -5,8 +5,10 @@ include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
 
 set(wallpapersimport_SRCS
     catalog.cpp
-    database.cpp
+    kdewallpapersdatabase.cpp
     main.cpp
+    ../database-common/channelscatalog.cpp
+    ../database-common/database.cpp
    )
 
 qt4_automoc(${wallpapersimport_SRCS})
