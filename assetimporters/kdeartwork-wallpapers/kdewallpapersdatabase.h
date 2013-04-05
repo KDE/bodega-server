@@ -17,7 +17,6 @@ private:
     void writeCategoryTags(const Catalog &catalog);
     void writeWallpapers(const Catalog &catalog);
     int partnerQuery();
-    int languageQuery(const QString &lang);
 
 private:
     int findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query);

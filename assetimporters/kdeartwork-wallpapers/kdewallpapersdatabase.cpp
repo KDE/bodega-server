@@ -180,11 +180,7 @@ void WallpapersDatabase::writeWallpapersChannelTags()
 
 }
 
-int WallpapersDatabase::languageQuery(const QString &lang) {
-    return 0;
-}
-
 int WallpapersDatabase::partnerQuery() {
-    return 0;
+    return 1;
 }
 
