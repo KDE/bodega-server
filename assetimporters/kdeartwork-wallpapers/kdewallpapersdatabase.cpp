@@ -231,28 +231,7 @@ int WallpapersDatabase::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuer
 
 void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
 {
-    QSqlQuery query;
-    query.prepare("delete from assetTags where asset = :assetId");
-    query.bindValue(":assetId", assetId);
-    query.exec();
-
-    query.prepare("insert into assetTags "
-                  "(asset, tag) "
-                  "values "
-                  "(:assetId, :tagId);");
-
-    query.bindValue(":assetId", assetId);
-    query.bindValue(":tagId", authorId(wallpaper.author));
-    if (!query.exec()) {
-        showError(query);
-    }
-
-    query.bindValue(":assetId", assetId);
-    const int mimetypeId = tagId(m_mimetypeTagId, wallpaper.mimeType, &m_mimetypeIds);
-    query.bindValue(":tagId", mimetypeId);
-    if (!query.exec()) {
-        showError(query);
-    }
+    writeAssetTags(assetId, wallpaper.author, wallpaper.mimeType);
 }
 
 void WallpapersDatabase::writeWallpapersChannelTags()
