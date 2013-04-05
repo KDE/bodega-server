@@ -257,7 +257,7 @@ void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int
 
 void WallpapersDatabase::writeWallpapersChannelTags()
 {
-    Database::writeChannelTags(QLatin1String("Wallpapers"), Catalog::c_mimeType, QLatin1String("Wallpapers"));
+    writeChannelTags(QLatin1String("Wallpapers"), Catalog::c_mimeType, QLatin1String("Wallpapers"));
 
 }
 
