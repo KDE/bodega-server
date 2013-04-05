@@ -162,32 +162,8 @@ int WallpapersDatabase::findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery
 
 int WallpapersDatabase::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, int assetId)
 {
-    query.bindValue(":name", wallpaper.name);
-    query.bindValue(":license", m_licenseId);
-    query.bindValue(":author", m_partnerId);
-    query.bindValue(":version", QLatin1String("1.0"));
-    query.bindValue(":path", wallpaper.installPath());
-    query.bindValue(":externid", wallpaper.pluginName);
-    query.bindValue(":image", "kdeartwork/" + wallpaper.path + ".jpg");
-    // XXX figure out what to do about descriptions
-    //query.bindValue(":description",);
-
-    if (assetId > 0) {
-        query.bindValue(":id", assetId);
-    }
-
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-
-    if (!query.first()) {
-        return 0;
-    }
-
-    QVariant res = query.value(0);
-    //qDebug()<<"Last id"<<res;
-    return res.toInt();
+    QString image = "kdeartwork/" + wallpaper.path + ".jpg";
+    return writeAsset(query, wallpaper.name, QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), wallpaper.installPath(), QString(), wallpaper.pluginName, image);
 }
 
 void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
