@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -93,7 +93,7 @@ void PackageDatabase::writePackages()
         file.close();
 
         //TODO: check if the image exists
-        int assetId = writeAsset(query, package.name, package.description, package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
+        int assetId = writeAsset(query, package.name, package.description, 1, 2, package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
         if (!assetId) {
             showError(query);
             QSqlDatabase::database().rollback();
@@ -119,7 +119,7 @@ void PackageDatabase::writePackages()
                 QSqlDatabase::database().rollback();
                 return;
             }
-            
+
 
             QSqlQuery channelassetQuery;
             channelassetQuery.prepare("insert into channelassets "
