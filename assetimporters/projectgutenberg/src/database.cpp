@@ -824,9 +824,9 @@ int Database::createLicenseId()
                   "(:licenseName, :licenseText) returning id;");
 
     query.bindValue(":licenseName",
-                    QObject::tr("Project Gutenberg License"));
+                    "Project Gutenberg License");
     query.bindValue(":licenseText",
-                    QObject::tr("http://www.gutenberg.org/wiki/Gutenberg:The_Project_Gutenberg_License"));
+                    "http://www.gutenberg.org/wiki/Gutenberg:The_Project_Gutenberg_License");
 
     if (!query.exec()) {
         showError(query);
