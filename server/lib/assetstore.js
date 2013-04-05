@@ -148,6 +148,14 @@ var AssetStore = (function() {
         clientReq.end();
     }
 
+    function keysToLowerCase(input) {
+        var ret = []
+        for (a in input) {
+            ret[a.toLowerCase()] = input[a]
+        }
+        return ret;
+    }
+
     function httpGetStream(res, parsedUrl, filename, fn)
     {
         var options = {
@@ -158,14 +166,15 @@ var AssetStore = (function() {
         http.get(options, function(downRes) {
             //console.log("statusCode: ", downRes.statusCode);
             //console.log("headers: ", downRes.headers);
-            if (!downRes.headers['Content-Length'] ||
-                !downRes.headers['Content-Type']) {
+            downRes.header = keysToLowerCase(downRes.header)
+            if (!downRes.headers['content-length'] ||
+                !downRes.headers['content-type']) {
                 fn(new Error("File is unavailable. Please try again later."));
                 return;
             }
 
-            res.header('Content-Length', downRes.headers['Content-Length']);
-            res.header('Content-Type', downRes.headers['Content-Type']);
+            res.header('Content-Length', downRes.headers['content-length']);
+            res.header('Content-Type', downRes.headers['content-type']);
             res.attachment(filename);
 
             downRes.on('data', function(data) {
