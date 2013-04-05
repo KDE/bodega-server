@@ -13,7 +13,6 @@ public:
 private:
     WallpapersDatabase(const QString& channelPath);
 
-    void writeInit(bool clearOldData);
     void writeLanguages(const Catalog &catalog);
     void writeCategoryTags(const Catalog &catalog);
     void writeWallpapers(const Catalog &catalog);

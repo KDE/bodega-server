@@ -55,45 +55,6 @@ WallpapersDatabase::WallpapersDatabase(const QString& channelPath)
     m_partnerId = 1;
 }
 
-void WallpapersDatabase::writeInit(bool clearOldData)
-{
-    QSqlDatabase::database().transaction();
-/*
-    m_partnerId = partnerQuery();
-    if (m_partnerId <= 0) {
-        QSqlQuery query;
-        if (!query.exec("insert into partners (name, developer, distributor) "
-                        "values ('Project Gutenberg', false, true);")) {
-            showError(query);
-            QSqlDatabase::database().rollback();
-            return;
-        }
-        m_partnerId = partnerQuery();
-    }*/
-    m_authorTagId = this->authorTagId();
-    if (!m_authorTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create author tag id");
-        return;
-    }
-    m_categoryTagId = this->categoryTagTypeId();
-    if (!m_categoryTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create author tag id");
-        return;
-    }
-    m_mimetypeTagId = this->mimetypeTagId();
-    if (!m_mimetypeTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create mimeType tag id");
-        return;
-    }
-
-    QSqlDatabase::database().commit();
-}
-
-
-
 void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
 {
     QTime time;
