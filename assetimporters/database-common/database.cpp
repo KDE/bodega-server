@@ -431,13 +431,14 @@ int Database::tagId(int tagTypeId, const QString &text,
 }
 
 int Database::writeAsset(QSqlQuery query, const QString &name, const QString &description,
+                         int licenseId, int partnerId,
                          const QString &version, const QString &path, const QString &file,
                          const QString &externid, const QString &imagePath)
 {
     query.bindValue(":name", name);
     query.bindValue(":description", description);
-    query.bindValue(":license", m_licenseId);
-    query.bindValue(":author", m_partnerId);
+    query.bindValue(":license", licenseId);
+    query.bindValue(":author", partnerId);
     query.bindValue(":version", version);
     query.bindValue(":path", path);
     query.bindValue(":file", file);

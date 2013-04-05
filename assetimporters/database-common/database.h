@@ -16,6 +16,7 @@ protected:
     void writeInit(bool clearOldData);
     void writeDeviceChannels();
     int writeAsset(QSqlQuery query, const QString &name, const QString &description,
+                   int licenseId, int partnerId,
                    const QString &version,
                    const QString &path, const QString &file,
                    const QString &externid, const QString &imagePath);
