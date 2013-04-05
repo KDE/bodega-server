@@ -21,6 +21,7 @@ var mime = require('mime');
 var fs = require('fs');
 var path = require('path');
 var http = require('http');
+var https = require('https');
 var url = require('url');
 
 var AssetStore = (function() {
@@ -158,12 +159,13 @@ var AssetStore = (function() {
 
     function httpGetStream(res, parsedUrl, filename, fn)
     {
+        var isSecure = parsedUrl.protocol === 'https:';
         var options = {
             'host': parsedUrl.hostname,
             'path': parsedUrl.path
         };
 
-        http.get(options, function(downRes) {
+        (isSecure ? http : https).get(options, function(downRes) {
             //console.log("statusCode: ", downRes.statusCode);
             //console.log("headers: ", downRes.headers);
             downRes.header = keysToLowerCase(downRes.header)
@@ -220,7 +222,7 @@ var AssetStore = (function() {
 
         //console.log(parsedUrl);
 
-        if (parsedUrl.protocol === 'http:') {
+        if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
             httpGetStream(res, parsedUrl, filename, fn);
         } else if (storageSystem === 's3') {
             s3GetStream(res, parsedUrl, filename, fn);
