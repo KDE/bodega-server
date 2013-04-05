@@ -345,33 +345,16 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 {
     Gutenberg::File epubFile = book.epubFile();
     QFileInfo fi(epubFile.url.path());
-    query.bindValue(":name", book.titles().first());
-    query.bindValue(":license", m_licenseId);
-    query.bindValue(":author", m_partnerId);
-    query.bindValue(":version", QLatin1String("1.0"));
-    query.bindValue(":path", epubFile.url.toString());
-    query.bindValue(":file", fi.fileName());
-    query.bindValue(":externid", book.bookId());
     Gutenberg::File coverFile = book.coverImage();
+
     QString cover = QFileInfo(coverFile.url.path()).fileName();
     if (cover.isEmpty()) {
         cover = QLatin1String("default/book.png");
     }
 
     cover.prepend("gutenberg/");
-    query.bindValue(":image", cover);
-    // XXX figure out what to do about descriptions
-    //query.bindValue(":description",);
 
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
+    return writeAsset(query, book.titles().first(), QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), epubFile.url.toString(), fi.fileName(), book.bookId(), cover);
 }
 
 void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
