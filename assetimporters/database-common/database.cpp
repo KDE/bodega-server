@@ -461,6 +461,11 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
 //TODO: more tag types?
 void Database::writeAssetTags(int assetId, const QString &mimeType, const QString &author)
 {
+    QSqlQuery deleteQuery;
+    deleteQuery.prepare("delete from assetTags where asset = :assetId");
+    deleteQuery.bindValue(":assetId", assetId);
+    deleteQuery.exec();
+
     QSqlQuery query;
     query.prepare("insert into assetTags "
                   "(asset, tag) "
