@@ -159,3 +159,8 @@ void PackageDatabase::writePackages()
 
     qDebug()<<"Writing took "<<elapsed / 1000. << " secs.";
 }
+
+int PackageDatabase::partnerQuery()
+{
+    return 1;
+}

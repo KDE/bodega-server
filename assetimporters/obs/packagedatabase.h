@@ -14,7 +14,7 @@ public:
 
 private:
     void writePackages();
-
+    int partnerQuery();
     PackageCatalog m_catalog;
     QString m_packageDescPath;
 };
