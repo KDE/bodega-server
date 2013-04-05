@@ -100,7 +100,13 @@ void PackageDatabase::writePackages()
             return;
         }
 
-        writeAssetTags(assetId, package.mimeType, package.author);
+        int author = authorId(package.author);
+        writeAssetTags(assetId, author);
+
+        //TODO FIXME
+        QHash<QString, int> mimetypeIds;
+        int mimetypeId = tagId(mimetypeTagId(), package.mimeType, &mimetypeIds);
+        writeAssetTags(assetId, mimetypeId);
 
         foreach (const QString &channel, package.channels) {
             //FIXME: assumes the channel already exists

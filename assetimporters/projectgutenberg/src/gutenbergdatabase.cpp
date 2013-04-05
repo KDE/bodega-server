@@ -359,48 +359,26 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 
 void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
 {
-    QSqlQuery query;
-    query.prepare("insert into assetTags "
-                  "(asset, tag) "
-                  "values "
-                  "(:assetId, :tagId);");
-
     QStringList authors = book.creators();
     foreach (QString author, authors) {
         int authorId = this->authorId(author);
-        query.bindValue(":assetId", assetId);
-        query.bindValue(":tagId", authorId);
-        if (!query.exec()) {
-            showError(query);
-        }
+        writeAssetTags(assetId, authorId);
     }
 
     QStringList contributors = book.contributors();
     foreach (QString contributor, contributors) {
         int contributorId = this->contributorId(contributor);
-        query.bindValue(":assetId", assetId);
-        query.bindValue(":tagId", contributorId);
-        if (!query.exec()) {
-            showError(query);
-        }
+        writeAssetTags(assetId, contributorId);
     }
 
     Gutenberg::File epubFile = book.epubFile();
-    query.bindValue(":assetId", assetId);
     int mimetypeId = tagId(m_mimetypeTagId,
                            epubFile.format,  &m_mimetypeIds);
-    query.bindValue(":tagId", mimetypeId);
-    if (!query.exec()) {
-        showError(query);
-    }
+    writeAssetTags(assetId, mimetypeId);
 
-    query.bindValue(":assetId", assetId);
     int createdId = tagId(m_createdTagId,
                           book.created(),  &m_createdIds);
-    query.bindValue(":tagId", createdId);
-    if (!query.exec()) {
-        showError(query);
-    }
+    writeAssetTags(assetId, createdId);
 
     Gutenberg::LCC lcc = book.lcc();
     QStringList lccNames = lcc.topCategories();
@@ -410,11 +388,7 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
         Q_ASSERT(m_categoryTagIds.contains(lccName));
         int categoryTagId = m_categoryTagIds[lccName];
         Q_ASSERT(categoryTagId);
-        query.bindValue(":assetId", assetId);
-        query.bindValue(":tagId", categoryTagId);
-        if (!query.exec()) {
-            showError(query);
-        }
+        writeAssetTags(assetId, categoryTagId);
     }
 }
 

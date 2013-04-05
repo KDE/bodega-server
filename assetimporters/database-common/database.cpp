@@ -460,13 +460,8 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
 }
 
 //TODO: more tag types?
-void Database::writeAssetTags(int assetId, const QString &mimeType, const QString &author)
+void Database::writeAssetTags(int assetId, int tagId)
 {
-    QSqlQuery deleteQuery;
-    deleteQuery.prepare("delete from assetTags where asset = :assetId");
-    deleteQuery.bindValue(":assetId", assetId);
-    deleteQuery.exec();
-
     QSqlQuery query;
     query.prepare("insert into assetTags "
                   "(asset, tag) "
@@ -474,18 +469,16 @@ void Database::writeAssetTags(int assetId, const QString &mimeType, const QStrin
                   "(:assetId, :tagId);");
 
     query.bindValue(":assetId", assetId);
-    query.bindValue(":tagId", this->authorId(author));
+    query.bindValue(":tagId", tagId);
     if (!query.exec()) {
         showError(query);
     }
+}
 
-    query.bindValue(":assetId", assetId);
-    int mimetypeId = tagId(m_mimetypeTagId,
-                           mimeType,  &m_mimetypeIds);
-    query.bindValue(":tagId", mimetypeId);
-    if (!query.exec()) {
-        showError(query);
-    }
+
+void Database::writeAssetTags(int assetId, QVariant &tagId)
+{
+    writeAssetTags(assetId, tagId.toInt());
 }
 
 void Database::writeChannelTags(const QString &name, const QString &mimeType, const QString &description)

@@ -20,7 +20,10 @@ protected:
                    const QString &version,
                    const QString &path, const QString &file,
                    const QString &externid, const QString &imagePath);
-    void writeAssetTags(int assetId, const QString &mimeType, const QString &author);
+    void writeAssetTags(int assetId, int tagId);
+
+    void writeAssetTags(int assetId, QVariant &tagId);
+
     int showError(const QSqlQuery &query) const;
     int channelId(const QString &name,
                   const QString &description,

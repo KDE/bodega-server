@@ -168,7 +168,10 @@ int WallpapersDatabase::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuer
 
 void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
 {
-    writeAssetTags(assetId, wallpaper.author, wallpaper.mimeType);
+    int author = authorId(wallpaper.author);
+    writeAssetTags(assetId, author);
+    int mimeTypeId = tagId(m_mimetypeTagId, wallpaper.mimeType, &m_mimetypeIds);
+    writeAssetTags(assetId, mimeTypeId);
 }
 
 void WallpapersDatabase::writeWallpapersChannelTags()
