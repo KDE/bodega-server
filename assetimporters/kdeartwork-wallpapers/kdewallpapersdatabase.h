@@ -8,14 +8,15 @@
 class WallpapersDatabase : public Database
 {
 public:
-    static void write(const QString &channelPath, const QString &catalogPath, bool clearOldData);
+    static void write(const QString &catalogPath, bool clearOldData);
 
 private:
-    WallpapersDatabase(const QString& channelPath);
+    WallpapersDatabase();
 
     void writeLanguages(const Catalog &catalog);
     void writeCategoryTags(const Catalog &catalog);
     void writeWallpapers(const Catalog &catalog);
+    void writeWallpaperChannels();
     int partnerQuery();
 
 private:

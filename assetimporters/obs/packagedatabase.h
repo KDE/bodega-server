@@ -3,6 +3,7 @@
 
 #include "../database-common/database.h"
 #include "packagecatalog.h"
+#include "channelscatalog.h"
 
 class PackageDatabase : public Database
 {
@@ -13,10 +14,12 @@ public:
     void write(bool clearOldData);
 
 private:
+    void writePackageChannels();
     void writePackages();
     int partnerQuery();
     PackageCatalog m_catalog;
     QString m_packageDescPath;
+    ChannelsCatalog m_channelsCatalog;
 };
 
 #endif

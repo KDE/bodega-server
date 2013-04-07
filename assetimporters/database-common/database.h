@@ -4,17 +4,17 @@
 #include <QHash>
 #include <QSqlDatabase>
 
-#include "channelscatalog.h"
+//#include "channelscatalog.h"
 
 class Database
 {
 
 public:
-    Database(const QString &channelsCatalogPath);
+    Database();
 
 protected:
     void writeInit(bool clearOldData);
-    void writeDeviceChannels();
+    void writeDeviceChannels(int channelId);
     int writeAsset(QSqlQuery query, const QString &name, const QString &description,
                    int licenseId, int partnerId,
                    const QString &version,
@@ -28,7 +28,7 @@ protected:
     int channelId(const QString &name,
                   const QString &description,
                   int parentId=0);
-    void writeChannels();
+    void writeChannels(const QString &name, const QString &description, const QString& image, int parentId = 0);
 
     virtual int partnerQuery() = 0;
     int authorQuery(const QString &author) const;
@@ -56,7 +56,7 @@ protected:
     int contributorId(const QString &contributor);
     int tagId(int tagTypeId, const QString &text,
               QHash<QString, int> *cache);
-    void writeChannelTags(const QString &name, const QString &mimeType, const QString &description);
+    void writeChannelTags(int channelId, int tagId);//const QString &name, const QString &mimeType, const QString &description);
     int createLicenseId();
 
 private:
@@ -75,7 +75,7 @@ private:
     QHash<QString, int> m_extraChannelIds;
     QHash<QString, int> m_mimetypeIds;
     QHash<QString, int> m_createdIds;
-    ChannelsCatalog m_channelsCatalog;
+//    ChannelsCatalog m_channelsCatalog;
 };
 
 

@@ -14,18 +14,18 @@ namespace Gutenberg
 class GutenbergDatabase : public Database
 {
 public:
-    static void write(const QString &channelPath, const Catalog &catalog, bool clearOldData);
+    static void write(const Catalog &catalog, bool clearOldData);
 
 private:
-    GutenbergDatabase(const QString &channelPath);
+    GutenbergDatabase();
 
     void writeInit(bool clearOldData);
     void writeLanguages(const Catalog &catalog);
     void writeCategoryTags(const Catalog &catalog);
     void writeBooks(const Catalog &catalog);
-    void writeChannels(const Catalog &catalog);
-    void writeDeviceChannels(const Catalog &catalog);
-    void writeChannelTags();
+    void writeBookChannels(const Catalog &catalog);
+    void writeBookDeviceChannels(const Catalog &catalog);
+    void writeBookChannelTags();
     int writeBookAsset(const Ebook &book, QSqlQuery &query);
     void writeBookAssetTags(const Ebook &book, int assetId);
     int bookAssetQuery(const Ebook &book) const;

@@ -28,19 +28,18 @@
 
 #include <QDebug>
 
-void WallpapersDatabase::write(const QString &channelPath, const QString &catalogPath, bool clearOldData)
+void WallpapersDatabase::write(const QString &catalogPath, bool clearOldData)
 {
-    WallpapersDatabase db(channelPath);
+    WallpapersDatabase db;
 
     Catalog catalog(catalogPath);
     db.writeInit(clearOldData);
     db.writeWallpapers(catalog);
-    db.writeChannels();
-    db.writeDeviceChannels();
+    db.writeWallpaperChannels();
 }
 
-WallpapersDatabase::WallpapersDatabase(const QString& channelPath)
-    : Database(channelPath),
+WallpapersDatabase::WallpapersDatabase()
+    : Database(),
     m_partnerId(0),
     m_authorTagId(0),
     m_categoryTagId(0),
@@ -53,6 +52,15 @@ WallpapersDatabase::WallpapersDatabase(const QString& channelPath)
     m_licenseId = 2;
     //Fix to KDE
     m_partnerId = 1;
+}
+
+void WallpapersDatabase::writeWallpaperChannels()
+{
+    writeChannels(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"), "default/wallpaper.png");
+
+    const int chanId = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
+
+    writeDeviceChannels(chanId);
 }
 
 void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
@@ -176,8 +184,12 @@ void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int
 
 void WallpapersDatabase::writeWallpapersChannelTags()
 {
-    writeChannelTags(QLatin1String("Wallpapers"), Catalog::c_mimeType, QLatin1String("Wallpapers"));
+    const int chanId = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
+    const int mime = mimetypeTagId();
 
+    QHash<QString, int> mimetype;
+    const int tag = tagId(mime, Catalog::c_mimeType, &mimetype);
+    writeChannelTags(chanId, tag);
 }
 
 int WallpapersDatabase::partnerQuery() {

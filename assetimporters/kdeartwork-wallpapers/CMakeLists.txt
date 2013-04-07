@@ -7,7 +7,6 @@ set(wallpapersimport_SRCS
     catalog.cpp
     kdewallpapersdatabase.cpp
     main.cpp
-    ../database-common/channelscatalog.cpp
     ../database-common/database.cpp
    )
 

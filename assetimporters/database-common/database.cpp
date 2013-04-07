@@ -29,7 +29,7 @@
 
 #include <QDebug>
 
-Database::Database(const QString &channelsCatalogPath)
+Database::Database()
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
       m_authorTagId(0),
@@ -37,8 +37,8 @@ Database::Database(const QString &channelsCatalogPath)
       m_licenseId(0),
       m_contributorTagId(0),
       m_createdTagId(0),
-      m_mimetypeTagId(0),
-      m_channelsCatalog(channelsCatalogPath)
+      m_mimetypeTagId(0)//,
+     // m_channelsCatalog(channelsCatalogPath)
 {
     //FIXME: fix to LGPL
     m_licenseId = 2;
@@ -86,41 +86,36 @@ void Database::writeInit(bool clearOldData)
         return;
     }
 
-    writeDeviceChannels();
-
     QSqlDatabase::database().commit();
 }
 
 
-void Database::writeChannels()
+void Database::writeChannels(const QString &name, const QString &description, const QString& image, int parentId)
 {
     QSqlDatabase::database().transaction();
 
-    foreach (const Channel &channel, m_channelsCatalog.channels()) {
-        int id = channelId(channel.name, channel.description, channelId(channel.parent, QString()));
-        if (!id) {
-            QSqlDatabase::database().rollback();
-            return;
-        }
-        m_extraChannelIds.insert(channel.name, id);
+    int id = channelId(name, description,parentId);
 
-        QSqlQuery query;
-        query.prepare("update channels set image = :image where id = :channelId;");
-        query.bindValue(":image", channel.image);
-        query.bindValue(":channelid", id);
-        if (!query.exec()) {
-            showError(query);
-            QSqlDatabase::database().rollback();
-            return;
-        }
+    if (!id) {
+        QSqlDatabase::database().rollback();
+        return;
+    }
 
-        writeChannelTags(channel.name, channel.mimeType, channel.description);
+    QSqlQuery query;
+    query.prepare("update channels set image = :image where id = :channelId;");
+    query.bindValue(":image", image);
+    query.bindValue(":channelid", id);
+
+    if (!query.exec()) {
+        showError(query);
+        QSqlDatabase::database().rollback();
+        return;
     }
 
     QSqlDatabase::database().commit();
 }
 
-void Database::writeDeviceChannels()
+void Database::writeDeviceChannels(int channelId)
 {
     QSqlQuery query;
 
@@ -128,28 +123,10 @@ void Database::writeDeviceChannels()
                   "values ('VIVALDI-1', :channelId);");
 
 
-    QHash<QString, int>::const_iterator itr;
-    for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
-         ++itr) {
-        int channelId = itr.value();
-
-        query.bindValue(":channelId", channelId);
-        if (!query.exec()) {
-            showError(query);
-            return;
-        }
-    }
-
-    for (itr = m_extraChannelIds.constBegin();
-         itr != m_extraChannelIds.constEnd();
-         ++itr) {
-        int channelId = itr.value();
-
-        query.bindValue(":channelId", channelId);
-        if (!query.exec()) {
-            showError(query);
-            return;
-        }
+    query.bindValue(":channelId", channelId);
+    if (!query.exec()) {
+        showError(query);
+        return;
     }
 }
 
@@ -481,29 +458,27 @@ void Database::writeAssetTags(int assetId, QVariant &tagId)
     writeAssetTags(assetId, tagId.toInt());
 }
 
-void Database::writeChannelTags(const QString &name, const QString &mimeType, const QString &description)
+void Database::writeChannelTags(int channelId, int tagId)
 {
     QSqlQuery query;
     query.prepare("insert into channelTags "
                   "(channel, tag) "
                   "values "
                   "(:channelId, :tagId);");
-    int mimetypeId = tagId(m_mimetypeTagId,
-                           mimeType,  &m_mimetypeIds);
-    int channel = channelId(name, description);
 
     QSqlQuery checkQuery;
     query.prepare("select * from channelTags where channel = :channel and tag = :tagId;");
-    query.bindValue(":channelId", channel);
-    query.bindValue(":tagId", mimetypeId);
+    query.bindValue(":channelId", channelId);
+    query.bindValue(":tagId", tagId);
 
     if (checkQuery.exec() && checkQuery.first()) {
         // tag already exists, don't make it again
         return;
     }
 
-    query.bindValue(":channelId", channel);
-    query.bindValue(":tagId", mimetypeId);
+    query.bindValue(":channelId", channelId);
+    query.bindValue(":tagId", tagId);
+
     if (!query.exec()) {
         showError(query);
     }

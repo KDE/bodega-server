@@ -15,9 +15,9 @@
 using namespace Gutenberg;
 
 
-void GutenbergDatabase::write(const QString &channelPath, const Catalog &catalog, bool clearOldData)
+void GutenbergDatabase::write(const Catalog &catalog, bool clearOldData)
 {
-    GutenbergDatabase db(channelPath);
+    GutenbergDatabase db;
 
     Q_ASSERT(catalog.isCompiled());
     if (!catalog.isCompiled()) {
@@ -28,12 +28,12 @@ void GutenbergDatabase::write(const QString &channelPath, const Catalog &catalog
     //db.writeLanguages(catalog);
     db.writeCategoryTags(catalog);
     db.writeBooks(catalog);
-    db.writeChannels(catalog);
-    db.writeDeviceChannels(catalog);
+    db.writeBookChannels(catalog);
+    db.writeBookDeviceChannels(catalog);
 }
 
-GutenbergDatabase::GutenbergDatabase(const QString &channelPath)
-    : Database(channelPath),
+GutenbergDatabase::GutenbergDatabase()
+    : Database(),
       m_partnerId(0),
       m_authorTagId(0),
       m_categoryTagId(0),
@@ -164,7 +164,6 @@ void GutenbergDatabase::writeCategoryTags(const Catalog &catalog)
     }
 }
 
-
 void GutenbergDatabase::writeBooks(const Catalog &catalog)
 {
     QTime time;
@@ -240,67 +239,34 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 }
 
 
-void GutenbergDatabase::writeChannels(const Catalog &catalog)
+void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 {
-    QSqlDatabase::database().transaction();
-
-    int booksChannel = channelId(QLatin1String("Books"), QLatin1String("Books"));
-    if (!booksChannel) {
-        QSqlDatabase::database().rollback();
-        return;
-    }
-    m_extraChannelIds.insert(QLatin1String("Books"), booksChannel);
-
-    QSqlQuery query;
-    query.prepare("update channels set image = 'default/book.png' where id = :channelId;");
-    query.bindValue(":channelid", booksChannel);
-    if (!query.exec()) {
-        showError(query);
-        QSqlDatabase::database().rollback();
-        return;
-    }
-
     const QHash<LCC::Category, QString> map = LCC::categoryMap();
     QHash<LCC::Category, QString>::const_iterator itr;
     for (itr = map.constBegin(); itr != map.constEnd(); ++itr) {
+
+        writeChannels(itr.value(), itr.value(), "default/book.png");
+
         int channel = channelId(
             itr.value(),
             itr.value(),
             booksChannel);
         if (!channel) {
-            QSqlDatabase::database().rollback();
             return;
         }
+
         m_channelIds[itr.value()] = channel;
     }
-    writeChannelTags();
-
-    QSqlDatabase::database().commit();
 }
 
-void GutenbergDatabase::writeDeviceChannels(const Catalog &catalog)
+void GutenbergDatabase::writeBookDeviceChannels(const Catalog &catalog)
 {
-    QSqlQuery checkQuery;
-    checkQuery.prepare("select channel from deviceChannels where device = 'VIVALDI-1' and channel = :channelId");
-    QSqlQuery writeQuery;
-    writeQuery.prepare("insert into deviceChannels (device, channel) "
-                  "values ('VIVALDI-1', :channelId);");
-
     QHash<QString, int>::const_iterator itr;
     for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
          ++itr) {
         const int channelId = itr.value();
 
-        checkQuery.bindValue(":channelId", channelId);
-        if (checkQuery.exec() && checkQuery.size() > 0) {
-            continue;
-        }
-
-        writeQuery.bindValue(":channelId", channelId);
-        if (!writeQuery.exec()) {
-            showError(writeQuery);
-            return;
-        }
+        writeDeviceChannels(channelId);
     }
 
     for (itr = m_extraChannelIds.constBegin();
@@ -308,16 +274,7 @@ void GutenbergDatabase::writeDeviceChannels(const Catalog &catalog)
          ++itr) {
         const int channelId = itr.value();
 
-        checkQuery.bindValue(":channelId", channelId);
-        if (checkQuery.exec() && checkQuery.size() > 0) {
-            continue;
-        }
-
-        writeQuery.bindValue(":channelId", channelId);
-        if (!writeQuery.exec()) {
-            showError(writeQuery);
-            return;
-        }
+        writeDeviceChannels(channelId);
     }
 }
 
@@ -392,14 +349,8 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
     }
 }
 
-void GutenbergDatabase::writeChannelTags()
+void GutenbergDatabase::writeBookChannelTags()
 {
-    QSqlQuery query;
-    query.prepare("insert into channelTags "
-              "(channel, tag) "
-              "values "
-              "(:channelId, :tagId);");
-
     QHash<QString, int>::const_iterator itr;
     for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
         ++itr) {
@@ -407,11 +358,7 @@ void GutenbergDatabase::writeChannelTags()
         int categoryTagId = m_categoryTagIds[itr.key()];
         Q_ASSERT(categoryTagId);
 
-        query.bindValue(":channelId", itr.value());
-        query.bindValue(":tagId", categoryTagId);
-        if (!query.exec()) {
-            showError(query);
-        }
+        writeChannelTags(itr.value(), categoryTagId);
     }
 }
 
