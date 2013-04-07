@@ -55,18 +55,7 @@ Database::Database()
 void Database::writeInit(bool clearOldData)
 {
     QSqlDatabase::database().transaction();
-/*
-    m_partnerId = partnerQuery();
-    if (m_partnerId <= 0) {
-        QSqlQuery query;
-        if (!query.exec("insert into partners (name, developer, distributor) "
-                        "values ('Project Gutenberg', false, true);")) {
-            showError(query);
-            QSqlDatabase::database().rollback();
-            return;
-        }
-        m_partnerId = partnerQuery();
-    }*/
+
     m_authorTagId = this->authorTagId();
     if (!m_authorTagId) {
         QSqlDatabase::database().rollback();
@@ -87,8 +76,21 @@ void Database::writeInit(bool clearOldData)
     }
 
     QSqlDatabase::database().commit();
-}
 
+    if (clearOldData) {
+        qDebug() << "deleting data first ... this can take a fair while as the database triggers run";
+        QSqlQuery cleanupQuery;
+        cleanupQuery.prepare("delete from deviceChannels where channel in (select id from channels where partner = :partner);");
+        cleanupQuery.bindValue(":partner", m_partnerId);
+        cleanupQuery.exec();
+        cleanupQuery.prepare("delete from channels where partner = :partner;");
+        cleanupQuery.bindValue(":partner", m_partnerId);
+        cleanupQuery.exec();
+        cleanupQuery.prepare("delete from assets where author = :partner;");
+        cleanupQuery.bindValue(":partner", m_partnerId);
+        cleanupQuery.exec();
+    }
+}
 
 void Database::writeChannels(const QString &name, const QString &description, const QString& image, int parentId)
 {

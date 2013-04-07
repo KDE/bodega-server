@@ -24,7 +24,7 @@ void GutenbergDatabase::write(const Catalog &catalog, bool clearOldData)
         qDebug()<<"Catalog must be compiled";
         return;
     }
-    db.writeInit(clearOldData);
+    db.writeBookInit(clearOldData);
     //db.writeLanguages(catalog);
     db.writeCategoryTags(catalog);
     db.writeBooks(catalog);
@@ -44,7 +44,7 @@ GutenbergDatabase::GutenbergDatabase()
 {
 }
 
-void GutenbergDatabase::writeInit(bool clearOldData)
+void GutenbergDatabase::writeBookInit(bool clearOldData)
 {
     QSqlDatabase::database().transaction();
 
@@ -61,59 +61,7 @@ void GutenbergDatabase::writeInit(bool clearOldData)
     }
     //qDebug()<<"partner id = "<<m_partnerId;
 
-    m_authorTagId = this->authorTagId();
-    if (!m_authorTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create author tag id");
-        return;
-    }
-    m_categoryTagId = this->categoryTagTypeId();
-    if (!m_categoryTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create author tag id");
-        return;
-    }
-    m_contributorTagId = this->contributorTagId();
-    if (!m_contributorTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create contributor tag id");
-        return;
-    }
-    m_createdTagId = this->createdTagId();
-    if (!m_createdTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create contributor tag id");
-        return;
-    }
-    m_mimetypeTagId = this->mimetypeTagId();
-    if (!m_mimetypeTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create contributor tag id");
-        return;
-    }
-
-    m_licenseId = createLicenseId();
-    if (!m_licenseId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create Project Gutenberg license id");
-        return;
-    }
-
-    if (clearOldData) {
-        qDebug() << "deleting data first ... this can take a fair while as the database triggers run";
-        QSqlQuery cleanupQuery;
-        cleanupQuery.prepare("delete from deviceChannels where channel in (select id from channels where partner = :partner);");
-        cleanupQuery.bindValue(":partner", m_partnerId);
-        cleanupQuery.exec();
-        cleanupQuery.prepare("delete from channels where partner = :partner;");
-        cleanupQuery.bindValue(":partner", m_partnerId);
-        cleanupQuery.exec();
-        cleanupQuery.prepare("delete from assets where author = :partner;");
-        cleanupQuery.bindValue(":partner", m_partnerId);
-        cleanupQuery.exec();
-    }
-
-    QSqlDatabase::database().commit();
+    writeInit(clearOldData);
 }
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)

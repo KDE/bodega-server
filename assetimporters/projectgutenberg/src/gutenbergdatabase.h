@@ -19,7 +19,7 @@ public:
 private:
     GutenbergDatabase();
 
-    void writeInit(bool clearOldData);
+    void writeBookInit(bool clearOldData);
     void writeLanguages(const Catalog &catalog);
     void writeCategoryTags(const Catalog &catalog);
     void writeBooks(const Catalog &catalog);
