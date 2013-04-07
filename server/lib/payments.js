@@ -66,7 +66,7 @@ function stripeErrorConvert(stripeErr, defaultError)
             default:
                 console.log(stripeErr);
                 return perr(defaultError,
-                            stripeErr.response.error.message);
+                            stripeErr.message);
             }
         }
     }
