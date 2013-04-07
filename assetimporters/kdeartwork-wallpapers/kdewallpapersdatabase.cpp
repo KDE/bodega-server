@@ -56,10 +56,9 @@ WallpapersDatabase::WallpapersDatabase()
 
 void WallpapersDatabase::writeWallpaperChannels()
 {
-    writeChannels(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"), "default/wallpaper.png");
+    const int chanId = writeChannels(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"), "default/wallpaper.png");
 
-    const int chanId = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
-
+    writeWallpapersChannelTags();
     writeDeviceChannels(chanId);
 }
 
@@ -178,7 +177,8 @@ void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int
 {
     int author = authorId(wallpaper.author);
     writeAssetTags(assetId, author);
-    int mimeTypeId = tagId(m_mimetypeTagId, wallpaper.mimeType, &m_mimetypeIds);
+    int mime = mimetypeTagId();
+    int mimeTypeId = tagId(mime, wallpaper.mimeType, &m_mimetypeIds);
     writeAssetTags(assetId, mimeTypeId);
 }
 
@@ -188,7 +188,7 @@ void WallpapersDatabase::writeWallpapersChannelTags()
     const int mime = mimetypeTagId();
 
     QHash<QString, int> mimetype;
-    const int tag = tagId(mime, Catalog::c_mimeType, &mimetype);
+    const int tag = tagId(mime, Catalog::c_mimeType, &m_mimetypeIds);
     writeChannelTags(chanId, tag);
 }
 
