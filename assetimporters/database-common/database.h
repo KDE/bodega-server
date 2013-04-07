@@ -28,7 +28,7 @@ protected:
     int channelId(const QString &name,
                   const QString &description,
                   int parentId=0);
-    void writeChannels(const QString &name, const QString &description, const QString& image, int parentId = 0);
+    int writeChannels(const QString &name, const QString &description, const QString& image, int parentId = 0);
 
     virtual int partnerQuery() = 0;
     int authorQuery(const QString &author) const;

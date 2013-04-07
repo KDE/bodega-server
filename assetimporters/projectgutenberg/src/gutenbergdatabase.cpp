@@ -189,16 +189,14 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
 void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 {
+    const int booksChannel = writeChannels(QLatin1String("Books"), QLatin1String("Books"), "default/book.png");
+
     const QHash<LCC::Category, QString> map = LCC::categoryMap();
     QHash<LCC::Category, QString>::const_iterator itr;
     for (itr = map.constBegin(); itr != map.constEnd(); ++itr) {
 
-        writeChannels(itr.value(), itr.value(), "default/book.png");
+        const int channel = writeChannels(itr.value(), itr.value(), "default/book.png", booksChannel);
 
-        int channel = channelId(
-            itr.value(),
-            itr.value(),
-            booksChannel);
         if (!channel) {
             return;
         }

@@ -92,7 +92,7 @@ void Database::writeInit(bool clearOldData)
     }
 }
 
-void Database::writeChannels(const QString &name, const QString &description, const QString& image, int parentId)
+int Database::writeChannels(const QString &name, const QString &description, const QString& image, int parentId)
 {
     QSqlDatabase::database().transaction();
 
@@ -100,7 +100,7 @@ void Database::writeChannels(const QString &name, const QString &description, co
 
     if (!id) {
         QSqlDatabase::database().rollback();
-        return;
+        return 0;
     }
 
     QSqlQuery query;
@@ -111,10 +111,12 @@ void Database::writeChannels(const QString &name, const QString &description, co
     if (!query.exec()) {
         showError(query);
         QSqlDatabase::database().rollback();
-        return;
+        return 0;
     }
 
     QSqlDatabase::database().commit();
+
+    return id;
 }
 
 void Database::writeDeviceChannels(int channelId)
