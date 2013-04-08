@@ -61,6 +61,19 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
     }
     //qDebug()<<"partner id = "<<m_partnerId;
 
+    m_licenseId = createLicenseId();
+    if (!m_licenseId) {
+        QSqlDatabase::database().rollback();
+        Q_ASSERT(!"couldn't create Project Gutenberg license id");
+        return;
+    }
+
+
+    m_mimetypeTagId = mimetypeTagId();
+    m_createdTagId = createdTagId();
+    m_partnerId = partnerQuery();
+
+    m_contributorTagId = contributorTagId();
     writeInit(clearOldData);
 }
 
@@ -257,7 +270,8 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 
     cover.prepend("gutenberg/");
 
-    return writeAsset(query, book.titles().first(), QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), epubFile.url.toString(), fi.fileName(), book.bookId(), cover);
+    int foo = writeAsset(query, book.titles().first(), QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), epubFile.url.toString(), fi.fileName(), book.bookId(), cover);
+    return foo;
 }
 
 void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
@@ -270,7 +284,9 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
 
     QStringList contributors = book.contributors();
     foreach (QString contributor, contributors) {
+
         int contributorId = this->contributorId(contributor);
+
         writeAssetTags(assetId, contributorId);
     }
 
@@ -278,11 +294,9 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
     int mimetypeId = tagId(m_mimetypeTagId,
                            epubFile.format,  &m_mimetypeIds);
     writeAssetTags(assetId, mimetypeId);
-
     int createdId = tagId(m_createdTagId,
                           book.created(),  &m_createdIds);
     writeAssetTags(assetId, createdId);
-
     Gutenberg::LCC lcc = book.lcc();
     QStringList lccNames = lcc.topCategories();
     //qDebug()<<"Book = "<< book.titles();
