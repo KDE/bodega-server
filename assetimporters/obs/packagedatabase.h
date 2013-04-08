@@ -16,7 +16,6 @@ public:
 private:
     void writePackageChannels();
     void writePackages();
-    int partnerQuery();
     PackageCatalog m_catalog;
     QString m_packageDescPath;
     ChannelsCatalog m_channelsCatalog;

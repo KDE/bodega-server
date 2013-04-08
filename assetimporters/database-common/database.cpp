@@ -33,17 +33,10 @@ Database::Database()
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
       m_authorTagId(0),
-      m_categoryTagId(0),
-      m_licenseId(0),
-      m_contributorTagId(0),
-      m_createdTagId(0),
-      m_mimetypeTagId(0)//,
-     // m_channelsCatalog(channelsCatalogPath)
+      m_categoryTagId(0)
 {
-    //FIXME: fix to LGPL
-    m_licenseId = 2;
     //Fix to KDE
-    m_partnerId = 1;
+    m_partnerId = partnerQuery();
     //db.setHostName("localhost");
     m_db.setDatabaseName("bodega");
     m_db.setUserName("bodega");
@@ -66,12 +59,6 @@ void Database::writeInit(bool clearOldData)
     if (!m_categoryTagId) {
         QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create author tag id");
-        return;
-    }
-    m_mimetypeTagId = this->mimetypeTagId();
-    if (!m_mimetypeTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create mimeType tag id");
         return;
     }
 
@@ -137,6 +124,16 @@ void Database::writeDeviceChannels(int channelId)
 int Database::authorQuery(const QString &author) const
 {
     return tagQuery(m_authorTagId, author);
+}
+
+int Database::partnerQuery()
+{
+    return 1;
+}
+
+int Database::licenseQuery()
+{
+    return 2;
 }
 
 int Database::tagQuery(int tagTypeId, const QString &text) const
@@ -373,7 +370,6 @@ int Database::authorId(const QString &author)
 {
     return tagId(m_authorTagId, author, &m_authorIds);
 }
-
 
 int Database::tagId(int tagTypeId, const QString &text,
                     QHash<QString, int> *cache)

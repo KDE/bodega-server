@@ -31,7 +31,7 @@ private:
     int bookAssetQuery(const Ebook &book) const;
     int partnerQuery();
     int languageQuery(const QString &lang);
-    int createLicenseId();
+    int licenseQuery();
     int contributorId(const QString &contributor);
     int categoryId(const QString &name);
 

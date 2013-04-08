@@ -61,7 +61,7 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
     }
     //qDebug()<<"partner id = "<<m_partnerId;
 
-    m_licenseId = createLicenseId();
+    m_licenseId = licenseQuery();
     if (!m_licenseId) {
         QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create Project Gutenberg license id");
@@ -353,7 +353,7 @@ int GutenbergDatabase::languageQuery(const QString &lang)
     return res.toInt();
 }
 
-int GutenbergDatabase::createLicenseId()
+int GutenbergDatabase::licenseQuery()
 {
     QSqlQuery query;
     if (!query.exec("select id from licenses where name = 'Project Gutenberg License';")) {

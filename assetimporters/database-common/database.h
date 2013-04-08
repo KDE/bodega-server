@@ -30,7 +30,9 @@ protected:
                   int parentId=0);
     int writeChannels(const QString &name, const QString &description, const QString& image, int parentId = 0);
 
-    virtual int partnerQuery() = 0;
+    virtual int partnerQuery();
+    virtual int licenseQuery();
+
     int authorQuery(const QString &author) const;
     int contributorQuery(const QString &author) const;
     int tagQuery(int tagTypeId, const QString &text) const;
@@ -64,18 +66,8 @@ private:
     int m_partnerId;
     int m_authorTagId;
     int m_categoryTagId;
-    int m_licenseId;
-    int m_contributorTagId;
-    int m_createdTagId;
-    int m_mimetypeTagId;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;
-    QHash<QString, int> m_categoryTagIds;
-    QHash<QString, int> m_contributorIds;
-    QHash<QString, int> m_extraChannelIds;
-    QHash<QString, int> m_mimetypeIds;
-    QHash<QString, int> m_createdIds;
-//    ChannelsCatalog m_channelsCatalog;
 };
 
 

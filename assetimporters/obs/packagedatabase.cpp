@@ -73,6 +73,7 @@ void PackageDatabase::writePackages()
                   "values "
                   "(:name, :description, :license, :author, :version, :path, :file, :externid, :image) "
                   "returning id;");
+    QHash<QString, int> mimetypeIds;
 
     for (itr = packages.constBegin(); itr != packages.constEnd(); ++itr) {
         const Package &package = *itr;
@@ -93,7 +94,7 @@ void PackageDatabase::writePackages()
         file.close();
 
         //TODO: check if the image exists
-        int assetId = writeAsset(query, package.name, package.description, 2, 1, package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
+        int assetId = writeAsset(query, package.name, package.description, licenseQuery(), partnerQuery(), package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
         if (!assetId) {
             showError(query);
             QSqlDatabase::database().rollback();
@@ -103,8 +104,6 @@ void PackageDatabase::writePackages()
         int author = authorId(package.author);
         writeAssetTags(assetId, author);
 
-        //TODO FIXME
-        QHash<QString, int> mimetypeIds;
         int mimetypeId = tagId(mimetypeTagId(), package.mimeType, &mimetypeIds);
         writeAssetTags(assetId, mimetypeId);
 
@@ -164,11 +163,6 @@ void PackageDatabase::writePackages()
     int elapsed = time.elapsed();
 
     qDebug()<<"Writing took "<<elapsed / 1000. << " secs.";
-}
-
-int PackageDatabase::partnerQuery()
-{
-    return 1;
 }
 
 void PackageDatabase::writePackageChannels()
