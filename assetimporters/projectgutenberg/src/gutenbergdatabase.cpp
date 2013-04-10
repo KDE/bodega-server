@@ -216,6 +216,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 
         m_channelIds[itr.value()] = channel;
     }
+    writeBookChannelTags();
 }
 
 void GutenbergDatabase::writeBookDeviceChannels(const Catalog &catalog)
@@ -399,3 +400,4 @@ int GutenbergDatabase::contributorId(const QString &contributor)
 {
     return tagId(m_contributorTagId, contributor, &m_contributorIds);
 }
+
