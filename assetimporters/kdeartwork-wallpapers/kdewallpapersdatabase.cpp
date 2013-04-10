@@ -56,7 +56,7 @@ WallpapersDatabase::WallpapersDatabase()
 
 void WallpapersDatabase::writeWallpaperChannels()
 {
-    const int chanId = writeChannels(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"), "default/wallpaper.png");
+    const int chanId = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
 
     writeWallpapersChannelTags();
     writeDeviceChannels(chanId);
@@ -105,9 +105,9 @@ void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
 
     QSqlQuery insertQuery;
     insertQuery.prepare("insert into assets "
-                  "(name, license, author, version, path, externid, image) "
+                  "(name, description, license, author, version, path, file, externid, image) "
                   "values "
-                  "(:name, :license, :author, :version, :path, :externid, :image) "
+                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image) "
                   "returning id;");
 
     for (itr = wallpapers.constBegin(); itr != wallpapers.constEnd(); ++itr) {

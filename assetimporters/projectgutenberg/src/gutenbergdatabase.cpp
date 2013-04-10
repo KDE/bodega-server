@@ -295,7 +295,7 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
                            epubFile.format,  &m_mimetypeIds);
     writeAssetTags(assetId, mimetypeId);
     int createdId = tagId(m_createdTagId,
-                          book.created(),  &m_createdIds);
+                          book.created(), &m_createdIds);
     writeAssetTags(assetId, createdId);
     Gutenberg::LCC lcc = book.lcc();
     QStringList lccNames = lcc.topCategories();
