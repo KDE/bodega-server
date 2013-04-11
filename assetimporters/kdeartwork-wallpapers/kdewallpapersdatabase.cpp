@@ -30,7 +30,7 @@
 
 void WallpapersDatabase::write(const QString &catalogPath, bool clearOldData)
 {
-    WallpapersDatabase db;
+    WallpapersDatabase db(catalogPath);
 
     Catalog catalog(catalogPath);
     db.writeInit(clearOldData);
@@ -38,8 +38,8 @@ void WallpapersDatabase::write(const QString &catalogPath, bool clearOldData)
     db.writeWallpaperChannels();
 }
 
-WallpapersDatabase::WallpapersDatabase()
-    : Database(),
+WallpapersDatabase::WallpapersDatabase(const QString &contentPath)
+    : Database(contentPath),
     m_partnerId(0),
     m_authorTagId(0),
     m_categoryTagId(0),
@@ -99,15 +99,15 @@ void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
     QSqlQuery updateQuery;
     updateQuery.prepare("update assets "
                   "set name = :name, license = :license, author = :author,"
-                  "version = :version, externid = :externid, image = :image "
+                  "version = :version, externid = :externid, image = :image, size = :size "
                   "where id = :id "
                   "returning id;");
 
     QSqlQuery insertQuery;
     insertQuery.prepare("insert into assets "
-                  "(name, description, license, author, version, path, file, externid, image) "
+                  "(name, description, license, author, version, path, file, externid, image, size) "
                   "values "
-                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image) "
+                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image, :size) "
                   "returning id;");
 
     for (itr = wallpapers.constBegin(); itr != wallpapers.constEnd(); ++itr) {

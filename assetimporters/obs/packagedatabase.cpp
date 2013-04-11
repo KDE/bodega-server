@@ -25,7 +25,7 @@
 PackageDatabase::PackageDatabase(const QString &channelsCatalogPath,
                                  const QString &packageCatalogPath,
                                  const QString &packageDescPath)
-    : Database(),
+    : Database(packageDescPath),
       m_channelsCatalog(channelsCatalogPath),
       m_catalog(PackageCatalog(packageCatalogPath)),
       m_packageDescPath(packageDescPath)
@@ -69,9 +69,9 @@ void PackageDatabase::writePackages()
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, description, license, author, version, path, file, externid, image) "
+                  "(name, description, license, author, version, path, file, externid, image, size) "
                   "values "
-                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image) "
+                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image, :size) "
                   "returning id;");
     QHash<QString, int> mimetypeIds;
 

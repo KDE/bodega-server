@@ -17,7 +17,7 @@ int main(int argc, char **argv)
     Gutenberg::Catalog catalog = Gutenberg::Parser::parse(QString::fromLatin1(argv[1]));
     catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
 
-    Gutenberg::GutenbergDatabase::write(catalog, false);
+    Gutenberg::GutenbergDatabase::write(catalog, argv[2], false);
 
     if (argc > 2) {
         // only fetch if we were given a cache dir

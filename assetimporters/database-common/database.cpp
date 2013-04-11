@@ -17,7 +17,6 @@
 
 #include "database.h"
 
-
 #include <QFileInfo>
 #include <QHash>
 #include <QLocale>
@@ -29,11 +28,12 @@
 
 #include <QDebug>
 
-Database::Database()
+Database::Database(const QString &contentPath)
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
       m_authorTagId(0),
-      m_categoryTagId(0)
+      m_categoryTagId(0),
+      m_contentPath(contentPath)
 {
     //Fix to KDE
     m_partnerId = partnerQuery();
@@ -423,6 +423,8 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
     query.bindValue(":image", imagePath);
     // XXX figure out what to do about descriptions
     //query.bindValue(":description",);
+
+    query.bindValue(":size", QFile(m_contentPath + '/' + file).size());
 
     if (!query.exec()) {
         showError(query);

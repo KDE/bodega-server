@@ -15,9 +15,9 @@
 using namespace Gutenberg;
 
 
-void GutenbergDatabase::write(const Catalog &catalog, bool clearOldData)
+void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath, bool clearOldData)
 {
-    GutenbergDatabase db;
+    GutenbergDatabase db(contentPath);
 
     Q_ASSERT(catalog.isCompiled());
     if (!catalog.isCompiled()) {
@@ -32,8 +32,8 @@ void GutenbergDatabase::write(const Catalog &catalog, bool clearOldData)
     db.writeBookDeviceChannels(catalog);
 }
 
-GutenbergDatabase::GutenbergDatabase()
-    : Database(),
+GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
+    : Database(contentPath),
       m_partnerId(0),
       m_authorTagId(0),
       m_categoryTagId(0),
@@ -153,9 +153,9 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, license, author, version, path, file, externid, image) "
+                  "(name, license, author, version, path, file, externid, image, size) "
                   "values "
-                  "(:name, :license, :author, :version, :path, :file, :externid, :image) "
+                  "(:name, :license, :author, :version, :path, :file, :externid, :image, :size) "
                   "returning id;");
 
     for (itr = books.constBegin(); itr != books.constEnd(); ++itr) {

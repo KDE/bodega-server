@@ -11,7 +11,7 @@ public:
     static void write(const QString &catalogPath, bool clearOldData);
 
 private:
-    WallpapersDatabase();
+    WallpapersDatabase(const QString &contentPath);
 
     void writeLanguages(const Catalog &catalog);
     void writeCategoryTags(const Catalog &catalog);

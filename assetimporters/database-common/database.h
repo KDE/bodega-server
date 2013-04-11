@@ -10,7 +10,7 @@ class Database
 {
 
 public:
-    Database();
+    Database(const QString &contentPath);
 
 protected:
     void writeInit(bool clearOldData);
@@ -68,6 +68,7 @@ private:
     int m_categoryTagId;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;
+    QString m_contentPath;
 };
 
 

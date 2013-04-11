@@ -131,6 +131,7 @@ create table assets
     versionTs   timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
     path        text        not null,
     file        text        not null,
+    size        int         not null,
     image       text,
     active      bool        not null default true
 );

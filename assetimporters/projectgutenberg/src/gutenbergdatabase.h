@@ -14,10 +14,10 @@ namespace Gutenberg
 class GutenbergDatabase : public Database
 {
 public:
-    static void write(const Catalog &catalog, bool clearOldData);
+    static void write(const Catalog &catalog, const QString &contentPath, bool clearOldData);
 
 private:
-    GutenbergDatabase();
+    GutenbergDatabase(const QString &contentPath);
 
     void writeBookInit(bool clearOldData);
     void writeLanguages(const Catalog &catalog);
