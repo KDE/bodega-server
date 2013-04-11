@@ -6,7 +6,7 @@ delete from affiliations;
 delete from languages;
 delete from channels;
 
-select setval('seq_assetsids', 0);
+select setval('seq_assetsids', 1);
 select setval('seq_languageids', 1);
 select setval('seq_peopleids', 1);
 select setval('seq_personroleids', 1);
@@ -20,15 +20,14 @@ insert into people (lastname, firstname, email, points, password)
 insert into people (lastname, firstname, email, points, password)
     values ('Seigo', 'Aaron', 'aseigo@kde.org', 10000, 'aseigo');
 
-insert into partners (name, developer, distributor) values ('KDE', true, true);
+insert into people (lastname, firstname, email, points, password)
+    values ('Martin', 'Marco', 'mart@kde.org', 10000, 'mart');
+
 insert into partners (name, developer, distributor) values ('Diamond Devices', false, true);
 insert into partners (name, developer, distributor) values ('Saphire Software', false, true);
 
 insert into tags (partner, type, title) values (2, 2, 'Approved by KDE');
 
-insert into personRoles (description) values ('Content Creator');
-insert into personRoles (description) values ('Validator');
-insert into personRoles (description) values ('Accounts');
 
 insert into affiliations (person, partner, role) values (2, 2, 2);
 insert into affiliations (person, partner, role) values (2, 2, 3);
@@ -37,9 +36,6 @@ insert into affiliations (person, partner, role) values (3, 2, 2);
 insert into affiliations (person, partner, role) values (3, 2, 3);
 insert into affiliations (person, partner, role) values (3, 2, 3);
 
-insert into languages (code, name) values ('C', 'English');
-insert into languages (code, name) values ('de', 'German');
-insert into languages (code, name) values ('fr', 'French');
 
 insert into channels (image, partner, active, name, description)
     values ('games.png', 2, true, 'Games', 'Fun and amusements');
@@ -62,13 +58,13 @@ insert into devices (partner, name, description, partnumber) values (2, 'Plasma 
 insert into devices (partner, name, description, partnumber) values (3, 'Bling Media Center', 'Imaginary hifi for your home', 'DD-1');
 insert into devices (partner, name, description, partnumber) values (3, 'Affordaphone', 'Finally a phone even you can afford', 'DD-2');
 
-insert into deviceChannels (device, channel) values (2, 2);
-insert into deviceChannels (device, channel) values (2, 3);
-insert into deviceChannels (device, channel) values (2, 4);
-insert into deviceChannels (device, channel) values (2, 5);
-insert into deviceChannels (device, channel) values (3, 6);
-insert into deviceChannels (device, channel) values (3, 6);
-insert into deviceChannels (device, channel) values (4, 6);
+insert into deviceChannels (device, channel) values ('KDE-1', 2);
+insert into deviceChannels (device, channel) values ('DD-1', 3);
+insert into deviceChannels (device, channel) values ('DD-1', 4);
+insert into deviceChannels (device, channel) values ('DD-1', 5);
+insert into deviceChannels (device, channel) values ('DD-2', 6);
+insert into deviceChannels (device, channel) values ('DD-2', 6);
+insert into deviceChannels (device, channel) values ('DD-2', 6);
 
 insert into assets (license, author, name, description, version, path, image, active, externid) values (1, 2, 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true, 'aquarium');
 insert into assets (license, author, name, description, version, path, image, active, externid) values (1, 2, 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true, 'dice');
@@ -77,16 +73,16 @@ insert into assets (license, author, name, description, version, path, image, ac
 insert into assets (license, author, name, description, version, path, image, active, externid) values (1, 2, 'Tetris', 'Stacking blocks', '0.1', 'org.kde.tetris.plasmoid', 'tetris.png', true, 'jstetris');
 insert into assets (license, author, name, description, version, path, image, active, externid) values (1, 2, 'Jewels', 'Connect the jewels', '0.1', 'org.kde.jewels.plasmoid', 'jewels.png', true, 'jewels');
 
-insert into assetPreviews (asset, path) values (1, 'fishswimming.png');
-insert into assetPreviews (asset, path) values (1, 'fishmultiplying.png');
+insert into assetPreviews (asset, path) values (2, 'fishswimming.png');
+insert into assetPreviews (asset, path) values (2, 'fishmultiplying.png');
 
-update assets set version = '0.2' where id = 1;
+update assets set version = '0.2' where id = 2;
 update assetChangelogs set changes = 'Bug fixes' where asset = 1 and version = '0.1';
 
-insert into assetTags (asset, tag) values (1, 1);
-insert into assetTags (asset, tag) values (1, 2);
 insert into assetTags (asset, tag) values (2, 1);
-insert into assetTags (asset, tag) values (2, 4);
+insert into assetTags (asset, tag) values (2, 2);
+insert into assetTags (asset, tag) values (3, 1);
+insert into assetTags (asset, tag) values (3, 4);
 insert into assetTags (asset, tag) values (4, 1);
 insert into assetTags (asset, tag) values (4, 2);
 insert into assetTags (asset, tag) values (5, 1);
