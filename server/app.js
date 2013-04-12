@@ -58,7 +58,7 @@ app.configure(function() {
     app.use(express.bodyParser());
     app.use(express.cookieParser());
     app.use(express.session({ secret: "love cookies",
-                              store: new RedisStore() }));
+                              store: new RedisStore(app.config.redis) }));
     app.use(app.router);
     app.set('views', __dirname + '/views');
 

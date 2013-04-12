@@ -6,6 +6,9 @@
         "host" :     "localhost",
         "name" :     "bodega"
     },
+    "redis" {
+        "host" : "localhost"
+    }
     "prefix" : "/bodega/v1/json/",
     "service" : {
         "smtp" : {
@@ -31,6 +34,6 @@
         "liveSecretKey" : ""
     },
     "pointConversionRate" : 110,
-    "host" : "127.0.0.1" // optional hostname; leave it out to connect to all interfaces
+    "host" : "localhost" // optional hostname; leave it out to connect to all interfaces
     "port" : 3000
 }
