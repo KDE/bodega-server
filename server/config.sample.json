@@ -17,19 +17,20 @@
         },
         "email" : "Name <returnaddress@example.org>"
     },
-    "storageSystem": "localStorage",
+    "storageSystem" : "localStorage",
     "s3" : {
         "key" : "",
         "secret" : "",
         "bucket" : ""
     },
-    "localStorage": {
-        "basePath": "/content/"
+    "localStorage" : {
+        "basePath" : "/content/"
     },
     "stripe" : {
         "testSecretKey" : "",
         "liveSecretKey" : ""
     },
-    "pointConversionRate": 110,
+    "pointConversionRate" : 110,
+    "host" : "127.0.0.1" // optional hostname; leave it out to connect to all interfaces
     "port" : 3000
 }
