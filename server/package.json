@@ -18,5 +18,13 @@
         "mocha": ">= 0.12.1",
         "should": ">= 0.5.1",
         "jshint": ">= 0.5.8"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "scripts": {
+        "preinstall": "./../sql/setup.sh",
+        "preupdate": "./../sql/updates/do_updates",
+        "start": "./main.sh"
     }
 }

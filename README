@@ -22,7 +22,7 @@ All commands that follow are done relative to the server directory.
 * Start the postgresql daemon (e.g.: /etc/init.d/postgresql start)
 * Create a postgresql user (e.g. bodega). It does not need to be a super user or be able to create
   databases.
-* Run the setup.sh file in the sql directory as the postgres user. Note that it assuesm the name of the
+* Run the setup.sh file in the sql directory as the postgres user. Note that it assumes the name of the
   postgres user is bodega. If you use a different user name or database name, this script will need
   to be tweaked.
 
