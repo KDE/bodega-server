@@ -150,9 +150,9 @@ var AssetStore = (function() {
     }
 
     function keysToLowerCase(input) {
-        var ret = []
-        for (a in input) {
-            ret[a.toLowerCase()] = input[a]
+        var ret = [];
+        for (var a in input) {
+            ret[a.toLowerCase()] = input[a];
         }
         return ret;
     }
@@ -168,7 +168,7 @@ var AssetStore = (function() {
         (isSecure ? http : https).get(options, function(downRes) {
             //console.log("statusCode: ", downRes.statusCode);
             //console.log("headers: ", downRes.headers);
-            downRes.header = keysToLowerCase(downRes.header)
+            downRes.header = keysToLowerCase(downRes.header);
             if (!downRes.headers['content-length'] ||
                 !downRes.headers['content-type']) {
                 fn(new Error("File is unavailable. Please try again later."));

@@ -94,7 +94,7 @@ if (fs.existsSync('cert/key.pem')) {
 }
 
 var port = app.config.port;
-var host = app.config.host ? app.config.host : null
+var host = app.config.host ? app.config.host : null;
 server.listen(port, host);
 
 console.log("Bodega server listening on %s%d in %s mode",
