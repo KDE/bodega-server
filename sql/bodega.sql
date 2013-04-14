@@ -39,7 +39,6 @@ create table people
     fullName     text,
     email        text        not null unique,
     password     text,
-    failedauth   int         not null default 0,
     points       int         not null default 0 constraint ct_personPoints check (points > -1),
     earnedPoints int         not null default 0 constraint ct_personEarnedPoints check (points > -1),
     owedPoints   int         not null default 0 constraint ct_personOwedPoints check (points > -1),

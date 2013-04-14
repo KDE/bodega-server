@@ -34,7 +34,7 @@ function generateHash(pass)
 function authenticate(db, req, res)
 {
     var authQuery =
-        "SELECT u.id, u.fullname, u.failedauth, u.email, u.active, \
+        "SELECT u.id, u.fullname, u.email, u.active, \
          u.points + u.owedPoints as points, u.password FROM people u JOIN devices d ON (d.partNumber = $1) WHERE u.email = $2;";
     var authUser = req.query.auth_user;
     var authPassword = req.query.auth_password;
