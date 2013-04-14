@@ -5,6 +5,8 @@ delete from personroles;
 delete from affiliations;
 delete from languages;
 delete from channels;
+delete from assets;
+delete from devices;
 
 select setval('seq_assetsids', 1);
 select setval('seq_languageids', 1);
@@ -14,27 +16,24 @@ select setval('seq_partnerids', 1);
 select setval('seq_channelids', 1);
 select setval('seq_deviceids', 1);
 
-insert into people (lastname, firstname, email, points, password)
-    values ('Rusin', 'Zack', 'zack@kde.org', 10000, '$2a$10$Iejk3uw6uGFCGR5OKaOOZO2tmnlIhPCsCvw7G1pLa81QH4fonDC.C');
+insert into people (lastname, firstname, email, points, password, active)
+    values ('Rusin', 'Zack', 'zack@kde.org', 10000, '$2a$10$Iejk3uw6uGFCGR5OKaOOZO2tmnlIhPCsCvw7G1pLa81QH4fonDC.C', true);
 
-insert into people (lastname, firstname, email, points, password)
-    values ('Seigo', 'Aaron', 'aseigo@kde.org', 10000, '$2a$10$h6oIz3q1suZ5ncy7HS7UcutdJtwI7WBQ9Nd7cpd5b8hPcFbaXlzGq');
+insert into people (lastname, firstname, email, points, password, active)
+    values ('Seigo', 'Aaron', 'aseigo@kde.org', 10000, '$2a$10$h6oIz3q1suZ5ncy7HS7UcutdJtwI7WBQ9Nd7cpd5b8hPcFbaXlzGq', true);
 
-insert into people (lastname, firstname, email, points, password)
-    values ('Martin', 'Marco', 'mart@kde.org', 10000, '$2a$10$VYBi6invWdeT..wQ5FFXqu67HQI5Y8WVAhN5orzUIsWAeMaAItYrS');
+insert into people (lastname, firstname, email, points, password, active)
+    values ('Martin', 'Marco', 'mart@kde.org', 10000, '$2a$10$VYBi6invWdeT..wQ5FFXqu67HQI5Y8WVAhN5orzUIsWAeMaAItYrS', true);
 
-insert into partners (name, developer, distributor) values ('Diamond Devices', false, true);
-insert into partners (name, developer, distributor) values ('Saphire Software', false, true);
+insert into partners (id, name, developer, distributor) values (2, 'KDE', false, true);
+insert into partners (id, name, developer, distributor) values (3, 'Diamond Devices', false, true);
+insert into partners (id, name, developer, distributor) values (4, 'Saphire Software', false, true);
 
-insert into tags (partner, type, title) values (2, 2, 'Approved by KDE');
-
-
-insert into affiliations (person, partner, role) values (2, 2, 2);
-insert into affiliations (person, partner, role) values (2, 2, 3);
-insert into affiliations (person, partner, role) values (2, 2, 3);
-insert into affiliations (person, partner, role) values (3, 2, 2);
-insert into affiliations (person, partner, role) values (3, 2, 3);
-insert into affiliations (person, partner, role) values (3, 2, 3);
+select affiliatePerson('zack@kde.org', 'KDE', 'Content Creator');
+select affiliatePerson('zack@kde.org', 'KDE', 'Validator');
+select affiliatePerson('aseigo@kde.org', 'KDE', 'Content Creator');
+select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Content Creator');
+select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');
 
 
 insert into channels (image, partner, active, name, description)
@@ -49,11 +48,13 @@ insert into channels (image, partner, active, name, description)
     values ('loser.png', 3, true, 'Diamond Device Magic', 'Best of the best from Diamond');
 
 
+insert into tags (partner, type, title) values (2, 2, 'Approved by KDE');
 insert into tags (partner, type, title) values (2, 3, 'Game');
 insert into tags (partner, type, title) values (2, 3, 'Card Game');
 insert into tags (partner, type, title) values (2, 3, 'Util');
 insert into tags (partner, type, title) values (2, 3, 'Misc');
 
+insert into devices (partner, name, description, partnumber) values (2, 'MPL', 'Usage of PA', 'VIVALDI-1');
 insert into devices (partner, name, description, partnumber) values (2, 'Plasma Workspace', 'KDE Plasma user interfaces', 'KDE-1');
 insert into devices (partner, name, description, partnumber) values (3, 'Bling Media Center', 'Imaginary hifi for your home', 'DD-1');
 insert into devices (partner, name, description, partnumber) values (3, 'Affordaphone', 'Finally a phone even you can afford', 'DD-2');
