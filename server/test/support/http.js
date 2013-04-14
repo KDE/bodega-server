@@ -1,9 +1,9 @@
 var http = require('http');
 
-function getUrl(server, url, fn, cookie) {
+function getUrl(app, url, fn, cookie) {
     var options = {
-        host: server.address().address,
-        port: server.address().port,
+        host: app.server.address().address,
+        port: app.server.address().port,
         path: url,
         headers : {
             'Cookie': cookie
@@ -21,11 +21,11 @@ function getUrl(server, url, fn, cookie) {
     });
 }
 
-function auth(server, fn) {
+function auth(app, fn) {
 
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
-    getUrl(server,
+    getUrl(app,
            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
            function(res) {
                res.statusCode.should.equal(200);
