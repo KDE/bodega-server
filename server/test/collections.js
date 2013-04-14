@@ -22,8 +22,8 @@ describe('Collections', function(){
     var cookie;
     var collectionId;
     var collectionName = 'favorites1';
-    var assets = [4, 34, 36, 38];
-    var assetsToRemove = [4, 34];
+    var assets = [3, 4, 5, 6];
+    var assetsToRemove = [4, 5];
     var numCollections = 0;
     describe('without authentication', function(){
         it('shouldnt allow listing collections', function(done) {
