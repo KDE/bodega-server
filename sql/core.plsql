@@ -285,16 +285,14 @@ DROP TRIGGER IF EXISTS trg_ct_processNewAsset ON assets;
 CREATE TRIGGER trg_ct_processNewAsset BEFORE INSERT ON assets
 FOR EACH ROW EXECUTE PROCEDURE ct_processNewAsset();
 
-CREATE OR REPLACE function affiliatePerson(firstname text, lastname text, email text,
-                                partnername text, prole text)
-returns void
+CREATE OR REPLACE function affiliatePerson(email text, partnername text, prole text) returns void
 AS
 $$
     INSERT INTO affiliations
      SELECT pep.id AS person, par.id AS partner, r.id AS role
        FROM people pep, partners par, personRoles r
-       WHERE pep.firstname=$1 AND pep.lastname=$2 AND pep.email=$3
-       AND par.name=$4
-       AND r.description=$5
+       WHERE pep.email = email
+       AND par.name = partnername
+       AND r.description = prole
 $$ language SQL;
 
