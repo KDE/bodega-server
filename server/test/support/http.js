@@ -2,8 +2,8 @@ var http = require('http');
 
 function getUrl(app, url, fn, cookie) {
     var options = {
-        host: app.server.address().address,
-        port: app.server.address().port,
+        host: app.config.host,
+        port: app.config.port,
         path: url,
         headers : {
             'Cookie': cookie
