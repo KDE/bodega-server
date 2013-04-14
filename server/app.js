@@ -81,21 +81,20 @@ app.configure('production', function() {
 
 require('./routes.js');
 
-var server;
 if (fs.existsSync('cert/key.pem')) {
     // https
     var privateKey = fs.readFileSync('cert/key.pem');
     var certificate = fs.readFileSync('cert/certificate.pem');
-    server = https.createServer({key: privateKey, cert: certificate}, app);
+    app.server = https.createServer({key: privateKey, cert: certificate}, app);
 } else {
     // ** NO ** SSL!
     console.log("WARNING: Setting up server with no ssl!");
-    server = http.createServer(app);
+    app.server = http.createServer(app);
 }
 
 var port = app.config.port;
 var host = app.config.host ? app.config.host : null;
-server.listen(port, host);
+app.server.listen(port, host);
 
 console.log("Bodega server listening on %s%d in %s mode",
             host ? host + ':' : '', port, app.settings.env);
