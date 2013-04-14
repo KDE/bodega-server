@@ -15,13 +15,13 @@ select setval('seq_channelids', 1);
 select setval('seq_deviceids', 1);
 
 insert into people (lastname, firstname, email, points, password)
-    values ('Rusin', 'Zack', 'zack@kde.org', 10000, 'zack');
+    values ('Rusin', 'Zack', 'zack@kde.org', 10000, '$2a$10$Iejk3uw6uGFCGR5OKaOOZO2tmnlIhPCsCvw7G1pLa81QH4fonDC.C');
 
 insert into people (lastname, firstname, email, points, password)
-    values ('Seigo', 'Aaron', 'aseigo@kde.org', 10000, 'aseigo');
+    values ('Seigo', 'Aaron', 'aseigo@kde.org', 10000, '$2a$10$h6oIz3q1suZ5ncy7HS7UcutdJtwI7WBQ9Nd7cpd5b8hPcFbaXlzGq');
 
 insert into people (lastname, firstname, email, points, password)
-    values ('Martin', 'Marco', 'mart@kde.org', 10000, 'mart');
+    values ('Martin', 'Marco', 'mart@kde.org', 10000, '$2a$10$VYBi6invWdeT..wQ5FFXqu67HQI5Y8WVAhN5orzUIsWAeMaAItYrS');
 
 insert into partners (name, developer, distributor) values ('Diamond Devices', false, true);
 insert into partners (name, developer, distributor) values ('Saphire Software', false, true);
