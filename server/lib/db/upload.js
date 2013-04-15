@@ -16,8 +16,32 @@
 */
 
 var utils = require('../utils.js');
+var fs = require('fs');
 
 module.exports = function(db, req, res) {
-    console.log("start");
-    console.log(req);
+    var json = {
+        device : req.session.user.device,
+        authStatus : req.session.authorized,
+        points : req.session.user.points,
+        asset : 1
+    };
+
+    console.log("start ");
+    console.log("path = "  + req.files.asset['path']);
+    console.log("size = "  + req.files.asset['size']);
+    console.log("filename = "  + req.files.asset['filename']);
+    console.log("length = "  + req.files.asset['length']);
+    var file = req.files.asset;
+
+
+    console.log('==============================================================');
+    var stream = fs.createReadStream(req.files.asset['path']);
+    /*
+    stream.setEncoding('utf8');
+    stream.on('start', function() { console.log('==============================================================') ; })
+          .on('data', function(chunk){ console.log(chunk); })
+          .on('end', function() { console.log('==============================================================');});
+    fs.unlink(file.path);
+    */
+    res.json(json);
 };
