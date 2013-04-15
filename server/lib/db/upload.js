@@ -26,26 +26,27 @@ function checkPartner(db, req, res)
     if (partner === null) {
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
                 [req.session.user.id],
-                function(err, qRes) {
-                    if (err || !qRes.rows || !qRes.rows.size < 1) {
+                function(err, result) {
+                    if (err || !result.rows || result.rows.length === 0) {
                         errors.report('UploadPartnerInvalid', req, res);
                         return;
                     }
 
-                    req.body.partner = qRes.rows[0].partner;
-                    fn(db, req, res);
+                    req.body.partner = result.rows[0].partner;
+                    storeAsset(db, req, res);
                 });
     } else {
         //console.log("checking up on partner");
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
                 [req.body.partner, req.session.user.id],
                 function(err, result) {
-                    if (err || !result.rows || !result.rows.size < 1) {
-                        //console.log("didn't find partner");
+                    if (err || !result.rows || result.rows.length === 0) {
+                        console.log("didn't find partner");
                         errors.report('UploadPartnerInvalid', req, res);
                         return;
                     }
 
+                    console.log("going to store the asset now .. " + req.body.partner + " " + result.rows.size);
                     storeAsset(db, req, res);
                 });
     }
@@ -60,8 +61,8 @@ function storeAsset(db, req, res)
                  app.assetStore.upload(req,
                      function(err, result) {
                          if (err) {
-                             console.log("error due to bad rename?");
-                             errors.report('Upload failed', req, res);
+                             //console.log("error due to bad rename?");
+                             errors.report('UploadFailed', req, res);
                              return;
                          }
 
@@ -99,9 +100,9 @@ module.exports = function(db, req, res) {
     //console.log("start ");
 
     var file = req.files.asset;
-    if (!file || file['size'] < 1 || file['filename'].size < 1) {
+    if (!file || file['size'] < 1 || file['filename'].length === 0) {
         //console.log("error due to bad file");
-        errors.report('Upload failed', req, res);
+        errors.report('UploadFailed', req, res);
         return;
     }
 
