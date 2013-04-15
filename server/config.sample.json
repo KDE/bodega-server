@@ -6,7 +6,7 @@
         "host" :     "localhost",
         "name" :     "bodega"
     },
-    "redis" {
+    "redis" : {
         "host" : "localhost"
     },
     "prefix" : "/bodega/v1/json/",
