@@ -23,7 +23,7 @@ function checkPartner(db, req, res)
 {
     //console.log("checking " + req.body.partner + ' ' + req.session.user.id);
     var partner = req.body.partner;
-    if (partner === null) {
+    if (!partner) {
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
                 [req.session.user.id],
                 function(err, result) {
@@ -41,7 +41,6 @@ function checkPartner(db, req, res)
                 [req.body.partner, req.session.user.id],
                 function(err, result) {
                     if (err || !result.rows || result.rows.length === 0) {
-                        console.log("didn't find partner");
                         errors.report('UploadPartnerInvalid', req, res);
                         return;
                     }
@@ -54,7 +53,6 @@ function checkPartner(db, req, res)
 
 function storeAsset(db, req, res)
 {
-    console.log("storing asset...");
     db.query("select nextval('seq_assetsids') as assetId;", [],
              function(err, result) {
                  req.files.asset.id = result.rows[0].assetid;
