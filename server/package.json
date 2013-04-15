@@ -17,6 +17,7 @@
     "devDependencies": {
         "mocha": ">= 0.12.1",
         "should": ">= 0.5.1",
-        "jshint": ">= 0.5.8"
+        "jshint": ">= 0.5.8",
+        "request" : "latest"
     }
 }
