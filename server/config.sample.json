@@ -28,6 +28,7 @@
     },
     "localStorage" : {
         "basePath" : "/content/"
+        "incomingBasePath" : "/incoming/"
     },
     "stripe" : {
         "testSecretKey" : "",
