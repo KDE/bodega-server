@@ -8,7 +8,7 @@
     },
     "redis" {
         "host" : "localhost"
-    }
+    },
     "prefix" : "/bodega/v1/json/",
     "service" : {
         "smtp" : {
