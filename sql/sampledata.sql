@@ -1,7 +1,6 @@
 --begin;
 delete from people;
 delete from partners;
-delete from personroles;
 delete from affiliations;
 delete from languages;
 delete from channels;
