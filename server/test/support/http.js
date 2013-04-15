@@ -29,7 +29,6 @@ function getUrl(app, url, fn, cookie) {
 function uploadFile(path, app, url, postData, fn, cookie) {
     var j = request.jar();
     if (cookie) {
-        console.log(cookie);
         //var c = request.cookie(cookie);
         for (var i in cookie) {
             j.add(new cookies.Cookie(cookie[i]));
@@ -53,7 +52,6 @@ function uploadFile(path, app, url, postData, fn, cookie) {
                 res.headers = response.headers;
                 fn(res);
             });
-    console.log("and the jar thinks: " + j.get(options));//"connect.sid"));
     var form = req.form();
     form.append('asset', fs.createReadStream(path));
     for (i in postData) {
