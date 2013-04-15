@@ -34,7 +34,7 @@ var AssetStore = (function() {
 
     function localPutStream(req, fn)
     {
-        console.log("Let the renaming begin!");
+        //console.log("Let the renaming begin!");
         var assetObj = req.files.asset;
         var path = process.cwd() + storageConfig.incomingBasePath;
         var relPath = assetObj.filename;

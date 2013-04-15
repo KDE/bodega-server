@@ -21,14 +21,14 @@ var fs = require('fs');
 
 function checkPartner(db, req, res)
 {
-    console.log("checking " + req.body.partner + ' ' + req.session.user.id);
+    //console.log("checking " + req.body.partner + ' ' + req.session.user.id);
     var partner = req.body.partner;
     if (partner === null) {
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
                 [req.session.user.id],
                 function(err, qRes) {
                     if (err || !qRes.rows || !qRes.rows.size < 1) {
-                        errors.report('UserNotUploader', req, res);
+                        errors.report('UploadPartnerInvalid', req, res);
                         return;
                     }
 
@@ -36,12 +36,12 @@ function checkPartner(db, req, res)
                     fn(db, req, res);
                 });
     } else {
-                        console.log("checking up on partner");
+        //console.log("checking up on partner");
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
                 [req.body.partner, req.session.user.id],
                 function(err, result) {
                     if (err || !result.rows || !result.rows.size < 1) {
-                        console.log("didn't find partner");
+                        //console.log("didn't find partner");
                         errors.report('UploadPartnerInvalid', req, res);
                         return;
                     }
@@ -75,7 +75,7 @@ function recordAsset(db, req, res)
 {
     var file = req.files.asset;
     var incomingPath = file.incomingPath;
-    console.log(req.session.user.id, "our paths are => " + file.filename + ' ' + incomingPath);
+    //console.log(req.session.user.id, "our paths are => " + file.filename + ' ' + incomingPath);
     var newAssetQuery = 'insert into incomingAssets (author, name, file, path) values ($1, $2, $3, $4)';
     db.query(newAssetQuery, [req.body.partner, file.filename, file.filename, incomingPath],
             function(err, result) {
@@ -96,7 +96,7 @@ function recordAsset(db, req, res)
 };
 
 module.exports = function(db, req, res) {
-    console.log("start ");
+    //console.log("start ");
 
     var file = req.files.asset;
     if (!file || file['size'] < 1 || file['filename'].size < 1) {
