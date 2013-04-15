@@ -26,7 +26,7 @@ function getUrl(app, url, fn, cookie) {
     });
 }
 
-function uploadFile(path, app, url, fn, cookie) {
+function uploadFile(path, app, url, postData, fn, cookie) {
     var j = request.jar();
     if (cookie) {
         console.log(cookie);
@@ -56,6 +56,9 @@ function uploadFile(path, app, url, fn, cookie) {
     console.log("and the jar thinks: " + j.get(options));//"connect.sid"));
     var form = req.form();
     form.append('asset', fs.createReadStream(path));
+    for (i in postData) {
+        form.append(i, postData[i]);
+    }
 }
 
 function auth(app, fn) {
