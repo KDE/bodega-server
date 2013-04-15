@@ -83,7 +83,7 @@ describe('Upload Workflow', function(){
                 __filename,
                 server,
                 '/bodega/v1/json/upload',
-                { 'partner' : 2 },
+                { 'partner' : 1 },
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
