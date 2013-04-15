@@ -32,6 +32,14 @@ All commands that follow are done relative to the server directory.
 
 Move config.sample.json to config.json and update/edit it if necessary.
 
+## Configuration
+
+Copy the config.sample.json file to config.json and customize the values within it. The configuration
+keys should be self-explanatory, and if you do not use a given service (e.g. S3 or Stripe) you can
+safely ignore those blocks completely.
+
+Most (often, all) of the default settings should work.
+
 ## Quick Start
 
    $ ./main.sh
@@ -47,9 +55,23 @@ You can also start it directly with:
 Updates to sql schemas, if necesary, will be found in in sql/updates with file names ordered in a
 numerically ascending sequence.
 
-## Running Tests
+## Testing
+
+To set up the server for running the tests, connect to the database with psql and load the sampledata.sql
+and testdata.sql files.
+
+To run the test suite, go into the server directory and run:
 
    $ make test
+
+You can also run individual test suites with:
+
+   $ make test/<testname>
+
+<testname> is the name of the .js file in the tests/ directory minus the .js extenstion, so for
+example:
+
+   $ make test/upload
 
 ## Checking the code
 
