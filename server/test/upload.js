@@ -96,6 +96,24 @@ describe('Upload Workflow', function(){
                 cookie);
         });
 
+        it('should succeed with no explicit partner', function(done){
+            utils.uploadFile(
+                __filename,
+                server,
+                '/bodega/v1/json/upload',
+                { },
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('asset');
+                    done();
+                },
+                cookie);
+        });
+
         it('should fail with an invalid partner', function(done){
             utils.uploadFile(
                 __filename,
