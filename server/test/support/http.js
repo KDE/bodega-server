@@ -45,7 +45,11 @@ function uploadFile(path, app, url, fn, cookie) {
                 var res = new Object();
                 res.statusCode = response.statusCode;
                 res.err = error;
-                res.body = JSON.parse(body);
+                try {
+                    res.body = JSON.parse(body);
+                } catch (e) {
+                    res.body = body;
+                }
                 res.headers = response.headers;
                 fn(res);
             });
