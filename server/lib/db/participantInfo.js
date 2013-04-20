@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -30,11 +30,12 @@ module.exports = function(db, req, res) {
         organization: '',
         firstName: '',
         lastName: '',
-        email: ''
+        email: '',
+        accountStatus: ''
     };
 
     if (req.session.authorized) {
-        var accountInfoQuery = "SELECT firstName, lastName, email FROM people WHERE id = $1;";
+        var accountInfoQuery = "SELECT firstName, lastName, email, accountStatus FROM people WHERE id = $1;";
         var q = db.query(accountInfoQuery, [req.session.user.id],
                          function(err, result)
                          {
@@ -46,6 +47,7 @@ module.exports = function(db, req, res) {
                             json.firstName = result.rows[0].firstname;
                             json.lastName = result.rows[0].lastname;
                             json.email = result.rows[0].email;
+                            json.accountStatus = result.rows[0].accountStatus;
 
                             var assetCountQuery = "SELECT COUNT(id) AS assetCount FROM assets WHERE author = $1;";
                             var q = db.query(assetCountQuery, [req.session.user.id],
