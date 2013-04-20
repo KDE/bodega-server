@@ -33,7 +33,8 @@ Database::Database(const QString &contentPath)
       m_partnerId(0),
       m_authorTagId(0),
       m_categoryTagId(0),
-      m_contentPath(contentPath)
+      m_contentPath(contentPath),
+      m_licenseId(0)
 {
     //Fix to KDE
     m_partnerId = partnerQuery();
@@ -128,11 +129,29 @@ int Database::authorQuery(const QString &author) const
 
 int Database::partnerQuery()
 {
+    QSqlQuery query;
+    query.prepare("select name from partners "
+                  "where :id = 'KDE'");
+    query.bindValue(":id", 1);
+    if (!query.exec() || !query.first()) {
+        showError(query);
+        return 0;
+    }
+
     return 1;
 }
 
 int Database::licenseQuery()
 {
+    QSqlQuery query;
+    query.prepare("select name from licenses "
+                  "where :id = 'LGPL'");
+    query.bindValue(":id", 2);
+    if (!query.exec() || !query.first()) {
+        showError(query);
+        return 0;
+    }
+
     return 2;
 }
 
@@ -462,12 +481,6 @@ void Database::writeAssetTags(int assetId, QVariant &tagId)
 
 void Database::writeChannelTags(int channelId, int tagId)
 {
-    QSqlQuery query;
-    query.prepare("insert into channelTags "
-                  "(channel, tag) "
-                  "values "
-                  "(:channelId, :tagId);");
-
     QSqlQuery checkQuery;
     checkQuery.prepare("select * from channelTags where channel = :channel and tag = :tagId;");
     checkQuery.bindValue(":channelId", channelId);
@@ -477,6 +490,11 @@ void Database::writeChannelTags(int channelId, int tagId)
         // tag already exists, don't make it again
         return;
     }
+    QSqlQuery query;
+    query.prepare("insert into channelTags "
+                  "(channel, tag) "
+                  "values "
+                  "(:channelId, :tagId);");
 
     query.bindValue(":channelId", channelId);
     query.bindValue(":tagId", tagId);

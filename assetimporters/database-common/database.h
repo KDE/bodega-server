@@ -66,6 +66,7 @@ private:
     int m_partnerId;
     int m_authorTagId;
     int m_categoryTagId;
+    int m_licenseId;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;
     QString m_contentPath;

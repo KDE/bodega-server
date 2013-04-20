@@ -167,7 +167,7 @@ void PackageDatabase::writePackages()
 
 void PackageDatabase::writePackageChannels()
 {
-    foreach(const Channel &c, m_channelsCatalog.channels()) {
+    foreach (const Channel &c, m_channelsCatalog.channels()) {
         writeChannels(c.name, c.description, c.image, c.parent.toInt());
 
         const int chanId = channelId(c.name, c.description, c.parent.toInt());

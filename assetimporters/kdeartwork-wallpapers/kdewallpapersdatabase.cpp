@@ -49,9 +49,9 @@ WallpapersDatabase::WallpapersDatabase(const QString &contentPath)
     m_mimetypeTagId(0)
 {
     //FIXME: fix to LGPL
-    m_licenseId = 2;
+    m_licenseId = licenseQuery();
     //Fix to KDE
-    m_partnerId = 1;
+    m_partnerId = partnerQuery();
 }
 
 void WallpapersDatabase::writeWallpaperChannels()
@@ -190,9 +190,5 @@ void WallpapersDatabase::writeWallpapersChannelTags()
     QHash<QString, int> mimetype;
     const int tag = tagId(mime, Catalog::c_mimeType, &m_mimetypeIds);
     writeChannelTags(chanId, tag);
-}
-
-int WallpapersDatabase::partnerQuery() {
-    return 1;
 }
 

@@ -51,6 +51,7 @@ private:
     QHash<QString, int> m_extraChannelIds;
     QHash<QString, int> m_mimetypeIds;
     QHash<QString, int> m_createdIds;
+    QHash<QString, int> m_languageIds;
 };
 }
 

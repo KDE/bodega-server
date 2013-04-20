@@ -340,18 +340,29 @@ int GutenbergDatabase::partnerQuery()
 
 int GutenbergDatabase::languageQuery(const QString &lang)
 {
-    QSqlQuery query;
-    query.prepare("select id from languages where code=:lang;");
-    query.bindValue(":lang", lang);
-    if (!query.exec()) {
-        showError(query);
-        return 0;
+    int id = m_languageIds.value(lang);
+
+    if (id < 1) {
+         QSqlQuery query;
+        query.prepare("select id from languages where code=:lang;");
+        query.bindValue(":lang", lang);
+
+        if (!query.exec()) {
+            showError(query);
+            return 0;
+        }
+
+        if (!query.first()) {
+            return 0;
+        }
+
+        QVariant res = query.value(0);
+
+        id = res.toInt();
+        m_languageIds.insert(lang, id);
     }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
+
+    return id;
 }
 
 int GutenbergDatabase::licenseQuery()
