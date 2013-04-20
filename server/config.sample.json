@@ -34,6 +34,6 @@
         "liveSecretKey" : ""
     },
     "pointConversionRate" : 110,
-    "host" : "localhost" // optional hostname; leave it out to connect to all interfaces
+    "host" : "localhost",
     "port" : 3000
 }

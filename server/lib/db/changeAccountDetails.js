@@ -119,8 +119,6 @@ function performEmailUpdate(db, req, res, next)
     }
 }
 
-
-
 function performCardUpdate(db, req, res, next)
 {
     var card = req.query.card;
@@ -155,6 +153,16 @@ function performCardUpdate(db, req, res, next)
     } else {
         next();
     }
+}
+
+function performAccountStatusUpdate(db, req, res, next) {
+    var stat = req.query.active;
+
+    if (!stat) {
+        next();
+        return;
+    }
+    performUpdate(db, 'active', stat, req.session.user.id, next);
 }
 
 function completeUpdate(db, req, res, next)
@@ -203,6 +211,7 @@ module.exports.changeDetails = function(db, req, res) {
         performFirstNameUpdate,
         performLastNameUpdate,
         performCardUpdate,
+        performAccountStatusUpdate,
         completeUpdate
         ], errorHandler, db, req, res);
 };
