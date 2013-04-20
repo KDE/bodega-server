@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -33,7 +33,8 @@ module.exports = function(db, req, res) {
         { layout: false,
           title: 'Account activation failed!',
           message: 'Activation parameters missing',
-          success: false
+          success: false,
+          storeName: app.config.storeInfo.name
         });
         return;
     }

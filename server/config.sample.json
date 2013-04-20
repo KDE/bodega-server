@@ -6,6 +6,12 @@
         "host" :     "localhost",
         "name" :     "bodega"
     },
+    "storeInfo" : {
+        "name" : "Make Play Live",
+        "description": "foo",
+        "url" : "http://makeplaylive.com",
+        "contact": "foo@example.gr"
+    },
     "redis" : {
         "host" : "localhost"
     },

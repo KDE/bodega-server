@@ -210,7 +210,8 @@ app.get(serverPath('participant/resetPassword'), function(req, res) {
                { layout: false,
                  resetCode: req.query.code,
                  userId: req.query.id,
-                 userEmail: req.query.email
+                 userEmail: req.query.email,
+                 storeName: app.config.storeInfo.name
                });
 });
 
@@ -260,5 +261,17 @@ app.get('/images/*', function(req, res) {
 
 //NOTE: Always has to be the last route
 app.get('/', function(req, res) {
-    res.render('index.jade',{});
+    res.render('index.jade', {
+        storeName: app.config.storeInfo.name,
+        storeUrl: app.config.storeInfo.url
+    });
+});
+
+app.get('/contact', function(req, res) {
+    res.json({
+        name: app.config.storeInfo.name,
+        desciption: app.config.storeInfo.desciption,
+        url: app.config.storeInfo.url,
+        contact: app.config.storeInfo.contact
+    });
 });

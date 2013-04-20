@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -36,7 +36,8 @@ module.exports = function(db, req, res) {
             { layout: false,
               title: 'Password reset failed!',
               message: 'Arguments missing!',
-              success: false
+              success: false,
+              storeName: app.config.storeInfo.name
             });
         return;
     }
@@ -48,7 +49,8 @@ module.exports = function(db, req, res) {
                 { layout: false,
                   title: 'Password reset failed!',
                   message: 'Couldn\'t encrypt the password! Please try again.',
-                  success: false
+                  success: false,
+                  storeName: app.config.storeInfo.name
                 });
             return;
         }
@@ -60,7 +62,8 @@ module.exports = function(db, req, res) {
                     { layout: false,
                       title: 'Password reset failed!',
                       message: 'Couldn\'t encrypt the password! Please try again.',
-                      success: false
+                      success: false,
+                      storeName: app.config.storeInfo.name
                     });
                 return;
             }
@@ -75,7 +78,8 @@ module.exports = function(db, req, res) {
                             { layout: false,
                               title: 'Password reset failed!',
                               message: 'Database communication problem! Please try again.',
-                              success: false
+                              success: false,
+                              storeName: app.config.storeInfo.name
                             });
                         return;
                     }
@@ -87,7 +91,8 @@ module.exports = function(db, req, res) {
                             { layout: false,
                               title: 'Password reset failed!',
                               message: 'Specified password reset code was invalid.',
-                              success: false
+                              success: false,
+                              storeName: app.config.storeInfo.name
                             });
                         return;
                     }
@@ -100,7 +105,8 @@ module.exports = function(db, req, res) {
                             { layout: false,
                               'title': title,
                               'message': message,
-                              success: true
+                              success: true,
+                              storeName: app.config.storeInfo.name
                             });
                 }
             );
