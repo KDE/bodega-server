@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -53,11 +53,6 @@ function authenticate(db, req, res)
 
             var userData = result.rows[0];
 
-            if (!userData.active) {
-                errors.report('AccountInactive', req, res);
-                return;
-            }
-
             BCrypt.compare(
                 authPassword, userData.password,
                 function(err, authorized) {
@@ -72,6 +67,7 @@ function authenticate(db, req, res)
                     obj.authStatus = authorized;
                     obj.points = userData.points;
                     obj.imageUrls = imageUrls;
+                    obj.active = userData.active;
                     var user = {
                         name:   authUser,
                         id: obj.userId,
