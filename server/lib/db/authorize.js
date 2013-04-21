@@ -52,6 +52,11 @@ function authenticate(db, req, res)
             }
 
             var userData = result.rows[0];
+            if (!userData.active) {
+                utils.sendConfirmationEmail(db, req, res, userData.id, userData.email);
+                errors.report('AccountInactive', req, res);
+                return;
+            }
 
             BCrypt.compare(
                 authPassword, userData.password,

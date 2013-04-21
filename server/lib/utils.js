@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -14,6 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
+
+var nodemailer = require('nodemailer');
 
 module.exports.findImagePaths = function(req)
 {
@@ -63,4 +65,88 @@ module.exports.standardJson = function(req, success)
     json.success = typeof success !== 'undefined' ? success : true;
     return json;
 };
+
+module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
+{
+    var service = app.config.service;
+    //XXX: replace with jade and html emails
+    var template =
+'Welcome to Make·Play·Live, \n\
+ \n\
+ To start using your Make·Play·Live account please confirm your email address\n\
+ by clicking on the following link:\n \
+ \n\
+ http://#{host}#{prefix}register/confirm?code=#{code}&email=#{email}&id=#{userId}\n \
+ \n\
+ Thank You,\n \
+ Make·Play·Live Team\n';
+    var transport = nodemailer.createTransport("SMTP",{
+        host:             service.smtp.host,
+        secureConnection: service.smtp.useSSL,
+        port:             service.smtp.port,
+        auth: {
+            user: service.smtp.user,
+            pass: service.smtp.pass
+        }
+    });
+
+    var mailOptions = {
+        transport: transport, // transport method to use
+        from: service.email,
+        to: userEmail, // list of receivers
+        subject: "Activate your new account", // Subject line
+        //text: text, //set later
+        //html: "<b>Hello world!</b>" // html body
+    };
+
+    var query =
+        'select ct_createAccountActivationCode($1) as activationcode;';
+
+    db.query(
+        query, [userId],
+        function(err, result) {
+            var text;
+            var json = {
+                userId: userId
+            };
+            if (err) {
+                deleteUser(db, args.userId);
+                errors.report('Database', req, res, err);
+                return false;
+            }
+
+            var confirmationCode = result.rows[0].activationcode;
+            text = template.replace('#{code}', confirmationCode);
+            text = text.replace('#{email}', userEmail);
+            text = text.replace('#{userId}', userId);
+            text = text.replace('#{host}', req.headers.host);
+            text = text.replace('#{prefix}', app.config.prefix);
+            mailOptions.text = text;
+
+            if (app.settings.env === 'test') {
+                json.confirmationCode = confirmationCode;
+                json.text = text;
+                res.json(json);
+                console.log(text);
+            } else {
+                nodemailer.sendMail(mailOptions, function(error) {
+                    var json = {};
+                    if (error) {
+                        deleteUser(db, args.userId);
+                        errors.report('MailerFailure', req, res, error);
+                        transport.close();
+                        return false;
+                    }
+
+                    json.message =
+                        "Confirmation email sent!";
+                    //console.log("Message sent!");
+                    res.json(json);
+                    transport.close(); // lets shut down the connection pool
+                });
+            }
+        }
+    );
+    return true;
+}
 
