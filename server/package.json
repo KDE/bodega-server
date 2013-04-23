@@ -23,8 +23,8 @@
         "node": ">=0.10.0"
     },
     "scripts": {
-        "preinstall": "./../sql/setup.sh",
-        "preupdate": "./../sql/updates/do_updates",
-        "start": "./main.sh"
+        "preinstall" : "./../sql/do_sql setup",
+        "preupdate" : "./../sql/do_sql update",
+        "start" : "./main.sh"
     }
 }
