@@ -619,7 +619,7 @@ void Database::writeChannelTags()
     }
 }
 
-int Database::showError(const QSqlQuery &query) const
+void Database::showError(const QSqlQuery &query) const
 {
     QSqlError error = query.lastError();
     qDebug() << Q_FUNC_INFO << "QPSQL Error: " << error.databaseText() << error.driverText();
