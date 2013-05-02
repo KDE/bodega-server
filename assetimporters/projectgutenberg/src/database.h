@@ -81,7 +81,7 @@ private:
     void writeBookAssetTags(const Ebook &book, int assetId);
     void writeChannelTags();
     int createLicenseId();
-    int showError(const QSqlQuery &query) const;
+    void showError(const QSqlQuery &query) const;
 
 private:
     QSqlDatabase m_db;
