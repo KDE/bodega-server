@@ -74,7 +74,8 @@ module.exports = function(db, req, res) {
                 { layout: false,
                   title: 'Success!',
                   message: 'A new Make·Play·Live account for ' + result.rows[0].email + ' has been created. You may now log in.',
-                  success: true
+                  success: true,
+                  storeName: app.config.storeInfo.name
                 });
             });
         });
