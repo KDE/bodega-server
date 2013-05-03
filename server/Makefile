@@ -7,4 +7,10 @@ test:
 check:
 	@./node_modules/.bin/jshint .
 
-.PHONY: test check
+sql:
+	./../sql/do_sql config.json ../sql/ setup
+
+update_sql:
+	./../sql/do_sql config.json ../sql/ update
+
+.PHONY: test check sql update_sql

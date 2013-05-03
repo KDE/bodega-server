@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
+var fs = require('fs');
+
 //those are the files that we use for the setup of the database
-var sql_commands = ['bodega.sql', 'core.plsql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql'];
+var sql_commands = ['bodega.sql', 'core.plsql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql', 'vivaldi.sql'];
 
 //those are the migration files which we will use in order to migrate and update successfully the db
 var update_sql_commands = [];
@@ -26,13 +28,13 @@ function series(command_list) {
     //this is out command for the sql files
     var sql_command = function(fileName) {
         var command = 'psql -d ' + config.database.name + ' -U ' + config.database.user + ' -f ';
-        command += npm_path + '/../sql/' + fileName + ' 1>/dev/null';
+        command += sql_dir + fileName + ' 1>/dev/null';
         return command;
     }
 
     function next() {
         var element = command_list.shift();
-        if (command_list.length > 0) {
+        if (element !== undefined) {
             var command = '';
             //the element is a sql file so make it a full command
             if (element.indexOf('.sql') > -1 || element.indexOf('.plsql') > -1) {
@@ -52,31 +54,30 @@ function series(command_list) {
     next();
 }
 
-var npm_path = '';
-var config = {};
-// find the npm dir, the npm dir is
-// dir where the package.json file is
-//and parse the package.json
-run('npm prefix', function(npmPath) {
-    var fs = require('fs');
-    npm_path = npmPath;
-    config = JSON.parse(fs.readFileSync((npm_path + '/config.json'), 'utf8'));
+var config_json = process.argv[2];
+var sql_dir = process.argv[3];
+var sql_argument = process.argv[4];
 
-    var argument = process.argv[2];
+if (sql_dir === undefined || config_json === undefined || sql_argument === undefined) {
+    console.log('Missing arguements');
+    console.log('This scripts needs as arguments <config.json filepath> <sql directory filepath> <sql command>');
+    return;
+}
 
-    if (argument == 'update') {
-        console.log('====Updating the database schema!!====');
-        series(update_sql_commands);
-    } else if (argument == 'setup') {
-        console.log('====Creating the database schema!!====');
-        sql_commands.unshift('createdb -O ' + config.database.name + ' ' + config.database.name);
-        sql_commands.unshift('dropdb ' + config.database.user);
-        series(sql_commands);
-    } else {
-        console.log('This script needs an argument, this can be either update or setup.');
-        console.log('setup: creates the database');
-        console.log('update: migrates the database');
-        return;
-    }
-});
+var config = JSON.parse(fs.readFileSync((config_json), 'utf8'));
+
+if (sql_argument == 'update') {
+    console.log('====Updating the database schema!!====');
+    series(update_sql_commands);
+} else if (sql_argument == 'setup') {
+    console.log('====Creating the database schema!!====');
+    sql_commands.unshift('createdb -O ' + config.database.name + ' ' + config.database.name);
+    sql_commands.unshift('dropdb ' + config.database.user);
+    series(sql_commands);
+} else {
+    console.log('This script needs an argument, this can be either update or setup.');
+    console.log('setup: creates the database');
+    console.log('update: migrates the database');
+    return;
+}
 
