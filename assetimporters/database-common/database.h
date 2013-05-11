@@ -30,8 +30,8 @@ protected:
                   int parentId=0);
     int writeChannels(const QString &name, const QString &description, const QString& image, int parentId = 0);
 
-    virtual int partnerQuery();
-    virtual int licenseQuery();
+    virtual int partnerId();
+    virtual int licenseId();
 
     int authorQuery(const QString &author) const;
     int contributorQuery(const QString &author) const;

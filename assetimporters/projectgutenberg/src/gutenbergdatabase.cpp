@@ -48,7 +48,7 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
 {
     QSqlDatabase::database().transaction();
 
-    m_partnerId = partnerQuery();
+    m_partnerId = partnerId();
     if (m_partnerId <= 0) {
         QSqlQuery query;
         if (!query.exec("insert into partners (name, developer, distributor) "
@@ -57,11 +57,11 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
             QSqlDatabase::database().rollback();
             return;
         }
-        m_partnerId = partnerQuery();
+        m_partnerId = partnerId();
     }
     //qDebug()<<"partner id = "<<m_partnerId;
 
-    m_licenseId = licenseQuery();
+    m_licenseId = licenseId();
     if (!m_licenseId) {
         QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create Project Gutenberg license id");
@@ -71,7 +71,7 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
 
     m_mimetypeTagId = mimetypeTagId();
     m_createdTagId = createdTagId();
-    m_partnerId = partnerQuery();
+    m_partnerId = partnerId();
 
     m_contributorTagId = contributorTagId();
     writeInit(clearOldData);
@@ -87,7 +87,7 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
         QLocale locale(lang);
 
         if (locale != QLocale::c()) {
-            if (languageQuery(lang) || languageQuery(locale.name())) {
+            if (languageId(lang) || languageId(locale.name())) {
                 qDebug()<<"Language = "<<lang
                         <<" already in the database";
                 continue;
@@ -323,7 +323,7 @@ void GutenbergDatabase::writeBookChannelTags()
     }
 }
 
-int GutenbergDatabase::partnerQuery()
+int GutenbergDatabase::partnerId()
 {
     QSqlQuery query;
     if (!query.exec("select id from partners "
@@ -338,7 +338,7 @@ int GutenbergDatabase::partnerQuery()
     return res.toInt();
 }
 
-int GutenbergDatabase::languageQuery(const QString &lang)
+int GutenbergDatabase::languageId(const QString &lang)
 {
     int id = m_languageIds.value(lang);
 
@@ -365,7 +365,7 @@ int GutenbergDatabase::languageQuery(const QString &lang)
     return id;
 }
 
-int GutenbergDatabase::licenseQuery()
+int GutenbergDatabase::licenseId()
 {
     QSqlQuery query;
     if (!query.exec("select id from licenses where name = 'Project Gutenberg License';")) {

@@ -37,7 +37,7 @@ Database::Database(const QString &contentPath)
       m_licenseId(0)
 {
     //Fix to KDE
-    m_partnerId = partnerQuery();
+    m_partnerId = partnerId();
     //db.setHostName("localhost");
     m_db.setDatabaseName("bodega");
     m_db.setUserName("bodega");
@@ -127,7 +127,7 @@ int Database::authorQuery(const QString &author) const
     return tagQuery(m_authorTagId, author);
 }
 
-int Database::partnerQuery()
+int Database::partnerId()
 {
     QSqlQuery query;
     query.prepare("select name from partners "
@@ -141,7 +141,7 @@ int Database::partnerQuery()
     return 1;
 }
 
-int Database::licenseQuery()
+int Database::licenseId()
 {
     QSqlQuery query;
     query.prepare("select name from licenses "

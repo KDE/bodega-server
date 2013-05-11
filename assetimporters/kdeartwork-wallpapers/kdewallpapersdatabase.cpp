@@ -49,9 +49,9 @@ WallpapersDatabase::WallpapersDatabase(const QString &contentPath)
     m_mimetypeTagId(0)
 {
     //FIXME: fix to LGPL
-    m_licenseId = licenseQuery();
+    m_licenseId = licenseId();
     //Fix to KDE
-    m_partnerId = partnerQuery();
+    m_partnerId = partnerId();
 }
 
 void WallpapersDatabase::writeWallpaperChannels()

@@ -29,9 +29,9 @@ private:
     int writeBookAsset(const Ebook &book, QSqlQuery &query);
     void writeBookAssetTags(const Ebook &book, int assetId);
     int bookAssetQuery(const Ebook &book) const;
-    int partnerQuery();
-    int languageQuery(const QString &lang);
-    int licenseQuery();
+    int partnerId();
+    int languageId(const QString &lang);
+    int licenseId();
     int contributorId(const QString &contributor);
     int categoryId(const QString &name);
 
