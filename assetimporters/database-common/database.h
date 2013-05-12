@@ -58,7 +58,7 @@ protected:
     int contributorId(const QString &contributor);
     int tagId(int tagTypeId, const QString &text,
               QHash<QString, int> *cache);
-    void writeChannelTags(int channelId, int tagId);//const QString &name, const QString &mimeType, const QString &description);
+    void writeChannelTags(int channelId, int tagId);
     int createLicenseId();
 
 private:
@@ -66,7 +66,6 @@ private:
     int m_partnerId;
     int m_authorTagId;
     int m_categoryTagId;
-    int m_licenseId;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;
     QString m_contentPath;

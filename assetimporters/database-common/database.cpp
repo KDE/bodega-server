@@ -33,11 +33,8 @@ Database::Database(const QString &contentPath)
       m_partnerId(0),
       m_authorTagId(0),
       m_categoryTagId(0),
-      m_contentPath(contentPath),
-      m_licenseId(0)
+      m_contentPath(contentPath)
 {
-    //Fix to KDE
-    m_partnerId = partnerId();
     //db.setHostName("localhost");
     m_db.setDatabaseName("bodega");
     m_db.setUserName("bodega");
@@ -48,6 +45,8 @@ Database::Database(const QString &contentPath)
 
 void Database::writeInit(bool clearOldData)
 {
+    m_partnerId = partnerId();
+
     QSqlDatabase::database().transaction();
 
     m_authorTagId = this->authorTagId();
@@ -130,29 +129,28 @@ int Database::authorQuery(const QString &author) const
 int Database::partnerId()
 {
     QSqlQuery query;
-    query.prepare("select name from partners "
-                  "where :id = 'KDE'");
-    query.bindValue(":id", 1);
+    query.prepare("select id from partners "
+                  "where name = 'KDE'");
     if (!query.exec() || !query.first()) {
         showError(query);
         return 0;
     }
 
-    return 1;
+    return query.value(0).toInt();
 }
 
 int Database::licenseId()
 {
     QSqlQuery query;
-    query.prepare("select name from licenses "
-                  "where :id = 'LGPL'");
-    query.bindValue(":id", 2);
+
+    query.prepare("select id from licenses "
+                  "where name = 'LGPL'");
     if (!query.exec() || !query.first()) {
         showError(query);
         return 0;
     }
 
-    return 2;
+    return query.value(0).toInt();
 }
 
 int Database::tagQuery(int tagTypeId, const QString &text) const
