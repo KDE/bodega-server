@@ -4,3 +4,4 @@ server/content/*/*
 server/public/images/*/*/*
 server/config.json
 server/node_modules
+server/incoming/[0-9]*
