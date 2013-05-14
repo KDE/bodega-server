@@ -6,7 +6,17 @@ var fs = require('fs');
 var sql_commands = ['bodega.sql', 'core.plsql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql', 'vivaldi.sql'];
 
 //those are the migration files which we will use in order to migrate and update successfully the db
+var updates_done_fn = 'updates/completed';
+var update_files = fs.readdirSync('updates');
+var done_updates = fs.existsSync(updates_done_fn) ? fs.readFileSync(updates_done_fn, { encoding: 'utf8' } ).split("\n") : [];
 var update_sql_commands = [];
+
+for (var i in update_files) {
+    var filename = update_files[i];
+    if (filename.substr(filename.length - 4, 4) === '.sql' && done_updates.indexOf(filename) === -1) {
+        update_sql_commands.push(filename);
+    }
+}
 
 var exec = require('child_process').exec;
 
@@ -69,6 +79,7 @@ var config = JSON.parse(fs.readFileSync((config_json), 'utf8'));
 if (sql_argument == 'update') {
     console.log('====Updating the database schema!!====');
     series(update_sql_commands);
+    fs.appendFileSync(updates_done_fn, "\n" + update_sql_commands.join("\n"), { encoding: 'utf8' } );
 } else if (sql_argument == 'setup') {
     console.log('====Creating the database schema!!====');
     sql_commands.unshift('createdb -O ' + config.database.name + ' ' + config.database.name);
