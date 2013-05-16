@@ -83,10 +83,13 @@ if (sql_argument == 'update') {
     series(update_sql_commands);
     fs.appendFileSync(updates_done_fn, "\n" + update_sql_commands.join("\n"), { encoding: 'utf8' } );
 } else if (sql_argument == 'setup') {
-    console.log('====Creating the database schema!!====');
+    console.log('====Creating the database schema====');
     sql_commands.unshift('createdb -O ' + config.database.name + ' ' + config.database.name);
     sql_commands.unshift('dropdb ' + config.database.user);
     series(sql_commands);
+} else if (sql_argument == 'testdata') {
+    console.log('====Populating the database with testing data====');
+    series(test_sql_commands);
 } else {
     console.log('This script needs an argument, this can be either update or setup.');
     console.log('setup: creates the database');
