@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
+var exec = require('child_process').exec;
+
 
 //those are the files that we use for the setup of the database
 var sql_commands = ['bodega.sql', 'core.plsql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql', 'vivaldi.sql'];
@@ -17,8 +19,6 @@ for (var i in update_files) {
         update_sql_commands.push(filename);
     }
 }
-
-var exec = require('child_process').exec;
 
 var run = function(command, fn) {
     var output = '';
