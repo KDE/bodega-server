@@ -13,4 +13,7 @@ sql:
 update_sql:
 	./../sql/do_sql config.json ../sql/ update
 
+test_sql:
+	./../sql/do_sql config.json ../sql/ testdata
+
 .PHONY: test check sql update_sql
