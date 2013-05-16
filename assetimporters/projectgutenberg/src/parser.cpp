@@ -362,6 +362,28 @@ QString Parser::parseRights(QXmlStreamReader *xml)
     }
 }
 
+QString Parser::parseDownloads(QXmlStreamReader *xml)
+{
+    readNextElement(xml);
+    Q_ASSERT(xml->tokenType() == QXmlStreamReader::StartElement);
+    Q_ASSERT(xml->name() == QLatin1String("nonNegativeInteger"));
+    readNextElement(xml);
+    Q_ASSERT(xml->tokenType() == QXmlStreamReader::StartElement);
+    Q_ASSERT(xml->name() == QLatin1String("value"));
+    readNextElement(xml);
+    readNextElement(xml);
+    Q_ASSERT(xml->tokenType() == QXmlStreamReader::EndElement);
+    Q_ASSERT(xml->name() == QLatin1String("value"));
+    readNextElement(xml);
+    Q_ASSERT(xml->tokenType() == QXmlStreamReader::EndElement);
+    Q_ASSERT(xml->name() == QLatin1String("nonNegativeInteger"));
+    readNextElement(xml);
+    Q_ASSERT(xml->tokenType() == QXmlStreamReader::EndElement);
+    Q_ASSERT(xml->name() == QLatin1String("downloads"));
+    return QString();
+}
+
+
 QStringList Parser::parseDescription(QXmlStreamReader *xml)
 {
     QXmlStreamAttributes attrs = xml->attributes();
@@ -569,6 +591,8 @@ Gutenberg::Ebook Parser::parseEtext(QXmlStreamReader *xml)
                 QString rightsStr = parseRights(xml);
                 Ebook::Rights rights = parseEbookRights(rightsStr);
                 book.setRights(rights);
+            } else if (elemName == QLatin1String("downloads")) {
+                parseDownloads(xml);
             } else if (elemName == QLatin1String("description")) {
                 QStringList lst = parseDescription(xml);
                 book.setDescriptions(lst);

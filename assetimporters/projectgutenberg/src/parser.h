@@ -58,6 +58,7 @@ private:
     QString parseEtextType(QXmlStreamReader *xml);
     QStringList parseEtextAlternative(QXmlStreamReader *xml);
     QString parseEtextTOC(QXmlStreamReader *xml);
+    QString parseDownloads(QXmlStreamReader *xml);
 
     void parseBag(QXmlStreamReader *xml);
 
