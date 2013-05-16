@@ -139,7 +139,7 @@ app.get(serverPath('purchase/:assetId'), isAuthorized,
             app.db.purchaseAsset(req, res);
         });
 
-app.post(serverPath('upload'),
+app.post(serverPath('upload'), isAuthorized,
          function(req, res) {
              //console.log(req.query);
              app.db.upload(req, res);

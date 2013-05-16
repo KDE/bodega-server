@@ -285,14 +285,34 @@ DROP TRIGGER IF EXISTS trg_ct_processNewAsset ON assets;
 CREATE TRIGGER trg_ct_processNewAsset BEFORE INSERT ON assets
 FOR EACH ROW EXECUTE PROCEDURE ct_processNewAsset();
 
-CREATE OR REPLACE function affiliatePerson(email text, partnername text, prole text) returns void
+CREATE OR REPLACE function affiliatePerson(text, text, text) returns BOOL
 AS
 $$
-    INSERT INTO affiliations
-     SELECT pep.id AS person, par.id AS partner, r.id AS role
-       FROM people pep, partners par, personRoles r
-       WHERE pep.email = email
-       AND par.name = partnername
-       AND r.description = prole
-$$ language SQL;
+DECLARE
+    targetEmail ALIAS FOR $1;
+    targetPartner ALIAS FOR $2;
+    targetRole ALIAS FOR $3;
+    person  int;
+    partner int;
+    role    int;
+BEGIN
+    SELECT INTO person id FROM people WHERE email = targetEmail;
+    IF NOT FOUND THEN
+        RETURN false;
+    END IF;
+
+    SELECT INTO partner id FROM partners WHERE name = targetPartner;
+    IF NOT FOUND THEN
+        RETURN false;
+    END IF;
+
+    SELECT INTO role id FROM personRoles WHERE description = targetRole;
+    IF NOT FOUND THEN
+        RETURN false;
+    END IF;
+
+    INSERT INTO affiliations (person, partner, role) values (person, partner, role);
+    return true;
+END;
+$$ LANGUAGE 'plpgsql';
 

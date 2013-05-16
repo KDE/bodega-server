@@ -34,9 +34,33 @@ var AssetStore = (function() {
 
     function localPutStream(req, fn)
     {
+        //console.log("Let the renaming begin!");
         var assetObj = req.files.asset;
-        var path = process.cwd() + storageConfig.basePath + assetObj.name;
-        fs.rename(assetObj.path, path, fn);
+        var path = process.cwd() + storageConfig.incomingBasePath;
+        var relPath = assetObj.filename;
+        if (assetObj.id) {
+            relPath = assetObj.id + '/' + relPath;
+            path += assetObj.id + '/';
+            fs.mkdirSync(path);
+        }
+        path += assetObj.filename;
+        //console.log("going to rename " + assetObj.path + " to " + path);
+        fs.rename(assetObj.path, path,
+                  function(err) {
+                      var res = { 'path' : relPath };
+                      if (err.code === 'EXDEV') {
+                          // we are apparently moving across partitions, so fallback to copying
+                          var is = fs.createReadStream(assetObj.path);
+                          var os = fs.createWriteStream(path);
+
+                          is.on('data', function(chunk) { os.write(chunk); })
+                            .on('end', function() { os.end(); fs.unlink(assetObj.path); fn(null, res) } );
+                          return;
+                      }
+
+                      fn(err, res);
+                    }
+                 );
     }
 
     function localGetStream(res, url, filename, fn)
