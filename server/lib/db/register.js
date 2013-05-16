@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -18,8 +18,6 @@
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 var BCrypt = require('bcrypt');
-var nodemailer = require('nodemailer');
-
 
 function deleteUser(db, userId)
 {
@@ -31,89 +29,6 @@ function deleteUser(db, userId)
                 return;
             }
         });
-}
-
-function sendConfirmationEmail(db, req, res, args)
-{
-    var service = app.config.service;
-    //XXX: replace with jade and html emails
-    var template =
-'Welcome to Make·Play·Live, \n\
- \n\
- To start using your Make·Play·Live account please confirm your email address\n\
- by clicking on the following link:\n \
- \n\
- http://#{host}#{prefix}register/confirm?code=#{code}&email=#{email}&id=#{userId}\n \
- \n\
- Thank You,\n \
- Make·Play·Live Team\n';
-    var transport = nodemailer.createTransport("SMTP",{
-        host:             service.smtp.host,
-        secureConnection: service.smtp.useSSL,
-        port:             service.smtp.port,
-        auth: {
-            user: service.smtp.user,
-            pass: service.smtp.pass
-        }
-    });
-
-    var mailOptions = {
-        transport: transport, // transport method to use
-        from: service.email,
-        to: args.email, // list of receivers
-        subject: "Activate your new account", // Subject line
-        //text: text, //set later
-        //html: "<b>Hello world!</b>" // html body
-    };
-
-    var query =
-        'select ct_createAccountActivationCode($1) as activationcode;';
-
-    db.query(
-        query, [args.userId],
-        function(err, result) {
-            var text;
-            var json = {
-                userId: args.userId
-            };
-            if (err) {
-                deleteUser(db, args.userId);
-                errors.report('Database', req, res, err);
-                return;
-            }
-
-            var confirmationCode = result.rows[0].activationcode;
-            text = template.replace('#{code}', confirmationCode);
-            text = text.replace('#{email}', args.email);
-            text = text.replace('#{userId}', args.userId);
-            text = text.replace('#{host}', req.headers.host);
-            text = text.replace('#{prefix}', app.config.prefix);
-            mailOptions.text = text;
-
-            if (app.settings.env === 'test') {
-                json.confirmationCode = confirmationCode;
-                json.text = text;
-                res.json(json);
-                console.log(text);
-            } else {
-                nodemailer.sendMail(mailOptions, function(error) {
-                    var json = {};
-                    if (error) {
-                        deleteUser(db, args.userId);
-                        errors.report('MailerFailure', req, res, error);
-                        transport.close();
-                        return;
-                    }
-
-                    json.message =
-                        "Confirmation email sent!";
-                    //console.log("Message sent!");
-                    res.json(json);
-                    transport.close(); // lets shut down the connection pool
-                });
-            }
-        }
-    );
 }
 
 function createUser(db, req, res, args)
@@ -150,7 +65,7 @@ function createUser(db, req, res, args)
                         return;
                     }
                     args.userId = result.rows[0].id;
-                    sendConfirmationEmail(db, req, res, args);
+                    utils.sendConfirmationEmail(db, req, res, args.userId, args.email);
                 }
             );
         });
@@ -176,14 +91,16 @@ function findUser(db, req, res, args)
                     return;
                 }
                 args.userId = result.rows[0].id;
-                sendConfirmationEmail(db, req, res, args);
+                var sendConfirmationEmailResult = utils.sendConfirmationEmail(db, req, res, args.userId, args.email);
+                if (!sendConfirmationEmailResult) {
+                    deleteUser(db, args.userId);
+                }
             } else {
                 createUser(db, req, res, args);
             }
         }
     );
 }
-
 
 module.exports = function(db, req, res) {
     var args = {
@@ -207,3 +124,4 @@ module.exports = function(db, req, res) {
 
     findUser(db, req, res, args);
 };
+

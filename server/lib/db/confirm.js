@@ -46,7 +46,16 @@ module.exports = function(db, req, res) {
             var json = {
                 userId: args.userId
             };
-            if (err) {
+
+            var updateError = true;
+            db.query('update people set active = true where id = $1', [args.userId], function(err2, result) {
+                if (err) {
+                    updateError = false;
+                    errors.report('Database', req, res, err2);
+                }
+            });
+
+            if (err || updateError) {
                 errors.report('Database', req, res, err);
                 res.render('registrationconfirmation.jade',
                 { layout: false,
