@@ -1,11 +1,11 @@
 --begin;
 delete from people;
-delete from partners;
-delete from affiliations;
-delete from languages;
 delete from channels;
 delete from assets;
 delete from devices;
+delete from partners;
+delete from affiliations;
+delete from languages;
 
 select setval('seq_assetsids', 1);
 select setval('seq_languageids', 1);
