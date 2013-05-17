@@ -47,16 +47,17 @@ module.exports = function(db, req, res) {
                 userId: args.userId
             };
 
-            var updateError = true;
+            var updateError = false;
             db.query('update people set active = true where id = $1', [args.userId], function(err2, result) {
                 if (err) {
-                    updateError = false;
+                    updateError = true;
                     errors.report('Database', req, res, err2);
                 }
             });
 
             if (err || updateError) {
                 errors.report('Database', req, res, err);
+
                 res.render('registrationconfirmation.jade',
                 { layout: false,
                   title: 'Account activation failed!',

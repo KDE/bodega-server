@@ -63,7 +63,10 @@ app.configure(function() {
     app.set('views', __dirname + '/views');
 
     app.use(function(req, res, next) {
-        res.render('404.jade', {});
+        res.render('404.jade', {
+            storeName: app.config.storeInfo.name,
+            storeUrl: app.config.storeInfo.url
+        });
     });
 });
 
