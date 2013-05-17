@@ -117,39 +117,16 @@ describe('Asset creation', function(){
         });
     });
 
-    describe('Basic fetch', function(){
-        it('should show info for an asset', function(done){
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/asset/16',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('asset');
-                    res.body.asset.should.have.property('id', 16);
-                    res.body.asset.should.have.property('partnerId');
-                    res.body.asset.should.have.property('license');
-                    res.body.asset.should.have.property('version');
-                    res.body.asset.should.have.property('filename');
-                    res.body.asset.should.have.property('image');
-                    res.body.asset.should.have.property('name');
-                    res.body.asset.should.have.property('description');
-                    done();
-                },
-                cookie);
-        });
-        it('should fetch tags', function(done){
+    describe('Creation', function(){
+        it('of a simple asset', function(done){
             postFiles(server,
                     '/bodega/v1/json/create',
                     [{
                         "name" : "info",
-                        "filename" : "mocha.opts"
+                        "filename" : "support/newassetinfo.json"
                     }, {
                         "name" : "mocha",
-                        "filename" : "mocha.opts"
+                        "filename" : "support/newassetinfo.json"
                     }], cookie,
                       function(res) {
                           console.log(res.body);

@@ -2,7 +2,6 @@ var fs = require('fs');
 var http = require('http');
 var paths = require('path');
 var request = require('request');
-var FormData = require('form-data');
 var cookies = require('./cookie.js');
 
 function getUrl(app, url, fn, cookie) {

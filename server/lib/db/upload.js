@@ -19,81 +19,6 @@ var errors = require('../errors.js');
 var utils = require('../utils.js');
 var fs = require('fs');
 
-function checkPartner(db, req, res)
-{
-    //console.log("checking " + req.body.partner + ' ' + req.session.user.id);
-    var partner = req.body.partner;
-    if (!partner) {
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
-                [req.session.user.id],
-                function(err, result) {
-                    if (err || !result.rows || result.rows.length === 0) {
-                        errors.report('UploadPartnerInvalid', req, res);
-                        return;
-                    }
-
-                    req.body.partner = result.rows[0].partner;
-                    storeAsset(db, req, res);
-                });
-    } else {
-        //console.log("checking up on partner");
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
-                [req.body.partner, req.session.user.id],
-                function(err, result) {
-                    if (err || !result.rows || result.rows.length === 0) {
-                        errors.report('UploadPartnerInvalid', req, res);
-                        return;
-                    }
-
-                    console.log("going to store the asset now .. " + req.body.partner + " " + result.rows.size);
-                    storeAsset(db, req, res);
-                });
-    }
-}
-
-function storeAsset(db, req, res)
-{
-    db.query("select nextval('seq_assetsids') as assetId;", [],
-             function(err, result) {
-                 req.files.asset.id = result.rows[0].assetid;
-                 app.assetStore.upload(req,
-                     function(err, result) {
-                         if (err) {
-                             //console.log("error due to bad rename?");
-                             errors.report('UploadFailed', req, res);
-                             return;
-                         }
-
-                         req.files.asset.incomingPath = result.path;
-                         recordAsset(db, req, res);
-                     });
-            });
-}
-
-function recordAsset(db, req, res)
-{
-    var file = req.files.asset;
-    var incomingPath = file.incomingPath;
-    //console.log(req.session.user.id, "our paths are => " + file.filename + ' ' + incomingPath);
-    var newAssetQuery = 'insert into incomingAssets (author, name, file, path) values ($1, $2, $3, $4)';
-    db.query(newAssetQuery, [req.body.partner, file.filename, file.filename, incomingPath],
-            function(err, result) {
-                if (err) {
-                    errors.report('Database', req, res, err);
-                    return;
-                }
-
-                var json = {
-                    device : req.session.user.device,
-                    authStatus : req.session.authorized,
-                    points : req.session.user.points,
-                    asset : req.files.asset.id
-                };
-
-                res.json(json);
-            });
-};
-
 module.exports = function(db, req, res) {
     //console.log("start ");
 
@@ -111,5 +36,5 @@ module.exports = function(db, req, res) {
     console.log("filename = "  + req.files.asset.filename);
     console.log("length = "  + req.files.asset['length']);
     */
-}
+};
 

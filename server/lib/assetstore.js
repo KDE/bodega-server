@@ -54,7 +54,7 @@ var AssetStore = (function() {
                           var os = fs.createWriteStream(path);
 
                           is.on('data', function(chunk) { os.write(chunk); })
-                            .on('end', function() { os.end(); fs.unlink(assetObj.path); fn(null, res) } );
+                            .on('end', function() { os.end(); fs.unlink(assetObj.path); fn(null, res); } );
                           return;
                       }
 
