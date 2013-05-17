@@ -59,8 +59,6 @@ module.exports.create = function(db, req, res) {
     var searchQuery =
         'SELECT * FROM collections WHERE person = $1 AND name = $2;';
     var defaultPageSize = 25;
-    var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
-    var offset = parseInt(req.query.offset, 10) || 0;
     var name = req.query.name;
     var isPublic = (req.query.public === 'true' ||
                     req.query.public === '1') ? true : false;
@@ -116,8 +114,6 @@ module.exports.remove = function(db, req, res) {
     var searchQuery =
         'SELECT * FROM collections WHERE person = $1 AND id = $2;';
     var defaultPageSize = 25;
-    var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
-    var offset = parseInt(req.query.offset, 10) || 0;
     var collectionId = req.query.collectionId;
 
     if (!collectionId) {
