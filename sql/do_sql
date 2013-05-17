@@ -26,7 +26,11 @@ function series(command_list) {
     //this is out command for the sql files
     var sql_command = function(fileName) {
         var command = 'psql -d ' + config.database.name + ' -U ' + config.database.user + ' -f ';
-        command += sql_dir + fileName + ' 1>/dev/null';
+        if (fileName.indexOf(sql_dir) === -1) {
+            command += sql_dir
+        }
+        command += fileName + ' 1>/dev/null';
+
         return command;
     }
 
@@ -75,7 +79,7 @@ if (sql_argument == 'update') {
     for (var i in update_files) {
         var filename = update_files[i];
         if (filename.substr(filename.length - 4, 4) === '.sql' && done_updates.indexOf(filename) === -1) {
-            update_sql_commands.push(filename);
+            update_sql_commands.push("updates/" + filename);
         }
     }
 
