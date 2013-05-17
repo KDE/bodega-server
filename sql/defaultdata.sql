@@ -32,6 +32,12 @@ INSERT INTO tags (type, title) VALUES (8, 'Adults Only');
 INSERT INTO licenses (name, text) VALUES ('GPL', '');
 INSERT INTO licenses (name, text) VALUES ('LGPL', '');
 INSERT INTO licenses (name, text) VALUES ('BSD', '');
+INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution', '');
+INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-ShareAlike', '');
+INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NoDerivs', '');
+INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NonCommercial', '');
+INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NonCommercial-ShareAlike', '');
+INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NonCommercial-NoDerivs', '');
 INSERT INTO licenses (name, text) VALUES ('Proprietary', '');
 
 -- create a partner for the owner (e.g. CT)
