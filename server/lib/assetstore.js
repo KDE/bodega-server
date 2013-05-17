@@ -44,22 +44,27 @@ var AssetStore = (function() {
             fs.mkdirSync(path);
         }
         path += assetObj.filename;
-        //console.log("going to rename " + assetObj.path + " to " + path);
+        console.log("going to rename " + assetObj.path + " to " + path);
         fs.rename(assetObj.path, path,
                   function(err) {
                       var res = { 'path' : relPath };
-                      if (err.code === 'EXDEV') {
-                          // we are apparently moving across partitions, so fallback to copying
+                      if (err && err.code === 'EXDEV') {
+                          // we are apparently moving across partitions,
+                          //  so fallback to copying
                           var is = fs.createReadStream(assetObj.path);
                           var os = fs.createWriteStream(path);
 
                           is.on('data', function(chunk) { os.write(chunk); })
-                            .on('end', function() { os.end(); fs.unlink(assetObj.path); fn(null, res); } );
+                            .on('end', function() {
+                                os.end();
+                                fs.unlink(assetObj.path);
+                                fn(null, res);
+                            });
                           return;
                       }
 
                       fn(err, res);
-                    }
+                  }
                  );
     }
 
