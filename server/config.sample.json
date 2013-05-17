@@ -33,7 +33,7 @@
         "bucket" : ""
     },
     "localStorage" : {
-        "basePath" : "/content/"
+        "basePath" : "/content/",
         "incomingBasePath" : "/incoming/"
     },
     "stripe" : {
