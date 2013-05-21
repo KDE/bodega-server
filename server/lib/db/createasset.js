@@ -300,6 +300,66 @@ function checkPartner(db, req, res, assetInfo)
     }
 }
 
+function assetHasTag(assetInfo, tagType)
+{
+    var keys = Object.keys(assetInfo.tags);
+    var tagIdx = 0;
+    var tagCount = keys.length;
+    for (tagIdx = 0; tagIdx < tagCount; ++tagIdx) {
+        var tagInfo = assetInfo.tags[tagIdx];
+        if (tagInfo.type == tagType) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function hasRequiredTags(db, req, res, assetInfo)
+{
+    var mandatoryTagsForAssetType = {
+        "application" : ["author", "license"],
+        "book" : ["author", "publisher"],
+        "game" : ["author", "license"]
+    };
+    var keys = Object.keys(assetInfo.tags);
+    var tagIdx = 0;
+    var tagCount = keys.length;
+    var assetType = null;
+    var err, tagType;
+
+    for (tagIdx = 0; tagIdx < tagCount; ++tagIdx) {
+        var tagInfo = assetInfo.tags[tagIdx];
+        if (tagInfo.type == "assetType") {
+            assetType = tagInfo.title;
+        }
+    }
+
+    if (!assetType) {
+        err = new Error("Missing required tag 'assetType'");
+        errors.report('UploadMissingTag', req, res, err);
+        return false;
+    }
+
+    var requiredTags = mandatoryTagsForAssetType[assetType];
+
+    if (!requiredTags) {
+        err = new Error("Unrecognized assetType");
+        errors.report('UploadMissingTag', req, res, err);
+        return false;
+    }
+
+    for (tagIdx = 0; tagIdx < requiredTags.length; ++tagIdx) {
+        tagType = requiredTags[tagIdx];
+        if (!assetHasTag(assetInfo, tagType)) {
+            err = new Error("Missing required tag: " + tagType);
+            errors.report('UploadMissingTag', req, res, err);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 module.exports = function(db, req, res) {
     // asset info
     //   icons
@@ -328,6 +388,11 @@ module.exports = function(db, req, res) {
         if (!assetInfo) {
             //"Unable to parse the asset info file.",
             errors.report('NoMatch', req, res);
+            return;
+        }
+
+        if (!hasRequiredTags(db, req, res, assetInfo)) {
+            //error has already been reported
             return;
         }
 

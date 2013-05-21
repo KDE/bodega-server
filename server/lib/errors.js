@@ -60,7 +60,8 @@ var ErrorType = {
     "CardProcessingError"    : 39,//error occurred while processing the card
 
     "UploadPartnerInvalid"   : 40,//the authorized user tried to upload without a valid partner id
-    "UploadFailed"           : 41 //the uploading of the file did not succeed
+    "UploadFailed"           : 41, //the uploading of the file did not succeed
+    "UploadMissingTag"       : 42 //the uploading of the file did not succeed
 };
 
 module.exports.Type = ErrorType;
