@@ -12,6 +12,7 @@ INSERT INTO tagTypes (type) VALUES ('descriptive');
 INSERT INTO tagTypes (type) VALUES ('user');
 INSERT INTO tagTypes (type) VALUES ('mimetype');
 INSERT INTO tagTypes (type) VALUES ('contentrating');
+INSERT INTO tagTypes (type) VALUES ('assetType');
 INSERT INTO tagTypes (type) VALUES ('created');
 INSERT INTO tagTypes (type) VALUES ('author');
 INSERT INTO tagTypes (type) VALUES ('contributor');
@@ -28,6 +29,18 @@ INSERT INTO tags (type, title) VALUES (8, 'Everyone 10+');
 INSERT INTO tags (type, title) VALUES (8, 'Teen');
 INSERT INTO tags (type, title) VALUES (8, 'Mature');
 INSERT INTO tags (type, title) VALUES (8, 'Adults Only');
+
+
+INSERT INTO tags (type, title) VALUES (9, 'article');
+INSERT INTO tags (type, title) VALUES (9, 'application');
+INSERT INTO tags (type, title) VALUES (9, 'audio');
+INSERT INTO tags (type, title) VALUES (9, 'audiobook');
+INSERT INTO tags (type, title) VALUES (9, 'book');
+INSERT INTO tags (type, title) VALUES (9, 'game');
+INSERT INTO tags (type, title) VALUES (9, 'magazine');
+INSERT INTO tags (type, title) VALUES (9, 'movie');
+INSERT INTO tags (type, title) VALUES (9, 'tvshow');
+INSERT INTO tags (type, title) VALUES (9, 'wallpaper');
 
 INSERT INTO licenses (name, text) VALUES ('GPL', '');
 INSERT INTO licenses (name, text) VALUES ('LGPL', '');
