@@ -248,6 +248,50 @@ app.post(serverPath('participant/resetPassword'),
 
 
 //********************************
+// Store management
+app.get(serverPath('store/create'),
+    function(req, res) {
+//        app.db.createStore(req, res);
+    }
+);
+
+app.get(serverPath('store/info'),
+    function(req, res) {
+//        app.db.storeInfo(req, res);
+    }
+);
+
+app.get(serverPath('store/delete'),
+    function(req, res) {
+//        app.db.deleteStore(req, res);
+    }
+);
+
+app.get(serverPath('store/updateChannel'),
+    function(req, res) {
+//        app.db.updateStoreChannel(req, res);
+    }
+);
+
+app.get(serverPath('store/removeChannel'),
+    function(req, res) {
+//        app.db.removeStoreChannel(req, res);
+    }
+);
+
+app.get(serverPath('store/addFeaturedCollection'),
+    function(req, res) {
+//        app.db.addFeaturedCollection(req, res);
+    }
+);
+
+app.get(serverPath('store/removeFeaturedCollection'),
+    function(req, res) {
+//        app.db.removeFeaturedCollection(req, res);
+    }
+);
+
+//********************************
 // Static content routes
 app.get(serverPath('hunt'),
     function(req, res) {
