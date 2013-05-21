@@ -36,16 +36,111 @@ function sendResponse(db, req, res, assetInfo)
 
 function deleteUpload(db, req, res, path)
 {
-    /* we don't care about errors at this point
-     * because if we're here an error already
-     * occured */
     app.assetStore.remove(path, function() {});
 }
 
-function cleanupAfterError(db, req, res, assetInfo)
+function reportError(db, req, res, assetInfo,
+                     errorType, error)
 {
+    var rmQuery =
+            'DELETE FROM incomingAssets WHERE id = $1;';
+
+    /* we don't care about errors at this point
+     * because if we're here an error already
+     * occured. We just want to cleanup garbage data and
+     * propagate an error as a response. */
+    db.query(rmQuery, [assetInfo.id],
+             function(err, result){});
     deleteUpload(db, req, res, assetInfo.incomingPath);
+    
+    errors.report(errorType, req, res, error);
 }
+
+function associateTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount)
+{
+    var tagQuery =
+            'insert into incomingAssetTags (asset, tag) values ($1, $2);';
+    var atEnd = (tagIdx == (tagCount - 1));
+    db.query(
+        tagQuery, [assetInfo.id, tagInfo.tagId],
+        function(err, result) {
+            if (err) {
+                reportError(db, req, res, assetInfo, 'Database', err);
+                return;
+            }
+            if (atEnd) {
+                sendResponse(db, req, res, assetInfo);
+            } else {
+                //process next tag
+                ++tagIdx;
+                setupTag(db, req, res, assetInfo,
+                         tagIdx, tagCount);
+            }
+        });
+}
+
+function recordTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount)
+{
+    var tagQuery =
+            'insert into tags (partner, type, title) values ($1, $2, $3) returning id;';
+    db.query(
+        tagQuery, [assetInfo.partnerId, tagInfo.typeId, tagInfo.title],
+        function(err, result) {
+            if (err) {
+                reportError(db, req, res, assetInfo, 'Database', err);
+                return;
+            }
+            if (result && result.rows.length > 0) {
+                tagInfo.tagId = result.rows[0].id;
+                associateTag(db, req, res, assetInfo,
+                             tagInfo, tagIdx, tagCount);
+            } else {
+                var e = new Error("Tag '" + tagInfo.type + "'doesn't exist!");
+                reportError(db, req, res, assetInfo,
+                            'NoMatch', e);
+                return;
+            }
+        });
+}
+
+function setupTag(db, req, res, assetInfo, tagIdx, tagCount)
+{
+    var tagInfo = assetInfo.tags[tagIdx];
+    var tagIdQuery =
+            "select id from tagtypes t where t.type=$1;";
+    db.query(
+        tagIdQuery, [tagInfo.type],
+        function(err, result) {
+            if (err) {
+                reportError(db, req, res, assetInfo,
+                            'Database', err);
+                return;
+            }
+            if (result && result.rows.length > 0) {
+                tagInfo.typeId = result.rows[0].id;
+                recordTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount);
+            } else {
+                var e = new Error("Tag '" + tagInfo.type + "'doesn't exist!");
+                reportError(db, req, res, assetInfo,
+                            'NoMatch', e);
+                return;
+            }
+        }
+    );
+
+}
+
+function setupTags(db, req, res, assetInfo)
+{
+    var i;
+    if (assetInfo.tags) {
+        var keys = Object.keys(assetInfo.tags);
+        var tagIdx = 0;
+        var tagCount = keys.length;
+        setupTag(db, req, res, assetInfo, tagIdx, tagCount);
+    }
+}
+
 
 function recordPreview(db, req, res, assetInfo, previewPath,
                        previewIdx, previewCount)
@@ -56,11 +151,12 @@ function recordPreview(db, req, res, assetInfo, previewPath,
              [assetInfo.id, previewPath],
              function(err, result) {
                  if (err) {
-                     errors.report('Database', req, res, err);
+                     reportError(db, req, res, assetInfo,
+                                 'Database', err);
                      return;
                  }
                  if (atEnd) {
-                     sendResponse(db, req, res, assetInfo);
+                     setupTags(db, req, res, assetInfo);
                  } else {
                      ++previewIdx;
                      setupPreview(db, req, res, assetInfo,
@@ -90,7 +186,8 @@ function setupPreview(db, req, res, assetInfo, previewIdx, previewCount)
         function(err, result) {
             if (err) {
                 //console.log("error due to bad rename?");
-                errors.report('UploadFailed', req, res);
+                reportError(db, req, res, assetInfo,
+                            'UploadFailed', err);
                 return;
             }
             recordPreview(db, req, res, assetInfo, result.path,
@@ -134,7 +231,8 @@ function recordAsset(db, req, res, assetInfo)
              [assetInfo.id, assetInfo.license, assetInfo.partnerId, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.incomingPath, assetInfo.filename],
              function(err, result) {
                  if (err) {
-                     errors.report('Database', req, res, err);
+                     reportError(db, req, res, assetInfo,
+                                 'Database', err);
                      return;
                  }
 
@@ -158,7 +256,8 @@ function storeAsset(db, req, res, assetInfo)
                      function(err, result) {
                          if (err) {
                              //console.log("error due to bad rename?");
-                             errors.report('UploadFailed', req, res);
+                             reportError(db, req, res, assetInfo,
+                                         'UploadFailed', err);
                              return;
                          }
                          assetInfo.incomingPath = result.path;
@@ -176,7 +275,8 @@ function checkPartner(db, req, res, assetInfo)
                  [req.session.user.id],
                  function(err, result) {
                      if (err || !result.rows || result.rows.length === 0) {
-                         errors.report('UploadPartnerInvalid', req, res);
+                         reportError(db, req, res, assetInfo,
+                                     'UploadPartnerInvalid', err);
                          return;
                      }
 
@@ -189,7 +289,8 @@ function checkPartner(db, req, res, assetInfo)
                  [partner, req.session.user.id],
                  function(err, result) {
                      if (err || !result.rows || result.rows.length === 0) {
-                         errors.report('UploadPartnerInvalid', req, res);
+                         reportError(db, req, res, assetInfo,
+                                     'UploadPartnerInvalid', err);
                          return;
                      }
 

@@ -13,10 +13,11 @@
         { "type" : "cover", "subtype" : "back", "file" : "sample-1.png" }
     ],
     "tags" : [
-        {"name" : "author", "value" : "Zack Rusin"},
-        {"name" : "publisher", "value" : "Coherent Theory" },
-        {"name" : "isbn", "value" : "00000000"},
-        {"name" : "created", "value" : "2013"},
-        {"name" : "url", "value" : "http://makeplaylive.com"}
+        {"type" : "assetType", "title" : "book" },
+        {"type" : "author", "title" : "Zack Rusin"},
+        {"type" : "publisher", "title" : "Coherent Theory" },
+        {"type" : "isbn", "title" : "00000000"},
+        {"type" : "created", "title" : "2013"},
+        {"type" : "url", "title" : "http://makeplaylive.com"}
     ]
 }
