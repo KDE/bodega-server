@@ -2,7 +2,6 @@ var fs = require('fs');
 var http = require('http');
 var paths = require('path');
 var request = require('request');
-var FormData = require('form-data');
 var cookies = require('./cookie.js');
 
 function getUrl(app, url, fn, cookie) {
@@ -64,7 +63,7 @@ function auth(app, fn) {
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
     getUrl(app,
-           '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
+           '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
            function(res) {
                res.statusCode.should.equal(200);
                res.headers.should.have.property(

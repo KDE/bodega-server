@@ -5,7 +5,7 @@ delete from affiliations;
 delete from languages;
 delete from channels;
 delete from assets;
-delete from devices;
+delete from stores;
 
 select setval('seq_assetsids', 1);
 select setval('seq_languageids', 1);
@@ -13,7 +13,6 @@ select setval('seq_peopleids', 1);
 select setval('seq_personroleids', 1);
 select setval('seq_partnerids', 1);
 select setval('seq_channelids', 1);
-select setval('seq_deviceids', 1);
 
 insert into people (lastname, firstname, email, points, password, active)
     values ('Rusin', 'Zack', 'zack@kde.org', 10000, '$2a$10$Iejk3uw6uGFCGR5OKaOOZO2tmnlIhPCsCvw7G1pLa81QH4fonDC.C', true);
@@ -53,18 +52,20 @@ insert into tags (partner, type, title) values (2, 3, 'Card Game');
 insert into tags (partner, type, title) values (2, 3, 'Util');
 insert into tags (partner, type, title) values (2, 3, 'Misc');
 
-insert into devices (partner, name, description, partnumber) values (2, 'MPL', 'Usage of PA', 'VIVALDI-1');
-insert into devices (partner, name, description, partnumber) values (2, 'Plasma Workspace', 'KDE Plasma user interfaces', 'KDE-1');
-insert into devices (partner, name, description, partnumber) values (3, 'Bling Media Center', 'Imaginary hifi for your home', 'DD-1');
-insert into devices (partner, name, description, partnumber) values (3, 'Affordaphone', 'Finally a phone even you can afford', 'DD-2');
+insert into stores (partner, name, description, partnumber) values (2, 'MPL', 'Usage of PA', 'VIVALDI-1');
+insert into stores (partner, name, description, partnumber) values (2, 'Plasma Workspace', 'KDE Plasma user interfaces', 'KDE-1');
+insert into stores (partner, name, description, partnumber) values (3, 'Bling Media Center', 'Imaginary hifi for your home', 'DD-1');
+insert into stores (partner, name, description, partnumber) values (3, 'Affordaphone', 'Finally a phone even you can afford', 'DD-2');
 
-insert into deviceChannels (device, channel) values ('KDE-1', 2);
-insert into deviceChannels (device, channel) values ('DD-1', 3);
-insert into deviceChannels (device, channel) values ('DD-1', 4);
-insert into deviceChannels (device, channel) values ('DD-1', 5);
-insert into deviceChannels (device, channel) values ('DD-2', 6);
-insert into deviceChannels (device, channel) values ('DD-2', 6);
-insert into deviceChannels (device, channel) values ('DD-2', 6);
+insert into storeChannels (store, channel) values ('VIVALDI-1', 2);
+insert into storeChannels (store, channel) values ('VIVALDI-1', 5);
+insert into storeChannels (store, channel) values ('KDE-1', 2);
+insert into storeChannels (store, channel) values ('DD-1', 3);
+insert into storeChannels (store, channel) values ('DD-1', 4);
+insert into storeChannels (store, channel) values ('DD-1', 5);
+insert into storeChannels (store, channel) values ('DD-2', 6);
+insert into storeChannels (store, channel) values ('DD-2', 6);
+insert into storeChannels (store, channel) values ('DD-2', 6);
 
 insert into assets (license, author, name, description, version, path, image, active, externid) values (1, 2, 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true, 'aquarium');
 insert into assets (license, author, name, description, version, path, image, active, externid) values (1, 2, 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true, 'dice');
@@ -89,6 +90,7 @@ insert into assetTags (asset, tag) values (5, 1);
 insert into assetTags (asset, tag) values (5, 2);
 insert into assetTags (asset, tag) values (6, 1);
 insert into assetTags (asset, tag) values (6, 2);
+insert into assetTags (asset, tag) values (6, 3);
 
 insert into channelTags (channel, tag) values (2, 1);
 insert into channelTags (channel, tag) values (2, 2);

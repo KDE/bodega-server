@@ -81,8 +81,7 @@ describe('Collections', function(){
     describe('authenticate', function(){
         it('should succeed', function(done){
             var expected = {
-                "userId": 2,
-                "device":"VIVALDI-1",
+                "store":"VIVALDI-1",
                 "authStatus":true,
                 "points" : 10000,
                 "imageUrls": {
@@ -96,7 +95,7 @@ describe('Collections', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

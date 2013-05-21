@@ -23,11 +23,11 @@ function launchDownload(db, req, res)
     var assetInfoQuery =
         "SELECT a.id, a.author as partnerId, a.version, a.path, a.file, a.name \
          FROM assets a LEFT JOIN channelAssets c ON (a.id = c.asset)  \
-         LEFT JOIN deviceChannels dc ON (dc.channel = c.channel) \
-         WHERE a.id = $1 and dc.device = $2";
+         LEFT JOIN storeChannels sc ON (sc.channel = c.channel) \
+         WHERE a.id = $1 and sc.store = $2";
 
     var q = db.query(
-        assetInfoQuery, [req.params.assetId, req.session.user.device],
+        assetInfoQuery, [req.params.assetId, req.session.user.store],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
@@ -51,7 +51,7 @@ function launchDownload(db, req, res)
 
 module.exports = function(db, req, res) {
     var q = db.query("SELECT ct_canDownload($1, $2, $3) as allowed;",
-                     [req.session.user.id, req.session.user.device, req.params.assetId],
+                     [req.session.user.id, req.session.user.store, req.params.assetId],
                      function(err, result) {
                         if (err || !result || result.rows.length < 1) {
                             errors.report('Database', req, res, err);

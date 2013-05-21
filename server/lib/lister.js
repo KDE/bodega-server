@@ -125,7 +125,7 @@ module.exports.listAssets = function listAssets(db, req, res, args, json)
          CASE WHEN p.points IS NULL THEN 0 ELSE p.points END AS points \
          FROM assets a LEFT JOIN partners ON (a.author = partners.id) \
          INNER JOIN subChannelAssets s ON (a.id = s.asset) \
-         LEFT JOIN assetPrices p ON (p.asset = s.asset AND p.device = $1) ';
+         LEFT JOIN assetPrices p ON (p.asset = s.asset AND p.store = $1) ';
     var whereQuery = 'WHERE s.channel = $2';
     var queryString = constructQuery(baseQuery, whereQuery, 2,
                                      [{
@@ -146,7 +146,7 @@ module.exports.listAssets = function listAssets(db, req, res, args, json)
     }
 
     db.query(
-        queryString, [req.session.user.device, args.channelId,
+        queryString, [req.session.user.store, args.channelId,
                       args.pageSize + 1, args.offset],
         function(err, result) {
             if (err) {

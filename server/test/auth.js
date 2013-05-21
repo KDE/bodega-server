@@ -22,9 +22,11 @@ describe('Authentication', function(){
     describe('when arguments are missing', function(){
         it('should report error', function(done){
             var expected = {
-                "device":0,
                 "authStatus":false,
+                "device":0,
+                "store":0,
                 "points":0,
+                "success": false,
                 "error": {"type": "MissingParameters"}
             };
             utils.getUrl(server,
@@ -43,14 +45,16 @@ describe('Authentication', function(){
      describe('when arguments are empty', function(){
         it('should report error', function(done){
             var expected = {
-                "device":0,
                 "authStatus":false,
+                "device":0,
+                "store":0,
                 "points":0,
+                "success": false,
                 "error": {"type" : "MissingParameters"}
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=&auth_password=&auth_device=',
+                '/bodega/v1/json/auth?auth_user=&auth_password=&auth_store=',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -65,13 +69,15 @@ describe('Authentication', function(){
     describe('when username is wrong', function(){
         it('should report error', function(done){
             var expected = {
-                "device":0,
                 "authStatus":false,
+                "device":0,
+                "store":0,
                 "points":0,
+                "success":false,
                 "error": {"type" : "MissingParameters"}};
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=&auth_password=&auth_device=',
+                '/bodega/v1/json/auth?auth_user=&auth_password=&auth_store=',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -86,13 +92,15 @@ describe('Authentication', function(){
     describe('when password is wrong', function(){
         it('should report error', function(done){
             var expected = {
-                "device":0,
                 "authStatus":false,
+                "device":0,
+                "store":0,
                 "points":0,
+                "success":false,
                 "error": {"type" : "NoMatch"}};
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=bad_password&auth_device=2',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=bad_password&auth_store=2',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -104,16 +112,18 @@ describe('Authentication', function(){
         });
     });
 
-    describe('when device is wrong', function(){
+    describe('when store is wrong', function(){
         it('should report error', function(done){
             var expected = {
-                "device":0,
                 "authStatus":false,
+                "device":0,
+                "store":0,
                 "points":0,
+                "success":false,
                 "error": {"type" : "NoMatch" }};
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=5',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=5',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -128,22 +138,24 @@ describe('Authentication', function(){
     describe('proper authorization', function(){
         it('authorize correctly.', function(done){
             var expected = {
-                "userId": 1,
-                "device":"VIVALDI-1",
                 "authStatus":true,
-                "points" : 10000,
+                "device":"VIVALDI-1",
+                "store":"VIVALDI-1",
+                "points": 10000,
+                "success": true,
                 "imageUrls": {
-                    "tiny":"http://0.0.0.0:3000/images/22",
-                    "small":"http://0.0.0.0:3000/images/32",
-                    "medium":"http://0.0.0.0:3000/images/64",
-                    "large":"http://0.0.0.0:3000/images/128",
-                    "huge":"http://0.0.0.0:3000/images/512",
-                    "previews":"http://0.0.0.0:3000/images/previews"
-                }
+                    "tiny":"http://localhost:3000/images/22",
+                    "small":"http://localhost:3000/images/32",
+                    "medium":"http://localhost:3000/images/64",
+                    "large":"http://localhost:3000/images/128",
+                    "huge":"http://localhost:3000/images/512",
+                    "previews":"http://localhost:3000/images/previews"
+                },
+                "active": true
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

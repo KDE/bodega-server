@@ -35,15 +35,14 @@ function authenticate(db, req, res)
 {
     var authQuery =
         "SELECT u.id, u.fullname, u.email, u.active, \
-         u.points + u.owedPoints as points, u.password FROM people u JOIN devices d ON (d.partNumber = $1) WHERE u.email = $2;";
+         u.points + u.owedPoints as points, u.password FROM people u JOIN stores s ON (s.id = $1) WHERE u.email = $2;";
     var authUser = req.query.auth_user;
     var authPassword = req.query.auth_password;
-    var authDevice = req.query.auth_device;
+    var authStore = utils.authStore(req);
     var imageUrls = utils.findImagePaths(req);
 
-    //generateHash(authPassword);
     var q = db.query(
-        authQuery, [authDevice, authUser],
+        authQuery, [authStore, authUser],
         function(err, result) {
 
             if (err || result.rows.length === 0) {
@@ -66,21 +65,19 @@ function authenticate(db, req, res)
                         errors.report('NoMatch', req, res, err);
                         return;
                     }
-                    var obj = {};
-                    obj.userId = userData.id;
-                    obj.device = authDevice;
-                    obj.authStatus = authorized;
-                    obj.points = userData.points;
-                    obj.imageUrls = imageUrls;
-                    obj.active = userData.active;
+
                     var user = {
-                        name:   authUser,
-                        id: obj.userId,
-                        device: authDevice,
-                        points: obj.points
+                        name: authUser,
+                        id: userData.id,
+                        store: authStore,
+                        points: userData.points
                     };
                     req.session.user = user;
-                    res.json(obj);
+
+                    var json = utils.standardJson(req);
+                    json.imageUrls = imageUrls;
+                    json.active = userData.active;
+                    res.json(json);
                 });
         });
 }

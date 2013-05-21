@@ -42,7 +42,7 @@ app.get(serverPath('auth'), function(req, res) {
         "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0");
     if (req.query.auth_user &&
         req.query.auth_password &&
-        req.query.auth_device) {
+        utils.authStore(req)) {
         app.db.authorize(req, res);
     } else {
         errors.report('MissingParameters', req, res);

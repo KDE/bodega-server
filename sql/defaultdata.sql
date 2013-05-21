@@ -31,8 +31,8 @@ INSERT INTO licenses (name, text) VALUES ('Proprietary', '');
 -- create a partner for the owner (e.g. CT)
 INSERT INTO partners (id, name, developer, distributor) VALUES (0, 'Make Play Live', true, true);
 
--- a "NULL" device for use with e.g. the bodegamarket log ins
-INSERT INTO devices (partner, name, partNumber) VALUES (0, 'No Device', 'null');
+-- a "NULL" store for use with e.g. the bodegamarket log ins
+INSERT INTO stores (partner, name, id) VALUES (0, 'No Store', 'null');
 
 
 -- default roles for the accounts

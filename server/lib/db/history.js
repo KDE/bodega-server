@@ -39,14 +39,10 @@ module.exports = function(db, req, res) {
                 return;
             }
 
-            var json = {
-                device : req.session.user.device,
-                authStatus : req.session.authorized,
-                points : req.session.user.points,
-                offset : offset,
-                hasMoreHistory: false,
-                history : []
-            };
+            var json = utils.standardJson(req);
+            json.offset = offset;
+            json.hasMoreHistory = false;
+            json.history = [];
 
             if (result) {
                 json.hasMoreHistory = result.rows.length > pageSize;

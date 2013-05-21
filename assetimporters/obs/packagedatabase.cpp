@@ -35,7 +35,7 @@ void PackageDatabase::write(bool clearOldData)
 {
     writeInit(clearOldData);
     writeChannels();
-    writeDeviceChannels();
+    writeStoreChannels();
     writePackages();
 }
 

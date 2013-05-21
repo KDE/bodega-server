@@ -116,26 +116,24 @@ module.exports = function(db, req, res) {
         "SELECT a.id, l.name as license, l.text as licenseText, a.author as partnerId, a.version, a.file, \
          a.image, a.name, a.description, ct_canDownload($3, $2, $1) AS downloadable, ct_assetPrice($2, $1) AS price \
          FROM assets a LEFT JOIN channelAssets c ON (a.id = c.asset)  \
-         LEFT JOIN deviceChannels dc ON (dc.channel = c.channel) \
+         LEFT JOIN storeChannels sc ON (sc.channel = c.channel) \
          LEFT JOIN licenses l ON (a.license = l.id) \
-         WHERE a.id = $1 and dc.device = $2";
+         WHERE a.id = $1 and sc.store = $2";
 
     var q = db.query(
-        assetInfoQuery, [req.params.assetId, req.session.user.device, req.session.user.id],
+        assetInfoQuery, [req.params.assetId, req.session.user.store, req.session.user.id],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
-            var json = {
-                device : req.session.user.device,
-                authStatus : req.session.authorized,
-                points : req.session.user.points,
-            };
+
+            var json = utils.standardJson(req);
             if (!result || result.rows.length <= 0) {
                 res.json(json);
                 return;
             }
+
             json.asset = {
                 id :         result.rows[0].id,
                 license:     result.rows[0].license,
@@ -149,6 +147,7 @@ module.exports = function(db, req, res) {
                 points:      result.rows[0].price,
                 canDownload: result.rows[0].downloadable
             };
+
             addTagsAndFinish(db, req, res, json);
         });
 };

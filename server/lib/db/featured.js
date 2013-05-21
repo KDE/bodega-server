@@ -31,14 +31,11 @@ module.exports = function(db, req, res) {
         'offset'     : offset,
         'pricePoint' : pricePoint
     };
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        points : req.session.user.points,
-        offset : offset,
-        hasMoreAssets : false,
-        channels : []
-    };
+
+    var json = utils.standardJson(req);
+    json.offset = offset;
+    json.hasMore = false;
+    json.channels = [];
 
     lister.listFeatured(db, req, res, args, json);
 };

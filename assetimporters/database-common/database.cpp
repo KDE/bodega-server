@@ -86,7 +86,7 @@ void Database::writeInit(bool clearOldData)
         return;
     }
 
-    writeDeviceChannels();
+    writeStoreChannels();
 
     QSqlDatabase::database().commit();
 }
@@ -120,11 +120,11 @@ void Database::writeChannels()
     QSqlDatabase::database().commit();
 }
 
-void Database::writeDeviceChannels()
+void Database::writeStoreChannels()
 {
     QSqlQuery query;
 
-    query.prepare("insert into deviceChannels (device, channel) "
+    query.prepare("insert into storeChannels (store, channel) "
                   "values ('VIVALDI-1', :channelId);");
 
 

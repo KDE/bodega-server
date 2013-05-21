@@ -43,7 +43,7 @@ module.exports.recordDownload = function(db, req)
     }
     db.query("SELECT ct_recordDownload($1, $2, $3, $4);",
             [req.session.user.id, req.params.assetId, ip,
-             req.session.user.device],
+             req.session.user.store],
             function(err, result) { }
             );
 };
@@ -54,11 +54,13 @@ module.exports.standardJson = function(req, success)
 
     if (req && req.session && req.session.authorized && req.session.user) {
         json.authStatus = req.session.authorized;
-        json.device = req.session.user.device;
+        json.device = req.session.user.store; // V2 deprecated
+        json.store = req.session.user.store;
         json.points = req.session.user.points;
     } else {
         json.authStatus = false;
-        json.device = 0;
+        json.device = 0; // V2 deprecated
+        json.store = 0;
         json.points = 0;
     }
 
@@ -66,7 +68,7 @@ module.exports.standardJson = function(req, success)
     return json;
 };
 
-module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
+module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
 {
     var service = app.config.service;
     //XXX: replace with jade and html emails
@@ -148,5 +150,18 @@ module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
         }
     );
     return true;
-}
+};
+
+module.exports.authStore = function(req)
+{
+    if (req) {
+        if (req.query.auth_store) {
+            return req.query.auth_store;
+        } else if (req.query.auth_device) {
+            return req.query.auth_device;
+        }
+    }
+
+    return null;
+};
 

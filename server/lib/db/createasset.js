@@ -22,14 +22,10 @@ var fs = require('fs');
 
 function sendResponse(db, req, res, assetInfo)
 {
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        points : req.session.user.points,
-        asset : {
-            id : assetInfo.id,
-            name : assetInfo.name
-        }
+    var json = utils.standardJson(req);
+    json.asset = {
+        id : assetInfo.id,
+        name : assetInfo.name
     };
     res.send(json);
 }

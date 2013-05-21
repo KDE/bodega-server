@@ -23,8 +23,7 @@ describe('Asset info', function(){
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
             var expected = {
-                "userId": 2,
-                "device":"VIVALDI-1",
+                "store":"VIVALDI-1",
                 "authStatus":true,
                 "points" : 10000,
                 "imageUrls": {
@@ -38,7 +37,7 @@ describe('Asset info', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -56,7 +55,7 @@ describe('Asset info', function(){
         it('should show info for an asset', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/asset/16',
+                '/bodega/v1/json/asset/6',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -64,7 +63,7 @@ describe('Asset info', function(){
                         'application/json; charset=utf-8');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
-                    res.body.asset.should.have.property('id', 16);
+                    res.body.asset.should.have.property('id', 6);
                     res.body.asset.should.have.property('partnerId');
                     res.body.asset.should.have.property('license');
                     res.body.asset.should.have.property('version');
@@ -79,7 +78,7 @@ describe('Asset info', function(){
         it('should fetch tags', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/asset/16',
+                '/bodega/v1/json/asset/6',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -101,7 +100,7 @@ describe('Asset info', function(){
         it('should show chanagelog', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/asset/16?changelog=1',
+                '/bodega/v1/json/asset/6?changelog=1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -117,7 +116,7 @@ describe('Asset info', function(){
         it('should show previews', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/asset/16?previews=1',
+                '/bodega/v1/json/asset/6?previews=1',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(

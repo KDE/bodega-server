@@ -208,24 +208,24 @@ BEGIN
         RETURN NEW;
     END IF;
 
-    INSERT INTO assetPrices (asset, device, points)
-    SELECT a.id, NEW.partNumber, ct_calcPoints(a.basePrice, NEW.flatMarkup, NEW.markup, NEW.minMarkup, NEW.maxMarkup)
+    INSERT INTO assetPrices (asset, store, points)
+    SELECT a.id, NEW.id, ct_calcPoints(a.basePrice, NEW.flatMarkup, NEW.markup, NEW.minMarkup, NEW.maxMarkup)
         FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
-                      LEFT JOIN deviceChannels dc ON (dc.channel = sa.channel)
+                      LEFT JOIN storeChannels dc ON (dc.channel = sa.channel)
                       LEFT JOIN channels c ON (c.id = dc.channel)
-        WHERE dc.device = NEW.partNumber AND c.parent IS NULL AND a.basePrice > 0;
+        WHERE dc.store = NEW.id AND c.parent IS NULL AND a.basePrice > 0;
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
 
-DROP TRIGGER IF EXISTS trg_ct_updateStorePricesOnStoreUpdate ON devices;
-CREATE TRIGGER trg_ct_updateStorePricesOnStoreUpdate AFTER INSERT OR UPDATE ON devices
+DROP TRIGGER IF EXISTS trg_ct_updateStorePricesOnStoreUpdate ON stores;
+CREATE TRIGGER trg_ct_updateStorePricesOnStoreUpdate AFTER INSERT OR UPDATE ON stores
 FOR EACH ROW EXECUTE PROCEDURE ct_updateStorePrices();
 
 -- sets prices in stores for a given asset
 CREATE OR REPLACE FUNCTION ct_updateAssetPrices(assetId int, basePrice int) RETURNS VOID AS $$
 DECLARE
-    deviceRec  RECORD;
+    storeRec  RECORD;
     price int := 0;
 BEGIN
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC') WHERE asset = assetId;
@@ -234,12 +234,12 @@ BEGIN
         RETURN;
     END IF;
 
-    FOR deviceRec IN
-        SELECT DISTINCT d.partNumber, d.minMarkup, d.maxMarkup, d.flatMarkup, d.markup
-        FROM devices d JOIN deviceChannels c ON (d.partNumber = c.device)
+    FOR storeRec IN
+        SELECT DISTINCT d.id, d.minMarkup, d.maxMarkup, d.flatMarkup, d.markup
+        FROM stores d JOIN storeChannels c ON (d.id = c.store)
                        JOIN channelAssets a ON (c.channel = a.channel AND a.asset = assetId)
     LOOP
-        INSERT INTO assetPrices (asset, device, points) VALUES (assetId, deviceRec.partNumber, ct_calcPoints(basePrice, deviceRec.flatMarkup, deviceRec.markup, deviceRec.minMarkup, deviceRec.maxMarkup));
+        INSERT INTO assetPrices (asset, store, points) VALUES (assetId, storeRec.id, ct_calcPoints(basePrice, storeRec.flatMarkup, storeRec.markup, storeRec.minMarkup, storeRec.maxMarkup));
     END LOOP;
 END;
 $$ LANGUAGE 'plpgsql';

@@ -20,14 +20,13 @@ var utils = require('./support/http');
 
 describe('Listing', function(){
     var cookie;
-    var booksChannelId;
-    var scienceChannelId;
-    var scienceChannelResponse;
+    var gamesChannelId;
+    var cardsChannelId;
+    var cardsChannelResponse;
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
             var expected = {
-                "userId": 1,
-                "device":"VIVALDI-1",
+                "store":"VIVALDI-1",
                 "authStatus":true,
                 "points" : 10000,
                 "imageUrls": {
@@ -41,7 +40,7 @@ describe('Listing', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -71,11 +70,11 @@ describe('Listing', function(){
                     channels.length.should.be.above(0);
                     for (var i = 0; i < channels.length; ++i) {
                         var channel = channels[i];
-                        if (channel.name === 'Books') {
-                            booksChannelId = channel.id;
+                        if (channel.name === 'Games') {
+                            gamesChannelId = channel.id;
                         }
                     }
-                    booksChannelId.should.be.above(0);
+                    gamesChannelId.should.be.above(0);
                     done();
                 },
                 cookie);
@@ -84,7 +83,7 @@ describe('Listing', function(){
         it('should list sub channels of a top channel', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + booksChannelId,
+                '/bodega/v1/json/channel/' + gamesChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -96,11 +95,11 @@ describe('Listing', function(){
                     channels.length.should.be.within(1, 25);
                     for (var i = 0; i < channels.length; ++i) {
                         var channel = channels[i];
-                        if (channel.name === 'Science') {
-                            scienceChannelId = channel.id;
+                        if (channel.name === 'Card Games') {
+                            cardsChannelId = channel.id;
                         }
                     }
-                    scienceChannelId.should.be.above(0);
+                    cardsChannelId.should.be.above(0);
                     done();
                 },
                 cookie);
@@ -109,7 +108,7 @@ describe('Listing', function(){
         it('should list channel with assets', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + scienceChannelId,
+                '/bodega/v1/json/channel/' + cardsChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -118,7 +117,7 @@ describe('Listing', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('assets');
                     Object.keys(res.body.assets).length.should.be.within(1, 25);
-                    scienceChannelResponse = res.body;
+                    cardsChannelResponse = res.body;
                     done();
                 },
                 cookie);
@@ -131,7 +130,7 @@ describe('Listing', function(){
             var runningTests = 3;
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + scienceChannelId +  '?pageSize=1',
+                '/bodega/v1/json/channel/' + cardsChannelId +  '?pageSize=1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -148,7 +147,7 @@ describe('Listing', function(){
                 cookie);
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + scienceChannelId + '?pageSize=10',
+                '/bodega/v1/json/channel/' + cardsChannelId + '?pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -165,7 +164,7 @@ describe('Listing', function(){
                 cookie);
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + scienceChannelId + '?pageSize=21',
+                '/bodega/v1/json/channel/' + cardsChannelId + '?pageSize=21',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -188,7 +187,7 @@ describe('Listing', function(){
         it('by name', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + scienceChannelId,
+                '/bodega/v1/json/channel/' + cardsChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -196,7 +195,7 @@ describe('Listing', function(){
                         'application/json; charset=utf-8');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('assets');
-                    res.body.should.be.eql(scienceChannelResponse);
+                    res.body.should.be.eql(cardsChannelResponse);
                     done();
                 },
                 cookie);
@@ -205,7 +204,7 @@ describe('Listing', function(){
         it('list channels by name with pageSize', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + scienceChannelId +
+                '/bodega/v1/json/channel/' + cardsChannelId +
                     '?listType=Channel&pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -224,7 +223,7 @@ describe('Listing', function(){
         it('list channels by name with offset', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + scienceChannelId +
+                '/bodega/v1/json/channel/' + cardsChannelId +
                     '?listType=Channel&offset=10&pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -235,7 +234,7 @@ describe('Listing', function(){
                     res.body.should.have.property('assets');
                     var assets = res.body.assets;
                     assets.length.should.be.equal(10);
-                    scienceChannelResponse.assets[10].should.be.eql(assets[0]);
+                    cardsChannelResponse.assets[10].should.be.eql(assets[0]);
                     done();
                 },
                 cookie);

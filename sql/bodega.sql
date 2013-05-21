@@ -76,11 +76,9 @@ create table affiliations
     role        int         references personRoles(id) not null
 );
 
-create sequence seq_deviceIds;
-
-create table devices
+create table stores
 (
-    partNumber  text        primary key,
+    id          text        primary key,
     partner     int         references partners(id) not null,
     name        text        not null,
     description text,
@@ -213,13 +211,13 @@ create index idx_subChannelAssetsByAsset on subChannelAssets (asset);
 create index idx_subChannelAssetsByChannel on subChannelAssets (channel);
 create index idx_subChannelAssetsByLeaf on subChannelAssets (leafChannel);
 
-create table deviceChannels
+create table storeChannels
 (
-    channel     int         references channels(id) on delete cascade,
-    device      text        references devices(partNumber) on delete cascade
+    channel     int         not null references channels(id) on delete cascade,
+    stores      text        not null references stores(id) on delete cascade
 );
 
-create index idx_deviceChanels on deviceChannels (channel, device);
+create index idx_storeChannels on storeChannels (channel, stores);
 
 create table channelText
 (
@@ -240,13 +238,13 @@ create table channelText
 create table assetPrices
 (
     asset       int         references assets(id) on delete cascade,
-    device      text        references devices(partNumber) on delete cascade,
+    store       text        references stores(id) on delete cascade,
     points      int         not null constraint ct_apAssetPricePoint check (points > 0),
     starting    timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
     ending      timestamp   constraint ct_apEndAfterStart check (ending > starting)
 );
 
-create index idx_assetPrices_assetChannel on assetPrices (asset, device);
+create index idx_assetPrices_assetChannel on assetPrices (asset, store);
 
 create sequence seq_purchaseIds;
 -- drop table purchases;
@@ -256,7 +254,7 @@ create table purchases
     person          int         references people(id) on delete set null,
     email           text        not null,
     asset           int         references assets(id) on delete set null,
-    device          text        not null,
+    store           text        not null,
     name            text        not null,
     points          int         not null CHECK (points >= 0),
     toParticipant   int         not null CHECK (points >= 0),
@@ -266,7 +264,7 @@ create table purchases
 
 create index idx_purchasesPeople on purchases(person);
 create index idx_purchasesAssets on purchases(asset);
-create index idx_purchasesDevice on purchases (device);
+create index idx_purchasesStores on purchases(store);
 
 -- drop table downloads;
 create table downloads
@@ -274,7 +272,7 @@ create table downloads
     asset           int         not null references assets(id) on delete set null,
     person          int         references people(id) on delete set null,
     downloadedOn    timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
-    device          text        REFERENCES devices(partNumber) on delete set null,
+    store           text        REFERENCES stores(id) on delete set null,
     address         inet        not null,
     title           text,
     version         text
@@ -282,7 +280,7 @@ create table downloads
 
 create index idx_downloadsPeople on downloads (person);
 create index idx_downloadsAsset on downloads (asset);
-create index idx_downloadsDevice on downloads (device);
+create index idx_downloadsStore on downloads (store);
 
 -- drop table pointTransactions;
 create table pointTransactions
@@ -316,7 +314,7 @@ create table batchJobsInProgress
 create table easterEggs
 (
     phrase      text    primary key,
-    device      text    not null references devices(partNumber) on delete cascade,
+    store       text    not null references stores(id) on delete cascade,
     egg         text
 );
 
