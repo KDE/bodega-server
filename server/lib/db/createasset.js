@@ -18,7 +18,7 @@
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 var fs = require('fs');
-
+var path = require('path');
 
 function sendResponse(db, req, res, assetInfo)
 {
@@ -34,13 +34,76 @@ function sendResponse(db, req, res, assetInfo)
     res.send(json);
 }
 
+function deleteUpload(db, req, res, path)
+{
+    /* we don't care about errors at this point
+     * because if we're here an error already
+     * occured */
+    app.assetStore.remove(path, function() {});
+}
+
+function cleanupAfterError(db, req, res, assetInfo)
+{
+    deleteUpload(db, req, res, assetInfo.incomingPath);
+}
+
+function recordPreview(db, req, res, assetInfo, previewPath,
+                       previewIdx, previewCount)
+{
+    var atEnd = (previewIdx == (previewCount - 1));
+    var newPreviewQuery = 'insert into incomingAssetPreviews (asset, path) values ($1, $2)';
+    db.query(newPreviewQuery,
+             [assetInfo.id, previewPath],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                     return;
+                 }
+                 if (atEnd) {
+                     sendResponse(db, req, res, assetInfo);
+                 } else {
+                     ++previewIdx;
+                     setupPreview(db, req, res, assetInfo,
+                                  previewIdx, previewCount);
+                 }
+             });
+}
+
+/**
+ * setupPreview is recursive through recordPreview because we want
+ * to make sure that the error stops the entire chain. with a for
+ * loop that would be impossible because each iteration of the for 
+ * loop would invoke an asynchronous function, essentially making
+ * them all run in parallel.
+ */
+function setupPreview(db, req, res, assetInfo, previewIdx, previewCount)
+{
+    var keys = Object.keys(assetInfo.previews);
+    var previewName = assetInfo.previews[keys[previewIdx]];
+    var preview = req.files[keys[previewIdx]];
+    var filename = path.basename(preview.name);
+    app.assetStore.upload(
+        preview.path, assetInfo.id, filename,
+        function(err, result) {
+            if (err) {
+                //console.log("error due to bad rename?");
+                errors.report('UploadFailed', req, res);
+                return;
+            }
+            recordPreview(db, req, res, assetInfo, result.path,
+                         previewIdx, previewCount);
+        });
+}
+
 function setupPreviews(db, req, res, assetInfo)
 {
     var i;
-    for (i = 0; i < req.files.previews.length; ++i) {
-        //upload req.files.previews[i]
+    if (assetInfo.previews) {
+        var keys = Object.keys(assetInfo.previews);
+        var previewIdx = 0;
+        var previewCount = keys.length;
+        setupPreview(db, req, res, assetInfo, previewIdx, previewCount);
     }
-    sendResponse(db, req, res, assetInfo);
 }
 
 
@@ -55,7 +118,7 @@ function setupIcons(db, req, res, assetInfo)
     //   req.files.icons.large
     //   req.files.icons.huge
 
-    setupPreviews(db, res, res, assetInfo);
+    setupPreviews(db, req, res, assetInfo);
 }
 
 
@@ -63,10 +126,9 @@ function recordAsset(db, req, res, assetInfo)
 {
     var file = req.files.asset;
     var incomingPath = assetInfo.incomingPath;
-    //console.log(req.session.user.id, "our paths are => " + file.filename + ' ' + incomingPath);
-    var newAssetQuery = 'insert into incomingAssets (license, author, baseprice, name, description, version, path, file) values ($1, $2, $3, $4, $5, $6, $7, $8)';
+    var newAssetQuery = 'insert into incomingAssets (id, license, author, baseprice, name, description, version, path, file) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
     db.query(newAssetQuery,
-             [assetInfo.license, assetInfo.author, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.incomingPath, file.filename],
+             [assetInfo.id, assetInfo.license, assetInfo.partnerId, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.incomingPath, assetInfo.filename],
              function(err, result) {
                  if (err) {
                      errors.report('Database', req, res, err);
@@ -81,17 +143,24 @@ function storeAsset(db, req, res, assetInfo)
 {
     db.query("select nextval('seq_assetsids') as assetId;", [],
              function(err, result) {
+                 var fromFile = req.files.asset.path;
+                 var name = req.files.asset.name;
+                 var filename = path.basename(name) + '-' + assetInfo.version;
                  assetInfo.id = result.rows[0].assetid;
+                 assetInfo.filename = filename;
+                 console.log(req.files.asset);
+                 console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + filename);
                  app.assetStore.upload(
-                     req,
+                     fromFile, assetInfo.id, filename,
                      function(err, result) {
                          if (err) {
                              //console.log("error due to bad rename?");
                              errors.report('UploadFailed', req, res);
                              return;
                          }
-
                          assetInfo.incomingPath = result.path;
+                         console.log("+++++++++++++++");
+                         console.log(assetInfo);
                          recordAsset(db, req, res, assetInfo);
                      });
              });
@@ -99,33 +168,33 @@ function storeAsset(db, req, res, assetInfo)
 
 function checkPartner(db, req, res, assetInfo)
 {
-    //console.log("checking " + req.body.partner + ' ' + req.session.user.id);
+    //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
     var partner = assetInfo.partnerId;
     if (!partner) {
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
-                [req.session.user.id],
-                function(err, result) {
-                    if (err || !result.rows || result.rows.length === 0) {
-                        errors.report('UploadPartnerInvalid', req, res);
-                        return;
-                    }
+                 [req.session.user.id],
+                 function(err, result) {
+                     if (err || !result.rows || result.rows.length === 0) {
+                         errors.report('UploadPartnerInvalid', req, res);
+                         return;
+                     }
 
-                    req.body.partner = result.rows[0].partner;
-                    storeAsset(db, req, res, assetInfo);
-                });
+                     assetInfo.partnerId = result.rows[0].partner;
+                     storeAsset(db, req, res, assetInfo);
+                 });
     } else {
         //console.log("checking up on partner");
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
-                [req.body.partner, req.session.user.id],
-                function(err, result) {
-                    if (err || !result.rows || result.rows.length === 0) {
-                        errors.report('UploadPartnerInvalid', req, res);
-                        return;
-                    }
+                 [partner, req.session.user.id],
+                 function(err, result) {
+                     if (err || !result.rows || result.rows.length === 0) {
+                         errors.report('UploadPartnerInvalid', req, res);
+                         return;
+                     }
 
-                    console.log("going to store the asset now .. " + req.body.partner + " " + result.rows.size);
-                    storeAsset(db, req, res, assetInfo);
-                });
+                     //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
+                     storeAsset(db, req, res, assetInfo);
+                 });
     }
 }
 
@@ -154,7 +223,6 @@ module.exports = function(db, req, res) {
             assetInfo = null;
         }
 
-        console.log("assetInfo is " + assetInfo);
         if (!assetInfo) {
             //"Unable to parse the asset info file.",
             errors.report('NoMatch', req, res);

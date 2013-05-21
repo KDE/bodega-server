@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var server = require('../app.js');
+var app = require('../app.js');
 var utils = require('./support/http');
 
 var mime = require('mime');
@@ -85,8 +85,8 @@ function postFiles(server, url, files, cookie, fn)
 
 describe('Asset creation', function(){
     var cookie;
-    describe('needs to authorize first', function(){
-        it('authorize correctly.', function(done){
+    describe('Authentication', function(){
+        it('should succeed.', function(done){
             var expected = {
                 "userId": 2,
                 "device":"VIVALDI-1",
@@ -102,7 +102,7 @@ describe('Asset creation', function(){
                 }
             };
             utils.getUrl(
-                server,
+                app,
                 '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -119,14 +119,20 @@ describe('Asset creation', function(){
 
     describe('Creation', function(){
         it('of a simple asset', function(done){
-            postFiles(server,
+            postFiles(app.server,
                     '/bodega/v1/json/create',
                     [{
                         "name" : "info",
-                        "filename" : "support/newassetinfo.json"
+                        "filename" : "sampleasset/sample-info.json"
                     }, {
-                        "name" : "mocha",
-                        "filename" : "support/newassetinfo.json"
+                        "name" : "asset",
+                        "filename" : "sampleasset/sample.pdf"
+                    },{
+                        "name" : "front-cover",
+                        "filename" : "sampleasset/sample-0.png"
+                    },{
+                        "name" : "back-cover",
+                        "filename" : "sampleasset/sample-0.png"
                     }], cookie,
                       function(res) {
                           console.log(res.body);

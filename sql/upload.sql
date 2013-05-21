@@ -20,3 +20,8 @@ create table incomingAssetTags
     tag         int         references tags(id) on delete cascade
 );
 
+create table incomingAssetPreviews
+(
+    asset       int         references incomingAssets(id) on delete cascade,
+    path        text
+);
