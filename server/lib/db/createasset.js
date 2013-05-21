@@ -79,8 +79,11 @@ function recordPreview(db, req, res, assetInfo, previewPath,
 function setupPreview(db, req, res, assetInfo, previewIdx, previewCount)
 {
     var keys = Object.keys(assetInfo.previews);
-    var previewName = assetInfo.previews[keys[previewIdx]];
-    var preview = req.files[keys[previewIdx]];
+    var previewInfo = assetInfo.previews[previewIdx];
+    var preview = req.files[previewInfo.file];
+    
+    //console.log(previewInfo);
+    //console.log(preview);
     var filename = path.basename(preview.name);
     app.assetStore.upload(
         preview.path, assetInfo.id, filename,
@@ -148,8 +151,8 @@ function storeAsset(db, req, res, assetInfo)
                  var filename = path.basename(name) + '-' + assetInfo.version;
                  assetInfo.id = result.rows[0].assetid;
                  assetInfo.filename = filename;
-                 console.log(req.files.asset);
-                 console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + filename);
+                 //console.log(req.files.asset);
+                 //console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + filename);
                  app.assetStore.upload(
                      fromFile, assetInfo.id, filename,
                      function(err, result) {
@@ -159,8 +162,6 @@ function storeAsset(db, req, res, assetInfo)
                              return;
                          }
                          assetInfo.incomingPath = result.path;
-                         console.log("+++++++++++++++");
-                         console.log(assetInfo);
                          recordAsset(db, req, res, assetInfo);
                      });
              });
@@ -229,7 +230,6 @@ module.exports = function(db, req, res) {
             return;
         }
 
-        console.log(assetInfo);
         checkPartner(db, req, res, assetInfo);
     });
 };

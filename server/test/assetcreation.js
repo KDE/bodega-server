@@ -128,15 +128,13 @@ describe('Asset creation', function(){
                         "name" : "asset",
                         "filename" : "sampleasset/sample.pdf"
                     },{
-                        "name" : "front-cover",
+                        "name" : "sample-0.png",
                         "filename" : "sampleasset/sample-0.png"
                     },{
-                        "name" : "back-cover",
-                        "filename" : "sampleasset/sample-0.png"
+                        "name" : "sample-1.png",
+                        "filename" : "sampleasset/sample-1.png"
                     }], cookie,
                       function(res) {
-                          console.log(res.body);
-                          console.log('done');
                           done();
                       });
         });

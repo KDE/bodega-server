@@ -3,19 +3,20 @@
     "name" : "Just A Sample",
     "version" : "2.1",
     "license" : "6",
-    "author" : "Zack Rusin",
-    "url" : "http://www.makeplaylive.com",
-    "isbn" : "00000000",
-    "publisher" : "some publishder",
-    "created" : "2013",
     "description" : "description of the book",
-    "language" : "en",
     "partnerId" : "2",
     "basePrice" : "0",
-    "previews" : {
-        "front-cover" : "sample-0.png"
-        "back-cover" : "sample-0.png"
-    },
-    "file" : "sample.pdf"
-    
+    "file" : "sample.pdf",
+    "languages" : ["en"],
+    "previews" : [
+        { "type" : "cover","subtype" : "front", "file" : "sample-0.png" },
+        { "type" : "cover", "subtype" : "back", "file" : "sample-1.png" }
+    ],
+    "tags" : [
+        {"name" : "author", "value" : "Zack Rusin"},
+        {"name" : "publisher", "value" : "Coherent Theory" },
+        {"name" : "isbn", "value" : "00000000"},
+        {"name" : "created", "value" : "2013"},
+        {"name" : "url", "value" : "http://makeplaylive.com"}
+    ]
 }
