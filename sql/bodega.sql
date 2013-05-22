@@ -174,7 +174,8 @@ create table channels
 (
     id          int         primary key default nextval('seq_channelIds'),
     partner     int         references partners(id),
-    parent      int         references channels (id) on delete set null,
+    parent      int         references channels(id) on delete set null,
+    topLevel    int         references channels(id) on delete set null,
     image       text,
     name        text        not null,
     description text,
