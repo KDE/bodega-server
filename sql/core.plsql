@@ -52,7 +52,7 @@ END;
 -- TRIGGER function to ensure channel parents remain coherent due to parent-child relationships between channels
 CREATE OR REPLACE FUNCTION ct_propagateChannelParent() RETURNS TRIGGER AS '
 BEGIN
-    UPDATE channels SET partner = NEW.partner WHERE parent = NEW.id;
+    UPDATE channels SET partner = NEW.partner, topLevel = NEW.topLevel WHERE parent = NEW.id;
     RETURN NEW;
 END;
 ' LANGUAGE 'plpgsql';
