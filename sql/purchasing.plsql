@@ -9,7 +9,7 @@ BEGIN
                             ORDER BY ap.starting DESC LIMIT 1;
     IF NOT FOUND THEN
         PERFORM ap.asset FROM channelAssets ap LEFT JOIN channels c ON (ap.channel = c.id)
-                                              LEFT JOIN storeChannels sc ON (c.id = sc.channel)
+                                              LEFT JOIN storeChannels sc ON (c.topLevel = sc.channel)
                                               LEFT JOIN assets a ON (ap.asset = a.id)
                                               WHERE ap.asset = what AND sc.store = fromStore;
         IF FOUND THEN

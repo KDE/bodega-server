@@ -13,3 +13,5 @@ drop function ct_recordDownload(who int, what int, fromWhere inet, device text)
 \i ../purchasing.plsql
 
 \i ../core.plsql
+
+update channels set parent = parent;

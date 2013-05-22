@@ -23,14 +23,14 @@ module.exports = function(db, req, res) {
     /*jshint multistr:true */
     var listTopChannelsQuery =
         "SELECT DISTINCT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
-         LEFT JOIN storeChannels d \
-         ON (c.id = d.channel) where d.store = $1 and c.parent IS NULL \
+         LEFT JOIN storeChannels sc \
+         ON (c.topLevel = sc.channel) where sc.store = $1 and c.parent IS NULL \
          ORDER BY c.name LIMIT $2 OFFSET $3";
     /*jshint multistr:true */
     var listParentChannelsQuery =
         "SELECT DISTINCT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
-         LEFT JOIN storeChannels d \
-         ON (c.id = d.channel) where d.store = $1 and c.parent = $2 \
+         LEFT JOIN storeChannels sc \
+         ON (c.topLevel = sc.channel) where sc.store = $1 and c.parent = $2 \
          ORDER BY c.name LIMIT $3 OFFSET $4";
     var defaultPageSize = 25;
     var args = {
