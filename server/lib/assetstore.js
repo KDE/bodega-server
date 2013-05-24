@@ -246,7 +246,7 @@ var AssetStore = (function() {
                 fn(err);
                 return;
             }
-            s3PutStream(fileFile, assetId, filename, client, fn);
+            s3PutStream(fromFile, assetId, filename, client, fn);
         } else {
             localPutStream(fromFile, assetId, filename, fn);
         }
