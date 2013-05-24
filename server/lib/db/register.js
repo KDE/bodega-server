@@ -19,18 +19,6 @@ var utils = require('../utils.js');
 var errors = require('../errors.js');
 var BCrypt = require('bcrypt');
 
-function deleteUser(db, userId)
-{
-    var query = 'DELETE FROM people WHERE id=$1;';
-    db.query(
-        query, [userId],
-        function(err, result) {
-            if (err) {
-                return;
-            }
-        });
-}
-
 function createUser(db, req, res, args)
 {
     var query =
@@ -93,7 +81,7 @@ function findUser(db, req, res, args)
                 args.userId = result.rows[0].id;
                 var sendConfirmationEmailResult = utils.sendConfirmationEmail(db, req, res, args.userId, args.email);
                 if (!sendConfirmationEmailResult) {
-                    deleteUser(db, args.userId);
+                    utils.deleteUser(db, args.userId);
                 }
             } else {
                 createUser(db, req, res, args);

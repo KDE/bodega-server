@@ -16,6 +16,7 @@
 */
 
 var nodemailer = require('nodemailer');
+var errors = require('./errors.js');
 
 module.exports.findImagePaths = function(req)
 {
@@ -66,6 +67,20 @@ module.exports.standardJson = function(req, success)
     return json;
 };
 
+function deleteUser(db, userId)
+{
+    var query = 'DELETE FROM people WHERE id=$1;';
+    db.query(
+        query, [userId],
+        function(err, result) {
+            if (err) {
+                return;
+            }
+        });
+}
+
+module.exports.deleteUser = deleteUser;
+
 module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
 {
     var service = app.config.service;
@@ -110,7 +125,7 @@ module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
                 userId: userId
             };
             if (err) {
-                deleteUser(db, args.userId);
+                deleteUser(db, userId);
                 errors.report('Database', req, res, err);
                 return false;
             }
@@ -132,7 +147,7 @@ module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
                 nodemailer.sendMail(mailOptions, function(error) {
                     var json = {};
                     if (error) {
-                        deleteUser(db, args.userId);
+                        deleteUser(db, userId);
                         errors.report('MailerFailure', req, res, error);
                         transport.close();
                         return false;
@@ -148,5 +163,5 @@ module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
         }
     );
     return true;
-}
+};
 
