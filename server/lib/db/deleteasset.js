@@ -150,10 +150,6 @@ function findIncomingAsset(db, req, res, assetInfo)
     );
 }
 
-function checkPartner(db, req, res, assetInfo)
-{
-}
-
 module.exports = function(db, req, res) {
     var assetInfo = {};
 
