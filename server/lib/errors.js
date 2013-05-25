@@ -64,7 +64,8 @@ var ErrorType = {
     "UploadInvalidJson"      : 42, //asset info data was malformed
     "UploadTagError"         : 43, //one of the required tags is missing
     "UploadPreviewError"     : 44, //the asset is missing a preview
-    "UploadIconError"        : 45 //the asset is missing an icon
+    "UploadIconError"        : 45, //the asset is missing an icon
+    "DeleteAssetMissing"     : 46 //the delete asset does not exist
 };
 
 module.exports.Type = ErrorType;
