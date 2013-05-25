@@ -85,6 +85,8 @@ function postFiles(server, url, files, cookie, fn)
 
 describe('Asset creation', function(){
     var cookie;
+    var incompleteAssetId;
+    var completeAssetId;
     describe('Authentication', function(){
         it('should succeed.', function(done){
             var expected = {
@@ -118,6 +120,26 @@ describe('Asset creation', function(){
     });
 
     describe('Creation', function(){
+        it('allow incomplete assets', function(done){
+            postFiles(app.server,
+                    '/bodega/v1/json/create',
+                    [{
+                        "name" : "info",
+                        "filename" : "sampleasset/sample-info-incomplete.json"
+                    }, {
+                        "name" : "asset",
+                        "filename" : "sampleasset/sample.pdf"
+                    }], cookie,
+                      function(res) {
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          incompleteAssetId = res.body.asset.id;
+                          done();
+                      });
+        });
+        
         it('of a simple asset', function(done){
             postFiles(app.server,
                     '/bodega/v1/json/create',
@@ -131,22 +153,19 @@ describe('Asset creation', function(){
                         "name" : "sample-0.png",
                         "filename" : "sampleasset/sample-0.png"
                     },{
-                        "name" : "icon22.png",
-                        "filename" : "sampleasset/icon22.png"
+                        "name" : "sample-1.png",
+                        "filename" : "sampleasset/sample-1.png"
                     },{
-                        "name" : "icon32.png",
-                        "filename" : "sampleasset/icon32.png"
-                    },{
-                        "name" : "icon64.png",
-                        "filename" : "sampleasset/icon64.png"
-                    },{
-                        "name" : "icon128.png",
-                        "filename" : "sampleasset/icon128.png"
-                    },{
-                        "name" : "icon512.png",
-                        "filename" : "sampleasset/icon512.png"
+                        "name" : "icon.jpg",
+                        "filename" : "sampleasset/icon.jpg"
                     }], cookie,
                       function(res) {
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          res.body.asset.should.have.property('name');
+                          completeAssetId = res.body.asset.id;
                           done();
                       });
         });

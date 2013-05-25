@@ -16,7 +16,7 @@
 */
 
 var async = require('async');
-var errors = require('errors.js');
+var errors = require('../errors.js');
 var path = require('path');
 
 
@@ -97,7 +97,7 @@ function findTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount, cb)
 }
 
 
-function setupTag(err, db, req, res, assetInfo, tagIdx, tagCount, cb)
+function setupTag(db, req, res, assetInfo, tagIdx, tagCount, cb)
 {
     var tagInfo = assetInfo.tags[tagIdx];
     var tagIdQuery =
@@ -126,7 +126,7 @@ function setupTag(err, db, req, res, assetInfo, tagIdx, tagCount, cb)
     );
 }
 
-module.exports.setupTags = function(db, req, res, assetInfo)
+module.exports.setupTags = function(db, req, res, assetInfo, fn)
 {
     var keys = Object.keys(assetInfo.tags);
     var tagIdx = 0;
@@ -141,8 +141,8 @@ module.exports.setupTags = function(db, req, res, assetInfo)
 
     async.waterfall(
         funcs, function(err, db, req, res, assetInfo, tagIdx, tagCount) {
-            
-        
+            //console.log(err);
+            fn(err, db, req, res, assetInfo);
         });
 };
 
@@ -179,9 +179,16 @@ function setupPreview(db, req, res, assetInfo, previewIdx, previewCount, cb)
     var previewInfo = assetInfo.previews[previewIdx];
     var preview = req.files[previewInfo.file];
     var e;
-    
-    //console.log(previewInfo);
-    //console.log(preview);
+
+    if (!preview || !previewInfo) {
+        preview = previewInfo ? previewInfo.file : previewIdx;
+        e = errors.create('UploadPreviewError',
+                          'Preview ' + preview + ' is missing.');
+        //console.log("error due to bad rename?");
+        cb(e, db, req, res, assetInfo, previewIdx, previewCount);
+        return;
+    }
+
     var filename = path.basename(preview.name);
     app.assetStore.upload(
         preview.path, assetInfo.id, filename,
@@ -197,7 +204,7 @@ function setupPreview(db, req, res, assetInfo, previewIdx, previewCount, cb)
         });
 }
 
-module.exports.setupPreviews = function(db, req, res, assetInfo)
+module.exports.setupPreviews = function(db, req, res, assetInfo, fn)
 {
     var keys = Object.keys(assetInfo.previews);
     var previewIdx = 0;
@@ -207,12 +214,12 @@ module.exports.setupPreviews = function(db, req, res, assetInfo)
     }];
 
     for (previewIdx = 0; previewIdx < previewCount; ++previewIdx) {
-        funcs.push(setupTag);
+        funcs.push(setupPreview);
     }
 
     async.waterfall(
-        funcs, function(err, db, req, res, assetInfo, previewIdx, previewCount) {
-            
-        
+        funcs,
+        function(err, db, req, res, assetInfo, previewIdx, previewCount) {
+            fn(err, db, req, res, assetInfo);
         });
 };

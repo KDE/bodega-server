@@ -54,15 +54,37 @@ function reportError(db, req, res, assetInfo,
 function setupTags(db, req, res, assetInfo)
 {
     if (assetInfo.tags) {
-        createUtils.setupTags(db, req, res, assetInfo);
+        createUtils.setupTags(
+            db, req, res, assetInfo,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    reportError(db, req, res, assetInfo,
+                               'UploadTagError', err);
+                    return;
+                }
+                sendResponse(db, req, res, assetInfo);
+            });
+    } else {
+        sendResponse(db, req, res, assetInfo);
     }
 }
 
-function setupPreviews(db, req, res, assetInfo)
+function setupPreviews(db, req, res, assetInfo, fn)
 {
     var i;
     if (assetInfo.previews) {
-        createUtils.setupPreviews(db, req, res, assetInfo);
+        createUtils.setupPreviews(
+            db, req, res, assetInfo,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    reportError(db, req, res, assetInfo,
+                               'UploadPreviewError', err);
+                    return;
+                }
+                setupTags(db, req, res, assetInfo);
+            });
+    } else {
+        setupTags(db, req, res, assetInfo);
     }
 }
 
@@ -185,9 +207,10 @@ module.exports = function(db, req, res) {
             assetInfo = null;
         }
 
-        if (!assetInfo) {
+        if (!assetInfo || !assetInfo.partnerId || !assetInfo.file ||
+            assetInfo.id) {
             //"Unable to parse the asset info file.",
-            errors.report('NoMatch', req, res);
+            errors.report('UploadInvalidJson', req, res);
             return;
         }
 

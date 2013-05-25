@@ -61,9 +61,10 @@ var ErrorType = {
 
     "UploadPartnerInvalid"   : 40,//the authorized user tried to upload without a valid partner id
     "UploadFailed"           : 41, //the uploading of the file did not succeed
-    "UploadMissingTag"       : 42, //one of the required tags is missing
-    "UploadMissingPreview"   : 43, //the asset is missing a preview
-    "UploadMissingIcon"      : 44 //the asset is missing an icon
+    "UploadInvalidJson"      : 42, //asset info data was malformed
+    "UploadTagError"         : 43, //one of the required tags is missing
+    "UploadPreviewError"     : 44, //the asset is missing a preview
+    "UploadIconError"        : 45 //the asset is missing an icon
 };
 
 module.exports.Type = ErrorType;
