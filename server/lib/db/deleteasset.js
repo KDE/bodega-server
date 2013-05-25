@@ -119,7 +119,7 @@ function findPublishedAsset(db, req, res, assetInfo)
                 errors.report('Database', req, res, err);
                 return;
             }
-            if (!result.rows || result.rows.length != 1) {
+            if (!result.rows || result.rows.length !== 1) {
                 errors.report('DeleteAssetMissing', req, res);
                 return;
             } else {
@@ -140,7 +140,7 @@ function findIncomingAsset(db, req, res, assetInfo)
                 errors.report('Database', req, res, err);
                 return;
             }
-            if (!result.rows || result.rows.length != 1) {
+            if (!result.rows || result.rows.length !== 1) {
                 findPublishedAsset(db, req, res, assetInfo);
             } else {
                 assetInfo = result.rows[0];
@@ -152,36 +152,6 @@ function findIncomingAsset(db, req, res, assetInfo)
 
 function checkPartner(db, req, res, assetInfo)
 {
-    //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
-    var partner = assetInfo.partnerId;
-    if (!partner) {
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
-                 [req.session.user.id],
-                 function(err, result) {
-                     if (err || !result.rows || result.rows.length === 0) {
-                         reportError(db, req, res, assetInfo,
-                                     'UploadPartnerInvalid', err);
-                         return;
-                     }
-
-                     assetInfo.partnerId = result.rows[0].partner;
-                     storeAsset(db, req, res, assetInfo);
-                 });
-    } else {
-        //console.log("checking up on partner");
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
-                 [partner, req.session.user.id],
-                 function(err, result) {
-                     if (err || !result.rows || result.rows.length === 0) {
-                         reportError(db, req, res, assetInfo,
-                                     'UploadPartnerInvalid', err);
-                         return;
-                     }
-
-                     //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
-                     storeAsset(db, req, res, assetInfo);
-                 });
-    }
 }
 
 module.exports = function(db, req, res) {

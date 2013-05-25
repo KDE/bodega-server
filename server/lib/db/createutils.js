@@ -223,3 +223,41 @@ module.exports.setupPreviews = function(db, req, res, assetInfo, fn)
             fn(err, db, req, res, assetInfo);
         });
 };
+
+
+module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
+{
+    //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
+    var partner = assetInfo.partnerId;
+    var e;
+    if (!partner) {
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
+                 [req.session.user.id],
+                 function(err, result) {
+                     if (err || !result.rows || result.rows.length === 0) {
+                         e = errors.create('UploadPartnerInvalid',
+                                           err ? err.message : '');
+                         fn(e, db, req, res, assetInfo);
+                         return;
+                     }
+
+                     assetInfo.partnerId = result.rows[0].partner;
+                     fn(null, db, req, res, assetInfo);
+                 });
+    } else {
+        //console.log("checking up on partner");
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
+                 [partner, req.session.user.id],
+                 function(err, result) {
+                     if (err || !result.rows || result.rows.length === 0) {
+                         e = errors.create('UploadPartnerInvalid',
+                                           err ? err.message : '');
+                         fn(e, db, req, res, assetInfo);
+                         return;
+                     }
+
+                     //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
+                     fn(null, db, req, res, assetInfo);
+                 });
+    }
+};
