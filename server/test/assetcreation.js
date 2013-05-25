@@ -131,8 +131,20 @@ describe('Asset creation', function(){
                         "name" : "sample-0.png",
                         "filename" : "sampleasset/sample-0.png"
                     },{
-                        "name" : "sample-1.png",
-                        "filename" : "sampleasset/sample-1.png"
+                        "name" : "icon22.png",
+                        "filename" : "sampleasset/icon22.png"
+                    },{
+                        "name" : "icon32.png",
+                        "filename" : "sampleasset/icon32.png"
+                    },{
+                        "name" : "icon64.png",
+                        "filename" : "sampleasset/icon64.png"
+                    },{
+                        "name" : "icon128.png",
+                        "filename" : "sampleasset/icon128.png"
+                    },{
+                        "name" : "icon512.png",
+                        "filename" : "sampleasset/icon512.png"
                     }], cookie,
                       function(res) {
                           done();

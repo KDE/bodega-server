@@ -61,7 +61,9 @@ var ErrorType = {
 
     "UploadPartnerInvalid"   : 40,//the authorized user tried to upload without a valid partner id
     "UploadFailed"           : 41, //the uploading of the file did not succeed
-    "UploadMissingTag"       : 42 //the uploading of the file did not succeed
+    "UploadMissingTag"       : 42, //one of the required tags is missing
+    "UploadMissingPreview"   : 43, //the asset is missing a preview
+    "UploadMissingIcon"      : 44 //the asset is missing an icon
 };
 
 module.exports.Type = ErrorType;
@@ -106,4 +108,3 @@ module.exports.report = function(type, req, res, err)
 
     res.json(obj);
 };
-
