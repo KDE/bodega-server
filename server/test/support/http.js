@@ -19,8 +19,12 @@ function getUrl(app, url, fn, cookie) {
             buf += chunk;
         });
         res.on("end", function(chunk) {
-            res.body = JSON.parse(buf);
-            fn(res);
+            try {
+                res.body = JSON.parse(buf);
+                fn(res);
+            } catch (e) {
+                console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
+            }
         });
     });
 }
