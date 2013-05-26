@@ -263,7 +263,7 @@ app.get(serverPath('store/info'), isAuthorized,
 
 app.get(serverPath('store/delete'), isAuthorized,
     function(req, res) {
-//        app.db.deleteStore(req, res);
+        app.db.deleteStore(req, res);
     }
 );
 

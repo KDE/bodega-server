@@ -45,19 +45,6 @@ describe('Store management', function(){
 
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
-            var expected = {
-                "store":"VIVALDI-1",
-                "authStatus":true,
-                "points" : 10000,
-                "imageUrls": {
-                    "tiny":"http://0.0.0.0:3000/images/22",
-                    "small":"http://0.0.0.0:3000/images/32",
-                    "medium":"http://0.0.0.0:3000/images/64",
-                    "large":"http://0.0.0.0:3000/images/128",
-                    "huge":"http://0.0.0.0:3000/images/512",
-                    "previews":"http://0.0.0.0:3000/images/previews"
-                }
-            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
@@ -132,8 +119,8 @@ describe('Store management', function(){
                         'content-type',
                         'application/json; charset=utf-8');
                     res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('store');
-                    res.body.store.should.eql(expected);
+                    res.body.should.have.property('storeInfo');
+                    res.body.storeInfo.should.eql(expected);
                     done();
                 },
                 cookie);
@@ -162,4 +149,21 @@ describe('Store management', function(){
 
     });
 
+    describe('delete a store', function(){
+        it('should succeed with a valid store', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/delete?id=1_FUN_TIMES_WITH_CLOWNS',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    done();
+                },
+                cookie);
+        });
+    });
 });

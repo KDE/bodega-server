@@ -173,6 +173,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbStores.create, req, res);
     };
 
+    BodegaDb.prototype.deleteStore = function(req, res) {
+        this.dbQuery(dbStores.delete, req, res);
+    };
+
     BodegaDb.prototype.hunt = function(req, res) {
         this.dbQuery(dbHunt, req, res);
     };

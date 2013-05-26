@@ -18,7 +18,7 @@
 var errors = require('../errors.js');
 var utils = require('../utils.js');
 
-function defaultPartnerId(db, req, res, rv)
+function defaultPartnerId(db, req, res, fn)
 {
     db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
             [req.session.user.id],
@@ -28,15 +28,15 @@ function defaultPartnerId(db, req, res, rv)
                     return -1;
                 }
 
-                rv(result.rows[0].partner, db, req, res);
+                fn(result.rows[0].partner, db, req, res);
             });
 }
 
-function partnerId(db, req, res, callback)
+function partnerId(db, req, res, fn)
 {
     var partner = utils.parseNumber(req.query.partner);
     if (partner < 1) {
-        defaultPartnerId(dfb, req, res, callback);
+        defaultPartnerId(db, req, res, fn);
     } else {
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
                 [partner, req.session.user.id],
@@ -46,7 +46,7 @@ function partnerId(db, req, res, callback)
                         return;
                     }
 
-                    callback(partner, db, req, res);
+                    fn(partner, db, req, res);
                 });
     }
 }
@@ -55,31 +55,26 @@ function returnStoreJson(id, db, req, res)
 {
     db.query("select s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.flatMarkup, s.markup from stores s join partners p on (s.partner = p.id) where s.id = $1",
              [id], function(err, result) {
-                 if (err || result.rows.length < 1) {
+                 if (err || !result.rows || result.rows.length < 1) {
                      errors.report('Database', req, res, err);
                      return;
                  }
 
                  var r = result.rows[0];
                  var json = utils.standardJson(req, true);
-                 json.store = { 'id': id,
-                                'name': r.name,
-                                'desc': r.description,
-                                'partner': { 'id': r.partnerid, 'name': r.partnername },
-                                'markups': { 'min': r.minmarkup, 'max': r.maxmarkup,
-                                             'flat': r.flatmarkup, 'markup': r.markup }
-                              };
+                 json.storeInfo = { 'id': id,
+                                    'name': r.name,
+                                    'desc': r.description,
+                                    'partner': { 'id': r.partnerid, 'name': r.partnername },
+                                    'markups': { 'min': r.minmarkup, 'max': r.maxmarkup,
+                                                 'flat': r.flatmarkup, 'markup': r.markup }
+                                 };
                  res.json(json);
              });
 }
 
 function createWithPartner(partner, db, req, res)
 {
-    if (partner < 1) {
-        errors.report('StorePartnerInvalid', req, res);
-        return;
-    }
-
     var name = req.query.name;
     if (!name || name === '') {
         errors.report('StoreNameInvalid', req, res);
@@ -96,6 +91,7 @@ function createWithPartner(partner, db, req, res)
              function(err, result) {
                  if (err) {
                     errors.report('Database', req, res);
+                    return;
                  }
 
                  if (result.rows && result.rows.length > 0) {
@@ -120,6 +116,32 @@ function createWithPartner(partner, db, req, res)
             });
 }
 
+function deleteWithPartner(partner, db, req, res)
+{
+    var id = req.query.id;
+    if (!id || id === '') {
+        error('StoreIdInvalid', req, req, errors.create("Invalid Store Id", "Invalid store passed into store deletion: " + id));
+        return;
+    }
+
+    db.query("delete from stores where id = $1 and partner = $2", [id, partner],
+             function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res);
+                    return;
+                }
+
+                if (result.rowCount < 1) {
+                    errors.report('StoreNotDeleted', req, res);
+                    return;
+                }
+
+                res.json(utils.standardJson(req));
+             });
+}
+
+
+
 /**
  * + int partner
  * + string name
@@ -130,6 +152,13 @@ function createWithPartner(partner, db, req, res)
  * * int flatmarkup
  **/
 module.exports.create = function(db, req, res) {
-    var partner = partnerId(db, req, res, createWithPartner);
-}
+    partnerId(db, req, res, createWithPartner);
+};
+
+/**
+ * + string ID
+ */
+module.exports.delete = function(db, req, res) {
+    partnerId(db, req, res, deleteWithPartner);
+};
 
