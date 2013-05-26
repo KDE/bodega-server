@@ -21,10 +21,11 @@ function getUrl(app, url, fn, cookie) {
         res.on("end", function(chunk) {
             try {
                 res.body = JSON.parse(buf);
-                fn(res);
             } catch (e) {
                 console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
             }
+
+            fn(res);
         });
     });
 }
