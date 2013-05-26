@@ -17,6 +17,7 @@
 
 var server = require('../app.js');
 var utils = require('./support/http');
+var querystring = require('querystring');
 
 describe('Stats', function(){
     var cookie;
@@ -63,7 +64,7 @@ describe('Stats', function(){
                         'application/json; charset=utf-8');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
-                    var stats = res.body.stats;
+                    var stats = res.body.stats[0];
                     stats.assets.should.be.eql(5);
                     stats.totalpoints.should.be.eql(1700);
                     stats.pointstoparticipant.should.be.eql(1605);
@@ -73,5 +74,36 @@ describe('Stats', function(){
                 cookie);
         });
 
+        it('stats with two asset numbers', function(done){
+            var query = {
+                assets: [3,4]
+            }
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('stats');
+                    var expected = {
+                        assets: [3, 2],
+                        totalpoints: [1500, 200],
+                        pointstoparticipant: [1425, 180],
+                        pointstostore: [70, 20]
+                    }
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
+                        stats.assets.should.be.eql(expected.assets[i]);
+                        stats.totalpoints.should.be.eql(expected.totalpoints[i]);
+                        stats.pointstoparticipant.should.be.eql(expected.pointstoparticipant[i]);
+                        stats.pointstostore.should.be.eql(expected.pointstostore[i]);
+                    }
+                    done();
+                },
+                cookie);
+        });
     });
 });

@@ -19,31 +19,46 @@ var utils = require('../utils.js');
 var errors = require('../errors.js');
 
 module.exports.assetStats = function(db, req, res) {
+    var params = [req.session.user.id];
+
     var query = "SELECT count(*) AS assets, \
             sum(points) AS totalpoints, \
             sum(toparticipant) AS pointstoparticipant, \
             sum(toStore) AS pointstostore \
     FROM purchases, devices \
     WHERE purchases.device = devices.partnumber \
-    AND devices.partner = $1;";
+    AND devices.partner = $1";
+
+    if (req.query.assets) {
+        params = params.concat(req.query.assets);
+        query += " AND (";
+
+        for (var i = 0; i < req.query.assets.length; ++i){
+            query += (i > 0 ? " OR ":"") + " purchases.asset = $" + (i+2);
+        }
+
+        query += ") GROUP BY purchases.asset";
+    }
+
+    query += ";";
 
     var json = {
         device : req.session.user.device,
         authStatus : req.session.authorized,
         points : req.session.user.points,
         channels : [],
-        assets   : []
+        stats   : []
     };
 
     db.query(
         query,
-        [req.session.user.id],
+        params,
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
-            json.stats = result.rows[0];
+            json.stats = result.rows;
             res.json(json);
         });
 };
