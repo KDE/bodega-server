@@ -57,11 +57,8 @@ module.exports.create = function(db, req, res) {
         'SELECT * FROM collections WHERE person = $1 AND name = $2;';
     var defaultPageSize = 25;
     var name = req.query.name;
-    var isPublic = (req.query.public === 'true' ||
-                    req.query.public === '1') ? true : false;
-    var isWishList = (req.query.wishlist === 'true' ||
-                      req.query.wishlist === '1') ? true : false;
-
+    var isPublic = utils.parseBool(req.query.public);
+    var isWishList = utils.parseBool(req.query.wishlist);
 
     if (!name) {
         // Name of the collection is missing.
