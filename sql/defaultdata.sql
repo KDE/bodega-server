@@ -42,3 +42,12 @@ INSERT INTO personRoles (description) VALUES ('Accounts');
 
 INSERT INTO batchJobsInProgress (job, dowork) VALUES ('gutenberg', false);
 
+
+
+-- some sample purchases that are used to test the stats
+INSERT INTO PURCHASES (id, person, email, asset, device, name, points, toparticipant, tostore, purchasedon) VALUES (1, 2, 'zack@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 00:00:00');
+INSERT INTO PURCHASES (id, person, email, asset, device, name, points, toparticipant, tostore, purchasedon) VALUES (2, 3, 'aseigo@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 01:00:00');
+INSERT INTO PURCHASES (id, person, email, asset, device, name, points, toparticipant, tostore, purchasedon) VALUES (3, 4, 'mart@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 02:00:00');
+
+INSERT INTO PURCHASES (id, person, email, asset, device, name, points, toparticipant, tostore, purchasedon) VALUES (4, 2, 'zack@kde.org', 4, 'VIVALDI-1', 'diamond', 100, 90, 10, '2013-05-25 13:26:00');
+INSERT INTO PURCHASES (id, person, email, asset, device, name, points, toparticipant, tostore, purchasedon) VALUES (5, 3, 'aseigo@kde.org', 4, 'VIVALDI-1', 'diamond', 100, 90, 10, '2013-05-25 09:35:24');

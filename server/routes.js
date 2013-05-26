@@ -246,6 +246,14 @@ app.post(serverPath('participant/resetPassword'),
     }
 );
 
+//*******************************
+// Stats
+app.get(serverPath('stats/assets'), isAuthorized,
+    function(req, res) {
+        app.db.assetStats(req, res);
+    }
+);
+
 
 //********************************
 // Static content routes
@@ -275,3 +283,6 @@ app.get('/contact', function(req, res) {
         contact: app.config.storeInfo.contact
     });
 });
+
+
+
