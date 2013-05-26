@@ -64,8 +64,9 @@ var ErrorType = {
     "UploadFailed"           : 41,//the uploading of the file did not succeed
 
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
-    "StorePartnerInvalid"    : 61,//on creating a store, the store id already exists
-    "StoreNameInvalid"       : 62,//on creating a store, the store id already exists
+    "StorePartnerInvalid"    : 61,//the partner provided is incorrect
+    "StoreNameInvalid"       : 62,//an invalid (e.g. missing) store name
+    "StoreNotDeleted"        : 63,//deleting a store failed
 };
 
 module.exports.Type = ErrorType;
