@@ -62,6 +62,10 @@ var ErrorType = {
 
     "UploadPartnerInvalid"   : 40,//the authorized user tried to upload without a valid partner id
     "UploadFailed"           : 41,//the uploading of the file did not succeed
+
+    "StoreIdExists"          : 60,//on creating a store, the store id already exists
+    "StorePartnerInvalid"    : 61,//on creating a store, the store id already exists
+    "StoreNameInvalid"       : 62,//on creating a store, the store id already exists
 };
 
 module.exports.Type = ErrorType;
