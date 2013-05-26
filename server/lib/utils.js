@@ -17,6 +17,25 @@
 
 var nodemailer = require('nodemailer');
 
+module.exports.parseBool = function(string)
+{
+    return (string === 'true' || string === '1') ? true : false;
+}
+
+module.exports.parseNumber = function(string)
+{
+    if (string === null) {
+        return 0;
+    }
+
+    var rv = parseInt(string);
+    if (isNaN(rv)) {
+        return 0;
+    }
+
+    return rv;
+}
+
 module.exports.findImagePaths = function(req)
 {
     var serverUrl = "http://" + req.header('host') + '/';
