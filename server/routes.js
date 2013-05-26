@@ -249,43 +249,43 @@ app.post(serverPath('participant/resetPassword'),
 
 //********************************
 // Store management
-app.get(serverPath('store/create'),
+app.get(serverPath('store/create'), isAuthorized,
     function(req, res) {
-//        app.db.createStore(req, res);
+        app.db.createStore(req, res);
     }
 );
 
-app.get(serverPath('store/info'),
+app.get(serverPath('store/info'), isAuthorized,
     function(req, res) {
 //        app.db.storeInfo(req, res);
     }
 );
 
-app.get(serverPath('store/delete'),
+app.get(serverPath('store/delete'), isAuthorized,
     function(req, res) {
 //        app.db.deleteStore(req, res);
     }
 );
 
-app.get(serverPath('store/updateChannel'),
+app.get(serverPath('store/updateChannel'), isAuthorized,
     function(req, res) {
 //        app.db.updateStoreChannel(req, res);
     }
 );
 
-app.get(serverPath('store/removeChannel'),
+app.get(serverPath('store/removeChannel'), isAuthorized,
     function(req, res) {
 //        app.db.removeStoreChannel(req, res);
     }
 );
 
-app.get(serverPath('store/addFeaturedCollection'),
+app.get(serverPath('store/addFeaturedCollection'), isAuthorized,
     function(req, res) {
 //        app.db.addFeaturedCollection(req, res);
     }
 );
 
-app.get(serverPath('store/removeFeaturedCollection'),
+app.get(serverPath('store/removeFeaturedCollection'), isAuthorized,
     function(req, res) {
 //        app.db.removeFeaturedCollection(req, res);
     }
