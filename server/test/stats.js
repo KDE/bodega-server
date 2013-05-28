@@ -55,10 +55,10 @@ describe('Stats', function(){
 
                     var expected = {
                         dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
-                        total: [1605, 470, 280],
-                    }
+                        total: [1605, 470, 280]
+                    };
 
-                    res.body.stats.length.should.equal(3)
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -75,7 +75,7 @@ describe('Stats', function(){
             var query = {
                 assets: [3],
                 metric: "points"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -89,10 +89,10 @@ describe('Stats', function(){
 
                     var expected = {
                         dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
-                        asset3: [1425, 280, 280],
-                    }
+                        asset3: [1425, 280, 280]
+                    };
 
-                    res.body.stats.length.should.equal(3)
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -109,7 +109,7 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "points"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -126,9 +126,9 @@ describe('Stats', function(){
                         asset3: [1425, 280, 280],
                         asset4: [180, 0, 0],
                         asset7: [0, 0, 0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(3)
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -149,7 +149,7 @@ describe('Stats', function(){
         it('Downloads stats without asset numbers: month granularity', function(done) {
             var query = {
                 metric: "downloads"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -163,9 +163,9 @@ describe('Stats', function(){
                     var expected = {
                         dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
                         total: [8, 3, 2, 1, 1]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(5)
+                    res.body.stats.length.should.equal(5);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         stats.dateof.should.be.eql(expected.dateof[i]);
@@ -180,7 +180,7 @@ describe('Stats', function(){
             var query = {
                 assets: [3],
                 metric: "downloads"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -193,10 +193,10 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z"],
-                        asset3: [6, 1, 2, 1],
-                    }
+                        asset3: [6, 1, 2, 1]
+                    };
 
-                    res.body.stats.length.should.equal(4)
+                    res.body.stats.length.should.equal(4);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         
@@ -212,7 +212,7 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "downloads"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -229,9 +229,9 @@ describe('Stats', function(){
                         asset3: [6, 1, 2, 1, 0],
                         asset4: [2, 1, 0, 0, 0],
                         asset7: [0, 0, 0, 0, 0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(5)
+                    res.body.stats.length.should.equal(5);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         stats.dateof.should.be.eql(expected.dateof[i]);
@@ -248,7 +248,7 @@ describe('Stats', function(){
         it('Purchases count stats without numbers', function(done) {
             var query = {
                 metric: "count"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -262,9 +262,9 @@ describe('Stats', function(){
                     var expected = {
                         dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
                         total: [5, 2, 1]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(3)
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         stats.dateof.should.be.eql(expected.dateof[i]);
@@ -279,7 +279,7 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "count"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -296,9 +296,9 @@ describe('Stats', function(){
                         asset3: [3, 1, 1],
                         asset4: [2, 0, 0],
                         asset7: [0, 0, 0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(3)
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         stats.dateof.should.be.eql(expected.dateof[i]);
@@ -317,7 +317,7 @@ describe('Stats', function(){
             var query = {
                 metric: "points",
                 granularity: "day"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -331,10 +331,10 @@ describe('Stats', function(){
 
                     var expected = {
                         dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-07-01T22:00:00.000Z"],
-                        total: [180, 1425, 280, 190, 280],
-                    }
+                        total: [180, 1425, 280, 190, 280]
+                    };
 
-                    res.body.stats.length.should.equal(5)
+                    res.body.stats.length.should.equal(5);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -352,7 +352,7 @@ describe('Stats', function(){
                 assets: [2,3,4,7],
                 metric: "points",
                 granularity: "day"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -369,9 +369,9 @@ describe('Stats', function(){
                         asset3: [0, 1425, 280, 0, 280],
                         asset4: [180, 0, 0, 0, 0],
                         asset7: [0, 0, 0, 0, 0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(5)
+                    res.body.stats.length.should.equal(5);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -390,7 +390,7 @@ describe('Stats', function(){
             var query = {
                 metric: "downloads",
                 granularity: "day"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -403,11 +403,11 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-05-26T22:00:00.000Z", "2013-05-28T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-06-11T22:00:00.000Z", "2013-07-01T22:00:00.000Z", "2013-07-22T22:00:00.000Z", "2013-09-29T22:00:00.000Z", "2013-09-30T22:00:00.000Z"], 
+                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-05-26T22:00:00.000Z", "2013-05-28T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-06-11T22:00:00.000Z", "2013-07-01T22:00:00.000Z", "2013-07-22T22:00:00.000Z", "2013-09-29T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
                         total: [2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(11)
+                    res.body.stats.length.should.equal(11);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -425,7 +425,7 @@ describe('Stats', function(){
                 assets: [2,3,4,7],
                 metric: "downloads",
                 granularity: "day"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -439,12 +439,12 @@ describe('Stats', function(){
                     var expected = {
                         dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-05-26T22:00:00.000Z", "2013-05-28T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-06-11T22:00:00.000Z", "2013-07-01T22:00:00.000Z", "2013-07-22T22:00:00.000Z", "2013-09-29T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
                         asset2: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-                        asset3: [0, 4, 1, 1, 1, 0, 0, 1, 1, 1, 0], 
-                        asset4: [2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], 
+                        asset3: [0, 4, 1, 1, 1, 0, 0, 1, 1, 1, 0],
+                        asset4: [2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
                         asset7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(11)
+                    res.body.stats.length.should.equal(11);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -463,7 +463,7 @@ describe('Stats', function(){
             var query = {
                 metric: "count",
                 granularity: "day"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -476,11 +476,11 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-07-01T22:00:00.000Z"], 
+                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-07-01T22:00:00.000Z"],
                         total: [2, 3, 1, 1, 1]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(5)
+                    res.body.stats.length.should.equal(5);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -498,7 +498,7 @@ describe('Stats', function(){
                 assets: [2,3,4,7],
                 metric: "count",
                 granularity: "day"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -512,12 +512,12 @@ describe('Stats', function(){
                     var expected = {
                         dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-07-01T22:00:00.000Z"],
                         asset2: [0, 0, 0, 1, 0],
-                        asset3: [0, 3, 1, 0, 1], 
-                        asset4: [2, 0, 0, 0, 0], 
+                        asset3: [0, 3, 1, 0, 1],
+                        asset4: [2, 0, 0, 0, 0],
                         asset7: [0, 0, 0, 0, 0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(5)
+                    res.body.stats.length.should.equal(5);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -537,7 +537,7 @@ describe('Stats', function(){
             var query = {
                 metric: "points",
                 granularity: "year"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -551,10 +551,10 @@ describe('Stats', function(){
 
                     var expected = {
                         dateof: ["2012-12-31T23:00:00.000Z"],
-                        total: [2355],
-                    }
+                        total: [2355]
+                    };
 
-                    res.body.stats.length.should.equal(1)
+                    res.body.stats.length.should.equal(1);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -572,7 +572,7 @@ describe('Stats', function(){
                 assets: [2,3,4,7],
                 metric: "points",
                 granularity: "year"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -589,9 +589,9 @@ describe('Stats', function(){
                         asset3: [1985],
                         asset4: [180],
                         asset7: [0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(1)
+                    res.body.stats.length.should.equal(1);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -610,7 +610,7 @@ describe('Stats', function(){
             var query = {
                 metric: "downloads",
                 granularity: "year"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -624,10 +624,10 @@ describe('Stats', function(){
 
                     var expected = {
                         dateof: ["2012-12-31T23:00:00.000Z"],
-                        total: [15],
-                    }
+                        total: [15]
+                    };
 
-                    res.body.stats.length.should.equal(1)
+                    res.body.stats.length.should.equal(1);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -645,7 +645,7 @@ describe('Stats', function(){
                 assets: [2,3,4,7],
                 metric: "downloads",
                 granularity: "year"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -662,9 +662,9 @@ describe('Stats', function(){
                         asset3: [10],
                         asset4: [3],
                         asset7: [0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(1)
+                    res.body.stats.length.should.equal(1);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -683,7 +683,7 @@ describe('Stats', function(){
             var query = {
                 metric: "count",
                 granularity: "year"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -697,10 +697,10 @@ describe('Stats', function(){
 
                     var expected = {
                         dateof: ["2012-12-31T23:00:00.000Z"],
-                        total: [8],
-                    }
+                        total: [8]
+                    };
 
-                    res.body.stats.length.should.equal(1)
+                    res.body.stats.length.should.equal(1);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -718,7 +718,7 @@ describe('Stats', function(){
                 assets: [2,3,4,7],
                 metric: "count",
                 granularity: "year"
-            }
+            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
@@ -735,9 +735,9 @@ describe('Stats', function(){
                         asset3: [5],
                         asset4: [2],
                         asset7: [0]
-                    }
+                    };
 
-                    res.body.stats.length.should.equal(1)
+                    res.body.stats.length.should.equal(1);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
