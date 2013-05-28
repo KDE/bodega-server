@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var app = require('../app.js');
+var server = require('../app.js');
 var utils = require('./support/http');
 
 var mime = require('mime');
@@ -83,14 +83,14 @@ function postFiles(server, url, files, cookie, fn)
     //console.log(data);
 }
 
-describe('Asset creation', function(){
+describe('Asset manipulation', function(){
     var cookie;
     var incompleteAssetId;
     var completeAssetId;
     describe('Authentication', function(){
         it('should succeed.', function(done){
             utils.getUrl(
-                app,
+                server,
                 '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -107,7 +107,7 @@ describe('Asset creation', function(){
 
     describe('Creation', function(){
         it('allow incomplete assets', function(done){
-            postFiles(app.server,
+            postFiles(server.server,
                     '/bodega/v1/json/create',
                     [{
                         "name" : "info",
@@ -127,7 +127,7 @@ describe('Asset creation', function(){
         });
 
         it('of a simple asset', function(done){
-            postFiles(app.server,
+            postFiles(server.server,
                     '/bodega/v1/json/create',
                     [{
                         "name" : "info",
@@ -154,6 +154,79 @@ describe('Asset creation', function(){
                           completeAssetId = res.body.asset.id;
                           done();
                       });
+        });
+    });
+
+
+    describe('Updates', function(){
+        it('works with incomplete assets', function(done){
+            postFiles(server.server,
+                      '/bodega/v1/json/update?assetId='+incompleteAssetId,
+                      [{
+                          "name" : "info",
+                          "filename" : "sampleasset/sample-info-update1.json"
+                      }], cookie,
+                      function(res) {
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          console.log(res.body);
+                          done();
+                      });
+        });
+    });
+
+    describe('Deletion', function(){
+        it('should work a complete assets', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/delete?assetId='+completeAssetId,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('asset');
+                    res.body.asset.should.have.property('id',
+                                                        completeAssetId);
+                    done();
+                },
+                cookie);
+        });
+        it('should work with incomplete assets', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/delete?assetId='+incompleteAssetId,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('asset');
+                    res.body.asset.should.have.property('id',
+                                                        incompleteAssetId);
+                    done();
+                },
+                cookie);
+        });
+        it('should not work with already delete assets', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/delete?assetId='+incompleteAssetId,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property(
+                        'type', 'DeleteAssetMissing');
+                    done();
+                },
+                cookie);
         });
     });
 });

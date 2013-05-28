@@ -1,0 +1,21 @@
+{
+    "name" : "Second Sample",
+    "version" : "3.1",
+    "license" : "7",
+    "description" : "another description",
+    "partnerId" : "2",
+    "languages" : ["en"],
+    "previews" : [
+        { "type" : "icon", "subtype" : "main", "file" : "sample-icon.jpg"},
+        { "type" : "cover", "subtype" : "front", "file" : "sample-0.png" },
+        { "type" : "cover", "subtype" :  "back", "file" : "sample-1.png" }
+    ],
+    "tags" : [
+        {"type" : "assetType", "title" : "book" },
+        {"type" : "author", "title" : "Zack Rusin"},
+        {"type" : "publisher", "title" : "Coherent Theory" },
+        {"type" : "isbn", "title" : "00000000"},
+        {"type" : "created", "title" : "2013"},
+        {"type" : "url", "title" : "http://makeplaylive.com"}
+    ]
+}
