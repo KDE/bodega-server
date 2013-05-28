@@ -53,7 +53,7 @@ describe('Stats', function(){
         });
 
  
-        it('stats without asset numbers', function(done){
+        /*it('stats without asset numbers', function(done){
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets',
@@ -72,7 +72,7 @@ describe('Stats', function(){
                     done();
                 },
                 cookie);
-        });
+        });*/
 
         it('stats with one asset number', function(done){
             var query = {
@@ -88,28 +88,22 @@ describe('Stats', function(){
                         'application/json; charset=utf-8');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
-                    var expected = {
-                        assets: [3, 2],
-                        totalpoints: [1500, 200],
-                        pointstoparticipant: [1425, 180],
-                        pointstostore: [70, 20]
-                    }
+
                     res.body.stats.length.should.equal(1)
 
                     var stats = res.body.stats[0];
-                    stats.assets.should.be.eql(3);
-                    stats.totalpoints.should.be.eql(1500);
-                    stats.pointstoparticipant.should.be.eql(1425);
-                    stats.pointstostore.should.be.eql(70);
+                    stats.dateof.should.be.eql("2013-05-31T22:00:00.000Z");
+                    stats.asset3.should.be.eql(0);
+
 
                     done();
                 },
                 cookie);
         });
 
-        it('stats with two asset numbers', function(done){
+        it('stats with four asset numbers', function(done){
             var query = {
-                assets: [3,4]
+                assets: [2,3,4,7]
             }
             utils.getUrl(
                 server,
@@ -122,18 +116,22 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        assets: [3, 2],
-                        totalpoints: [1500, 200],
-                        pointstoparticipant: [1425, 180],
-                        pointstostore: [70, 20]
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z"],
+                        asset2: [0, 190, 0, 0],
+                        asset3: [1425, 280, 280, 0],
+                        asset4: [180, 0, 0, 0],
+                        asset7: [0, 0, 0, 0]
                     }
-                    res.body.stats.length.should.equal(2)
+
+                    //res.body.stats.length.should.equal(2)
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
-                        stats.assets.should.be.eql(expected.assets[i]);
-                        stats.totalpoints.should.be.eql(expected.totalpoints[i]);
-                        stats.pointstoparticipant.should.be.eql(expected.pointstoparticipant[i]);
-                        stats.pointstostore.should.be.eql(expected.pointstostore[i]);
+
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.asset2.should.be.eql(expected.asset2[i]);
+                        stats.asset3.should.be.eql(expected.asset3[i]);
+                        stats.asset4.should.be.eql(expected.asset4[i]);
+                        stats.asset7.should.be.eql(expected.asset7[i]);
                     }
                     done();
                 },
