@@ -261,3 +261,68 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
                  });
     }
 };
+
+
+function findPublishedAsset(db, req, res, assetInfo, fn)
+{
+    var q = "select * from assets where id = $1 and author = $2;";
+    var e;
+    db.query(
+        q, [assetInfo.id, assetInfo.partnerId],
+        function(err, result) {
+            if (err) {
+                e = errors.create('Database', err.message);
+                fn(e, db, req, res, assetInfo);
+                return;
+            }
+            if (!result.rows || result.rows.length !== 1) {
+                e = errors.create('UpdateAssetMissing',
+                                  'Unable to find the update asset ' +
+                                  assetInfo.id);
+                fn(e, db, req, res, assetInfo);
+                return;
+            } else {
+                assetInfo = result.rows[0];
+                fn(null, db, req, res, assetInfo);
+            }
+        }
+    );
+}
+
+function findIncomingAsset(db, req, res, assetInfo, fn)
+{
+    var q = "select * from incomingAssets where id = $1 and author = $2;";
+    var e;
+    db.query(
+        q, [assetInfo.id, assetInfo.partnerId],
+        function(err, result) {
+            if (err) {
+                e = errors.create('Database', err.message);
+                fn(e, db, req, res, assetInfo);
+                return;
+            }
+            if (!result.rows || result.rows.length !== 1) {
+                findPublishedAsset(db, req, res, assetInfo, fn);
+            } else {
+                assetInfo = result.rows[0];
+                assetInfo.incoming = true;
+                fn(null, db, req, res, assetInfo);
+            }
+        }
+    );
+}
+
+module.exports.findAsset = function(db, req, res, assetInfo, fn)
+{
+    //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
+    var partner = assetInfo.partnerId;
+    var e;
+
+    if (!assetInfo || !assetInfo.id || !assetInfo.partnerId) {
+        e = errors.create('MissingParameters',
+                          'Asset info missing asset or partner id.');
+        fn(e, db, req, res, assetInfo);
+        return;
+    }
+    findIncomingAsset(db, req, res, assetInfo, fn);
+};

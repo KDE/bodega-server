@@ -109,47 +109,6 @@ function deleteIncomingAsset(db, req, res, assetInfo)
     findPreviewFiles(db, req, res, assetInfo, queries);
 }
 
-function findPublishedAsset(db, req, res, assetInfo)
-{
-    var q = "select * from assets where id = $1 and author = $2;";
-    db.query(
-        q, [assetInfo.id, assetInfo.partnerId],
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-            if (!result.rows || result.rows.length !== 1) {
-                errors.report('DeleteAssetMissing', req, res);
-                return;
-            } else {
-                assetInfo = result.rows[0];
-                deletePublishedAsset(db, req, res, assetInfo);
-            }
-        }
-    );
-}
-
-function findIncomingAsset(db, req, res, assetInfo)
-{
-    var q = "select * from incomingAssets where id = $1 and author = $2;";
-    db.query(
-        q, [assetInfo.id, assetInfo.partnerId],
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-            if (!result.rows || result.rows.length !== 1) {
-                findPublishedAsset(db, req, res, assetInfo);
-            } else {
-                assetInfo = result.rows[0];
-                deleteIncomingAsset(db, req, res, assetInfo);
-            }
-        }
-    );
-}
-
 module.exports = function(db, req, res) {
     var assetInfo = {};
 
@@ -167,6 +126,19 @@ module.exports = function(db, req, res) {
                 errors.report('UploadPartnerInvalid', req, res, err);
                 return;
             }
-            findIncomingAsset(db, req, res, assetInfo);
+            createUtils.findAsset(
+                db, req, res, assetInfo,
+                function(err, db, req, res, assetInfo) {
+                    if (err) {
+                        errors.report('DeleteAssetMissing', req, res);
+                        return;
+                    }
+                    if (assetInfo.incoming) {
+                        deleteIncomingAsset(db, req, res, assetInfo);
+                    } else {
+                        deletePublishedAsset(db, req, res, assetInfo);
+                    }
+                }
+            );
         });
 };

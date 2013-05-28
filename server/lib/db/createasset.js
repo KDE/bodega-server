@@ -184,7 +184,7 @@ module.exports = function(db, req, res) {
 
     fs.readFile(req.files.info.path, function (err, data) {
         if (err) {
-            errors.report('Database', req, res, err);
+            errors.report('UploadInvalidJson', req, res, err);
             return;
         }
         try {
@@ -194,8 +194,7 @@ module.exports = function(db, req, res) {
             assetInfo = null;
         }
 
-        if (!assetInfo || !assetInfo.partnerId || !assetInfo.file ||
-            assetInfo.id) {
+        if (!assetInfo || !assetInfo.file || assetInfo.id) {
             //"Unable to parse the asset info file.",
             errors.report('UploadInvalidJson', req, res);
             return;
