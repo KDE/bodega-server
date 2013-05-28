@@ -127,7 +127,7 @@ module.exports = function(db, req, res) {
                 return;
             }
             createUtils.findAsset(
-                db, req, res, assetInfo,
+                db, req, res, assetInfo, true,
                 function(err, db, req, res, assetInfo) {
                     if (err) {
                         errors.report('DeleteAssetMissing', req, res);

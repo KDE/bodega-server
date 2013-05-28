@@ -242,6 +242,7 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
                      }
 
                      assetInfo.partnerId = result.rows[0].partner;
+                     assetInfo.author = result.rows[0].partner;
                      fn(null, db, req, res, assetInfo);
                  });
     } else {
@@ -263,7 +264,7 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
 };
 
 
-function findPublishedAsset(db, req, res, assetInfo, fn)
+function findPublishedAsset(db, req, res, assetInfo, fillIn, fn)
 {
     var q = "select * from assets where id = $1 and author = $2;";
     var e;
@@ -282,14 +283,17 @@ function findPublishedAsset(db, req, res, assetInfo, fn)
                 fn(e, db, req, res, assetInfo);
                 return;
             } else {
-                assetInfo = result.rows[0];
+                if (fillIn) {
+                    assetInfo = result.rows[0];
+                }
+                assetInfo.incoming = false;
                 fn(null, db, req, res, assetInfo);
             }
         }
     );
 }
 
-function findIncomingAsset(db, req, res, assetInfo, fn)
+function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
 {
     var q = "select * from incomingAssets where id = $1 and author = $2;";
     var e;
@@ -302,9 +306,11 @@ function findIncomingAsset(db, req, res, assetInfo, fn)
                 return;
             }
             if (!result.rows || result.rows.length !== 1) {
-                findPublishedAsset(db, req, res, assetInfo, fn);
+                findPublishedAsset(db, req, res, assetInfo, fillIn, fn);
             } else {
-                assetInfo = result.rows[0];
+                if (fillIn) {
+                    assetInfo = result.rows[0];
+                }
                 assetInfo.incoming = true;
                 fn(null, db, req, res, assetInfo);
             }
@@ -312,7 +318,7 @@ function findIncomingAsset(db, req, res, assetInfo, fn)
     );
 }
 
-module.exports.findAsset = function(db, req, res, assetInfo, fn)
+module.exports.findAsset = function(db, req, res, assetInfo, fillIn, fn)
 {
     //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
     var partner = assetInfo.partnerId;
@@ -324,5 +330,5 @@ module.exports.findAsset = function(db, req, res, assetInfo, fn)
         fn(e, db, req, res, assetInfo);
         return;
     }
-    findIncomingAsset(db, req, res, assetInfo, fn);
+    findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
 };

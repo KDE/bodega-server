@@ -37,6 +37,7 @@ var dbPurchaseAsset = require('./db/purchaseAsset.js');
 var dbHunt = require('./db/easterEggHunt.js');
 var dbCreateAsset = require('./db/createasset.js');
 var dbDeleteAsset = require('./db/deleteasset.js');
+var dbUpdateAsset = require('./db/updateasset.js');
 
 
 var BodegaDb = (function() {
@@ -138,6 +139,10 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.deleteAsset = function(req, res) {
         this.dbQuery(dbDeleteAsset, req, res);
+    };
+
+    BodegaDb.prototype.updateAsset = function(req, res) {
+        this.dbQuery(dbUpdateAsset, req, res);
     };
 
     BodegaDb.prototype.listCollections = function(req, res) {

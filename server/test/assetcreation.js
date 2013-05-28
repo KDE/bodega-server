@@ -171,7 +171,26 @@ describe('Asset manipulation', function(){
         });
     });
 
-    
+
+    describe('Updates', function(){
+        it('works with incomplete assets', function(done){
+            postFiles(server.server,
+                      '/bodega/v1/json/update?assetId='+incompleteAssetId,
+                      [{
+                          "name" : "info",
+                          "filename" : "sampleasset/sample-info-update1.json"
+                      }], cookie,
+                      function(res) {
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          console.log(res.body);
+                          done();
+                      });
+        });
+    });
+
     describe('Deletion', function(){
         it('should work a complete assets', function(done){
             utils.getUrl(
