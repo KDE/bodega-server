@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var app = require('../app.js');
+var server = require('../app.js');
 var utils = require('./support/http');
 
 var mime = require('mime');
@@ -104,7 +104,7 @@ describe('Asset creation', function(){
                 }
             };
             utils.getUrl(
-                app,
+                server,
                 '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -121,7 +121,7 @@ describe('Asset creation', function(){
 
     describe('Creation', function(){
         it('allow incomplete assets', function(done){
-            postFiles(app.server,
+            postFiles(server.server,
                     '/bodega/v1/json/create',
                     [{
                         "name" : "info",
@@ -141,7 +141,7 @@ describe('Asset creation', function(){
         });
         
         it('of a simple asset', function(done){
-            postFiles(app.server,
+            postFiles(server.server,
                     '/bodega/v1/json/create',
                     [{
                         "name" : "info",

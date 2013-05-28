@@ -32,7 +32,6 @@ var dbHistory = require('./db/history.js');
 var dbResetRequest = require('./db/resetrequest.js');
 var dbResetConfirm = require('./db/resetconfirm.js');
 var dbDownload = require('./db/download.js');
-var dbUpload = require('./db/upload.js');
 var dbCollections = require('./db/collections.js');
 var dbPurchaseAsset = require('./db/purchaseAsset.js');
 var dbHunt = require('./db/easterEggHunt.js');
@@ -130,10 +129,6 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.download = function(req, res) {
         this.dbQuery(dbDownload, req, res);
-    };
-
-    BodegaDb.prototype.upload = function(req, res) {
-        this.dbQuery(dbUpload, req, res);
     };
 
     BodegaDb.prototype.createAsset = function(req, res) {
