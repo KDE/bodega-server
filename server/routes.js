@@ -319,14 +319,28 @@ app.get(serverPath('store/removeFeaturedCollection'), isAuthorized,
     }
 );
 
-//********************************
-// Static content routes
 app.get(serverPath('hunt'),
     function(req, res) {
         app.db.hunt(req, res);
     }
 );
 
+/******************************************************
+ * Note: This must be the last route with a serverPath
+ *       because we use to catch invalid urls.
+ */
+app.get(serverPath('*'), function(req, res) {
+    var json = utils.standardJson(req, false);
+    json.error = {
+        type : "InvalidUrl",
+        url : req.url,
+        method : req.method
+    };
+    res.json(json);
+});
+
+//********************************
+// Static content routes
 app.get('/images/*', function(req, res) {
     res.sendfile(__dirname + '/public' + req.url);
 });
