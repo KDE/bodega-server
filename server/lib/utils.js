@@ -21,7 +21,7 @@ var errors = require('./errors.js');
 module.exports.parseBool = function(string)
 {
     return (string === 'true' || string === '1') ? true : false;
-}
+};
 
 module.exports.parseNumber = function(string)
 {
@@ -29,13 +29,13 @@ module.exports.parseNumber = function(string)
         return 0;
     }
 
-    var rv = parseInt(string);
+    var rv = parseInt(string, 10);
     if (isNaN(rv)) {
         return 0;
     }
 
     return rv;
-}
+};
 
 module.exports.findImagePaths = function(req)
 {
