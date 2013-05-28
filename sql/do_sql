@@ -24,16 +24,17 @@ var run = function(command, fn) {
 
 function series(list) {
     //this is out command for the sql files
-    var command_list = new Array(list);
+    var command_list = list;
     var sql_command = function(fileName) {
-        var command = 'psql -d ' + config.database.name + ' -U ' + config.database.user + ' -f ';
+        var command = 'psql -d ' + config.database.name + ' -U ' +
+            config.database.user + ' -f ';
         if (fileName.indexOf(sql_dir) === -1) {
             command += sql_dir
         }
         command += fileName + ' 1>/dev/null';
 
         return command;
-    }
+    };
 
     function next() {
         var element = command_list.shift();
@@ -48,6 +49,7 @@ function series(list) {
                 //its already a command
                 command = element;
             }
+            console.log(command);
             run(command, function(result) {
                  console.log(result.trim());
                  next();
@@ -63,7 +65,8 @@ var config_json = process.argv[2];
 var sql_dir = process.argv[3];
 var sql_argument = process.argv[4];
 
-if (sql_dir === undefined || config_json === undefined || sql_argument === undefined) {
+if (sql_dir === undefined || config_json === undefined ||
+    sql_argument === undefined) {
     console.log('Missing arguments');
     console.log('This scripts needs as arguments <config.json filepath> <sql directory filepath> <sql command>');
     return;
@@ -76,12 +79,15 @@ if (sql_argument == 'update') {
     //those are the migration files which we will use in order to migrate and update successfully the db
     var updates_done_fn = sql_dir + '/updates/completed';
     var update_files = fs.readdirSync(sql_dir + '/updates');
-    var done_updates = fs.existsSync(updates_done_fn) ? fs.readFileSync(updates_done_fn, { encoding: 'utf8' } ).split("\n") : [];
+    var done_updates = fs.existsSync(updates_done_fn) ?
+        fs.readFileSync(updates_done_fn, { encoding: 'utf8' } ).split("\n") :
+        [];
     var update_sql_commands = [];
 
     for (var i in update_files) {
         var filename = "updates/" + update_files[i];
-        if (filename.substr(filename.length - 4, 4) === '.sql' && done_updates.indexOf(filename) === -1) {
+        if (filename.substr(filename.length - 4, 4) === '.sql' &&
+            done_updates.indexOf(filename) === -1) {
             update_sql_commands.push(filename);
         }
     }
@@ -91,12 +97,17 @@ if (sql_argument == 'update') {
     } else {
         console.log('Applying these updates ' + update_sql_commands);
         series(update_sql_commands);
-        fs.appendFileSync(updates_done_fn, "\n" + update_sql_commands.join("\n"), { encoding: 'utf8' } );
+        fs.appendFileSync(updates_done_fn, "\n" +
+                          update_sql_commands.join("\n"),
+                          { encoding: 'utf8' } );
     }
 } else if (sql_argument == 'setup') {
     console.log('====Creating the database schema====');
-    sql_commands.unshift('createdb -O ' + config.database.name + ' ' + config.database.name);
+    console.log(sql_commands);
+    sql_commands.unshift('createdb -O ' + config.database.name + ' ' +
+                         config.database.name);
     sql_commands.unshift('dropdb ' + config.database.user);
+    console.log(sql_commands);
     series(sql_commands);
 } else if (sql_argument == 'testdata') {
     console.log('====Populating the database with testing data====');
