@@ -53,7 +53,7 @@ describe('Stats', function(){
         });
 
  
-        /*it('stats without asset numbers', function(done){
+        it('stats without asset numbers', function(done){
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets',
@@ -64,15 +64,24 @@ describe('Stats', function(){
                         'application/json; charset=utf-8');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
-                    var stats = res.body.stats[0];
-                    stats.assets.should.be.eql(5);
-                    stats.totalpoints.should.be.eql(1700);
-                    stats.pointstoparticipant.should.be.eql(1605);
-                    stats.pointstostore.should.be.eql(90);
+
+                    var expected = {
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
+                        total: [1605, 470, 280],
+                    }
+
+                    //res.body.stats.length.should.equal(2)
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
+
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.total.should.be.eql(expected.total[i]);
+                    }
+
                     done();
                 },
                 cookie);
-        });*/
+        });
 
         it('stats with one asset number', function(done){
             var query = {

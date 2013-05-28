@@ -22,31 +22,30 @@ var errors = require('../errors.js');
 module.exports.assetStats = function(db, req, res) {
     var params = [req.session.user.id];
 
-    if (!req.query.assets) {
-        return;
-    }
+    var query = ""
 
-    params = params.concat(req.query.assets);
-
-    var assetsPlaceholders = "";
-    for (var i = 0; i < req.query.assets.length; ++i) {
-        assetsPlaceholders += (i > 0 ? ", ":"") + "$" + (i+1);
-    }
-
-    var query = "select date_trunc('month', p.purchasedon) dateOf,"
-    
-    for (var i = 0; i < req.query.assets.length; ++i) {
-        query += "SUM(CASE WHEN asset = $" + (i+2) + " THEN p.toparticipant ELSE 0 END) AS asset" + req.query.assets[i];
-        if (i < req.query.assets.length - 1) {
-            query += ", ";
+    if (req.query.assets) {
+        params = params.concat(req.query.assets);
+        var query = "select date_trunc('month', p.purchasedon) dateOf,"
+        
+        for (var i = 0; i < req.query.assets.length; ++i) {
+            query += "SUM(CASE WHEN asset = $" + (i+2) + " THEN p.toparticipant ELSE 0 END) AS asset" + req.query.assets[i];
+            if (i < req.query.assets.length - 1) {
+                query += ", ";
+            }
         }
-    }
 
-    query += " from purchases p left join assets a on (p.asset = a.id and a.author = $1) where asset in (";
-    for (var i = 0; i < req.query.assets.length; ++i) {
-        query += (i > 0 ? ", ":"") + "$" + (i+1);
+        query += " from purchases p left join assets a on (p.asset = a.id and a.author = $1) where asset in (";
+        for (var i = 0; i < req.query.assets.length; ++i) {
+            query += (i > 0 ? ", ":"") + "$" + (i+1);
+        }
+        query += ") group by dateOf order by dateOf;";
+    } else {
+        query += "select date_trunc('month', p.purchasedon) dateOf, \
+                  SUM(p.toparticipant) AS total \
+                  from purchases p left join assets a on (p.asset = a.id and a.author = $1) \
+                  group by dateOf order by dateOf;"
     }
-    query += ") group by dateOf order by dateOf;";
     
     var json = {
         device : req.session.user.device,
