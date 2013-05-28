@@ -3,7 +3,7 @@
     "version" : "3.1",
     "license" : "7",
     "description" : "another description",
-    "partnerId" : "2",
+    "partner" : "2",
     "languages" : ["en"],
     "previews" : [
         { "type" : "icon", "subtype" : "main", "file" : "sample-icon.jpg"},

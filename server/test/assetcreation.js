@@ -171,7 +171,6 @@ describe('Asset manipulation', function(){
                           res.body.should.not.have.property('error');
                           res.body.should.have.property('asset');
                           res.body.asset.should.have.property('id');
-                          console.log(res.body);
                           done();
                       });
         });

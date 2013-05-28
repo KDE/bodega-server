@@ -3,7 +3,7 @@
     "version" : "2.1",
     "license" : "6",
     "description" : "description of the book",
-    "partnerId" : "2",
+    "partner" : "2",
     "basePrice" : "0",
     "file" : "sample.pdf",
     "languages" : ["en"],

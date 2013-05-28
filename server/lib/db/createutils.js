@@ -47,7 +47,7 @@ function recordTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount, cb)
             'insert into tags (partner, type, title) values ($1, $2, $3) returning id;';
     var e;
     db.query(
-        insertTagQuery, [assetInfo.partnerId, tagInfo.typeId, tagInfo.title],
+        insertTagQuery, [assetInfo.partner, tagInfo.typeId, tagInfo.title],
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
@@ -75,7 +75,7 @@ function findTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount, cb)
             'select id from tags where type = $1 and title = $2;';
     var e;
     db.query(
-        findTagQuery, [assetInfo.partnerId, tagInfo.typeId, tagInfo.title],
+        findTagQuery, [assetInfo.partner, tagInfo.typeId, tagInfo.title],
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
@@ -227,8 +227,8 @@ module.exports.setupPreviews = function(db, req, res, assetInfo, fn)
 
 module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
 {
-    //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
-    var partner = assetInfo.partnerId;
+    //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
+    var partner = assetInfo.partner;
     var e;
     if (!partner) {
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
@@ -241,8 +241,7 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
                          return;
                      }
 
-                     assetInfo.partnerId = result.rows[0].partner;
-                     assetInfo.author = result.rows[0].partner;
+                     assetInfo.partner = result.rows[0].partner;
                      fn(null, db, req, res, assetInfo);
                  });
     } else {
@@ -266,10 +265,10 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
 
 function findPublishedAsset(db, req, res, assetInfo, fillIn, fn)
 {
-    var q = "select * from assets where id = $1 and author = $2;";
+    var q = "select * from assets where id = $1 and partner = $2;";
     var e;
     db.query(
-        q, [assetInfo.id, assetInfo.partnerId],
+        q, [assetInfo.id, assetInfo.partner],
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
@@ -295,10 +294,10 @@ function findPublishedAsset(db, req, res, assetInfo, fillIn, fn)
 
 function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
 {
-    var q = "select * from incomingAssets where id = $1 and author = $2;";
+    var q = "select * from incomingAssets where id = $1 and partner = $2;";
     var e;
     db.query(
-        q, [assetInfo.id, assetInfo.partnerId],
+        q, [assetInfo.id, assetInfo.partner],
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
@@ -320,11 +319,11 @@ function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
 
 module.exports.findAsset = function(db, req, res, assetInfo, fillIn, fn)
 {
-    //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
-    var partner = assetInfo.partnerId;
+    //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
+    var partner = assetInfo.partner;
     var e;
 
-    if (!assetInfo || !assetInfo.id || !assetInfo.partnerId) {
+    if (!assetInfo || !assetInfo.id || !assetInfo.partner) {
         e = errors.create('MissingParameters',
                           'Asset info missing asset or partner id.');
         fn(e, db, req, res, assetInfo);

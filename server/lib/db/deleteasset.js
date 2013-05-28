@@ -117,7 +117,7 @@ module.exports = function(db, req, res) {
         return;
     }
     assetInfo.id = req.query.assetId;
-    assetInfo.partnerId = req.query.partnerId;
+    assetInfo.partner = req.query.partner;
 
     createUtils.isContentCreator(
         db, req, res, assetInfo,

@@ -54,7 +54,7 @@ function buildQueryString(assetInfo)
         inserted  : 0
     };
 
-    //id, license, author, baseprice, name, description, version, path, file
+    //id, license, baseprice, name, description, version, path, file
     addToStr(q, assetInfo, 'license');
     addToStr(q, assetInfo, 'baseprice');
     addToStr(q, assetInfo, 'name');
@@ -69,9 +69,7 @@ function buildQueryString(assetInfo)
     queryStr += q.insertStr + " = " + q.valuesStr;
     queryStr += " where id = " + assetInfo.id;
     queryStr += " and";
-    queryStr += " author = " + assetInfo.partnerId;
-
-    console.log(queryStr);
+    queryStr += " partner = " + assetInfo.partner;
 
     if (!q.inserted) {
         return null;
@@ -123,8 +121,6 @@ module.exports = function(db, req, res) {
         return;
     }
 
-    console.log(req.query);
-
     fs.readFile(req.files.info.path, function (err, data) {
         if (err) {
             errors.report('UploadInvalidJson', req, res, err);
@@ -158,12 +154,12 @@ module.exports = function(db, req, res) {
                 if (err) {
                     errors.report('UploadPartnerInvalid', req, res, err);
                     return;
-                }  
+                }
                 createUtils.findAsset(
                     db, req, res, assetInfo, false,
                     function(err, db, req, res, assetInfo) {
                         if (err) {
-                            errors.report('DeleteAssetMissing', req, res);
+                            errors.report('DeleteAssetMissing', req, res, err);
                             return;
                         }
                         if (assetInfo.incoming) {

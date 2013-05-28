@@ -97,7 +97,7 @@ function recordAsset(db, req, res, assetInfo)
     var incomingPath = assetInfo.incomingPath;
     var newAssetQuery = 'insert into incomingAssets (id, license, partner, baseprice, name, description, version, path, file) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
     db.query(newAssetQuery,
-             [assetInfo.id, assetInfo.license, assetInfo.partnerId, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.incomingPath, assetInfo.filename],
+             [assetInfo.id, assetInfo.license, assetInfo.partner, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.incomingPath, assetInfo.filename],
              function(err, result) {
                  if (err) {
                      reportError(db, req, res, assetInfo,
@@ -136,8 +136,8 @@ function storeAsset(db, req, res, assetInfo)
 
 function checkPartner(db, req, res, assetInfo)
 {
-    //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
-    var partner = assetInfo.partnerId;
+    //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
+    var partner = assetInfo.partner;
     if (!partner) {
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
                  [req.session.user.id],
@@ -148,7 +148,7 @@ function checkPartner(db, req, res, assetInfo)
                          return;
                      }
 
-                     assetInfo.partnerId = result.rows[0].partner;
+                     assetInfo.partner = result.rows[0].partner;
                      storeAsset(db, req, res, assetInfo);
                  });
     } else {
