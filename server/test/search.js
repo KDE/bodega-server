@@ -20,9 +20,8 @@ var utils = require('./support/http');
 
 describe('Searching', function(){
     var cookie;
-    var booksChannelId;
-    var scienceChannelId;
-    var scienceChannelResponse;
+    var gamesChannelId;
+    var cardGamesChannelId;
     describe('initialization', function(){
         it('authorize correctly.', function(done){
             var expected = {
@@ -53,7 +52,7 @@ describe('Searching', function(){
                 });
         });
 
-        it('find the books channel', function(done){
+        it('find the games channel', function(done){
             utils.getUrl(
                 server,
                 '/bodega/v1/json/channels',
@@ -68,20 +67,20 @@ describe('Searching', function(){
                     channels.length.should.be.above(0);
                     for (var i = 0; i < channels.length; ++i) {
                         var channel = channels[i];
-                        if (channel.name === 'Books') {
-                            booksChannelId = channel.id;
+                        if (channel.name === 'Games') {
+                            gamesChannelId = channel.id;
                         }
                     }
-                    booksChannelId.should.be.above(0);
+                    gamesChannelId.should.be.above(0);
                     done();
                 },
                 cookie);
         });
 
-        it('find the science channel', function(done){
+        it('find the card games channel', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + booksChannelId,
+                '/bodega/v1/json/channel/' + gamesChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -93,11 +92,11 @@ describe('Searching', function(){
                     channels.length.should.be.within(1, 25);
                     for (var i = 0; i < channels.length; ++i) {
                         var channel = channels[i];
-                        if (channel.name === 'Science') {
-                            scienceChannelId = channel.id;
+                        if (channel.name === 'Card Games') {
+                            cardGamesChannelId = channel.id;
                         }
                     }
-                    scienceChannelId.should.be.above(0);
+                    cardGamesChannelId.should.be.above(0);
                     done();
                 },
                 cookie);
@@ -146,8 +145,8 @@ describe('Searching', function(){
         it('should find an asset', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/search?channelId=' + booksChannelId +
-                    '&query=\'mathematica\'',
+                '/bodega/v1/json/search?channelId=' + gamesChannelId +
+                    '&query=\'diamond\'',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -159,7 +158,7 @@ describe('Searching', function(){
                     assets.should.be.lengthOf(1);
                     var asset = assets[0];
                     asset.name.should.be.eql(
-                        'Philosophiae Naturalis Principia Mathematica');
+                        'Diamond Juice');
                     done();
                 },
                 cookie);
@@ -168,8 +167,8 @@ describe('Searching', function(){
         it('work with plaintext query', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/search?channelId=' + booksChannelId +
-                    '&query=\'principia+mathematica\'',
+                '/bodega/v1/json/search?channelId=' + gamesChannelId +
+                    '&query=\'best+app+from+Diamond+to+date\'',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -181,7 +180,7 @@ describe('Searching', function(){
                     assets.should.be.lengthOf(1);
                     var asset = assets[0];
                     asset.name.should.be.eql(
-                        'Philosophiae Naturalis Principia Mathematica');
+                        'Diamond Juice');
                     done();
                 },
                 cookie);
