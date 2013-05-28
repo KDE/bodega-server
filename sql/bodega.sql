@@ -217,7 +217,7 @@ create index idx_subChannelAssetsByLeaf on subChannelAssets (leafChannel);
 create table storeChannels
 (
     channel     int         not null references channels(id) on delete cascade,
-    stores      text        not null references stores(id) on delete cascade
+    store       text        not null references stores(id) on delete cascade
 );
 
 create index idx_storeChannels on storeChannels (channel, stores);

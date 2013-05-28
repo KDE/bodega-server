@@ -57,15 +57,15 @@ insert into stores (id, partner, name, description) values ('KDE-1', 2, 'Plasma 
 insert into stores (id, partner, name, description) values ('DD-1', 3, 'Bling Media Center', 'Imaginary hifi for your home');
 insert into stores (id, partner, name, description) values ('DD-2', 3, 'Affordaphone', 'Finally a phone even you can afford');
 
-insert into storeChannels (stores, channel) values ('VIVALDI-1', 2);
-insert into storeChannels (stores, channel) values ('VIVALDI-1', 5);
-insert into storeChannels (stores, channel) values ('KDE-1', 2);
-insert into storeChannels (stores, channel) values ('DD-1', 3);
-insert into storeChannels (stores, channel) values ('DD-1', 4);
-insert into storeChannels (stores, channel) values ('DD-1', 5);
-insert into storeChannels (stores, channel) values ('DD-2', 6);
-insert into storeChannels (stores, channel) values ('DD-2', 6);
-insert into storeChannels (stores, channel) values ('DD-2', 6);
+insert into storeChannels (store, channel) values ('VIVALDI-1', 2);
+insert into storeChannels (store, channel) values ('VIVALDI-1', 5);
+insert into storeChannels (store, channel) values ('KDE-1', 2);
+insert into storeChannels (store, channel) values ('DD-1', 3);
+insert into storeChannels (store, channel) values ('DD-1', 4);
+insert into storeChannels (store, channel) values ('DD-1', 5);
+insert into storeChannels (store, channel) values ('DD-2', 6);
+insert into storeChannels (store, channel) values ('DD-2', 6);
+insert into storeChannels (store, channel) values ('DD-2', 6);
 
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true, 'aquarium');
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true, 'dice');
