@@ -69,9 +69,11 @@ describe('Redeeming points code', function(){
     describe('Try to redeem codes', function(){
         it('A non-existent code', function(done){
             var expected = {
-                "store":'VIVALDI-1',
                 "authStatus":true,
+                "device":'VIVALDI-1',
+                "store":'VIVALDI-1',
                 "points":startPoints,
+                "success": false,
                 "error": {'type' : 'RedeemCodeFailure'}};
             utils.getUrl(
                 server,
@@ -89,6 +91,7 @@ describe('Redeeming points code', function(){
         it('A working code', function(done){
             var expected = {
                 "authStatus":true,
+                "device": 'VIVALDI-1',
                 "store": 'VIVALDI-1',
                 "points":startPoints + testPoints,
                 "success": true,
