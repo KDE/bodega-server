@@ -20,6 +20,7 @@ var RedisStore = require('connect-redis')(express);
 var fs = require('fs');
 var https = require('https');
 var http = require('http');
+/*jshint -W079 */
 var app = module.exports = express();
 var argv = require('optimist').argv;
 
