@@ -83,7 +83,7 @@ function postFiles(server, url, files, cookie, fn)
     //console.log(data);
 }
 
-describe('Asset creation', function(){
+describe('Asset manipulation', function(){
     var cookie;
     var incompleteAssetId;
     var completeAssetId;
@@ -168,6 +168,60 @@ describe('Asset creation', function(){
                           completeAssetId = res.body.asset.id;
                           done();
                       });
+        });
+    });
+
+    
+    describe('Deletion', function(){
+        it('should work a complete assets', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/delete?assetId='+completeAssetId,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('asset');
+                    res.body.asset.should.have.property('id',
+                                                        completeAssetId);
+                    done();
+                },
+                cookie);
+        });
+        it('should work with incomplete assets', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/delete?assetId='+incompleteAssetId,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('asset');
+                    res.body.asset.should.have.property('id',
+                                                        incompleteAssetId);
+                    done();
+                },
+                cookie);
+        });
+        it('should not work with already delete assets', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/delete?assetId='+incompleteAssetId,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property(
+                        'type', 'DeleteAssetMissing');
+                    done();
+                },
+                cookie);
         });
     });
 });

@@ -241,6 +241,11 @@ app.post(serverPath('create'), isAuthorized,
              //console.log(req.query);
              app.db.createAsset(req, res);
          });
+app.get(serverPath('delete'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.deleteAsset(req, res);
+         });
 
 
 //********************************

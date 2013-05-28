@@ -40,9 +40,9 @@ function deleteFile(db, req, res, path)
 function deleteFiles(db, req, res, assetInfo)
 {
     var i;
-    deleteFiles(db, req, res, assetInfo.path);
-    for (i = 0; assetInfo.previews.length; ++i) {
-        deleteFiles(db, req, res, assetInfo.previews[i].path);
+    deleteFile(db, req, res, assetInfo.path);
+    for (i = 0; i < assetInfo.previews.length; ++i) {
+        deleteFile(db, req, res, assetInfo.previews[i].path);
     }
     sendResponse(db, req, res, assetInfo);
 }
@@ -95,7 +95,7 @@ function deletePublishedAsset(db, req, res, assetInfo)
         deleteAsset :
         "update assets set active = FALSE where id = $1;"
     };
-    findPreviewFiles(db, req, res, assetInfo);
+    findPreviewFiles(db, req, res, assetInfo, queries);
 }
 
 function deleteIncomingAsset(db, req, res, assetInfo)
@@ -106,7 +106,7 @@ function deleteIncomingAsset(db, req, res, assetInfo)
         deleteAsset :
         "delete from incomingassets where id = $1;"
     };
-    findPreviewFiles(db, req, res, assetInfo);
+    findPreviewFiles(db, req, res, assetInfo, queries);
 }
 
 function findPublishedAsset(db, req, res, assetInfo)
@@ -153,12 +153,12 @@ function findIncomingAsset(db, req, res, assetInfo)
 module.exports = function(db, req, res) {
     var assetInfo = {};
 
-    if (!req.params.assetId) {
+    if (!req.query.assetId) {
         errors.report('MissingParameters', req, res);
         return;
     }
-    assetInfo.id = req.params.assetId;
-    assetInfo.partnerId = req.params.partnerId;
+    assetInfo.id = req.query.assetId;
+    assetInfo.partnerId = req.query.partnerId;
 
     createUtils.isContentCreator(
         db, req, res, assetInfo,
@@ -168,7 +168,5 @@ module.exports = function(db, req, res) {
                 return;
             }
             findIncomingAsset(db, req, res, assetInfo);
-            deleteIncomingAsset();
-            deletePublishedAsset();
         });
 };

@@ -32,22 +32,10 @@ function sendResponse(db, req, res, assetInfo)
     res.send(json);
 }
 
-function deleteUpload(db, req, res, path)
-{
-    app.assetStore.remove(path, function() {});
-}
 
 function reportError(db, req, res, assetInfo,
                      errorType, error)
 {
-    /*
-    var rmQuery =
-            'DELETE FROM incomingAssets WHERE id = $1;';
-
-    db.query(rmQuery, [assetInfo.id],
-             function(err, result){});
-    deleteUpload(db, req, res, assetInfo.incomingPath);
-    */
     errors.report(errorType, req, res, error);
 }
 
@@ -117,7 +105,6 @@ function recordAsset(db, req, res, assetInfo)
                                  'Database', err);
                      return;
                  }
-
                  setupIcons(db, req, res, assetInfo);
              });
 }
