@@ -107,7 +107,7 @@ function recordAsset(db, req, res, assetInfo)
 {
     var file = req.files.asset;
     var incomingPath = assetInfo.incomingPath;
-    var newAssetQuery = 'insert into incomingAssets (id, license, author, baseprice, name, description, version, path, file) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
+    var newAssetQuery = 'insert into incomingAssets (id, license, partner, baseprice, name, description, version, path, file) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
     db.query(newAssetQuery,
              [assetInfo.id, assetInfo.license, assetInfo.partnerId, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.incomingPath, assetInfo.filename],
              function(err, result) {

@@ -61,14 +61,14 @@ BEGIN
         RETURN 3;
     END IF;
 
-    -- give the uploader/author/owner points as a result
-    SELECT INTO assetInfo basePrice, author, name FROM assets WHERE id = what;
+    -- give the uploader/partner/owner points as a result
+    SELECT INTO assetInfo basePrice, partner, name FROM assets WHERE id = what;
     IF price > 0 THEN
         IF price < assetInfo.basePrice THEN
             assetInfo.basePrice = price;
         END IF;
         storeEarns := price - assetInfo.basePrice;
-        UPDATE people SET earnedPoints = earnedPoints + assetInfo.basePrice, owedPoints = owedPoints + assetInfo.basePrice WHERE id = assetInfo.author;
+        UPDATE people SET earnedPoints = earnedPoints + assetInfo.basePrice, owedPoints = owedPoints + assetInfo.basePrice WHERE id = assetInfo.partner;
     END IF;
 
     -- insert into the purchases recording table
@@ -88,7 +88,7 @@ BEGIN
     PERFORM * FROM purchases WHERE person = who AND store = fromStore AND asset = what;
     IF NOT FOUND THEN
         -- you can always download your own stuff
-        PERFORM * FROM assets WHERE id = what AND author = who;
+        PERFORM * FROM assets WHERE id = what AND partner = who;
         IF FOUND THEN
             RETURN TRUE;
         END IF;

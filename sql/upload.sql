@@ -2,7 +2,7 @@ create table incomingAssets
 (
     id          int         primary key default nextval('seq_assetsIds'),
     license     int         references licenses(id),
-    author      int         references partners(id),
+    partner     int         references partners(id),
     basePrice   int         default 0 CHECK(basePrice >= 0),
     name        text,
     description text,

@@ -38,7 +38,7 @@ BEGIN
         t.type in (select id from tagtypes where type in ('category', 'descriptive', 'author', 'contributor'))
     ) as temp
         LEFT JOIN assets a ON (a.id = temp.id)
-        LEFT JOIN partners ON (a.author = partners.id)
+        LEFT JOIN partners ON (a.partner = partners.id)
     GROUP BY a.id
     ORDER BY rank DESC, max(a.name) LIMIT $3 OFFSET $4;
 END;

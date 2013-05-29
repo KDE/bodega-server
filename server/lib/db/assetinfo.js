@@ -113,7 +113,7 @@ function addTagsAndFinish(db, req, res, json)
 
 module.exports = function(db, req, res) {
     var assetInfoQuery =
-        "SELECT a.id, l.name as license, l.text as licenseText, a.author as partnerId, a.version, a.file, \
+        "SELECT a.id, l.name as license, l.text as licenseText, a.partner as partnerId, a.version, a.file, \
          a.image, a.name, a.description, ct_canDownload($3, $2, $1) AS downloadable, ct_assetPrice($2, $1) AS price \
          FROM assets a LEFT JOIN channelAssets c ON (a.id = c.asset)  \
          LEFT JOIN storeChannels sc ON (sc.channel = c.channel) \

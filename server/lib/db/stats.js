@@ -35,7 +35,7 @@ module.exports.assetStats = function(db, req, res) {
             }
         }
 
-        query += " from purchases p left join assets a on (p.asset = a.id and a.author = $1) where asset in (";
+        query += " from purchases p left join assets a on (p.asset = a.id and a.partner = $1) where asset in (";
         for (i = 0; i < req.query.assets.length; ++i) {
             query += (i > 0 ? ", ":"") + "$" + (i+1);
         }
@@ -43,7 +43,7 @@ module.exports.assetStats = function(db, req, res) {
     } else {
         query += "select date_trunc('month', p.purchasedon) dateOf, \
                   SUM(p.toparticipant) AS total \
-                  from purchases p left join assets a on (p.asset = a.id and a.author = $1) \
+                  from purchases p left join assets a on (p.asset = a.id and a.partner = $1) \
                   group by dateOf order by dateOf;";
     }
 

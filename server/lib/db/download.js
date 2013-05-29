@@ -21,7 +21,7 @@ var errors = require('../errors.js');
 function launchDownload(db, req, res)
 {
     var assetInfoQuery =
-        "SELECT a.id, a.author as partnerId, a.version, a.path, a.file, a.name \
+        "SELECT a.id, a.partner as partnerId, a.version, a.path, a.file, a.name \
          FROM assets a LEFT JOIN channelAssets c ON (a.id = c.asset)  \
          LEFT JOIN storeChannels sc ON (sc.channel = c.channel) \
          WHERE a.id = $1 and sc.store = $2";

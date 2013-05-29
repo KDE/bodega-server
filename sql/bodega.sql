@@ -119,7 +119,7 @@ create table assets
 (
     id          int         primary key default nextval('seq_assetsIds'),
     license     int         references licenses(id),
-    author      int         references partners(id),
+    partner     int         references partners(id),
     basePrice   int         not null default 0 CHECK(basePrice >= 0),
     externId    text,
     name        text        not null,
@@ -135,7 +135,7 @@ create table assets
 
 -- we sort by name in listings, and this gives us a precomputed ordering
 create index idx_asset_names on assets (name);
-create index idx_asset_authors on assets (author);
+create index idx_asset_partners on assets (partner);
 
 create table assetTags
 (

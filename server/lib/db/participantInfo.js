@@ -49,7 +49,7 @@ module.exports = function(db, req, res) {
                             json.email = result.rows[0].email;
                             json.active = result.rows[0].active;
 
-                            var assetCountQuery = "SELECT COUNT(id) AS assetCount FROM assets WHERE author = $1;";
+                            var assetCountQuery = "SELECT COUNT(id) AS assetCount FROM assets WHERE partner = $1;";
                             var q = db.query(assetCountQuery, [req.session.user.id],
                                              function(err, result)
                                              {

@@ -150,7 +150,7 @@ module.exports.listAssets = function(db, req, res) {
          CASE WHEN p.points IS NULL THEN 0 ELSE p.points END AS points \
          FROM collectionsContent bc \
          INNER JOIN assets a ON (bc.asset = a.id) \
-         LEFT JOIN partners ON (a.author = partners.id) \
+         LEFT JOIN partners ON (a.partner = partners.id) \
          LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $1) \
          INNER JOIN collections b ON (b.person = $2) \
          WHERE bc.collection = $3 \

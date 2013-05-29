@@ -65,7 +65,7 @@ function searchAssets(db, req, res, args, json)
         t.title = $1 AND t.type in (SELECT id FROM tagtypes WHERE type = \'easter eggs\') \
     ) as temp \
         LEFT JOIN assets a ON (a.id = temp.id) \
-        LEFT JOIN partners ON (a.author = partners.id) \
+        LEFT JOIN partners ON (a.partner = partners.id) \
     GROUP BY a.id \
     ORDER BY rank DESC, max(a.name) LIMIT $3 OFFSET $4   \
     ;';
