@@ -11,12 +11,12 @@ check:
 	@./node_modules/.bin/jshint .
 
 sql:
-	./../sql/do_sql config.json ../sql/ setup
+	cd ../sql && ./do_sql ../server/config.json . setup
 
 update_sql:
-	./../sql/do_sql config.json ../sql/ update
+	cd ../sql && ./do_sql ../server/config.json . update
 
 test_sql:
-	./../sql/do_sql config.json ../sql/ testdata
+	cd ../sql && ./do_sql ../server/config.json . testdata
 
 .PHONY: test check sql update_sql

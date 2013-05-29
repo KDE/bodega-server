@@ -10,8 +10,8 @@ drop function ct_assetPrice(fromDevice text, what int);
 drop function ct_purchase(who int, fromDevice text, what int);
 drop function ct_canDownload(who int, fromDevice text, what int)
 drop function ct_recordDownload(who int, what int, fromWhere inet, device text)
-\i ../purchasing.plsql
 
-\i ../core.plsql
+purchasing.plsql
+core.plsql
 
 update channels set parent = parent;
