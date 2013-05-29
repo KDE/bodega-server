@@ -40,6 +40,7 @@ describe('Stats', function(){
 
  
         it('Points stats without asset numbers', function(done){
+            //not setting metrics there, assumes that without it goes to points by default
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets',
@@ -69,9 +70,10 @@ describe('Stats', function(){
                 cookie);
         });
 
-        it('Points stats with one asset number', function(done){
+        it('Points stats with one asset number', function(done) {
             var query = {
-                assets: [3]
+                assets: [3],
+                metric: "points"
             }
             utils.getUrl(
                 server,
@@ -98,7 +100,8 @@ describe('Stats', function(){
 
         it('Points stats with four asset numbers', function(done) {
             var query = {
-                assets: [2,3,4,7]
+                assets: [2,3,4,7],
+                metric: "points"
             }
             utils.getUrl(
                 server,
@@ -152,17 +155,16 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z"],
-                        asset2: [0, 190, 0, 0],
-                        asset3: [1425, 280, 280, 0],
-                        asset4: [180, 0, 0, 0],
-                        asset7: [0, 0, 0, 0]
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        asset2: [0, 1, 0, 0, 1],
+                        asset3: [6, 1, 2, 1, 0],
+                        asset4: [2, 1, 0, 0, 0],
+                        asset7: [0, 0, 0, 0, 0]
                     }
 
                     //res.body.stats.length.should.equal(2)
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
-
                         stats.dateof.should.be.eql(expected.dateof[i]);
                         stats.asset2.should.be.eql(expected.asset2[i]);
                         stats.asset3.should.be.eql(expected.asset3[i]);

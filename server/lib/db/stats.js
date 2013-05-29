@@ -52,7 +52,7 @@ module.exports.assetStats = function(db, req, res) {
     } else if (req.query.metric == "downloads") {
         if (req.query.assets) {
             params = params.concat(req.query.assets);
-            query = "select date_trunc('month', d.purchasedon) dateOf,"
+            query = "select date_trunc('month', d.downloadedon) dateOf,"
             
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += "sum(CASE WHEN asset = $" + (i+2) + " THEN 1 ELSE 0 END) AS asset" + req.query.assets[i];
@@ -66,6 +66,7 @@ module.exports.assetStats = function(db, req, res) {
                 query += (i > 0 ? ", ":"") + "$" + (i+1);
             }
             query += ") group by dateOf order by dateOf;";
+
         } else {
             query += "select date_trunc('month', d.downloadedon) dateOf, \
                     count(*) AS total \
