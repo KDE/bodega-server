@@ -242,6 +242,14 @@ app.post(serverPath('create'), isAuthorized,
              app.db.createAsset(req, res);
          });
 
+//*******************************
+// Stats
+app.get(serverPath('stats/assets'), isAuthorized,
+    function(req, res) {
+        app.db.assetStats(req, res);
+    }
+);
+
 
 //********************************
 // Static content routes
@@ -273,3 +281,4 @@ app.get('/', function(req, res) {
         storeUrl: app.config.storeInfo.url
     });
 });
+
