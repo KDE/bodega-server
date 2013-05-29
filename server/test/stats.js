@@ -57,7 +57,7 @@ describe('Stats', function(){
                         total: [1605, 470, 280],
                     }
 
-                    //res.body.stats.length.should.equal(2)
+                    res.body.stats.length.should.equal(3)
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -86,12 +86,18 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
 
-                    res.body.stats.length.should.equal(1)
+                    var expected = {
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
+                        asset3: [1425, 280, 280],
+                    }
 
-                    var stats = res.body.stats[0];
-                    stats.dateof.should.be.eql("2013-05-31T22:00:00.000Z");
-                    stats.asset3.should.be.eql(0);
+                    res.body.stats.length.should.equal(3)
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
 
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.asset3.should.be.eql(expected.asset3[i]);
+                    }
 
                     done();
                 },
@@ -114,14 +120,14 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z"],
-                        asset2: [0, 190, 0, 0],
-                        asset3: [1425, 280, 280, 0],
-                        asset4: [180, 0, 0, 0],
-                        asset7: [0, 0, 0, 0]
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
+                        asset2: [0, 190, 0],
+                        asset3: [1425, 280, 280],
+                        asset4: [180, 0, 0],
+                        asset7: [0, 0, 0]
                     }
 
-                    //res.body.stats.length.should.equal(2)
+                    res.body.stats.length.should.equal(3)
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -139,6 +145,68 @@ describe('Stats', function(){
 
 
         //Downloads
+        it('Downloads stats without asset numbers', function(done) {
+            var query = {
+                metric: "downloads"
+            }
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('stats');
+                    var expected = {
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        total: [8, 3, 2, 1, 1]
+                    }
+
+                    res.body.stats.length.should.equal(5)
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.total.should.be.eql(expected.total[i]);
+                    }
+                    done();
+                },
+                cookie);
+        });
+
+        it('Downloads stats with one asset numbers', function(done) {
+            var query = {
+                assets: [3],
+                metric: "downloads"
+            }
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('stats');
+                    var expected = {
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        asset3: [6, 1, 2, 1],
+                    }
+
+                    res.body.stats.length.should.equal(4)
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
+                        
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.asset3.should.be.eql(expected.asset3[i]);
+                    }
+                    done();
+                },
+                cookie);
+        });
+
         it('Downloads stats with four asset numbers', function(done) {
             var query = {
                 assets: [2,3,4,7],
@@ -162,7 +230,74 @@ describe('Stats', function(){
                         asset7: [0, 0, 0, 0, 0]
                     }
 
-                    //res.body.stats.length.should.equal(2)
+                    res.body.stats.length.should.equal(5)
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.asset2.should.be.eql(expected.asset2[i]);
+                        stats.asset3.should.be.eql(expected.asset3[i]);
+                        stats.asset4.should.be.eql(expected.asset4[i]);
+                        stats.asset7.should.be.eql(expected.asset7[i]);
+                    }
+                    done();
+                },
+                cookie);
+        });
+
+        it('Purchases count stats without numbers', function(done) {
+            var query = {
+                metric: "count"
+            }
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('stats');
+                    var expected = {
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        total: [5, 2, 1]
+                    }
+
+                    res.body.stats.length.should.equal(3)
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.total.should.be.eql(expected.total[i]);
+                    }
+                    done();
+                },
+                cookie);
+        });
+
+        it('Purchases count stats with four asset numbers', function(done) {
+            var query = {
+                assets: [2,3,4,7],
+                metric: "count"
+            }
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('stats');
+                    var expected = {
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        asset2: [0, 1, 0],
+                        asset3: [3, 1, 1],
+                        asset4: [2, 0, 0],
+                        asset7: [0, 0, 0]
+                    }
+
+                    res.body.stats.length.should.equal(3)
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         stats.dateof.should.be.eql(expected.dateof[i]);

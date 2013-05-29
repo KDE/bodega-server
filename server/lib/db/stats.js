@@ -39,7 +39,7 @@ module.exports.assetStats = function(db, req, res) {
 
             query += " from purchases p left join assets a on (p.asset = a.id and a.author = $1) where asset in (";
             for (i = 0; i < req.query.assets.length; ++i) {
-                query += (i > 0 ? ", ":"") + "$" + (i+1);
+                query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
             query += ") group by dateOf order by dateOf;";
         } else {
@@ -63,7 +63,7 @@ module.exports.assetStats = function(db, req, res) {
 
             query += " from downloads d left join assets a on (d.asset = a.id and a.author = $1) where asset in (";
             for ( i = 0; i < req.query.assets.length; ++i) {
-                query += (i > 0 ? ", ":"") + "$" + (i+1);
+                query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
             query += ") group by dateOf order by dateOf;";
 
@@ -88,7 +88,7 @@ module.exports.assetStats = function(db, req, res) {
 
             query += " from purchases p left join assets a on (p.asset = a.id and a.author = $1) where asset in (";
             for (var i = 0; i < req.query.assets.length; ++i) {
-                query += (i > 0 ? ", ":"") + "$" + (i+1);
+                query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
             query += ") group by dateOf order by dateOf;";
         } else {
