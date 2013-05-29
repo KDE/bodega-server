@@ -28,7 +28,7 @@ module.exports = function(db, req, res) {
     }
 
     db.query("SELECT ct_purchase($1, $2, $3) as result;",
-             [req.session.user.id, req.session.user.device, asset],
+             [req.session.user.id, req.session.user.store, asset],
              function(error, result)
              {
                  if (error || !result) {

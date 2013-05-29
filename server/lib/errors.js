@@ -15,13 +15,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var utils = require("./utils.js");
 
 var ErrorType = {
     "Connection"             : 1,//reserved for client side connection errors
     "Unknown"                : 2,//unexpected problem
     "Database"               : 3,//db communication problem
     "Unauthorized"           : 4,//unauthorized access
-    "MissingParameters"      : 5,//username/password/device id missing
+    "MissingParameters"      : 5,//username/password/store id missing
     "NoMatch"                : 6,//no or incorrect result
     "AccountInactive"        : 7,//account is inactive
     "AccountExists"          : 8,//collection/asset already exists
@@ -65,6 +66,11 @@ var ErrorType = {
     "UploadTagError"         : 43, //one of the required tags is missing
     "UploadPreviewError"     : 44, //the asset is missing a preview
     "UploadIconError"        : 45 //the asset is missing an icon
+
+    "StoreIdExists"          : 60,//on creating a store, the store id already exists
+    "StorePartnerInvalid"    : 61,//the partner provided is incorrect
+    "StoreNameInvalid"       : 62,//an invalid (e.g. missing) store name
+    "StoreNotDeleted"        : 63,//deleting a store failed
 };
 
 module.exports.Type = ErrorType;
@@ -85,20 +91,10 @@ module.exports.report = function(type, req, res, err)
         type = "Unknown";
     }
 
-    var obj = {};
-    obj.device = 0;
-    obj.authStatus = false;
-    obj.points = 0;
-    obj.error = {
+    var json = utils.standardJson(req, false);
+    json.error = {
         'type' : type
     };
-
-    if (req && req.session && req.session.authorized &&
-        req.session.user) {
-        obj.authStatus = req.session.authorized;
-        obj.device = req.session.user.device;
-        obj.points = req.session.user.points;
-    }
 
     if (err && err.message) {
         console.warn('-- Error:');
@@ -107,5 +103,5 @@ module.exports.report = function(type, req, res, err)
         console.warn('-- end --');
     }
 
-    res.json(obj);
+    res.json(json);
 };

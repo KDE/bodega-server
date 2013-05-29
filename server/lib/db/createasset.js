@@ -23,8 +23,7 @@ var path = require('path');
 
 function sendResponse(db, req, res, assetInfo)
 {
-    var json = utils.standardJson(req, true);
-
+    var json = utils.standardJson(req);
     json.asset = {
         id : assetInfo.id,
         name : assetInfo.name

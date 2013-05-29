@@ -40,7 +40,7 @@ private:
     void writeCategoryTags(const Catalog &catalog);
     void writeBooks(const Catalog &catalog);
     void writeChannels(const Catalog &catalog);
-    void writeDeviceChannels(const Catalog &catalog);
+    void writeStoreChannels(const Catalog &catalog);
 
 private:
     int partnerQuery() const;

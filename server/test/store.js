@@ -17,19 +17,17 @@
 
 var server = require('../app.js');
 var utils = require('./support/http');
+var queryString = require('querystring');
 
-describe('Upload Workflow', function(){
+describe('Store management', function(){
     var cookie;
 
-    describe('uploading without authenticating', function(){
+    describe('Create store without authenticating', function(){
         it('should fail', function(done) {
-            utils.uploadFile(
-                __filename,
+            utils.getUrl(
                 server,
-                '/bodega/v1/json/upload',
-                null,
+                '/bodega/v1/json/store/create',
                 function(res) {
-                    //for (i in res) { console.log(i + " => " ); }
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -47,19 +45,6 @@ describe('Upload Workflow', function(){
 
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
-            var expected = {
-                "store":"VIVALDI-1",
-                "authStatus":true,
-                "points" : 10000,
-                "imageUrls": {
-                    "tiny":"http://0.0.0.0:3000/images/22",
-                    "small":"http://0.0.0.0:3000/images/32",
-                    "medium":"http://0.0.0.0:3000/images/64",
-                    "large":"http://0.0.0.0:3000/images/128",
-                    "huge":"http://0.0.0.0:3000/images/512",
-                    "previews":"http://0.0.0.0:3000/images/previews"
-                }
-            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
@@ -76,61 +61,109 @@ describe('Upload Workflow', function(){
         });
     });
 
-    describe('uploading a file', function(){
-        it('should succeed with a valid partner', function(done){
-            utils.uploadFile(
-                __filename,
-                server,
-                '/bodega/v1/json/upload',
-                { 'partner' : 1 },
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('asset');
-                    done();
-                },
-                cookie);
-        });
-
-        it('should succeed with no explicit partner', function(done){
-            utils.uploadFile(
-                __filename,
-                server,
-                '/bodega/v1/json/upload',
-                { },
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('asset');
-                    done();
-                },
-                cookie);
-        });
-
+    describe('create a store', function(){
         it('should fail with an invalid partner', function(done){
-            utils.uploadFile(
-                __filename,
+            utils.getUrl(
                 server,
-                '/bodega/v1/json/upload',
-                { 'partner' : 10 },
+                '/bodega/v1/json/store/create?partner=2',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
-                    res.body.error.should.have.property('type',
-                                                        'UploadPartnerInvalid');
+                    res.body.error.should.have.property('type', 'StorePartnerInvalid');
+                    done();
+                },
+                cookie);
+        });
+
+        it('should fail without a name', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/create?partner=1',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'StoreNameInvalid');
+                    done();
+                },
+                cookie);
+        });
+
+        it('should succeed with a valid partner and name', function(done){
+            var query =
+                { 'partner' : 1,
+                  'name': 'Fun Times With Clowns',
+                  'desc': 'Clowns are actually scary'
+                };
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/create?' + queryString.stringify(query),
+                function(res) {
+                    var expected = {
+                        'id': '1_FUN_TIMES_WITH_CLOWNS',
+                        'name': 'Fun Times With Clowns',
+                        'desc': 'Clowns are actually scary',
+                        'partner': { 'id': 1, 'name': 'KDE' },
+                        'markups': { 'min': 0, 'max': 0,
+                                     'flat': false, 'markup': 0 }
+                    };
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('storeInfo');
+                    res.body.storeInfo.should.eql(expected);
+                    done();
+                },
+                cookie);
+        });
+
+        it('should fail with an id that exists', function(done){
+            var query =
+                { 'partner' : 1,
+                  'name': 'Fun Times With Clowns',
+                };
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/create?' + queryString.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'StoreIdExists');
+                    done();
+                },
+                cookie);
+        });
+
+    });
+
+    describe('delete a store', function(){
+        it('should succeed with a valid store', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/delete?id=1_FUN_TIMES_WITH_CLOWNS',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
                     done();
                 },
                 cookie);
         });
     });
-
 });

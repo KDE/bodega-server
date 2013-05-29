@@ -19,7 +19,12 @@ function getUrl(app, url, fn, cookie) {
             buf += chunk;
         });
         res.on("end", function(chunk) {
-            res.body = JSON.parse(buf);
+            try {
+                res.body = JSON.parse(buf);
+            } catch (e) {
+                console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
+            }
+
             fn(res);
         });
     });
@@ -63,7 +68,7 @@ function auth(app, fn) {
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
     getUrl(app,
-           '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
+           '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
            function(res) {
                res.statusCode.should.equal(200);
                res.headers.should.have.property(

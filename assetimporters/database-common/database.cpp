@@ -67,7 +67,7 @@ void Database::writeInit(bool clearOldData)
     if (clearOldData) {
         qDebug() << "deleting data first ... this can take a fair while as the database triggers run";
         QSqlQuery cleanupQuery;
-        cleanupQuery.prepare("delete from deviceChannels where channel in (select id from channels where partner = :partner);");
+        cleanupQuery.prepare("delete from storeChannels where channel in (select id from channels where partner = :partner);");
         cleanupQuery.bindValue(":partner", m_partnerId);
         cleanupQuery.exec();
         cleanupQuery.prepare("delete from channels where partner = :partner;");
@@ -106,11 +106,11 @@ int Database::writeChannels(const QString &name, const QString &description, con
     return id;
 }
 
-void Database::writeDeviceChannels(int channelId)
+void Database::writeStoreChannels()
 {
     QSqlQuery query;
 
-    query.prepare("insert into deviceChannels (device, channel) "
+    query.prepare("insert into storeChannels (store, channel) "
                   "values ('VIVALDI-1', :channelId);");
 
 

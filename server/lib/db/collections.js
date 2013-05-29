@@ -27,11 +27,8 @@ module.exports.listAll = function(db, req, res) {
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
     var offset = parseInt(req.query.offset, 10) || 0;
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        collections : []
-    };
+    var json = utils.standardJson(req);
+    json.collections = [];
 
     db.query(
         queryString, [req.session.user.id, pageSize + 1, offset],
@@ -60,11 +57,8 @@ module.exports.create = function(db, req, res) {
         'SELECT * FROM collections WHERE person = $1 AND name = $2;';
     var defaultPageSize = 25;
     var name = req.query.name;
-    var isPublic = (req.query.public === 'true' ||
-                    req.query.public === '1') ? true : false;
-    var isWishList = (req.query.wishlist === 'true' ||
-                      req.query.wishlist === '1') ? true : false;
-
+    var isPublic = utils.parseBool(req.query.public);
+    var isWishList = utils.parseBool(req.query.wishlist);
 
     if (!name) {
         // Name of the collection is missing.
@@ -92,16 +86,13 @@ module.exports.create = function(db, req, res) {
                         errors.report('Database', req, res, err);
                         return;
                     }
-                    var json = {
-                        device : req.session.user.device,
-                        authStatus : req.session.authorized,
-                        collections : [{
+                    var json = utils.standardJson(req);
+                    json.collections = [{
                             id : result.rows[0].id,
                             name : name,
                             public : isPublic,
                             wishlist : isWishList
-                        }]
-                    };
+                        }];
                     res.json(json);
                 });
         });
@@ -142,11 +133,8 @@ module.exports.remove = function(db, req, res) {
                         errors.report('Database', req, res, err);
                         return;
                     }
-                    var json = {
-                        device : req.session.user.device,
-                        authStatus : req.session.authorized,
-                    };
-                    res.json(json);
+
+                    res.json(utils.standardJson(req));
                 });
         });
 };
@@ -163,7 +151,7 @@ module.exports.listAssets = function(db, req, res) {
          FROM collectionsContent bc \
          INNER JOIN assets a ON (bc.asset = a.id) \
          LEFT JOIN partners ON (a.author = partners.id) \
-         LEFT JOIN assetPrices p ON (p.asset = a.id AND p.device = $1) \
+         LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $1) \
          INNER JOIN collections b ON (b.person = $2) \
          WHERE bc.collection = $3 \
          ORDER BY a.name LIMIT $4 OFFSET $5';
@@ -172,11 +160,8 @@ module.exports.listAssets = function(db, req, res) {
     var offset = parseInt(req.query.offset, 10) || 0;
     var collectionId = req.query.collectionId;
 
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        collection : {}
-    };
+    var json = utils.standardJson(req);
+    json.collection = {};
     if (!collectionId) {
         //Id of the collection is missing.
         errors.report('MissingParameters', req, res);
@@ -200,7 +185,7 @@ module.exports.listAssets = function(db, req, res) {
             };
 
             db.query(
-                assetsQuery, [req.session.user.device, req.session.user.id,
+                assetsQuery, [req.session.user.store, req.session.user.id,
                               json.collection.id,
                               pageSize + 1, offset],
                 function(err, result) {
@@ -231,11 +216,9 @@ module.exports.addAsset = function(db, req, res) {
     var collectionId = req.query.collectionId;
     var assetId = req.query.assetId;
 
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        collection : []
-    };
+    var json = utils.standardJson(req);
+    json.collection = [];
+
     if (!collectionId) {
         //"Id of the collection is missing.",
         errors.report('MissingParameters', req, res);
@@ -305,11 +288,9 @@ module.exports.removeAsset = function(db, req, res) {
     var collectionId = req.query.collectionId;
     var assetId = req.query.assetId;
 
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        collection : []
-    };
+    var json = utils.standardJson(req);
+    json.collection = [];
+
     if (!collectionId) {
         //"Id of the collection is missing.",
         errors.report('MissingParameters', req, res);

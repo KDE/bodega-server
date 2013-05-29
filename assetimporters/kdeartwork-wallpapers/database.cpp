@@ -36,7 +36,7 @@ void Database::write(const Catalog &catalog, bool clearOldData)
     db.writeInit(clearOldData);
     db.writeWallpapers(catalog);
     db.writeChannels(catalog);
-    db.writeDeviceChannels(catalog);
+    db.writeStoreChannels(catalog);
 }
 
 Database::Database()
@@ -213,11 +213,11 @@ void Database::writeChannels(const Catalog &catalog)
     QSqlDatabase::database().commit();
 }
 
-void Database::writeDeviceChannels(const Catalog &catalog)
+void Database::writeStoreChannels(const Catalog &catalog)
 {
     QSqlQuery query;
 
-    query.prepare("insert into deviceChannels (device, channel) "
+    query.prepare("insert into storeChannels (store, channel) "
                   "values ('VIVALDI-1', :channelId);");
 
 

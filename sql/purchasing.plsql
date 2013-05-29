@@ -1,17 +1,17 @@
-CREATE OR REPLACE FUNCTION ct_assetPrice(fromDevice text, what int) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION ct_assetPrice(fromStore text, what int) RETURNS INT AS $$
 DECLARE
     price   int := -1;
 BEGIN
     SELECT INTO price points FROM assetPrices ap LEFT JOIN assets a ON (ap.asset = a.id)
-                             WHERE ap.asset = what AND ap.device = fromDevice AND
+                             WHERE ap.asset = what AND ap.store = fromStore AND
                                    ap.starting <= (current_timestamp AT TIME ZONE 'UTC') AND
                                    (ap.ending IS NULL OR ap.ending >= current_timestamp AT TIME ZONE 'UTC')
                             ORDER BY ap.starting DESC LIMIT 1;
     IF NOT FOUND THEN
         PERFORM ap.asset FROM channelAssets ap LEFT JOIN channels c ON (ap.channel = c.id)
-                                              LEFT JOIN deviceChannels dc ON (c.id = dc.channel)
+                                              LEFT JOIN storeChannels sc ON (c.topLevel = sc.channel)
                                               LEFT JOIN assets a ON (ap.asset = a.id)
-                                              WHERE ap.asset = what AND dc.device = fromDevice;
+                                              WHERE ap.asset = what AND sc.store = fromStore;
         IF FOUND THEN
             price := 0;
         ELSE
@@ -26,7 +26,7 @@ $$ LANGUAGE 'plpgsql';
 -- try to purchase
 -- PARAMETERS: int person, int asset
 -- RETURNS: empty string on success, string explaining error on failure
-CREATE OR REPLACE FUNCTION ct_purchase(who int, fromDevice text, what int) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION ct_purchase(who int, fromStore text, what int) RETURNS INT AS $$
 DECLARE
     price   int := 0;
     participantEarns int := 0;
@@ -34,13 +34,13 @@ DECLARE
     assetInfo RECORD;
     purchaserEmail   text;
 BEGIN
-    PERFORM * FROM purchases WHERE person = who AND device = fromDevice AND asset = what;
+    PERFORM * FROM purchases WHERE person = who AND store = fromStore AND asset = what;
     IF FOUND THEN
         -- already purchased!
         RETURN 0;
     END IF;
 
-    SELECT INTO price ct_assetPrice(fromDevice, what);
+    SELECT INTO price ct_assetPrice(fromStore, what);
     IF price < 0 THEN
         RETURN 1;
     END IF;
@@ -72,7 +72,7 @@ BEGIN
     END IF;
 
     -- insert into the purchases recording table
-    INSERT INTO purchases (person, email, device, asset, name, points, toParticipant, toStore) VALUES (who, purchaserEmail, fromDevice, what, assetInfo.name, price, assetInfo.basePrice, storeEarns);
+    INSERT INTO purchases (person, email, store, asset, name, points, toParticipant, toStore) VALUES (who, purchaserEmail, fromStore, what, assetInfo.name, price, assetInfo.basePrice, storeEarns);
     RETURN 0;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -80,12 +80,12 @@ $$ LANGUAGE 'plpgsql';
 -- check if download is allowed
 -- PARAMETERS: int person, int asset
 -- RETURNS: bool true if can download, false if not
-CREATE OR REPLACE FUNCTION ct_canDownload(who int, fromDevice text, what int) RETURNS BOOL AS $$
+CREATE OR REPLACE FUNCTION ct_canDownload(who int, fromStore text, what int) RETURNS BOOL AS $$
 DECLARE
     price   int := 0;
     channel int := 0;
 BEGIN
-    PERFORM * FROM purchases WHERE person = who AND device = fromDevice AND asset = what;
+    PERFORM * FROM purchases WHERE person = who AND store = fromStore AND asset = what;
     IF NOT FOUND THEN
         -- you can always download your own stuff
         PERFORM * FROM assets WHERE id = what AND author = who;
@@ -93,7 +93,7 @@ BEGIN
             RETURN TRUE;
         END IF;
 
-        SELECT INTO price ct_assetPrice(fromDevice, what);
+        SELECT INTO price ct_assetPrice(fromStore, what);
         IF price < 0 THEN
             RETURN FALSE;
             --RETURN 'Requested asset not found. (ct_candl/01)';
@@ -110,7 +110,7 @@ $$ LANGUAGE 'plpgsql';
 -- registers a download
 -- PARAMETERS: int person, int asset, inet from
 -- RETURNS: bool true if can download, false if not
-CREATE OR REPLACE FUNCTION ct_recordDownload(who int, what int, fromWhere inet, device text) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION ct_recordDownload(who int, what int, fromWhere inet, store text) RETURNS VOID AS $$
 DECLARE
     asset   RECORD;
 BEGIN

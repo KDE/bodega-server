@@ -177,7 +177,7 @@ void PackageDatabase::writePackageChannels()
 
         writeChannelTags(chanId, mimetypeId);
 
-        writeDeviceChannels(chanId);
+        writeStoreChannels(chanId);
     }
 }
 

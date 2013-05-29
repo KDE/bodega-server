@@ -26,8 +26,7 @@ describe('Searching', function(){
     describe('initialization', function(){
         it('authorize correctly.', function(done){
             var expected = {
-                "userId": 1,
-                "device":"VIVALDI-1",
+                "store":"VIVALDI-1",
                 "authStatus":true,
                 "points" : 10000,
                 "imageUrls": {
@@ -41,7 +40,7 @@ describe('Searching', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

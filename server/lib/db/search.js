@@ -38,7 +38,7 @@ function searchAssets(db, req, res, args, json)
         0 as tagrank \
         FROM assets a \
         INNER JOIN subChannelAssets s ON (a.id = s.asset)  \
-        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.device = $5)  \
+        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $5)  \
         WHERE \
         a.en_index @@ plainto_tsquery(\'english\', $1) AND \
         s.channel = $2 \
@@ -48,7 +48,7 @@ function searchAssets(db, req, res, args, json)
         ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) as tagrank \
         FROM assets a \
         INNER JOIN subChannelAssets s ON (a.id = s.asset) \
-        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.device = $5)  \
+        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $5)  \
         LEFT JOIN assetTags at ON (a.id = at.asset)  \
         LEFT JOIN tags t on (t.id = at.tag) \
         WHERE \
@@ -58,7 +58,7 @@ function searchAssets(db, req, res, args, json)
       UNION \
         SELECT a.id as id, p.points as points, 1 as namerank, 1 as tagrank \
         FROM assets a \
-        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.device = $5) \
+        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $5) \
         LEFT JOIN assetTags at ON (a.id = at.asset)  \
         LEFT JOIN tags t on (t.id = at.tag) \
         WHERE \
@@ -72,7 +72,7 @@ function searchAssets(db, req, res, args, json)
 
     db.query(
         query,
-        [args.query, args.channelId, args.pageSize, args.offset, req.session.user.device],
+        [args.query, args.channelId, args.pageSize, args.offset, req.session.user.store],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
@@ -89,14 +89,14 @@ function searchChannels(db, req, res, args, json)
     var query =
         'SELECT c.id, c.image, c.name, c.description FROM channels c \
          CROSS JOIN  plainto_tsquery(\'english\', $1) as query \
-         LEFT JOIN deviceChannels d  ON (c.id = d.channel) \
-         WHERE d.device = $2 and c.en_index @@ query  \
+         LEFT JOIN storeChannels sc  ON (c.topLevel = sc.channel) \
+         WHERE sc.store = $2 and c.en_index @@ query  \
          ORDER BY  ts_rank_cd(c.en_index, query) DESC, c.name  \
          LIMIT $3 OFFSET $4;';
 
     db.query(
         query,
-        [args.query, req.session.user.device,
+        [args.query, req.session.user.store,
          args.pageSize, args.offset],
         function(err, result) {
             if (err) {
@@ -119,13 +119,9 @@ module.exports = function(db, req, res) {
         'offset'        : offset,
         'channelId'     : req.query.channelId,
     };
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        points : req.session.user.points,
-        channels : [],
-        assets   : []
-    };
+    var json = utils.standardJson(req);
+    json.channels = [];
+    json.assets = [];
 
     if (!args.query) {
         //"Search query was empty.",

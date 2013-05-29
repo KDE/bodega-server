@@ -46,7 +46,7 @@ void Database::write(const Catalog &catalog, bool clearOldData)
     db.writeCategoryTags(catalog);
     db.writeBooks(catalog);
     db.writeChannels(catalog);
-    db.writeDeviceChannels(catalog);
+    db.writeStoreChannels(catalog);
 }
 
 Database::Database()
@@ -124,8 +124,8 @@ void Database::writeInit(bool clearOldData)
 
     if (clearOldData) {
         qDebug() << "deleting data first ... this can take a fair while as the database triggers run";
-        QSqlQuery cleanupQuery;
-        cleanupQuery.prepare("delete from deviceChannels where channel in (select id from channels where partner = :partner);");
+        QSqlQuery cleanupQuerystore;
+        cleanupQuery.prepare("delete from storeChannels where channel in (select id from channels where partner = :partner);");
         cleanupQuery.bindValue(":partner", m_partnerId);
         cleanupQuery.exec();
         cleanupQuery.prepare("delete from channels where partner = :partner;");
@@ -301,12 +301,12 @@ void Database::writeChannels(const Catalog &catalog)
     QSqlDatabase::database().commit();
 }
 
-void Database::writeDeviceChannels(const Catalog &catalog)
+void Database::writeStoreChannels(const Catalog &catalog)
 {
     QSqlQuery checkQuery;
-    checkQuery.prepare("select channel from deviceChannels where device = 'VIVALDI-1' and channel = :channelId");
+    checkQuery.prepare("select channel from storeChannels where store = 'VIVALDI-1' and channel = :channelId");
     QSqlQuery writeQuery;
-    writeQuery.prepare("insert into deviceChannels (device, channel) "
+    writeQuery.prepare("insert into storeChannels (store, channel) "
                   "values ('VIVALDI-1', :channelId);");
 
     QHash<QString, int>::const_iterator itr;

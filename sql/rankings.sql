@@ -11,7 +11,15 @@ create table collections
 -- drop table collectionsContent;
 create table collectionsContent
 (
-   collection   int             not null references collections(id) on delete cascade,
-   asset        int             not null references assets(id) on delete cascade,
-   dateAdded    timestamp       not null default (current_timestamp AT TIME ZONE 'UTC')
+    collection   int             not null references collections(id) on delete cascade,
+    asset        int             not null references assets(id) on delete cascade,
+    dateAdded    timestamp       not null default (current_timestamp AT TIME ZONE 'UTC')
+);
+
+-- drop table featuredCollections;
+create table featuredCollections
+(
+    collection  int         not null references collection(id) on default cascade,
+    device      text        not null references devices(partNumber) on delete cascade,
+    channel     int         references channels(id) on delete cascade
 );
