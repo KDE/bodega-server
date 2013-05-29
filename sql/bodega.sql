@@ -134,6 +134,7 @@ create table assets
 
 -- we sort by name in listings, and this gives us a precomputed ordering
 create index idx_asset_names on assets (name);
+create index idx_asset_authors on assets (author);
 
 create table assetTags
 (
