@@ -39,7 +39,7 @@ describe('Stats', function(){
         });
 
  
-        it('stats without asset numbers', function(done){
+        it('Points stats without asset numbers', function(done){
             utils.getUrl(
                 server,
                 '/bodega/v1/json/stats/assets',
@@ -69,7 +69,7 @@ describe('Stats', function(){
                 cookie);
         });
 
-        it('stats with one asset number', function(done){
+        it('Points stats with one asset number', function(done){
             var query = {
                 assets: [3]
             }
@@ -96,9 +96,50 @@ describe('Stats', function(){
                 cookie);
         });
 
-        it('stats with four asset numbers', function(done){
+        it('Points stats with four asset numbers', function(done) {
             var query = {
                 assets: [2,3,4,7]
+            }
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('stats');
+                    var expected = {
+                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z"],
+                        asset2: [0, 190, 0, 0],
+                        asset3: [1425, 280, 280, 0],
+                        asset4: [180, 0, 0, 0],
+                        asset7: [0, 0, 0, 0]
+                    }
+
+                    //res.body.stats.length.should.equal(2)
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
+
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.asset2.should.be.eql(expected.asset2[i]);
+                        stats.asset3.should.be.eql(expected.asset3[i]);
+                        stats.asset4.should.be.eql(expected.asset4[i]);
+                        stats.asset7.should.be.eql(expected.asset7[i]);
+                    }
+                    done();
+                },
+                cookie);
+        });
+
+
+
+        //Downloads
+        it('Downloads stats with four asset numbers', function(done) {
+            var query = {
+                assets: [2,3,4,7],
+                metric: "downloads"
             }
             utils.getUrl(
                 server,
