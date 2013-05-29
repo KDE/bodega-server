@@ -7,4 +7,5 @@ server/public/images/*/*/*
 server/config.json
 server/node_modules
 server/incoming/[0-9]*
+server/bodega*log
 sql/updates/completed
