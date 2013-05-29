@@ -18,9 +18,16 @@
 var utils = require('./lib/utils.js');
 var errors = require('./lib/errors.js');
 
+function anonBrowsing(req, res, next)
+{
+    req.preAuth = app.config.anonAccess &&
+                  app.config.anonAccess.browsing === true;
+    next();
+}
+
 function isAuthorized(req, res, next)
 {
-    if (req.session.authorized) {
+    if (req.preAuth === true || req.session.authorized) {
         next();
     } else {
         errors.report("Unauthorized", req, res);
@@ -40,10 +47,18 @@ app.get(serverPath('auth'), function(req, res) {
     res.header(
         'Cache-Control',
         "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0");
-    if (req.query.auth_user &&
-        req.query.auth_password &&
-        utils.authStore(req)) {
-        app.db.authorize(req, res);
+    var store = utils.authStore(req);
+    if (store) {
+        if (req.query.auth_user &&
+            req.query.auth_password) {
+            app.db.authorize(req, res);
+        } else {
+            if (!req.session.user) {
+                var user = { "store": store };
+                req.session.user = user;
+            }
+            res.json(utils.standardJson(req));
+        }
     } else {
         errors.report('MissingParameters', req, res);
     }
@@ -70,30 +85,29 @@ app.get(serverPath('register/confirm'), function(req, res) {
 
 //********************************
 // Store listing
-app.get(serverPath('channels'), isAuthorized, function(req, res) {
+app.get(serverPath('channels'), anonBrowsing, isAuthorized, function(req, res) {
     //console.log(req.query);
     app.db.listChannels(req, res);
 });
 
-app.get(serverPath('channel/:parentChannel'), isAuthorized,
+app.get(serverPath('channel/:parentChannel'), anonBrowsing, isAuthorized,
         function(req, res) {
-            //console.log(req.query);
             app.db.listChannels(req, res);
         });
 
-app.get(serverPath('asset/:assetId'), isAuthorized,
+app.get(serverPath('asset/:assetId'), anonBrowsing, isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.assetInfo(req, res);
         });
 
-app.get(serverPath('featured'), isAuthorized,
+app.get(serverPath('featured'), anonBrowsing, isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.listFeatured(req, res);
         });
 
-app.get(serverPath('search'), isAuthorized,
+app.get(serverPath('search'), anonBrowsing, isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.search(req, res);
