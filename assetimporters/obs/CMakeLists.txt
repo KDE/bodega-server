@@ -6,7 +6,7 @@ include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
 set(packagesimport_SRCS
     packagecatalog.cpp
     packagedatabase.cpp
-    ../database-common/channelscatalog.cpp
+    channelscatalog.cpp
     ../database-common/database.cpp
     main.cpp
    )

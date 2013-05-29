@@ -17,7 +17,6 @@
 
 #include "database.h"
 
-
 #include <QFileInfo>
 #include <QHash>
 #include <QLocale>
@@ -29,21 +28,13 @@
 
 #include <QDebug>
 
-Database::Database(const QString &channelsCatalogPath)
+Database::Database(const QString &contentPath)
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
       m_authorTagId(0),
       m_categoryTagId(0),
-      m_licenseId(0),
-      m_contributorTagId(0),
-      m_createdTagId(0),
-      m_mimetypeTagId(0),
-      m_channelsCatalog(channelsCatalogPath)
+      m_contentPath(contentPath)
 {
-    //FIXME: fix to LGPL
-    m_licenseId = 2;
-    //Fix to KDE
-    m_partnerId = 1;
     //db.setHostName("localhost");
     m_db.setDatabaseName("bodega");
     m_db.setUserName("bodega");
@@ -54,19 +45,10 @@ Database::Database(const QString &channelsCatalogPath)
 
 void Database::writeInit(bool clearOldData)
 {
+    m_partnerId = partnerId();
+
     QSqlDatabase::database().transaction();
-/*
-    m_partnerId = partnerQuery();
-    if (m_partnerId <= 0) {
-        QSqlQuery query;
-        if (!query.exec("insert into partners (name, developer, distributor) "
-                        "values ('Project Gutenberg', false, true);")) {
-            showError(query);
-            QSqlDatabase::database().rollback();
-            return;
-        }
-        m_partnerId = partnerQuery();
-    }*/
+
     m_authorTagId = this->authorTagId();
     if (!m_authorTagId) {
         QSqlDatabase::database().rollback();
@@ -79,48 +61,52 @@ void Database::writeInit(bool clearOldData)
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
-    m_mimetypeTagId = this->mimetypeTagId();
-    if (!m_mimetypeTagId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create mimeType tag id");
-        return;
-    }
-
-    writeDeviceChannels();
 
     QSqlDatabase::database().commit();
+
+    if (clearOldData) {
+        qDebug() << "deleting data first ... this can take a fair while as the database triggers run";
+        QSqlQuery cleanupQuery;
+        cleanupQuery.prepare("delete from deviceChannels where channel in (select id from channels where partner = :partner);");
+        cleanupQuery.bindValue(":partner", m_partnerId);
+        cleanupQuery.exec();
+        cleanupQuery.prepare("delete from channels where partner = :partner;");
+        cleanupQuery.bindValue(":partner", m_partnerId);
+        cleanupQuery.exec();
+        cleanupQuery.prepare("delete from assets where author = :partner;");
+        cleanupQuery.bindValue(":partner", m_partnerId);
+        cleanupQuery.exec();
+    }
 }
 
-
-void Database::writeChannels()
+int Database::writeChannels(const QString &name, const QString &description, const QString& image, int parentId)
 {
     QSqlDatabase::database().transaction();
 
-    foreach (const Channel &channel, m_channelsCatalog.channels()) {
-        int id = channelId(channel.name, channel.description, channelId(channel.parent, QString()));
-        if (!id) {
-            QSqlDatabase::database().rollback();
-            return;
-        }
-        m_extraChannelIds.insert(channel.name, id);
+    int id = channelId(name, description,parentId);
 
-        QSqlQuery query;
-        query.prepare("update channels set image = :image where id = :channelId;");
-        query.bindValue(":image", channel.image);
-        query.bindValue(":channelid", id);
-        if (!query.exec()) {
-            showError(query);
-            QSqlDatabase::database().rollback();
-            return;
-        }
+    if (!id) {
+        QSqlDatabase::database().rollback();
+        return 0;
+    }
 
-        writeChannelTags(channel.name, channel.mimeType, channel.description);
+    QSqlQuery query;
+    query.prepare("update channels set image = :image where id = :channelId;");
+    query.bindValue(":image", image);
+    query.bindValue(":channelid", id);
+
+    if (!query.exec()) {
+        showError(query);
+        QSqlDatabase::database().rollback();
+        return 0;
     }
 
     QSqlDatabase::database().commit();
+
+    return id;
 }
 
-void Database::writeDeviceChannels()
+void Database::writeDeviceChannels(int channelId)
 {
     QSqlQuery query;
 
@@ -128,35 +114,43 @@ void Database::writeDeviceChannels()
                   "values ('VIVALDI-1', :channelId);");
 
 
-    QHash<QString, int>::const_iterator itr;
-    for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
-         ++itr) {
-        int channelId = itr.value();
-
-        query.bindValue(":channelId", channelId);
-        if (!query.exec()) {
-            showError(query);
-            return;
-        }
-    }
-
-    for (itr = m_extraChannelIds.constBegin();
-         itr != m_extraChannelIds.constEnd();
-         ++itr) {
-        int channelId = itr.value();
-
-        query.bindValue(":channelId", channelId);
-        if (!query.exec()) {
-            showError(query);
-            return;
-        }
+    query.bindValue(":channelId", channelId);
+    if (!query.exec()) {
+        showError(query);
+        return;
     }
 }
-
 
 int Database::authorQuery(const QString &author) const
 {
     return tagQuery(m_authorTagId, author);
+}
+
+int Database::partnerId()
+{
+    QSqlQuery query;
+    query.prepare("select id from partners "
+                  "where name = 'KDE'");
+    if (!query.exec() || !query.first()) {
+        showError(query);
+        return 0;
+    }
+
+    return query.value(0).toInt();
+}
+
+int Database::licenseId()
+{
+    QSqlQuery query;
+
+    query.prepare("select id from licenses "
+                  "where name = 'LGPL'");
+    if (!query.exec() || !query.first()) {
+        showError(query);
+        return 0;
+    }
+
+    return query.value(0).toInt();
 }
 
 int Database::tagQuery(int tagTypeId, const QString &text) const
@@ -375,7 +369,7 @@ int Database::mimetypeTagId()
 
 int Database::channelId(const QString &name,
                         const QString &description,
-                        int parentId )
+                        int parentId)
 {
     if (name.isEmpty()) {
         return 0;
@@ -393,7 +387,6 @@ int Database::authorId(const QString &author)
 {
     return tagId(m_authorTagId, author, &m_authorIds);
 }
-
 
 int Database::tagId(int tagTypeId, const QString &text,
                     QHash<QString, int> *cache)
@@ -432,13 +425,14 @@ int Database::tagId(int tagTypeId, const QString &text,
 }
 
 int Database::writeAsset(QSqlQuery query, const QString &name, const QString &description,
+                         int licenseId, int partnerId,
                          const QString &version, const QString &path, const QString &file,
                          const QString &externid, const QString &imagePath)
 {
     query.bindValue(":name", name);
     query.bindValue(":description", description);
-    query.bindValue(":license", m_licenseId);
-    query.bindValue(":author", m_partnerId);
+    query.bindValue(":license", licenseId);
+    query.bindValue(":author", partnerId);
     query.bindValue(":version", version);
     query.bindValue(":path", path);
     query.bindValue(":file", file);
@@ -446,6 +440,8 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
     query.bindValue(":image", imagePath);
     // XXX figure out what to do about descriptions
     //query.bindValue(":description",);
+
+    query.bindValue(":size", QFile(m_contentPath + '/' + file).size());
 
     if (!query.exec()) {
         showError(query);
@@ -460,7 +456,7 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
 }
 
 //TODO: more tag types?
-void Database::writeAssetTags(int assetId, const QString &mimeType, const QString &author)
+void Database::writeAssetTags(int assetId, int tagId)
 {
     QSqlQuery query;
     query.prepare("insert into assetTags "
@@ -469,38 +465,41 @@ void Database::writeAssetTags(int assetId, const QString &mimeType, const QStrin
                   "(:assetId, :tagId);");
 
     query.bindValue(":assetId", assetId);
-    query.bindValue(":tagId", this->authorId(author));
-    if (!query.exec()) {
-        showError(query);
-    }
-
-    query.bindValue(":assetId", assetId);
-    int mimetypeId = tagId(m_mimetypeTagId,
-                           mimeType,  &m_mimetypeIds);
-    query.bindValue(":tagId", mimetypeId);
+    query.bindValue(":tagId", tagId);
     if (!query.exec()) {
         showError(query);
     }
 }
 
-void Database::writeChannelTags(const QString &name, const QString &mimeType, const QString &description)
+
+void Database::writeAssetTags(int assetId, QVariant &tagId)
 {
+    writeAssetTags(assetId, tagId.toInt());
+}
+
+void Database::writeChannelTags(int channelId, int tagId)
+{
+    QSqlQuery checkQuery;
+    checkQuery.prepare("select * from channelTags where channel = :channel and tag = :tagId;");
+    checkQuery.bindValue(":channelId", channelId);
+    checkQuery.bindValue(":tagId", tagId);
+
+    if (checkQuery.exec() && checkQuery.first()) {
+        // tag already exists, don't make it again
+        return;
+    }
     QSqlQuery query;
     query.prepare("insert into channelTags "
                   "(channel, tag) "
                   "values "
                   "(:channelId, :tagId);");
 
-    int mimetypeId = tagId(m_mimetypeTagId,
-                           mimeType,  &m_mimetypeIds);
-    int wallpapersChannel = channelId(name, description);
+    query.bindValue(":channelId", channelId);
+    query.bindValue(":tagId", tagId);
 
-    query.bindValue(":channelId", wallpapersChannel);
-    query.bindValue(":tagId", mimetypeId);
     if (!query.exec()) {
         showError(query);
     }
-
 }
 
 int Database::showError(const QSqlQuery &query) const

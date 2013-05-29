@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -25,7 +25,8 @@
 PackageDatabase::PackageDatabase(const QString &channelsCatalogPath,
                                  const QString &packageCatalogPath,
                                  const QString &packageDescPath)
-    : Database(channelsCatalogPath),
+    : Database(packageDescPath),
+      m_channelsCatalog(channelsCatalogPath),
       m_catalog(PackageCatalog(packageCatalogPath)),
       m_packageDescPath(packageDescPath)
 {
@@ -34,8 +35,7 @@ PackageDatabase::PackageDatabase(const QString &channelsCatalogPath,
 void PackageDatabase::write(bool clearOldData)
 {
     writeInit(clearOldData);
-    writeChannels();
-    writeDeviceChannels();
+    writePackageChannels();
     writePackages();
 }
 
@@ -69,10 +69,11 @@ void PackageDatabase::writePackages()
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, description, license, author, version, path, file, externid, image) "
+                  "(name, description, license, author, version, path, file, externid, image, size) "
                   "values "
-                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image) "
+                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image, :size) "
                   "returning id;");
+    QHash<QString, int> mimetypeIds;
 
     for (itr = packages.constBegin(); itr != packages.constEnd(); ++itr) {
         const Package &package = *itr;
@@ -93,14 +94,18 @@ void PackageDatabase::writePackages()
         file.close();
 
         //TODO: check if the image exists
-        int assetId = writeAsset(query, package.name, package.description, package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
+        int assetId = writeAsset(query, package.name, package.description, licenseId(), partnerId(), package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
         if (!assetId) {
             showError(query);
             QSqlDatabase::database().rollback();
             return;
         }
 
-        writeAssetTags(assetId, package.mimeType, package.author);
+        int author = authorId(package.author);
+        writeAssetTags(assetId, author);
+
+        int mimetypeId = tagId(mimetypeTagId(), package.mimeType, &mimetypeIds);
+        writeAssetTags(assetId, mimetypeId);
 
         foreach (const QString &channel, package.channels) {
             //FIXME: assumes the channel already exists
@@ -119,7 +124,7 @@ void PackageDatabase::writePackages()
                 QSqlDatabase::database().rollback();
                 return;
             }
-            
+
 
             QSqlQuery channelassetQuery;
             channelassetQuery.prepare("insert into channelassets "
@@ -159,3 +164,20 @@ void PackageDatabase::writePackages()
 
     qDebug()<<"Writing took "<<elapsed / 1000. << " secs.";
 }
+
+void PackageDatabase::writePackageChannels()
+{
+    foreach (const Channel &c, m_channelsCatalog.channels()) {
+        writeChannels(c.name, c.description, c.image, c.parent.toInt());
+
+        const int chanId = channelId(c.name, c.description, c.parent.toInt());
+        const int mime = mimetypeTagId();
+        QHash<QString, int> mimetypeIds;
+        const int mimetypeId = tagId(mime, c.mimeType, &mimetypeIds);
+
+        writeChannelTags(chanId, mimetypeId);
+
+        writeDeviceChannels(chanId);
+    }
+}
+

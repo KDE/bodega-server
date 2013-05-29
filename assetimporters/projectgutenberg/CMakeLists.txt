@@ -1,2 +1,2 @@
 project(gutimport)
-subdirs(src)
+add_subdirectory(src)

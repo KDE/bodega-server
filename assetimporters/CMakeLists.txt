@@ -3,3 +3,4 @@ find_package(Qt4 REQUIRED)
 
 add_subdirectory(projectgutenberg)
 add_subdirectory(kdeartwork-wallpapers)
+add_subdirectory(obs)

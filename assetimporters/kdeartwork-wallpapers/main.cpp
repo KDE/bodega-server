@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -15,22 +15,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "database.h"
-#include "catalog.h"
+#include "kdewallpapersdatabase.h"
 
 #include <QtCore>
-
 
 int main(int argc, char **argv)
 {
     if (argc < 2) {
         qWarning() << "Usage:";
-        qWarning() << "\t"<< argv[0] << "uncompressed wallpapers dir";
+        qWarning() << "\t"<< argv[0] << "<uncompressed wallpapers dir>";
         exit(1);
     }
 
-    Catalog catalog(argv[1]);
-
     //TODO: make the write delete the data based on a command line switch
-    Database::write(catalog, false);
+    WallpapersDatabase::write(argv[1], false);
 }

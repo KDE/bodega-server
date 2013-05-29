@@ -4,31 +4,35 @@
 #include <QHash>
 #include <QSqlDatabase>
 
-#include "channelscatalog.h"
+//#include "channelscatalog.h"
 
 class Database
 {
 
 public:
-    Database(const QString &channelsCatalogPath);
+    Database(const QString &contentPath);
 
 protected:
     void writeInit(bool clearOldData);
-    void writeDeviceChannels();
+    void writeDeviceChannels(int channelId);
     int writeAsset(QSqlQuery query, const QString &name, const QString &description,
+                   int licenseId, int partnerId,
                    const QString &version,
                    const QString &path, const QString &file,
                    const QString &externid, const QString &imagePath);
-    void writeAssetTags(int assetId, const QString &mimeType, const QString &author);
+    void writeAssetTags(int assetId, int tagId);
+
+    void writeAssetTags(int assetId, QVariant &tagId);
+
     int showError(const QSqlQuery &query) const;
     int channelId(const QString &name,
                   const QString &description,
                   int parentId=0);
-    void writeChannels();
+    int writeChannels(const QString &name, const QString &description, const QString& image, int parentId = 0);
 
-private:
-    int partnerQuery() const;
-    int languageQuery(const QString &lang) const;
+    virtual int partnerId();
+    virtual int licenseId();
+
     int authorQuery(const QString &author) const;
     int contributorQuery(const QString &author) const;
     int tagQuery(int tagTypeId, const QString &text) const;
@@ -37,14 +41,12 @@ private:
                      int parentId) const;
     int categoryQuery(const QString &name) const;
 
-private:
     int tagTypeCreate(const QString &type);
     int channelCreate(const QString &name,
                       const QString &description,
                       int parentId=0);
     int categoryCreate(const QString &name);
 
-private:
     int authorTagId();
     int categoryTagTypeId();
     int contributorTagId();
@@ -56,7 +58,7 @@ private:
     int contributorId(const QString &contributor);
     int tagId(int tagTypeId, const QString &text,
               QHash<QString, int> *cache);
-    void writeChannelTags(const QString &name, const QString &mimeType, const QString &description);
+    void writeChannelTags(int channelId, int tagId);
     int createLicenseId();
 
 private:
@@ -64,18 +66,9 @@ private:
     int m_partnerId;
     int m_authorTagId;
     int m_categoryTagId;
-    int m_licenseId;
-    int m_contributorTagId;
-    int m_createdTagId;
-    int m_mimetypeTagId;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;
-    QHash<QString, int> m_categoryTagIds;
-    QHash<QString, int> m_contributorIds;
-    QHash<QString, int> m_extraChannelIds;
-    QHash<QString, int> m_mimetypeIds;
-    QHash<QString, int> m_createdIds;
-    ChannelsCatalog m_channelsCatalog;
+    QString m_contentPath;
 };
 
 
