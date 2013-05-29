@@ -18,16 +18,21 @@
 var server = require('../app.js');
 var utils = require('./support/http');
 
+var authedBrowsing = !(app.config.anonAccess && app.config.anonAccess.browsing === true);
+console.log("Testing with " + (authedBrowsing ? "authenticated" : "anonymous" ) + " browsing");
+
 describe('Listing', function(){
     var cookie;
     var gamesChannelId;
     var cardsChannelId;
     var cardsChannelResponse;
-    describe('needs to authorize first', function(){
+
+    describe(authedBrowsing ? 'needs to authenticate first' : 'needs to create a session', function(){
         it('authorize correctly.', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
+                authedBrowsing ? '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1' :
+                                 '/bodega/v1/json/auth?auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -35,7 +40,9 @@ describe('Listing', function(){
                         'application/json; charset=utf-8');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     done();
                 });
         });
@@ -51,7 +58,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('channels');
                     var channels = res.body.channels;
                     channels.length.should.be.above(0);
@@ -76,7 +85,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('channels');
                     var channels = res.body.channels;
                     channels.length.should.be.within(1, 25);
@@ -101,7 +112,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('assets');
                     Object.keys(res.body.assets).length.should.be.within(1, 25);
                     cardsChannelResponse = res.body;
@@ -123,7 +136,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('assets');
                     Object.keys(res.body.assets).length.should.be.equal(1);
                     --runningTests;
@@ -140,7 +155,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('assets');
                     Object.keys(res.body.assets).length.should.be.equal(10);
                     --runningTests;
@@ -157,7 +174,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('assets');
                     Object.keys(res.body.assets).length.should.be.equal(21);
                     --runningTests;
@@ -180,7 +199,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('assets');
                     res.body.should.be.eql(cardsChannelResponse);
                     done();
@@ -198,7 +219,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('assets');
                     var assets = res.body.assets;
                     assets.length.should.be.equal(10);
@@ -217,7 +240,9 @@ describe('Listing', function(){
                     res.headers.should.have.property(
                         'content-type',
                         'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
+                    if (authedBrowsing) {
+                        res.body.should.have.property('authStatus', true);
+                    }
                     res.body.should.have.property('assets');
                     var assets = res.body.assets;
                     assets.length.should.be.equal(10);
