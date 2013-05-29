@@ -21,11 +21,12 @@ var fs = require('fs');
 var https = require('https');
 var http = require('http');
 var app = module.exports = express();
+var argv = require('optimist').argv;
 
 GLOBAL.app = app;
-app.config = JSON.parse(fs.readFileSync(('./config.json'), 'utf8'));
+app.config = JSON.parse(fs.readFileSync(argv.config ? argv.config : './config.json', 'utf8'));
 
-if (app.settings.env === 'production') {
+if (argv.production) {
     app.config.stripe.secretKey = app.config.stripe.liveSecretKey;
 } else {
     app.config.stripe.secretKey = app.config.stripe.testSecretKey;

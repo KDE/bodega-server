@@ -13,7 +13,8 @@
         "mime" : ">= 1.2.5",
         "validator" : ">= 0.4.5",
         "stripe" : "latest",
-        "async" : "latest"
+        "async" : "latest",
+        "optimist" : "latest"
     },
     "devDependencies": {
         "mocha": ">= 0.12.1",
