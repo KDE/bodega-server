@@ -32,7 +32,6 @@ var dbHistory = require('./db/history.js');
 var dbResetRequest = require('./db/resetrequest.js');
 var dbResetConfirm = require('./db/resetconfirm.js');
 var dbDownload = require('./db/download.js');
-var dbUpload = require('./db/upload.js');
 var dbCollections = require('./db/collections.js');
 var dbPurchaseAsset = require('./db/purchaseAsset.js');
 var dbHunt = require('./db/easterEggHunt.js');
