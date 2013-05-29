@@ -65,7 +65,7 @@ var ErrorType = {
     "UploadInvalidJson"      : 42, //asset info data was malformed
     "UploadTagError"         : 43, //one of the required tags is missing
     "UploadPreviewError"     : 44, //the asset is missing a preview
-    "UploadIconError"        : 45 //the asset is missing an icon
+    "UploadIconError"        : 45, //the asset is missing an icon
 
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
     "StorePartnerInvalid"    : 61,//the partner provided is incorrect
