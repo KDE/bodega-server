@@ -44,43 +44,32 @@ app.contentPartner = new ContentPartner();
 
 // We don't want an exception to kill our app, but we don't want
 //   to intercept exception in tests or during dev testing
-if (app.settings.env === 'production') {
+if (argv.production) {
+    app.use(express.errorHandler());
     process.on('uncaughtException', function(err) {
         console.log("Uncaught exception: ");
         console.log(err);
         console.log(err.stack);
     });
+} else {
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 }
 
 // Configuration
-app.configure(function() {
-    //app.use(express.logger());
-    app.use(express.static(__dirname + '/public'));
-    app.use(express.bodyParser());
-    app.use(express.cookieParser());
-    app.use(express.session({ secret: "love cookies",
-                              store: new RedisStore(app.config.redis) }));
-    app.use(app.router);
-    app.set('views', __dirname + '/views');
+//app.use(express.logger());
+app.use(express.static(__dirname + '/public'));
+app.use(express.bodyParser());
+app.use(express.cookieParser());
+app.use(express.session({ secret: app.config.cookieSecret ? app.config.cookieSecret : "love cookies",
+                          store: new RedisStore(app.config.redis) }));
+app.use(app.router);
+app.set('views', __dirname + '/views');
 
-    app.use(function(req, res, next) {
-        res.render('404.jade', {
-            storeName: app.config.storeInfo.name,
-            storeUrl: app.config.storeInfo.url
-        });
+app.use(function(req, res, next) {
+    res.render('404.jade', {
+        storeName: app.config.storeInfo.name,
+        storeUrl: app.config.storeInfo.url
     });
-});
-
-app.configure('development', function() {
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
-
-app.configure('test', function() {
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
-
-app.configure('production', function() {
-    app.use(express.errorHandler());
 });
 
 require('./routes.js');
@@ -101,4 +90,4 @@ var host = app.config.host ? app.config.host : null;
 app.server.listen(port, host);
 
 console.log("Bodega server listening on %s%d in %s mode",
-            host ? host + ':' : '', port, app.settings.env);
+            host ? host + ':' : '', port, argv.production ? "production" : "devel");
