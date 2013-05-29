@@ -183,4 +183,23 @@ INSERT INTO purchases VALUES (5, 3, 'aseigo@kde.org', 4, 'VIVALDI-1', 'diamond',
 INSERT INTO purchases VALUES (6, 3, 'aseigo@kde.rog', 3, 'VIVALDI-1', 'dice', 300, 280, 15, '2013-06-02 01:02:03');
 INSERT INTO purchases VALUES (7, 4, 'mart@kde.org', 3, 'VIVALDI-1', 'dice', 300, 280, 15, '2013-07-02 01:02:03');
 INSERT INTO purchases VALUES (8, 4, 'mart@kde.org', 2, 'VIVALDI-1', 'aquarium', 200, 190, 5, '2013-06-10 09:10:11');
+
+
+--downloads sample data for the statistics test
+INSERT INTO downloads VALUES (3, 2, '2013-05-26 00:00:00', 'VIVALDI-1', '45.46.47.48', 'dice', 1);
+INSERT INTO downloads VALUES (3, 3, '2013-05-26 01:00:00', 'VIVALDI-1', '58.59.56.61', 'dice', 1);
+INSERT INTO downloads VALUES (3, 4, '2013-05-26 02:00:00', 'VIVALDI-1', '67.68.69.70', 'dice', 1);
+INSERT INTO downloads VALUES (4, 2, '2013-05-25 13:26:00', 'VIVALDI-1', '45.46.47.48', 'diamond', 1);
+INSERT INTO downloads VALUES (4, 3, '2013-05-25 09:35:24', 'VIVALDI-1', '58.59.56.61', 'diamond', 1);
+INSERT INTO downloads VALUES (3, 3, '2013-06-02 01:02:03', 'VIVALDI-1', '58.59.56.61', 'dice', 1);
+INSERT INTO downloads VALUES (3, 4, '2013-07-02 01:02:03', 'VIVALDI-1', '67.68.69.70', 'dice', 1);
+INSERT INTO downloads VALUES (2, 4, '2013-06-10 09:10:11', 'VIVALDI-1', '67.68.69.70', 'aquarium', 1);
+
+INSERT INTO downloads VALUES (3, 2, '2013-05-26 02:00:00', 'VIVALDI-1', '45.46.47.48', 'dice', 1);
+INSERT INTO downloads VALUES (3, 3, '2013-05-27 03:00:00', 'VIVALDI-1', '58.59.56.61', 'dice', 1);
+INSERT INTO downloads VALUES (3, 4, '2013-05-29 12:00:00', 'VIVALDI-1', '67.68.69.70', 'dice', 1);
+INSERT INTO downloads VALUES (4, 3, '2013-06-12 19:35:24', 'VIVALDI-1', '58.59.56.61', 'diamond', 1);
+INSERT INTO downloads VALUES (3, 3, '2013-07-23 11:02:03', 'VIVALDI-1', '58.59.56.61', 'dice', 1);
+INSERT INTO downloads VALUES (3, 4, '2013-09-30 22:02:03', 'VIVALDI-1', '67.68.69.70', 'dice', 1);
+INSERT INTO downloads VALUES (2, 4, '2013-10-01 23:10:11', 'VIVALDI-1', '67.68.69.70', 'aquarium', 1);
 --end;
