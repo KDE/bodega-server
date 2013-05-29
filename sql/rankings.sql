@@ -19,7 +19,7 @@ create table collectionsContent
 -- drop table featuredCollections;
 create table featuredCollections
 (
-    collection  int         not null references collection(id) on default cascade,
-    device      text        not null references devices(partNumber) on delete cascade,
+    collection  int         not null references collections(id) on delete cascade,
+    store      text        not null references stores(id) on delete cascade,
     channel     int         references channels(id) on delete cascade
 );
