@@ -29,7 +29,7 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
     db.writeCategoryTags(catalog);
     db.writeBooks(catalog);
     db.writeBookChannels(catalog);
-    db.writeBookDeviceChannels(catalog);
+    db.writeBookStoreChannels(catalog);
 }
 
 GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
@@ -219,14 +219,14 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
     writeBookChannelTags();
 }
 
-void GutenbergDatabase::writeBookDeviceChannels(const Catalog &catalog)
+void GutenbergDatabase::writeBookStoreChannels(const Catalog &catalog)
 {
     QHash<QString, int>::const_iterator itr;
     for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
          ++itr) {
         const int channelId = itr.value();
 
-        writeDeviceChannels(channelId);
+        writeStoreChannels(channelId);
     }
 
     for (itr = m_extraChannelIds.constBegin();
@@ -234,7 +234,7 @@ void GutenbergDatabase::writeBookDeviceChannels(const Catalog &catalog)
          ++itr) {
         const int channelId = itr.value();
 
-        writeDeviceChannels(channelId);
+        writeStoreChannels(channelId);
     }
 }
 

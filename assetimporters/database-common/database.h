@@ -14,7 +14,7 @@ public:
 
 protected:
     void writeInit(bool clearOldData);
-    void writeStoreeChannels();
+    void writeStoreChannels(int channelId);
     int writeAsset(QSqlQuery query, const QString &name, const QString &description,
                    int licenseId, int partnerId,
                    const QString &version,

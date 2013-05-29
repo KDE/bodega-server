@@ -106,7 +106,7 @@ int Database::writeChannels(const QString &name, const QString &description, con
     return id;
 }
 
-void Database::writeStoreChannels()
+void Database::writeStoreChannels(int channelId)
 {
     QSqlQuery query;
 

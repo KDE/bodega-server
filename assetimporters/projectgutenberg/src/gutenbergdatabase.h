@@ -24,7 +24,7 @@ private:
     void writeCategoryTags(const Catalog &catalog);
     void writeBooks(const Catalog &catalog);
     void writeBookChannels(const Catalog &catalog);
-    void writeBookDeviceChannels(const Catalog &catalog);
+    void writeBookStoreChannels(const Catalog &catalog);
     void writeBookChannelTags();
     int writeBookAsset(const Ebook &book, QSqlQuery &query);
     void writeBookAssetTags(const Ebook &book, int assetId);

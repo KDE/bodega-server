@@ -59,7 +59,7 @@ void WallpapersDatabase::writeWallpaperChannels()
     const int chanId = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
 
     writeWallpapersChannelTags();
-    writeDeviceChannels(chanId);
+    writeStoreChannels(chanId);
 }
 
 void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
