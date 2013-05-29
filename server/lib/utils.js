@@ -80,7 +80,7 @@ module.exports.standardJson = function(req, success)
     } else {
         json.authStatus = false;
         json.device = 0; // V2 deprecated
-        json.store = 0;
+        json.store = req.session.user.store;
         json.points = 0;
     }
 
