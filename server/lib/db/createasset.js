@@ -1,5 +1,5 @@
 /* 
-    Copyright 2012 Coherent Theory LLC
+    Copyright 2013 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -17,37 +17,75 @@
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
+var createUtils = require('./createutils.js');
 var fs = require('fs');
-
+var path = require('path');
 
 function sendResponse(db, req, res, assetInfo)
 {
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        points : req.session.user.points,
-        asset : {
-            id : assetInfo.id,
-            name : assetInfo.name
-        }
+    var json = utils.standardJson(req, true);
+
+    json.asset = {
+        id : assetInfo.id,
+        name : assetInfo.name
     };
     res.send(json);
 }
 
-function setupContent(db, req, res, assetInfo)
+function deleteUpload(db, req, res, path)
 {
-    //upload req.files.previews[i]
-
-    sendResponse(db, req, res, assetInfo);
+    app.assetStore.remove(path, function() {});
 }
 
-function setupPreviews(db, req, res, assetInfo)
+function reportError(db, req, res, assetInfo,
+                     errorType, error)
+{
+    /*
+    var rmQuery =
+            'DELETE FROM incomingAssets WHERE id = $1;';
+
+    db.query(rmQuery, [assetInfo.id],
+             function(err, result){});
+    deleteUpload(db, req, res, assetInfo.incomingPath);
+    */
+    errors.report(errorType, req, res, error);
+}
+
+function setupTags(db, req, res, assetInfo)
+{
+    if (assetInfo.tags) {
+        createUtils.setupTags(
+            db, req, res, assetInfo,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    reportError(db, req, res, assetInfo,
+                               'UploadTagError', err);
+                    return;
+                }
+                sendResponse(db, req, res, assetInfo);
+            });
+    } else {
+        sendResponse(db, req, res, assetInfo);
+    }
+}
+
+function setupPreviews(db, req, res, assetInfo, fn)
 {
     var i;
-    for (i = 0; i < assetInfo.length; ++i) {
-        //upload req.files.previews[i]
+    if (assetInfo.previews) {
+        createUtils.setupPreviews(
+            db, req, res, assetInfo,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    reportError(db, req, res, assetInfo,
+                               'UploadPreviewError', err);
+                    return;
+                }
+                setupTags(db, req, res, assetInfo);
+            });
+    } else {
+        setupTags(db, req, res, assetInfo);
     }
-    setupContent();
 }
 
 
@@ -62,30 +100,86 @@ function setupIcons(db, req, res, assetInfo)
     //   req.files.icons.large
     //   req.files.icons.huge
 
-    setupPreviews(db, res, res, assetInfo);
+    setupPreviews(db, req, res, assetInfo);
 }
 
 
-function setupAsset(db, req, res, assetInfo)
+function recordAsset(db, req, res, assetInfo)
 {
-    var insertQuery =
-        'INSERT INTO assets (license, author, basePrce, externId, name, \
-          description, version, path, image) \
-         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id;';
+    var file = req.files.asset;
+    var incomingPath = assetInfo.incomingPath;
+    var newAssetQuery = 'insert into incomingAssets (id, license, author, baseprice, name, description, version, path, file) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
+    db.query(newAssetQuery,
+             [assetInfo.id, assetInfo.license, assetInfo.partnerId, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.incomingPath, assetInfo.filename],
+             function(err, result) {
+                 if (err) {
+                     reportError(db, req, res, assetInfo,
+                                 'Database', err);
+                     return;
+                 }
 
-    db.query(
-        insertQuery,
-        [assetInfo.license,  assetInfo.author, assetInfo.basePrce,
-         assetInfo.externId, assetInfo.name,   assetInfo.description,
-         assetInfo.version,  assetInfo.path,   assetInfo.image],
-        function(err, result) {
-            if (err || !result.rows) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-            assetInfo.id = result.rows[0].id;
-            setupIcons(db, req, res, assetInfo);
-        });
+                 setupIcons(db, req, res, assetInfo);
+             });
+}
+
+function storeAsset(db, req, res, assetInfo)
+{
+    db.query("select nextval('seq_assetsids') as assetId;", [],
+             function(err, result) {
+                 var fromFile = req.files.asset.path;
+                 var name = req.files.asset.name;
+                 var filename = path.basename(name) + '-' + assetInfo.version;
+                 assetInfo.id = result.rows[0].assetid;
+                 assetInfo.filename = filename;
+                 //console.log(req.files.asset);
+                 //console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + filename);
+                 app.assetStore.upload(
+                     fromFile, assetInfo.id, filename,
+                     function(err, result) {
+                         if (err) {
+                             //console.log("error due to bad rename?");
+                             reportError(db, req, res, assetInfo,
+                                         'UploadFailed', err);
+                             return;
+                         }
+                         assetInfo.incomingPath = result.path;
+                         recordAsset(db, req, res, assetInfo);
+                     });
+             });
+}
+
+function checkPartner(db, req, res, assetInfo)
+{
+    //console.log("checking " + assetInfo.partnerId + ' ' + req.session.user.id);
+    var partner = assetInfo.partnerId;
+    if (!partner) {
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
+                 [req.session.user.id],
+                 function(err, result) {
+                     if (err || !result.rows || result.rows.length === 0) {
+                         reportError(db, req, res, assetInfo,
+                                     'UploadPartnerInvalid', err);
+                         return;
+                     }
+
+                     assetInfo.partnerId = result.rows[0].partner;
+                     storeAsset(db, req, res, assetInfo);
+                 });
+    } else {
+        //console.log("checking up on partner");
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
+                 [partner, req.session.user.id],
+                 function(err, result) {
+                     if (err || !result.rows || result.rows.length === 0) {
+                         reportError(db, req, res, assetInfo,
+                                     'UploadPartnerInvalid', err);
+                         return;
+                     }
+
+                     //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
+                     storeAsset(db, req, res, assetInfo);
+                 });
+    }
 }
 
 module.exports = function(db, req, res) {
@@ -113,14 +207,13 @@ module.exports = function(db, req, res) {
             assetInfo = null;
         }
 
-        console.log("assetInfo is " + assetInfo);
-        if (!assetInfo) {
+        if (!assetInfo || !assetInfo.partnerId || !assetInfo.file ||
+            assetInfo.id) {
             //"Unable to parse the asset info file.",
-            errors.report('NoMatch', req, res);
+            errors.report('UploadInvalidJson', req, res);
             return;
         }
 
-        console.log(assetInfo);
-        setupAsset(db, req, res, assetInfo);
+        checkPartner(db, req, res, assetInfo);
     });
 };

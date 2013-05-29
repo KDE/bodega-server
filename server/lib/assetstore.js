@@ -16,6 +16,7 @@
 */
 
 var utils = require('./utils.js');
+var errors = require('./errors.js');
 var knox = require('knox');
 var mime = require('mime');
 var fs = require('fs');
@@ -32,34 +33,43 @@ var AssetStore = (function() {
         storageConfig = app.config[storageSystem];
     }
 
-    function localPutStream(req, fn)
+    function localPutStream(fromFile, assetId, filename, fn)
     {
         //console.log("Let the renaming begin!");
-        var assetObj = req.files.asset;
-        var path = process.cwd() + storageConfig.incomingBasePath;
-        var relPath = assetObj.filename;
-        if (assetObj.id) {
-            relPath = assetObj.id + '/' + relPath;
-            path += assetObj.id + '/';
+        var path = process.cwd() + storageConfig.incomingBasePath +
+                assetId;
+        var relPath = assetId + '/' + filename;
+
+        try {
             fs.mkdirSync(path);
+        } catch (err) {
+            if (!fs.existsSync(path)) {
+                fn(err);
+                return;
+            }
         }
-        path += assetObj.filename;
-        //console.log("going to rename " + assetObj.path + " to " + path);
-        fs.rename(assetObj.path, path,
+        path += '/' + filename;
+
+        //console.log("going to rename " + fromFile + " to " + path);
+        fs.rename(fromFile, path,
                   function(err) {
                       var res = { 'path' : relPath };
-                      if (err.code === 'EXDEV') {
-                          // we are apparently moving across partitions, so fallback to copying
-                          var is = fs.createReadStream(assetObj.path);
+                      if (err && err.code === 'EXDEV') {
+                          // we are apparently moving across partitions,
+                          //  so fallback to copying
+                          var is = fs.createReadStream(fromFile);
                           var os = fs.createWriteStream(path);
 
                           is.on('data', function(chunk) { os.write(chunk); })
-                            .on('end', function() { os.end(); fs.unlink(assetObj.path); fn(null, res) } );
+                            .on('end', function() {
+                                os.end();
+                                fs.unlink(fromFile);
+                                fn(null, res);
+                            });
                           return;
                       }
-
                       fn(err, res);
-                    }
+                  }
                  );
     }
 
@@ -84,11 +94,9 @@ var AssetStore = (function() {
         });
     }
 
-    function s3PutStream(req, client, fn)
+    function s3PutStream(fromFile, assetId, filename, client, fn)
     {
-        var assetObj = req.files.asset;
-
-        fs.stat(assetObj.path, function(err, stat) {
+        fs.stat(fromFile, function(err, stat) {
             if (err) {
                 fn(err);
                 return;
@@ -98,9 +106,9 @@ var AssetStore = (function() {
                 return;
             }
 
-            var stream = fs.createReadStream(assetObj.path);
+            var stream = fs.createReadStream(fromFile);
 
-            var s3Req = client.put(assetObj.name, {
+            var s3Req = client.put(assetId+filename, {
                 'Content-Length': stat.size,
                 'Content-Type': mime.lookup(stream.path),
                 'x-amz-acl': 'private'
@@ -222,7 +230,13 @@ var AssetStore = (function() {
         });
     }
 
-    AssetStore.prototype.upload = function (req, fn) {
+    AssetStore.prototype.upload = function(fromFile, assetId, filename, fn) {
+        if (!fromFile || !assetId || !filename) {
+            var err = errors.create('MissingParameters', '');
+            fn(err);
+            return;
+        }
+        
         if (storageSystem === 's3') {
             var client;
 
@@ -232,9 +246,9 @@ var AssetStore = (function() {
                 fn(err);
                 return;
             }
-            s3PutStream(req, client, fn);
+            s3PutStream(fromFile, assetId, filename, client, fn);
         } else {
-            localPutStream(req, fn);
+            localPutStream(fromFile, assetId, filename, fn);
         }
     };
 
@@ -257,34 +271,43 @@ var AssetStore = (function() {
 
     AssetStore.prototype.remove = function(fileUrl, fn) {
         var parsedUrl = url.parse(fileUrl);
-        var client;
 
-        try {
-            client = knox.createClient(storageConfig);
-        } catch (err) {
-            fn(err);
-            return;
-        }
+        if (storageSystem === 's3') {
+            var client;
 
-        var clientReq = client.del(parsedUrl.path);
-        clientReq.on('response', function(downRes) {
-            //console.log("download statusCode: ", downRes.statusCode);
-            //console.log("headers: ", downRes.headers);
-
-            if (downRes.statusCode !== 200 &&
-                downRes.statusCode !== 204) {
-                fn(new Error("File is unavailable. Please try again later."));
+            try {
+                client = knox.createClient(storageConfig);
+            } catch (err) {
+                fn(err);
                 return;
             }
-            fn(null, downRes);
-        });
 
-        clientReq.on('error', function(e) {
-            fn(e);
-            return;
-        });
+            var clientReq = client.del(parsedUrl.path);
+            clientReq.on('response', function(downRes) {
+                //console.log("download statusCode: ", downRes.statusCode);
+                //console.log("headers: ", downRes.headers);
 
-        clientReq.end();
+                if (downRes.statusCode !== 200 &&
+                    downRes.statusCode !== 204) {
+                    fn(new Error("File is unavailable. Please try again later."));
+                    return;
+                }
+                fn(null, downRes);
+            });
+
+            clientReq.on('error', function(e) {
+                fn(e);
+                return;
+            });
+
+            clientReq.end();
+        } else {
+            fs.unlink(parsedUrl.path,
+                      function(err) {
+                          fn(err);
+                          return;
+                      });
+        }
     };
 
     return AssetStore;

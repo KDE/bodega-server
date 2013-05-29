@@ -60,7 +60,11 @@ var ErrorType = {
     "CardProcessingError"    : 39,//error occurred while processing the card
 
     "UploadPartnerInvalid"   : 40,//the authorized user tried to upload without a valid partner id
-    "UploadFailed"           : 41,//the uploading of the file did not succeed
+    "UploadFailed"           : 41, //the uploading of the file did not succeed
+    "UploadInvalidJson"      : 42, //asset info data was malformed
+    "UploadTagError"         : 43, //one of the required tags is missing
+    "UploadPreviewError"     : 44, //the asset is missing a preview
+    "UploadIconError"        : 45 //the asset is missing an icon
 };
 
 module.exports.Type = ErrorType;
@@ -105,4 +109,3 @@ module.exports.report = function(type, req, res, err)
 
     res.json(obj);
 };
-

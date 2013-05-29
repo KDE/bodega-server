@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var server = require('../app.js');
+var app = require('../app.js');
 var utils = require('./support/http');
 
 var mime = require('mime');
@@ -85,8 +85,10 @@ function postFiles(server, url, files, cookie, fn)
 
 describe('Asset creation', function(){
     var cookie;
-    describe('needs to authorize first', function(){
-        it('authorize correctly.', function(done){
+    var incompleteAssetId;
+    var completeAssetId;
+    describe('Authentication', function(){
+        it('should succeed.', function(done){
             var expected = {
                 "userId": 2,
                 "device":"VIVALDI-1",
@@ -102,7 +104,7 @@ describe('Asset creation', function(){
                 }
             };
             utils.getUrl(
-                server,
+                app,
                 '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_device=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -117,43 +119,53 @@ describe('Asset creation', function(){
         });
     });
 
-    describe('Basic fetch', function(){
-        it('should show info for an asset', function(done){
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/asset/16',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('asset');
-                    res.body.asset.should.have.property('id', 16);
-                    res.body.asset.should.have.property('partnerId');
-                    res.body.asset.should.have.property('license');
-                    res.body.asset.should.have.property('version');
-                    res.body.asset.should.have.property('filename');
-                    res.body.asset.should.have.property('image');
-                    res.body.asset.should.have.property('name');
-                    res.body.asset.should.have.property('description');
-                    done();
-                },
-                cookie);
-        });
-        it('should fetch tags', function(done){
-            postFiles(server,
+    describe('Creation', function(){
+        it('allow incomplete assets', function(done){
+            postFiles(app.server,
                     '/bodega/v1/json/create',
                     [{
                         "name" : "info",
-                        "filename" : "mocha.opts"
+                        "filename" : "sampleasset/sample-info-incomplete.json"
                     }, {
-                        "name" : "mocha",
-                        "filename" : "mocha.opts"
+                        "name" : "asset",
+                        "filename" : "sampleasset/sample.pdf"
                     }], cookie,
                       function(res) {
-                          console.log(res.body);
-                          console.log('done');
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          incompleteAssetId = res.body.asset.id;
+                          done();
+                      });
+        });
+        
+        it('of a simple asset', function(done){
+            postFiles(app.server,
+                    '/bodega/v1/json/create',
+                    [{
+                        "name" : "info",
+                        "filename" : "sampleasset/sample-info.json"
+                    }, {
+                        "name" : "asset",
+                        "filename" : "sampleasset/sample.pdf"
+                    },{
+                        "name" : "sample-0.png",
+                        "filename" : "sampleasset/sample-0.png"
+                    },{
+                        "name" : "sample-1.png",
+                        "filename" : "sampleasset/sample-1.png"
+                    },{
+                        "name" : "icon.jpg",
+                        "filename" : "sampleasset/icon.jpg"
+                    }], cookie,
+                      function(res) {
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          res.body.asset.should.have.property('name');
+                          completeAssetId = res.body.asset.id;
                           done();
                       });
         });

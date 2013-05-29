@@ -12,7 +12,8 @@
         "knox" : ">= 0.0.9",
         "mime" : ">= 1.2.5",
         "validator" : ">= 0.4.5",
-        "stripe" : "latest"
+        "stripe" : "latest",
+        "async" : "latest"
     },
     "devDependencies": {
         "mocha": ">= 0.12.1",

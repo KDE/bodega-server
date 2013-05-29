@@ -81,13 +81,6 @@ app.get(serverPath('channel/:parentChannel'), isAuthorized,
             app.db.listChannels(req, res);
         });
 
-app.post(serverPath('create'), isAuthorized,
-         function(req, res) {
-             //console.log(req.query);
-             app.db.createAsset(req, res);
-         });
-
-
 app.get(serverPath('asset/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
@@ -138,12 +131,6 @@ app.get(serverPath('purchase/:assetId'), isAuthorized,
             //console.log(req.query);
             app.db.purchaseAsset(req, res);
         });
-
-app.post(serverPath('upload'), isAuthorized,
-         function(req, res) {
-             //console.log(req.query);
-             app.db.upload(req, res);
-         });
 
 
 //********************************
@@ -246,6 +233,15 @@ app.post(serverPath('participant/resetPassword'),
     }
 );
 
+/************************************************
+ * Asset management
+ */
+app.post(serverPath('create'), isAuthorized,
+         function(req, res) {
+             //console.log(req.query);
+             app.db.createAsset(req, res);
+         });
+
 
 //********************************
 // Static content routes
@@ -259,13 +255,6 @@ app.get('/images/*', function(req, res) {
     res.sendfile(__dirname + '/public' + req.url);
 });
 
-//NOTE: Always has to be the last route
-app.get('/', function(req, res) {
-    res.render('index.jade', {
-        storeName: app.config.storeInfo.name,
-        storeUrl: app.config.storeInfo.url
-    });
-});
 
 app.get('/contact', function(req, res) {
     res.json({
@@ -273,5 +262,14 @@ app.get('/contact', function(req, res) {
         desciption: app.config.storeInfo.desciption,
         url: app.config.storeInfo.url,
         contact: app.config.storeInfo.contact
+    });
+});
+
+
+//NOTE: Always has to be the last route
+app.get('/', function(req, res) {
+    res.render('index.jade', {
+        storeName: app.config.storeInfo.name,
+        storeUrl: app.config.storeInfo.url
     });
 });

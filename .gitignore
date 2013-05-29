@@ -7,3 +7,4 @@ server/public/images/*/*/*
 server/config.json
 server/node_modules
 server/incoming/[0-9]*
+sql/updates/completed

@@ -164,4 +164,3 @@ module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
     );
     return true;
 };
-
