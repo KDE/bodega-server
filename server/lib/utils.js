@@ -88,7 +88,6 @@ module.exports.standardJson = function(req, success)
     return json;
 };
 
-<<<<<<< HEAD
 function deleteUser(db, userId)
 {
     var query = 'DELETE FROM people WHERE id=$1;';
@@ -103,10 +102,7 @@ function deleteUser(db, userId)
 
 module.exports.deleteUser = deleteUser;
 
-module.exports.sendConfirmationEmail= function(db, req, res, userId, userEmail)
-=======
 module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
->>>>>>> store-creation
 {
     var service = app.config.service;
     //XXX: replace with jade and html emails
