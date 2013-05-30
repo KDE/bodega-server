@@ -1,8 +1,10 @@
 --begin;
 delete from people;
+delete from purchases;
+delete from downloads;
 delete from channels;
-delete from assets;
 delete from stores;
+delete from assets;
 delete from partners;
 delete from affiliations;
 delete from languages;
