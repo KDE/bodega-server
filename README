@@ -19,6 +19,8 @@ All commands that follow are done relative to the server directory.
 ## Database setup
 
 * Start the redis daemon (e.g.: /etc/init.d/redis start)
+* Ensure that postgresql is configured to retrieve dates in UTC by default. This is done by
+  editing postgresql.conf and ensuring "timezone = 'utc'" (it defaults to "posixrules")
 * Start the postgresql daemon (e.g.: /etc/init.d/postgresql start)
 * Create a postgresql user (e.g. bodega). It does not need to be a super user or be able to create
   databases.
