@@ -35,10 +35,10 @@ module.exports.assetStats = function(db, req, res) {
     }
 
     if (req.query.metric === "count") {
-        if (req.query.assets) {
+        if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
             query = "select date_trunc('" + granularity + "', p.purchasedon) dateOf,";
-            
+
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += "sum(CASE WHEN asset = $" + (i+2) + " THEN 1 ELSE 0 END) AS asset" + req.query.assets[i];
                 if (i < req.query.assets.length - 1) {
@@ -59,10 +59,10 @@ module.exports.assetStats = function(db, req, res) {
         }
 
     } else if (req.query.metric === "downloads") {
-        if (req.query.assets) {
+        if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
             query = "select date_trunc('" + granularity + "', d.downloadedon) dateOf,";
-            
+
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += "sum(CASE WHEN asset = $" + (i+2) + " THEN 1 ELSE 0 END) AS asset" + req.query.assets[i];
                 if (i < req.query.assets.length - 1) {
@@ -83,10 +83,10 @@ module.exports.assetStats = function(db, req, res) {
                     group by dateOf order by dateOf;";
         }
     } else {
-        if (req.query.assets) {
+        if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
             query = "select date_trunc('" + granularity + "', p.purchasedon) dateOf,";
-            
+
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += "SUM(CASE WHEN asset = $" + (i+2) + " THEN p.toparticipant ELSE 0 END) AS asset" + req.query.assets[i];
                 if (i < req.query.assets.length - 1) {
@@ -110,6 +110,7 @@ module.exports.assetStats = function(db, req, res) {
     var json = utils.standardJson(req);
     json.stats = [];
 
+    //console.log("trying " + query + " with " + params);
     db.query(
         query,
         params,
