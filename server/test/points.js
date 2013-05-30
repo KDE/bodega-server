@@ -21,8 +21,9 @@ var utils = require('./support/http');
 /* Only run the payments tests if the secret key
  * is in the config.json file */
 var describeC = (app.config.stripe.secretKey && app.
-                 config.stripe.secretKey.length > 10)
-        ? describe : describe.skip;    
+                 config.stripe.secretKey.length > 10) ?
+        describe :
+        describe.skip;
 
 describeC('Point operations', function(){
     var cookie;
