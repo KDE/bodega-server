@@ -65,7 +65,7 @@ describe('Store management', function(){
         it('should fail with an invalid partner', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/create?partner=2',
+                '/bodega/v1/json/store/create?partner=3',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -82,7 +82,7 @@ describe('Store management', function(){
         it('should fail without a name', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/create?partner=1',
+                '/bodega/v1/json/store/create?partner=2',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -98,7 +98,7 @@ describe('Store management', function(){
 
         it('should succeed with a valid partner and name', function(done){
             var query =
-                { 'partner' : 1,
+                { 'partner' : 2,
                   'name': 'Fun Times With Clowns',
                   'desc': 'Clowns are actually scary'
                 };
@@ -107,10 +107,40 @@ describe('Store management', function(){
                 '/bodega/v1/json/store/create?' + queryString.stringify(query),
                 function(res) {
                     var expected = {
-                        'id': '1_FUN_TIMES_WITH_CLOWNS',
+                        'id': '2_FUN_TIMES_WITH_CLOWNS',
                         'name': 'Fun Times With Clowns',
                         'desc': 'Clowns are actually scary',
-                        'partner': { 'id': 1, 'name': 'KDE' },
+                        'partner': { 'id': 2, 'name': 'KDE' },
+                        'markups': { 'min': 0, 'max': 0,
+                                     'flat': false, 'markup': 0 }
+                    };
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('storeInfo');
+                    res.body.storeInfo.should.eql(expected);
+                    done();
+                },
+                cookie);
+        });
+
+        it('should succeed with a name and no partner explicitly specified', function(done){
+            var query =
+                { 'id': 'somethingcrazy',
+                  'name': 'More Fun',
+                  'desc': ''
+                };
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/create?' + queryString.stringify(query),
+                function(res) {
+                    var expected = {
+                        'id': 'somethingcrazy',
+                        'name': 'More Fun',
+                        'desc': '',
+                        'partner': { 'id': 2, 'name': 'KDE' },
                         'markups': { 'min': 0, 'max': 0,
                                      'flat': false, 'markup': 0 }
                     };
@@ -128,7 +158,7 @@ describe('Store management', function(){
 
         it('should fail with an id that exists', function(done){
             var query =
-                { 'partner' : 1,
+                { 'partner' : 2,
                   'name': 'Fun Times With Clowns',
                 };
             utils.getUrl(
@@ -153,7 +183,23 @@ describe('Store management', function(){
         it('should succeed with a valid store', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/delete?id=1_FUN_TIMES_WITH_CLOWNS',
+                '/bodega/v1/json/store/delete?id=2_FUN_TIMES_WITH_CLOWNS',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    done();
+                },
+                cookie);
+        });
+
+        it('should succeed with another valid store', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/delete?id=somethingcrazy',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
