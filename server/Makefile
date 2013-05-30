@@ -8,7 +8,7 @@ test/%:
                 $@.js --reporter $(REPORTER)
 
 check:
-	@./node_modules/.bin/jshint .
+	@./node_modules/.bin/jshint --extra-ext .json . ; if [ $$? -eq 0 ] ; then echo "Done. Clean!" ; fi
 
 sql:
 	cd ../sql && ./do_sql ../server/config.json . setup
