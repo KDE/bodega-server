@@ -96,6 +96,41 @@ function updateIncomingAsset(db, req, res, assetInfo)
     });
 }
 
+function setupTags(db, req, res, assetInfo)
+{
+    if (assetInfo.tags) {
+        createUtils.setupTags(
+            db, req, res, assetInfo,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    errors.report('UploadTagError',
+                                  req, res, err);
+                    return;
+                }
+                sendResponse(db, req, res, assetInfo);
+            });
+    } else {
+        sendResponse(db, req, res, assetInfo);
+    }
+}
+
+function setupPreviews(db, req, res, assetInfo)
+{
+    if (assetInfo.previews) {
+        createUtils.setupPreviews(
+            db, req, res, assetInfo,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    errors.report('UploadPreviewError', req, res, err);
+                    return;
+                }
+                setupTags(db, req, res, assetInfo);
+            });
+    } else {
+        setupTags(db, req, res, assetInfo);
+    }
+}
+
 function updatePublishedAsset(db, req, res, assetInfo)
 {
     var incomingAssetQuery =
