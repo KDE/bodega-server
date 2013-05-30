@@ -20,7 +20,7 @@ var errors = require('../errors.js');
 
 
 module.exports.assetStats = function(db, req, res) {
-    var params = [req.session.user.id];
+    var params = [req.session.user.partner];
 
     var i;
     var query = "";
