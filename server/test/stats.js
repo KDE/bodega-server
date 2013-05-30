@@ -15,13 +15,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var pg = require('pg');
 var server = require('../app.js');
 var utils = require('./support/http');
 var querystring = require('querystring');
 
 describe('Stats', function(){
     var cookie;
-    describe('initialization', function(){
+    describe('database environment', function() {
+        it('timezone set to UTC in postgresql.conf or db session', function(done) {
+            var connectionString = app.config.database.protocol + "://" +
+                                   app.config.database.user + ":" + app.config.database.password +
+                                   "@" + app.config.database.host + "/" +
+                                   app.config.database.name;
+
+             pg.connect(connectionString, function(err, client, finis) {
+                 client.query("SHOW time zone;", [],
+                     function(err, result) {
+                         result.rows[0].TimeZone.should.eql('UTC');
+                         finis();
+                         done();
+                     });
+             });
+        });
+    });
+
+    describe('initialization', function() {
         it('authorize correctly.', function(done){
             utils.getUrl(
                 server,
@@ -37,8 +56,9 @@ describe('Stats', function(){
                     done();
                 });
         });
-
+    });
  
+    describe('get statistics', function() {
         //Granularity: MONTH
         it('Points stats without asset numbers: month granularity', function(done){
             //not setting metrics there, assumes that without it goes to points by default
@@ -54,7 +74,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
                         total: [1605, 470, 280]
                     };
 
@@ -88,7 +108,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
                         asset3: [1425, 280, 280]
                     };
 
@@ -121,7 +141,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
                         asset2: [0, 190, 0],
                         asset3: [1425, 280, 280],
                         asset4: [180, 0, 0],
@@ -152,7 +172,7 @@ describe('Stats', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -161,7 +181,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
                         total: [8, 3, 2, 1, 1]
                     };
 
@@ -183,7 +203,7 @@ describe('Stats', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -192,14 +212,14 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z"],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z"],
                         asset3: [6, 1, 2, 1]
                     };
 
                     res.body.stats.length.should.equal(4);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
-                        
+
                         stats.dateof.should.be.eql(expected.dateof[i]);
                         stats.asset3.should.be.eql(expected.asset3[i]);
                     }
@@ -224,7 +244,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z", "2013-08-31T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
                         asset2: [0, 1, 0, 0, 1],
                         asset3: [6, 1, 2, 1, 0],
                         asset4: [2, 1, 0, 0, 0],
@@ -260,7 +280,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z"],
                         total: [5, 2, 1]
                     };
 
@@ -291,7 +311,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-04-30T22:00:00.000Z", "2013-05-31T22:00:00.000Z", "2013-06-30T22:00:00.000Z"],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z"],
                         asset2: [0, 1, 0],
                         asset3: [3, 1, 1],
                         asset4: [2, 0, 0],
@@ -330,7 +350,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-07-01T22:00:00.000Z"],
+                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-07-02T00:00:00.000Z"],
                         total: [180, 1425, 280, 190, 280]
                     };
 
@@ -364,7 +384,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-07-01T22:00:00.000Z"],
+                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-07-02T00:00:00.000Z"],
                         asset2: [0, 0, 0, 190, 0],
                         asset3: [0, 1425, 280, 0, 280],
                         asset4: [180, 0, 0, 0, 0],
@@ -385,7 +405,7 @@ describe('Stats', function(){
                 },
                 cookie);
         });
-        
+
         it('Downloads stats without asset numbers: day granularity', function(done){
             var query = {
                 metric: "downloads",
@@ -403,7 +423,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-05-26T22:00:00.000Z", "2013-05-28T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-06-11T22:00:00.000Z", "2013-07-01T22:00:00.000Z", "2013-07-22T22:00:00.000Z", "2013-09-29T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-06-12T00:00:00.000Z", "2013-07-02T00:00:00.000Z", "2013-07-23T00:00:00.000Z", "2013-09-30T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
                         total: [2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                     };
 
@@ -437,7 +457,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-05-26T22:00:00.000Z", "2013-05-28T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-06-11T22:00:00.000Z", "2013-07-01T22:00:00.000Z", "2013-07-22T22:00:00.000Z", "2013-09-29T22:00:00.000Z", "2013-09-30T22:00:00.000Z"],
+                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-06-12T00:00:00.000Z", "2013-07-02T00:00:00.000Z", "2013-07-23T00:00:00.000Z", "2013-09-30T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
                         asset2: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
                         asset3: [0, 4, 1, 1, 1, 0, 0, 1, 1, 1, 0],
                         asset4: [2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
@@ -458,7 +478,7 @@ describe('Stats', function(){
                 },
                 cookie);
         });
-        
+
         it('Purchases count stats without asset numbers: day granularity', function(done){
             var query = {
                 metric: "count",
@@ -476,7 +496,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-07-01T22:00:00.000Z"],
+                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-07-02T00:00:00.000Z"],
                         total: [2, 3, 1, 1, 1]
                     };
 
@@ -510,7 +530,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-24T22:00:00.000Z", "2013-05-25T22:00:00.000Z", "2013-06-01T22:00:00.000Z", "2013-06-09T22:00:00.000Z", "2013-07-01T22:00:00.000Z"],
+                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-07-02T00:00:00.000Z"],
                         asset2: [0, 0, 0, 1, 0],
                         asset3: [0, 3, 1, 0, 1],
                         asset4: [2, 0, 0, 0, 0],
@@ -531,7 +551,7 @@ describe('Stats', function(){
                 },
                 cookie);
         });
-        
+
         //different Granularity: YEAR
         it('Points stats without asset numbers: year granularity', function(done){
             var query = {
@@ -550,7 +570,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2012-12-31T23:00:00.000Z"],
+                        dateof: ["2013-01-01T00:00:00.000Z"],
                         total: [2355]
                     };
 
@@ -584,7 +604,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2012-12-31T23:00:00.000Z"],
+                        dateof: ["2013-01-01T00:00:00.000Z"],
                         asset2: [190],
                         asset3: [1985],
                         asset4: [180],
@@ -623,7 +643,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2012-12-31T23:00:00.000Z"],
+                        dateof: ["2013-01-01T00:00:00.000Z"],
                         total: [15]
                     };
 
@@ -657,7 +677,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2012-12-31T23:00:00.000Z"],
+                        dateof: ["2013-01-01T00:00:00.000Z"],
                         asset2: [2],
                         asset3: [10],
                         asset4: [3],
@@ -678,7 +698,7 @@ describe('Stats', function(){
                 },
                 cookie);
         });
-        
+
         it('Purchases count stats without asset numbers: year granularity', function(done){
             var query = {
                 metric: "count",
@@ -696,7 +716,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2012-12-31T23:00:00.000Z"],
+                        dateof: ["2013-01-01T00:00:00.000Z"],
                         total: [8]
                     };
 
@@ -730,7 +750,7 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2012-12-31T23:00:00.000Z"],
+                        dateof: ["2013-01-01T00:00:00.000Z"],
                         asset2: [1],
                         asset3: [5],
                         asset4: [2],
