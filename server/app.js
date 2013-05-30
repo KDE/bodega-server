@@ -24,6 +24,8 @@ var http = require('http');
 var app = module.exports = express();
 var argv = require('optimist').argv;
 
+process.env.TZ = 'UTC';
+
 GLOBAL.app = app;
 app.config = JSON.parse(fs.readFileSync(argv.config ? argv.config : './config.json', 'utf8'));
 
