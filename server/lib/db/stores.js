@@ -136,7 +136,7 @@ function deleteWithPartner(partner, db, req, res)
 {
     var id = req.query.id;
     if (!id || id === '') {
-        errors.report('StoreIdInvalid', req, req, errors.create("Invalid Store Id", "Invalid store passed into store deletion: " + id));
+        errors.report('StoreIdInvalid', req, res, errors.create("Invalid Store Id", "Invalid store passed into store deletion: " + id));
         return;
     }
 
