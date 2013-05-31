@@ -167,7 +167,7 @@ function ifCanManageStore(db, req, res, fn)
                                 return;
                             }
 
-                            if (!result.rows || result.rows.count < 1) {
+                            if (result.rowCount < 1) {
                                 errors.report('StoreIdInvalid', req, res);
                                 return;
                             }

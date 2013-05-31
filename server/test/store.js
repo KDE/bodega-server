@@ -96,7 +96,7 @@ describe('Store management', function(){
         });
     });
 
-    describe('create a store', function(){
+    describe('Store creation', function(){
         it('should fail with an invalid partner', function(done){
             utils.getUrl(
                 server,
@@ -214,7 +214,7 @@ describe('Store management', function(){
 
     });
 
-    describe('list stores', function() {
+    describe('Store listing', function() {
         it('should list all stores associated with the authentication person',
            function(done) {
                 utils.getUrl(
@@ -269,7 +269,31 @@ describe('Store management', function(){
            });
     });
 
-    describe('Markup setting', function() {
+    describe('Setting markups', function() {
+        it('should fail on a non-existant store', function(done) {
+            var query = {
+                'id': 'does_not_exist',
+                'maxmarkup': 100,
+                'minmarkup': 10,
+                'flatmarkup': true,
+                'markup': 20
+            };
+
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/setMarkups?' + queryString.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', false);
+                    res.body.error.should.have.property('type', 'StoreIdInvalid');
+                    done();
+                },
+                cookie);
+        });
+
         it('should succeed on an existing store', function(done) {
             var query = {
                 'id': '2_FUN_TIMES_WITH_CLOWNS',
@@ -338,10 +362,8 @@ describe('Store management', function(){
                 },
                 cookie);
         });
-    });
 
-    describe('list stores after deletion of new stores', function() {
-        it('should list all stores associated with the authentication person',
+        it('listing should reflect deletions',
            function(done) {
                 utils.getUrl(
                     server,

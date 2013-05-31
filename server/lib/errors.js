@@ -68,10 +68,12 @@ var ErrorType = {
     "UploadIconError"        : 45, //the asset is missing an icon
     "DeleteAssetMissing"     : 46, //the delete asset does not exist
     "InvalidUrl"             : 47, //the requested url is invalid
+
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
     "StorePartnerInvalid"    : 61,//the partner provided is incorrect
     "StoreNameInvalid"       : 62,//an invalid (e.g. missing) store name
-    "StoreNotDeleted"        : 63//deleting a store failed
+    "StoreNotDeleted"        : 63,//deleting a store failed
+    "StoreIdInvalid"         : 64,//the provided store id is not valid for this user
 };
 
 module.exports.Type = ErrorType;
