@@ -309,7 +309,6 @@ describe('Asset manipulation', function(){
             server,
             '/bodega/v1/json/delete?assetId='+completeAssetId,
             function(res) {
-                done();
             },
             cookie);
         utils.getUrl(
