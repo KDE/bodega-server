@@ -172,7 +172,6 @@ function ifCanManageStore(db, req, res, fn)
                                 return;
                             }
 
-                            console.log('we have something like -> ' + result.rows + ' .. ' + result.rows.count + " : " + result.rows[0]);
                             fn(partner, result.rows[0].id, db, req, res);
                         });
               });
@@ -213,8 +212,6 @@ function setMarkups(partner, store, db, req, res)
     if (count > 0) {
         query += updates.join(', ') + ' where id = $' + ++count;
         params.push(store);
-    console.log("going in with " + query);
-    console.log("params are " + params);
         db.query(query, params,
                  function(err, result) {
                      if (err) {
