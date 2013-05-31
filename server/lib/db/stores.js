@@ -51,24 +51,40 @@ function partnerId(db, req, res, fn)
     }
 }
 
-function returnStoreJson(id, db, req, res)
+function sendStoreJson(id, db, req, res)
 {
-    db.query("select s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.flatMarkup, s.markup from stores s join partners p on (s.partner = p.id) where s.id = $1",
-             [id], function(err, result) {
+    var query = "select s.id, s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.flatMarkup, s.markup \
+                 from stores s join partners p on (s.partner = p.id) \
+                 where p.id in (select distinct partner from affiliations where person = $1)";
+    var params = [req.session.user.id];
+    if (typeof id === 'string' && id.length > 0) {
+        query += " and s.id = $2";
+        params.push(id);
+    }
+    query += " order by s.id";
+
+    db.query(query, params, function(err, result) {
                  if (err || !result.rows || result.rows.length < 1) {
                      errors.report('Database', req, res, err);
                      return;
                  }
 
-                 var r = result.rows[0];
-                 var json = utils.standardJson(req, true);
-                 json.storeInfo = { 'id': id,
-                                    'name': r.name,
-                                    'desc': r.description,
-                                    'partner': { 'id': r.partnerid, 'name': r.partnername },
-                                    'markups': { 'min': r.minmarkup, 'max': r.maxmarkup,
-                                                 'flat': r.flatmarkup, 'markup': r.markup }
-                                 };
+                 var storeInfo = [];
+
+                 for (var i = 0; i < result.rows.length; ++i) {
+                     var r = result.rows[i];
+                     storeInfo.push(
+                         { 'id': r.id,
+                           'name': r.name,
+                           'desc': r.description,
+                           'partner': { 'id': r.partnerid, 'name': r.partnername },
+                           'markups': { 'min': r.minmarkup, 'max': r.maxmarkup,
+                           'flat': r.flatmarkup, 'markup': r.markup }
+                     });
+                 }
+
+                 var json = utils.standardJson(req);
+                 json.storeInfo = storeInfo;
                  res.json(json);
              });
 }
@@ -111,7 +127,7 @@ function createWithPartner(partner, db, req, res)
                                 return;
                             }
 
-                            returnStoreJson(id, db, req, res);
+                            sendStoreJson(id, db, req, res);
                          });
             });
 }
@@ -140,7 +156,15 @@ function deleteWithPartner(partner, db, req, res)
              });
 }
 
+/********************* PUBLIC API *********************/
 
+/**
+ * No arguments taken, returns an array containing all stores associated to this
+ * person's partner organizations
+ */
+module.exports.list = function(db, req, res) {
+    sendStoreJson(null, db, req, res);
+}
 
 /**
  * + int partner

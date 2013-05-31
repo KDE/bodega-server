@@ -179,6 +179,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbPurchaseAsset, req, res);
     };
 
+    BodegaDb.prototype.listStores = function(req, res) {
+        this.dbQuery(dbStores.list, req, res);
+    };
+
     BodegaDb.prototype.createStore = function(req, res) {
         this.dbQuery(dbStores.create, req, res);
     };

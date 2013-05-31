@@ -281,15 +281,15 @@ app.get(serverPath('stats/assets'), isAuthorized,
 
 //********************************
 // Store management
-app.get(serverPath('store/create'), isAuthorized,
+app.get(serverPath('store/list'), isAuthorized,
     function(req, res) {
-        app.db.createStore(req, res);
+        app.db.listStores(req, res);
     }
 );
 
-app.get(serverPath('store/info'), isAuthorized,
+app.get(serverPath('store/create'), isAuthorized,
     function(req, res) {
-//        app.db.storeInfo(req, res);
+        app.db.createStore(req, res);
     }
 );
 

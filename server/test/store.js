@@ -106,14 +106,14 @@ describe('Store management', function(){
                 server,
                 '/bodega/v1/json/store/create?' + queryString.stringify(query),
                 function(res) {
-                    var expected = {
+                    var expected = [ {
                         'id': '2_FUN_TIMES_WITH_CLOWNS',
                         'name': 'Fun Times With Clowns',
                         'desc': 'Clowns are actually scary',
                         'partner': { 'id': 2, 'name': 'KDE' },
                         'markups': { 'min': 0, 'max': 0,
                                      'flat': false, 'markup': 0 }
-                    };
+                    } ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -136,14 +136,14 @@ describe('Store management', function(){
                 server,
                 '/bodega/v1/json/store/create?' + queryString.stringify(query),
                 function(res) {
-                    var expected = {
+                    var expected = [ {
                         'id': 'somethingcrazy',
                         'name': 'More Fun',
                         'desc': '',
                         'partner': { 'id': 2, 'name': 'KDE' },
                         'markups': { 'min': 0, 'max': 0,
                                      'flat': false, 'markup': 0 }
-                    };
+                    } ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -179,8 +179,63 @@ describe('Store management', function(){
 
     });
 
-    describe('delete a store', function(){
-        it('should succeed with a valid store', function(done){
+    describe('list stores', function() {
+        it('should list all stores associated with the authentication person',
+           function(done) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/store/list',
+                    function(res) {
+                        var expected = [
+                        {
+                            'id': '2_FUN_TIMES_WITH_CLOWNS',
+                            'name': 'Fun Times With Clowns',
+                            'desc': 'Clowns are actually scary',
+                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'markups': { 'min': 0, 'max': 0,
+                            'flat': false, 'markup': 0 }
+                        },
+                        {
+                            'id': 'KDE-1',
+                            'name': 'Plasma Workspace',
+                            'desc': 'KDE Plasma user interfaces',
+                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'markups': { 'min': 0, 'max': 0,
+                            'flat': true, 'markup': 0 }
+                        },
+                        {
+                            'id': 'somethingcrazy',
+                            'name': 'More Fun',
+                            'desc': '',
+                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'markups': { 'min': 0, 'max': 0,
+                            'flat': false, 'markup': 0 }
+                        },
+                        {
+                            'id': 'VIVALDI-1',
+                            'name': 'MPL',
+                            'desc': 'Usage of PA',
+                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'markups': { 'min': 0, 'max': 0,
+                            'flat': true, 'markup': 0 }
+                        }
+                        ];
+
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json; charset=utf-8');
+                        res.body.should.have.property('authStatus', true);
+                        res.body.should.have.property('success', true);
+                        res.body.storeInfo.should.eql(expected);
+                        done();
+                    },
+                    cookie);
+           });
+    });
+
+    describe('delete a store', function() {
+        it('should succeed with a valid store', function(done) {
             utils.getUrl(
                 server,
                 '/bodega/v1/json/store/delete?id=2_FUN_TIMES_WITH_CLOWNS',
@@ -211,5 +266,44 @@ describe('Store management', function(){
                 },
                 cookie);
         });
+    });
+
+    describe('list stores after deletion of new stores', function() {
+        it('should list all stores associated with the authentication person',
+           function(done) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/store/list',
+                    function(res) {
+                        var expected = [
+                        {
+                            'id': 'KDE-1',
+                            'name': 'Plasma Workspace',
+                            'desc': 'KDE Plasma user interfaces',
+                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'markups': { 'min': 0, 'max': 0,
+                            'flat': true, 'markup': 0 }
+                        },
+                        {
+                            'id': 'VIVALDI-1',
+                            'name': 'MPL',
+                            'desc': 'Usage of PA',
+                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'markups': { 'min': 0, 'max': 0,
+                            'flat': true, 'markup': 0 }
+                        }
+                        ];
+
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json; charset=utf-8');
+                        res.body.should.have.property('authStatus', true);
+                        res.body.should.have.property('success', true);
+                        res.body.storeInfo.should.eql(expected);
+                        done();
+                    },
+                    cookie);
+           });
     });
 });
