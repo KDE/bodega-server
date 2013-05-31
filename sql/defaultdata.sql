@@ -61,6 +61,7 @@ INSERT INTO stores (partner, name, id) VALUES (0, 'No Store', 'null');
 
 
 -- default roles for the accounts
+INSERT INTO personRoles (description) VALUES ('Store Manager');
 INSERT INTO personRoles (description) VALUES ('Content Creator');
 INSERT INTO personRoles (description) VALUES ('Validator');
 INSERT INTO personRoles (description) VALUES ('Accounts');
