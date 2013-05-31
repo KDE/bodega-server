@@ -111,7 +111,7 @@ function createWithPartner(partner, db, req, res)
                  }
 
                  if (result.rows && result.rows.length > 0) {
-                    errors.report('StoreIdExists', req, res, errors.create("Store id exists", "Attempted to create " + id + " for " + partner));
+                    errors.report('StoreIdExists', req, res);//, errors.create("Store id exists", "Attempted to create " + id + " for " + partner));
                     return;
                  }
 
