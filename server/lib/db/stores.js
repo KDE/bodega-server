@@ -156,6 +156,79 @@ function deleteWithPartner(partner, db, req, res)
              });
 }
 
+function ifCanManageStore(db, req, res, fn)
+{
+    partnerId(db, req, res,
+              function(partner, db, req, res) {
+                  db.query("select id from stores where id = $1 and partner = $2", [req.query.id, partner],
+                        function(err, result) {
+                            if (err || !result) {
+                                errors.report('Database', req, res);
+                                return;
+                            }
+
+                            if (!result.rows || result.rows.count < 1) {
+                                errors.report('StoreIdInvalid', req, res);
+                                return;
+                            }
+
+                            console.log('we have something like -> ' + result.rows + ' .. ' + result.rows.count + " : " + result.rows[0]);
+                            fn(partner, result.rows[0].id, db, req, res);
+                        });
+              });
+}
+
+function setMarkups(partner, store, db, req, res)
+{
+    var query = "update stores set ";
+    var updates = [];
+    var params = [];
+    var count = 0;
+
+    var min = utils.parseNumber(req.query.minmarkup, -1);
+    if (min >= 0) {
+        updates.push("minMarkup = $" + ++count);
+        params.push(min);
+    }
+
+    var max = utils.parseNumber(req.query.maxmarkup, -1);
+    if (max >= 0) {
+        updates.push("maxMarkup = $" + ++count);
+        params.push(max);
+    }
+
+    var flat = req.query.flatmarkup;
+    if (flat) {
+        flat = utils.parseBool(flat);
+        updates.push("flatMarkup = $" + ++count);
+        params.push(flat);
+    }
+
+    var markup = utils.parseNumber(req.query.markup, -1);
+    if (markup >= 0) {
+        updates.push("markup = $" + ++count);
+        params.push(markup);
+    }
+
+    if (count > 0) {
+        query += updates.join(', ') + ' where id = $' + ++count;
+        params.push(store);
+    console.log("going in with " + query);
+    console.log("params are " + params);
+        db.query(query, params,
+                 function(err, result) {
+                     if (err) {
+                         errors.report('Database', req, res);
+                         return;
+                     }
+
+                     sendStoreJson(store, db, req, res);
+                 });
+    } else {
+        sendStoreJson(store, db, req, res);
+    }
+}
+
 /********************* PUBLIC API *********************/
 
 /**
@@ -174,6 +247,7 @@ module.exports.list = function(db, req, res) {
  * * int minmarkup
  * * int maxmarkup
  * * int flatmarkup
+ * * int markup
  **/
 module.exports.create = function(db, req, res) {
     partnerId(db, req, res, createWithPartner);
@@ -186,3 +260,13 @@ module.exports.delete = function(db, req, res) {
     partnerId(db, req, res, deleteWithPartner);
 };
 
+/**
+ * + string ID
+ * + int minMarkup
+ * + int maxMarkup
+ * + bool flatMarkup
+ * + markup
+ */
+module.exports.setMarkups = function(db, req, res) {
+    ifCanManageStore(db, req, res, setMarkups);
+}

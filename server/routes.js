@@ -299,6 +299,12 @@ app.get(serverPath('store/delete'), isAuthorized,
     }
 );
 
+app.get(serverPath('store/setMarkups'), isAuthorized,
+    function(req, res) {
+        app.db.setMarkups(req, res);
+    }
+);
+
 app.get(serverPath('store/updateChannel'), isAuthorized,
     function(req, res) {
 //        app.db.updateStoreChannel(req, res);

@@ -269,7 +269,44 @@ describe('Store management', function(){
            });
     });
 
-    describe('delete a store', function() {
+    describe('Markup setting', function() {
+        it('should succeed on an existing store', function(done) {
+            var query = {
+                'id': '2_FUN_TIMES_WITH_CLOWNS',
+                'maxmarkup': 100,
+                'minmarkup': 10,
+                'flatmarkup': true,
+                'markup': 20
+            };
+
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/setMarkups?' + queryString.stringify(query),
+                function(res) {
+                    var expected = [
+                        {
+                            'id': '2_FUN_TIMES_WITH_CLOWNS',
+                            'name': 'Fun Times With Clowns',
+                            'desc': 'Clowns are actually scary',
+                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'markups': { 'min': 10, 'max': 100,
+                            'flat': true, 'markup': 20 }
+                        }
+                    ];
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    res.body.storeInfo.should.eql(expected);
+                    done();
+                },
+                cookie);
+        });
+    });
+
+
+    describe('Store deletion', function() {
         it('should succeed with a valid store', function(done) {
             utils.getUrl(
                 server,

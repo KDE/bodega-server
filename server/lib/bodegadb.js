@@ -191,6 +191,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbStores.delete, req, res);
     };
 
+    BodegaDb.prototype.setMarkups = function(req, res) {
+        this.dbQuery(dbStores.setMarkups, req, res);
+    };
+
     BodegaDb.prototype.hunt = function(req, res) {
         this.dbQuery(dbHunt, req, res);
     };
