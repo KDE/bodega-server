@@ -163,12 +163,7 @@ module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
             text = text.replace('#{prefix}', app.config.prefix);
             mailOptions.text = text;
 
-            if (app.settings.env === 'test') {
-                json.confirmationCode = confirmationCode;
-                json.text = text;
-                res.json(json);
-                console.log(text);
-            } else {
+            if (app.production) {
                 nodemailer.sendMail(mailOptions, function(error) {
                     var json = {};
                     if (error) {
@@ -184,6 +179,11 @@ module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
                     res.json(json);
                     transport.close(); // lets shut down the connection pool
                 });
+            } else {
+                json.confirmationCode = confirmationCode;
+                json.text = text;
+                res.json(json);
+                console.log(text);
             }
         }
     );

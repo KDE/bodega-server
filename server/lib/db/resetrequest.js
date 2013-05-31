@@ -85,12 +85,7 @@ function sendResetEmail(db, req, res, args)
             text = text.replace('#{address}', clientIp);
             mailOptions.text = text;
 
-            if (app.settings.env === 'test') {
-                json.resetCode = resetCode;
-                json.text = text;
-                res.json(json);
-                console.log(text);
-            } else {
+            if (app.production) {
                 nodemailer.sendMail(mailOptions, function(error) {
                     var json = {};
                     if (error) {
@@ -104,6 +99,11 @@ function sendResetEmail(db, req, res, args)
                     res.json(json);
                     transport.close(); // lets shut down the connection pool
                 });
+            } else {
+                json.resetCode = resetCode;
+                json.text = text;
+                res.json(json);
+                console.log(text);
             }
         }
     );

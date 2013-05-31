@@ -31,8 +31,10 @@ app.config = JSON.parse(fs.readFileSync(argv.config ? argv.config : './config.js
 
 if (argv.production) {
     app.config.stripe.secretKey = app.config.stripe.liveSecretKey;
+    app.production = true;
 } else {
     app.config.stripe.secretKey = app.config.stripe.testSecretKey;
+    app.production = false;
 }
 
 // We require our own modules after creating a server
@@ -93,4 +95,4 @@ var host = app.config.host ? app.config.host : null;
 app.server.listen(port, host);
 
 console.log("Bodega server listening on %s%d in %s mode",
-            host ? host + ':' : '', port, argv.production ? "production" : "devel");
+            host ? host + ':' : '', port, app.production ? "production" : "devel");
