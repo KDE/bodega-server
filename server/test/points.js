@@ -18,16 +18,20 @@
 var server = require('../app.js');
 var utils = require('./support/http');
 
-/* Only run the payments tests if the secret key
- * is in the config.json file */
-var describeC = (app.config.stripe.secretKey && app.
-                 config.stripe.secretKey.length > 10) ?
-        describe :
-        describe.skip;
-
-describeC('Point operations', function(){
+describe('Point operations', function(){
     var cookie;
     var startPoints;
+
+    /* Only run the payments tests if the secret key
+     * is in the config.json file */
+    if (!app.config.stripe.secretKey ||
+        app.config.stripe.secretKey.length < 10) {
+        it('skips - .', function(done){
+            console.log("Stripe tests disabled");
+            done();
+        });
+        return;
+    }
 
     after(function(done) {
         //try to delete the account if one was created
