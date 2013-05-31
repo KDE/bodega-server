@@ -12,7 +12,6 @@ delete from languages;
 select setval('seq_assetsids', 1);
 select setval('seq_languageids', 1);
 select setval('seq_peopleids', 1);
-select setval('seq_personroleids', 1);
 select setval('seq_partnerids', 1);
 select setval('seq_channelids', 1);
 
@@ -30,6 +29,7 @@ insert into partners (id, name, developer, distributor) values (3, 'Diamond Devi
 insert into partners (id, name, developer, distributor) values (4, 'Saphire Software', false, true);
 
 select affiliatePerson('zack@kde.org', 'KDE', 'Content Creator');
+select affiliatePerson('zack@kde.org', 'KDE', 'Store Manager');
 select affiliatePerson('zack@kde.org', 'KDE', 'Validator');
 select affiliatePerson('aseigo@kde.org', 'KDE', 'Content Creator');
 select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Content Creator');
