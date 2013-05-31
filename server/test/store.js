@@ -294,6 +294,30 @@ describe('Store management', function(){
                 cookie);
         });
 
+        it('should fail on a store that exists, but we are not authorized to manage', function(done) {
+            var query = {
+                'id': 'DD-2',
+                'maxmarkup': 100,
+                'minmarkup': 10,
+                'flatmarkup': true,
+                'markup': 20
+            };
+
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/setMarkups?' + queryString.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', false);
+                    res.body.error.should.have.property('type', 'StoreIdInvalid');
+                    done();
+                },
+                cookie);
+        });
+
         it('should succeed on an existing store', function(done) {
             var query = {
                 'id': '2_FUN_TIMES_WITH_CLOWNS',
