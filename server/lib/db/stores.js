@@ -20,7 +20,7 @@ var utils = require('../utils.js');
 
 function defaultPartnerId(db, req, res, fn)
 {
-    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
+    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Store Manager';",
             [req.session.user.id],
             function(err, result) {
                 if (err || !result.rows || result.rows.length === 0) {
@@ -38,7 +38,7 @@ function partnerId(db, req, res, fn)
     if (partner < 1) {
         defaultPartnerId(db, req, res, fn);
     } else {
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Store Manager';",
                 [partner, req.session.user.id],
                 function(err, result) {
                     if (err || !result.rows || result.rows.length === 0) {
