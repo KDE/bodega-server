@@ -44,11 +44,18 @@ Most (often, all) of the default settings should work.
 
 ## Quick Start
 
+   $ cd server
    $ ./main.sh
 
 You can also start it directly with:
 
    $ node app.js
+
+though that is generally not recommended. Using the main.sh: it is a future proof habit to get into.
+
+To start it in production mode, do:
+
+    $ ./main.sh production
 
 ## Updating
 
@@ -57,18 +64,34 @@ You can also start it directly with:
 Updates to sql schemas, if necesary, will be found in in sql/updates with file names ordered in a
 numerically ascending sequence.
 
+To update the database when changes occur, do:
+
+    $ cd server
+    $ make update_sql
+
+This will run any update scripts in sql/updates/ that have not yet been run. To run a script again,
+either load it manually via the psql command into the bodega database or edit (or remove) the
+sql/updates/completed file which records which updates have been applied. Errors while running
+updates are usually fine and simply mean that the changes were already found in the database.
+
 ## Testing
 
-To set up the server for running the tests, connect to the database with psql and load the sampledata.sql
-and testdata.sql files.
+To set up the server for running the tests, first ensure that you have a database set up just for
+testing as the tests rely on a test data set which replaces whatever data may otherwise be in the
+database. In other words: do not run the tests on a production system and expect things to go well.
 
-To run the test suite, go into the server directory and run:
+To load the testing data set:
 
-   $ make test
+    $ cd server
+    $ make test_sql
+
+Then run the test suite:
+
+    $ make test
 
 You can also run individual test suites with:
 
-   $ make test/<testname>
+    $ make test/<testname>
 
 <testname> is the name of the .js file in the tests/ directory minus the .js extenstion, so for
 example:
