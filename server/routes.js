@@ -265,6 +265,10 @@ app.post(serverPath('update'), isAuthorized,
              //console.log(req.query);
              app.db.updateAsset(req, res);
          });
+app.get(serverPath('listAssets'), isAuthorized, function(req, res) {
+    //console.log(req.query);
+    app.db.listAssets(req, res);
+});
 
 //*******************************
 // Stats

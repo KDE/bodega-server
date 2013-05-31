@@ -176,6 +176,61 @@ describe('Asset manipulation', function(){
         });
     });
 
+    describe('Listing assets', function(){
+        it('lists published by default', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/listAssets',
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('assets');
+                    res.body.assets.length.should.be.equal(25);
+                    done();
+                },
+                cookie);
+        });
+        it('lists published when asked', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/listAssets?type=published',
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('assets');
+                    res.body.assets.length.should.be.equal(25);
+                    done();
+                },
+                cookie);
+        });
+        it('lists incoming when asked', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/listAssets?type=incoming',
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('assets');
+                    res.body.assets.length.should.be.equal(2);
+                    done();
+                },
+                cookie);
+        });
+        it('lists all when asked', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/listAssets?type=all',
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('assets');
+                    res.body.assets.length.should.be.equal(27);
+                    done();
+                },
+                cookie);
+        });
+    });
+
     describe('Deletion', function(){
         it('should work a complete assets', function(done){
             utils.getUrl(
@@ -227,5 +282,42 @@ describe('Asset manipulation', function(){
                 },
                 cookie);
         });
+        
+        it('listing incoming after deletion shouldnt return any', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/listAssets?type=incoming',
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('assets');
+                    res.body.assets.length.should.be.equal(0);
+                    done();
+                },
+                cookie);
+        });
+    });
+
+    /* Make sure that even after an error we delete the assets
+     *  that we created for the test */
+    after(function(done) {
+        if (!server || (!completeAssetId && !incompleteAssetId)) {
+            done();
+            return;
+        }
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/delete?assetId='+completeAssetId,
+            function(res) {
+                done();
+            },
+            cookie);
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/delete?assetId='+incompleteAssetId,
+            function(res) {
+                done();
+            },
+            cookie);
     });
 });
