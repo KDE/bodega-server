@@ -22,7 +22,7 @@ var queryString = require('querystring');
 describe('Store management', function(){
     var cookie;
 
-    describe('Create store without authenticating', function(){
+    describe('Creating a store without authenticating', function(){
         it('should fail', function(done) {
             utils.getUrl(
                 server,
@@ -43,7 +43,42 @@ describe('Store management', function(){
         });
     });
 
-    describe('needs to authorize first', function(){
+    describe('Create a store with someone who is not authorized to do so', function(){
+        it('Authorize with a person who is NOT a Store Manager', function(done){
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/auth?auth_user=aseigo@kde.org&auth_password=aseigo&auth_store=VIVALDI-1',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.headers.should.have.property('set-cookie');
+                    cookie = res.headers['set-cookie'];
+                    res.body.should.have.property('authStatus', true);
+                    done();
+                });
+        });
+        it('Creation request should fail', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/create',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type',
+                                                        'StorePartnerInvalid');
+                    done();
+                },
+                cookie);
+        });
+    });
+
+    describe('Authorize as a person who is a Store Manager', function(){
         it('authorize correctly.', function(done){
             utils.getUrl(
                 server,
