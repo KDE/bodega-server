@@ -21,9 +21,10 @@ function getUrl(app, url, fn, cookie) {
             try {
                 res.body = JSON.parse(buf);
             } catch (e) {
-                console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
-            }
 
+                console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
+                res.body = buf;
+            }
             fn(res);
         });
     });
