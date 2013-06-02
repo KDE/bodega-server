@@ -329,3 +329,41 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION ct_updateChannel(channelId int, channelParent int, channelName text) RETURNS BOOL
+AS
+$$
+DECLARE
+    parentTrace int;
+BEGIN
+    IF (channelParent > 0) THEN
+        IF (channelId = channelParent) THEN
+            RETURN FALSE;
+        END IF;
+
+        parentTrace := channelParent;
+        WHILE parentTrace > 0
+        LOOP
+            SELECT INTO parentTrace parent FROM channels WHERE id = parentTrace;
+            IF NOT FOUND THEN
+                RETURN FALSE;
+            END IF;
+
+            IF (parentTrace = channelId) THEN
+                -- Uh-oh .. we found a loop back to ourself
+                RETURN FALSE;
+            END IF;
+
+        END LOOP;
+
+        UPDATE channels SET parent = channelParent WHERE id = channelId;
+    ELSIF (channelParent = 0) THEN
+        UPDATE channels SET parent = null WHERE id = channelId;
+    END IF;
+
+    IF (length(channelName) > 0) THEN
+        UPDATE channels SET name = channelName WHERE id = channelId;
+    END IF;
+
+    RETURN TRUE;
+END;
+$$ LANGUAGE 'plpgsql';
