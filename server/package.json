@@ -14,7 +14,8 @@
         "validator" : ">= 0.4.5",
         "stripe" : "latest",
         "async" : "latest",
-        "optimist" : "latest"
+        "optimist" : "latest",
+        "marked" : "latest"
     },
     "devDependencies": {
         "mocha": ">= 0.12.1",

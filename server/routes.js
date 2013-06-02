@@ -17,6 +17,9 @@
 
 var utils = require('./lib/utils.js');
 var errors = require('./lib/errors.js');
+var markdown = require("marked");
+var fs = require('fs');
+var path = require('path');
 
 function anonBrowsing(req, res, next)
 {
@@ -359,6 +362,28 @@ app.get('/contact', function(req, res) {
     });
 });
 
+app.get('/api/(*)', function(req, res) {
+    var filename = path.normalize(req.params[0]);
+    var filePath;
+
+    if (filename === 'api') {
+        //we are on /api/ so we are loading the /doc/index.markdown
+        filePath = __dirname + '/doc/index.markdown';
+    } else {
+        filePath = __dirname + '/doc/' + filename + '.markdown';
+    }
+
+    fs.readFile(filePath, 'utf8', function(err, data) {
+        if (err) {
+            res.render('404.jade', {
+                storeName: app.config.storeInfo.name,
+                storeUrl: app.config.storeInfo.url
+            });
+        } else {
+            res.send(markdown(data));
+        }
+    });
+});
 
 //NOTE: Always has to be the last route
 app.get('/', function(req, res) {
