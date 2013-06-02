@@ -226,6 +226,46 @@ function setMarkups(partner, store, db, req, res)
     }
 }
 
+function createNewChannel(partner, store, db, req, res)
+{
+    //TODO:implement
+}
+
+function updateChannel(partner, store, db, req, res)
+{
+    var channelId = utils.parseNumber(req.channel.id);
+    var channelParent = utils.parseNumber(req.channel.id);
+    var channelName = req.channel.name;
+
+    if (channelId > 0) {
+        db.query("select partner, parent, toplevel from channels where id = $1;" [ channelId ],
+                 function(err, result) {
+                     if (err) {
+                         error.report('Database', req, res);
+                         return;
+                     }
+
+                     if (!result || !result.rows || result.rowCount < 1) {
+                         error.report('StoreChannelIdInvalid', req, res);
+                         return;
+                     }
+
+                     // check that the parent is not going to create a loop
+                     // check that the parent exists, associated with this partner?
+                     // set the name
+                     db.query('select ct_updateChannel($1, $2, $3);', [channelId, channelParent, channelName],
+                              function(err, result) {
+                                  if (req.tags) {
+                                       //TODO: implement tags
+                                  }
+                              });
+
+                 });
+    } else {
+        createNewChannel(partner, store, db, req, res);
+    }
+}
+
 /********************* PUBLIC API *********************/
 
 /**
@@ -239,7 +279,7 @@ module.exports.list = function(db, req, res) {
 /**
  * + int partner
  * + string name
- * * string ID
+ * * string id
  * * string description
  * * int minmarkup
  * * int maxmarkup
@@ -251,14 +291,14 @@ module.exports.create = function(db, req, res) {
 };
 
 /**
- * + string ID
+ * + string id
  */
 module.exports.delete = function(db, req, res) {
     partnerId(db, req, res, deleteWithPartner);
 };
 
 /**
- * + string ID
+ * + string id
  * + int minMarkup
  * + int maxMarkup
  * + bool flatMarkup
@@ -266,4 +306,17 @@ module.exports.delete = function(db, req, res) {
  */
 module.exports.setMarkups = function(db, req, res) {
     ifCanManageStore(db, req, res, setMarkups);
+}
+
+/**
+ * + string id
+ * + channel {
+ *      * int id; if < 1 (or missing) a new channel will be created
+ *      * int parent; the parent channel for this one
+ *      * string name; the name for the channel
+ *      at least one of id or name must be provided
+ * * Array[int] tags
+ */
+module.exports.updateChannel = function(db, req, res) {
+    ifCanManageStore(db, req, res, updateChannel);
 }

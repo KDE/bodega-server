@@ -74,6 +74,7 @@ var ErrorType = {
     "StoreNameInvalid"       : 62,//an invalid (e.g. missing) store name
     "StoreNotDeleted"        : 63,//deleting a store failed
     "StoreIdInvalid"         : 64,//the provided store id is not valid for this user
+    "StoreChannelIdInvalid"  : 65,//the requested channel id for editting is invalid
 };
 
 module.exports.Type = ErrorType;
