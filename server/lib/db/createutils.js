@@ -190,18 +190,9 @@ function setupPreview(db, req, res, assetInfo, previewIdx, previewCount, cb)
     }
 
     var filename = path.basename(preview.name);
-    app.assetStore.upload(
-        preview.path, assetInfo.id, filename,
-        function(err, result) {
-            if (err) {
-                e = errors.create('UploadFailed', err.message);
-                //console.log("error due to bad rename?");
-                cb(e, db, req, res, assetInfo, previewIdx, previewCount);
-                return;
-            }
-            recordPreview(db, req, res, assetInfo, result.path,
-                          previewIdx, previewCount, cb);
-        });
+    console.log("Upload preview " + filename);
+    recordPreview(db, req, res, assetInfo, filename,
+                  previewIdx, previewCount, cb);
 }
 
 module.exports.setupPreviews = function(db, req, res, assetInfo, fn)

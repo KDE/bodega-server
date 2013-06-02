@@ -94,10 +94,9 @@ function setupIcons(db, req, res, assetInfo)
 function recordAsset(db, req, res, assetInfo)
 {
     var file = req.files.asset;
-    var incomingPath = assetInfo.incomingPath;
-    var newAssetQuery = 'insert into incomingAssets (id, license, partner, baseprice, name, description, version, path, file) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
+    var newAssetQuery = 'insert into incomingAssets (id, license, partner, baseprice, name, description, version, file) values ($1, $2, $3, $4, $5, $6, $7, $8)';
     db.query(newAssetQuery,
-             [assetInfo.id, assetInfo.license, assetInfo.partner, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.incomingPath, assetInfo.filename],
+             [assetInfo.id, assetInfo.license, assetInfo.partner, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.file],
              function(err, result) {
                  if (err) {
                      reportError(db, req, res, assetInfo,
@@ -114,21 +113,18 @@ function storeAsset(db, req, res, assetInfo)
              function(err, result) {
                  var fromFile = req.files.asset.path;
                  var name = req.files.asset.name;
-                 var filename = path.basename(name) + '-' + assetInfo.version;
                  assetInfo.id = result.rows[0].assetid;
-                 assetInfo.filename = filename;
                  //console.log(req.files.asset);
-                 //console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + filename);
+                 //console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + assetInfo.file);
                  app.assetStore.upload(
-                     fromFile, assetInfo.id, filename,
-                     function(err, result) {
+                     fromFile, assetInfo,
+                     function(err) {
                          if (err) {
                              //console.log("error due to bad rename?");
                              reportError(db, req, res, assetInfo,
                                          'UploadFailed', err);
                              return;
                          }
-                         assetInfo.incomingPath = result.path;
                          recordAsset(db, req, res, assetInfo);
                      });
              });
@@ -198,7 +194,7 @@ module.exports = function(db, req, res) {
             errors.report('UploadInvalidJson', req, res);
             return;
         }
-
+        assetInfo.incoming = true;
         checkPartner(db, req, res, assetInfo);
     });
 };

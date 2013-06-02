@@ -32,17 +32,16 @@ function sendResponse(db, req, res, assetInfo)
     res.send(json);
 }
 
-function deleteFile(db, req, res, path)
+function deletePreview(db, req, res, preview)
 {
-    app.assetStore.remove(path, function() {});
 }
 
 function deleteFiles(db, req, res, assetInfo)
 {
     var i;
-    deleteFile(db, req, res, assetInfo.path);
+    app.assetStore.remove(assetInfo, function(err){});
     for (i = 0; i < assetInfo.previews.length; ++i) {
-        deleteFile(db, req, res, assetInfo.previews[i].path);
+        deletePreview(db, req, res, assetInfo.previews[i]);
     }
     sendResponse(db, req, res, assetInfo);
 }

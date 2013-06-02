@@ -28,62 +28,139 @@ var url = require('url');
 var AssetStore = (function() {
     var storageConfig;
     var storageSystem;
+    var incomingDirPath;
+    var contentDirPath;
+
+    function checkContentDirectory(dirpath) {
+        var stats;
+
+        if (!dirpath) {
+            console.error("Invalid content directory! Set storageConfig!");
+            process.exit(1);
+        }
+        
+        stats = fs.statSync(dirpath);
+        
+        if (!stats.isDirectory()) {
+            try {
+                fs.mkdirSync(dirpath, "0700");
+            } catch (err) {
+                if (!fs.existsSync(dirpath)) {
+                    console.log(err);
+                    console.error("Unable to create content directory: " + dirpath);
+                    process.exit(1);
+                }
+            }
+        }
+
+        fs.chmod(dirpath, '0700', function (err) {
+            if (err) {
+                console.error(dirpath + " has invalid permissions and the server can't change them!");
+                process.exit(1);
+            }
+        });
+    }
+    
     function AssetStore() {
+        var stats;
+        
         storageSystem = app.config.storageSystem;
         storageConfig = app.config[storageSystem];
+
+        if (storageSystem !== "s3") {
+            incomingDirPath = path.join(process.cwd(),
+                                        storageConfig.incomingBasePath);
+            contentDirPath = path.join(process.cwd(),
+                                       storageConfig.basePath);
+            checkContentDirectory(incomingDirPath);
+            checkContentDirectory(contentDirPath);
+        }
     }
 
-    function localPutStream(fromFile, assetId, filename, fn)
+    function pathForAsset(assetInfo) {
+        var assetPath = assetInfo.path;
+        var parsedUrl;
+
+        /* If it's a http url just return it as is */
+        if (assetPath) {
+            parsedUrl = url.parse(assetPath);
+            if (parsedUrl.protocol === 'http:' ||
+                parsedUrl.protocol === 'https:') {
+                return assetPath;
+            }
+        }
+
+        if (!assetInfo.id || !assetInfo.file) {
+            return null;
+        }
+
+        if (storageSystem === 's3') {
+            assetPath = assetInfo.id + assetInfo.file;
+            if (assetInfo.incoming) {
+                assetPath = "incoming-" + assetPath;
+            }
+        } else {
+            if (assetInfo.incoming) {
+                assetPath =
+                    path.join(incomingDirPath,
+                              assetInfo.id.toString());
+            } else {
+                assetPath =
+                    path.join(contentDirPath,
+                              assetInfo.id.toString());
+            }
+            assetPath = path.join(assetPath, assetInfo.file);
+        }
+        return assetPath;
+    }
+
+    function localMove(fromFile, toFile, fn) {
+        fs.rename(fromFile, toFile, function(err) {
+            if (err && err.code === 'EXDEV') {
+                // we are apparently moving across partitions,
+                //  so fallback to copying
+                var is = fs.createReadStream(fromFile);
+                var os = fs.createWriteStream(toFile);
+                
+                is.on('data', function(chunk) { os.write(chunk); })
+                    .on('end', function() {
+                        os.end();
+                        fs.unlink(fromFile);
+                        fn(null);
+                    });
+                return;
+            }
+            fn(err);
+        });
+    }
+
+
+    function localPutStream(fromFile, assetPath, fn)
     {
         //console.log("Let the renaming begin!");
-        var path = process.cwd() + storageConfig.incomingBasePath +
-                assetId;
-        var relPath = assetId + '/' + filename;
-
+        var dirname = path.dirname(assetPath);
         try {
-            fs.mkdirSync(path);
+            fs.mkdirSync(dirname, "0700");
         } catch (err) {
-            if (!fs.existsSync(path)) {
+            if (!fs.existsSync(dirname)) {
                 fn(err);
                 return;
             }
         }
-        path += '/' + filename;
 
-        //console.log("going to rename " + fromFile + " to " + path);
-        fs.rename(fromFile, path,
-                  function(err) {
-                      var res = { 'path' : relPath };
-                      if (err && err.code === 'EXDEV') {
-                          // we are apparently moving across partitions,
-                          //  so fallback to copying
-                          var is = fs.createReadStream(fromFile);
-                          var os = fs.createWriteStream(path);
-
-                          is.on('data', function(chunk) { os.write(chunk); })
-                            .on('end', function() {
-                                os.end();
-                                fs.unlink(fromFile);
-                                fn(null, res);
-                            });
-                          return;
-                      }
-                      fn(err, res);
-                  }
-                 );
+        //console.log("going to rename " + fromFile + " to " + assetPath);
+        localMove(fromFile, assetPath, fn);
     }
 
-    function localGetStream(res, url, filename, fn)
+    function localGetStream(res, parsedUrl, filename, fn)
     {
-        var path = process.cwd() + storageConfig.basePath + url.path;
-        fs.stat(path,
-        function(err, stat) {
+        fs.stat(parsedUrl.path, function(err, stat) {
             if (err) {
                 fn(err);
                 return;
             }
 
-            var stream = fs.createReadStream(path);
+            var stream = fs.createReadStream(parsedUrl.path);
             res.header('Content-Length', stat.size);
             res.header('Content-Type', mime.lookup(stream.path));
             res.attachment(filename);
@@ -94,40 +171,17 @@ var AssetStore = (function() {
         });
     }
 
-    function s3PutStream(fromFile, assetId, filename, client, fn)
+    function s3PutStream(fromFile, assetPath, client, fn)
     {
-        fs.stat(fromFile, function(err, stat) {
-            if (err) {
-                fn(err);
-                return;
-            }
-            if (!stat.isFile()) {
-                fn(new Error('Problem streaming file. Try again later.'));
-                return;
-            }
-
-            var stream = fs.createReadStream(fromFile);
-
-            var s3Req = client.put(assetId+filename, {
-                'Content-Length': stat.size,
-                'Content-Type': mime.lookup(stream.path),
-                'x-amz-acl': 'private'
-            });
-            s3Req.on('response', function(res){
-                //console.log('Upload res status code = ' + res.statusCode);
-                //console.log(res.headers);
-                if (res.statusCode !== 200) {
-                    fn(new Error("File is unavailable. " +
-                                 "Please try again later."));
-                    return;
-                }
-                fn(null, res);
-            });
-            stream
-                .on('error', function(err){ fn(err); })
-                .on('data', function(chunk){ s3Req.write(chunk); })
-                .on('end', function(){ s3Req.end(); });
-        });
+        client.putFile(fromFile, assetPath, {'x-amz-acl': 'private'},
+                       function (err, res) {
+                           if (res.statusCode !== 200) {
+                               fn(new Error("File is unavailable. " +
+                                            "Please try again later."));
+                               return;
+                           }
+                           fn(err, res);
+                       });
     }
 
     function s3GetStream(res, parsedUrl, filename, fn)
@@ -230,13 +284,15 @@ var AssetStore = (function() {
         });
     }
 
-    AssetStore.prototype.upload = function(fromFile, assetId, filename, fn) {
-        if (!fromFile || !assetId || !filename) {
+    AssetStore.prototype.upload = function(fromFile, assetInfo, fn) {
+        var assetPath;
+        if (!fromFile || !assetInfo.id || !assetInfo.file) {
             var err = errors.create('MissingParameters', '');
             fn(err);
             return;
         }
-        
+        assetPath = pathForAsset(assetInfo);
+
         if (storageSystem === 's3') {
             var client;
 
@@ -246,31 +302,31 @@ var AssetStore = (function() {
                 fn(err);
                 return;
             }
-            s3PutStream(fromFile, assetId, filename, client, fn);
+            s3PutStream(fromFile, assetPath, client, fn);
         } else {
-            localPutStream(fromFile, assetId, filename, fn);
+            localPutStream(fromFile, assetPath, fn);
         }
     };
 
-    // storageUrl: the storage mechanism specific URL
-    // filename: the name that hte file should be sent to the client as
     // fn: a function used to process errors with
-    AssetStore.prototype.download = function(res, storageUrl, filename, fn) {
-        var parsedUrl = url.parse(storageUrl);
-
+    AssetStore.prototype.download = function(res, assetInfo, fn) {
+        var assetPath = pathForAsset(assetInfo);
+        var parsedUrl = url.parse(assetPath);
         //console.log(parsedUrl);
 
-        if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-            httpGetStream(res, parsedUrl, filename, fn);
+        if (parsedUrl.protocol === 'http:' ||
+            parsedUrl.protocol === 'https:') {
+            httpGetStream(res, parsedUrl, assetInfo.file, fn);
         } else if (storageSystem === 's3') {
-            s3GetStream(res, parsedUrl, filename, fn);
+            s3GetStream(res, parsedUrl, assetInfo.file, fn);
         } else {
-            localGetStream(res, parsedUrl, filename, fn);
+            localGetStream(res, parsedUrl, assetInfo.file, fn);
         }
     };
 
-    AssetStore.prototype.remove = function(fileUrl, fn) {
-        var parsedUrl = url.parse(fileUrl);
+    AssetStore.prototype.remove = function(assetInfo, fn) {
+        var assetPath = pathForAsset(assetInfo);
+        var parsedUrl = url.parse(assetPath);
 
         if (storageSystem === 's3') {
             var client;
@@ -302,11 +358,43 @@ var AssetStore = (function() {
 
             clientReq.end();
         } else {
-            fs.unlink(parsedUrl.path,
-                      function(err) {
-                          fn(err);
-                          return;
-                      });
+            fs.unlink(parsedUrl.path, function(err) {
+                fn(err);
+                return;
+            });
+        }
+    };
+
+    AssetStore.prototype.publish = function(assetInfo, fn) {
+        var incomingAssetPath, assetPath;
+
+        if (!assetInfo.incoming) {
+            console.warn("Trying to publishing a non-incoming asset!");
+            return;
+        }
+
+        //Can't publish external assets
+        if (assetInfo.path) {
+            return;
+        }
+
+        incomingAssetPath = pathForAsset(assetInfo);
+        assetInfo.incoming = false;
+        assetPath = pathForAsset(assetInfo);
+        assetInfo.incoming = true;
+
+        if (storageSystem === 's3') {
+            var client;
+            console.log("S3 publishing isn't well tested!");
+            try {
+                client = knox.createClient(storageConfig);
+            } catch (err) {
+                fn(err);
+                return;
+            }
+            client.copyFile(incomingAssetPath, assetPath, fn);
+        } else {
+            localMove(incomingAssetPath, assetPath, fn);
         }
     };
 
