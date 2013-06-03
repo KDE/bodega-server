@@ -115,15 +115,16 @@ module.exports = function(db, req, res) {
     var assetInfoQuery =
         "SELECT a.id, l.name as license, l.text as licenseText, a.partner as partnerId, a.version, a.file, \
          a.image, a.name, a.description, ct_canDownload($3, $2, $1) AS downloadable, ct_assetPrice($2, $1) AS price \
-         FROM assets a LEFT JOIN channelAssets c ON (a.id = c.asset)  \
-         LEFT JOIN storeChannels sc ON (sc.channel = c.channel) \
-         LEFT JOIN licenses l ON (a.license = l.id) \
-         WHERE a.id = $1 and sc.store = $2";
+         FROM assets a LEFT JOIN channelAssets ca ON (a.id = ca.asset)  \
+                       LEFT JOIN channels c ON (ca.channel = c.id)  \
+                       LEFT JOIN licenses l ON (a.license = l.id) \
+         WHERE a.id = $1 AND c.store = $2";
 
     var q = db.query(
         assetInfoQuery, [req.params.assetId, req.session.user.store, req.session.user.id],
         function(err, result) {
             if (err) {
+                console.log('LAAAAAAAAAAAAAAAAAAAAME');
                 errors.report('Database', req, res, err);
                 return;
             }
