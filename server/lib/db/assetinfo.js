@@ -124,7 +124,6 @@ module.exports = function(db, req, res) {
         assetInfoQuery, [req.params.assetId, req.session.user.store, req.session.user.id],
         function(err, result) {
             if (err) {
-                console.log('LAAAAAAAAAAAAAAAAAAAAME');
                 errors.report('Database', req, res, err);
                 return;
             }
