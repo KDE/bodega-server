@@ -29,11 +29,10 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
     db.writeCategoryTags(catalog);
     db.writeBooks(catalog);
     db.writeBookChannels(catalog);
-    db.writeBookStoreChannels(catalog);
 }
 
 GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
-    : Database(contentPath),
+    : Database(contentPath, "VIVALDI-1"),
       m_partnerId(0),
       m_authorTagId(0),
       m_categoryTagId(0),
@@ -153,9 +152,9 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, license, author, version, path, file, externid, image, size) "
+                  "(name, license, partner, version, path, file, externid, image, size) "
                   "values "
-                  "(:name, :license, :author, :version, :path, :file, :externid, :image, :size) "
+                  "(:name, :license, :partner, :version, :path, :file, :externid, :image, :size) "
                   "returning id;");
 
     for (itr = books.constBegin(); itr != books.constEnd(); ++itr) {
@@ -202,13 +201,13 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
 void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 {
-    const int booksChannel = writeChannels(QLatin1String("Books"), QLatin1String("Books"), "default/book.png");
+    const int booksChannel = writeChannel(QLatin1String("Books"), QLatin1String("Books"), "default/book.png");
 
     const QHash<LCC::Category, QString> map = LCC::categoryMap();
     QHash<LCC::Category, QString>::const_iterator itr;
     for (itr = map.constBegin(); itr != map.constEnd(); ++itr) {
 
-        const int channel = writeChannels(itr.value(), itr.value(), "default/book.png", booksChannel);
+        const int channel = writeChannel(itr.value(), itr.value(), "default/book.png", booksChannel);
 
         if (!channel) {
             return;
@@ -217,25 +216,6 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         m_channelIds[itr.value()] = channel;
     }
     writeBookChannelTags();
-}
-
-void GutenbergDatabase::writeBookStoreChannels(const Catalog &catalog)
-{
-    QHash<QString, int>::const_iterator itr;
-    for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
-         ++itr) {
-        const int channelId = itr.value();
-
-        writeStoreChannels(channelId);
-    }
-
-    for (itr = m_extraChannelIds.constBegin();
-         itr != m_extraChannelIds.constEnd();
-         ++itr) {
-        const int channelId = itr.value();
-
-        writeStoreChannels(channelId);
-    }
 }
 
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const

@@ -25,7 +25,7 @@
 PackageDatabase::PackageDatabase(const QString &channelsCatalogPath,
                                  const QString &packageCatalogPath,
                                  const QString &packageDescPath)
-    : Database(packageDescPath),
+    : Database(packageDescPath, "VIVALDI-1"),
       m_channelsCatalog(channelsCatalogPath),
       m_catalog(PackageCatalog(packageCatalogPath)),
       m_packageDescPath(packageDescPath)
@@ -168,7 +168,7 @@ void PackageDatabase::writePackages()
 void PackageDatabase::writePackageChannels()
 {
     foreach (const Channel &c, m_channelsCatalog.channels()) {
-        writeChannels(c.name, c.description, c.image, c.parent.toInt());
+        writeChannel(c.name, c.description, c.image, c.parent.toInt());
 
         const int chanId = channelId(c.name, c.description, c.parent.toInt());
         const int mime = mimetypeTagId();
@@ -176,8 +176,6 @@ void PackageDatabase::writePackageChannels()
         const int mimetypeId = tagId(mime, c.mimeType, &mimetypeIds);
 
         writeChannelTags(chanId, mimetypeId);
-
-        writeStoreChannels(chanId);
     }
 }
 

@@ -39,7 +39,7 @@ void WallpapersDatabase::write(const QString &catalogPath, bool clearOldData)
 }
 
 WallpapersDatabase::WallpapersDatabase(const QString &contentPath)
-    : Database(contentPath),
+    : Database(contentPath, "VIVALDI-1"),
     m_partnerId(0),
     m_authorTagId(0),
     m_categoryTagId(0),
@@ -57,9 +57,7 @@ WallpapersDatabase::WallpapersDatabase(const QString &contentPath)
 void WallpapersDatabase::writeWallpaperChannels()
 {
     const int chanId = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
-
     writeWallpapersChannelTags();
-    writeStoreChannels(chanId);
 }
 
 void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
@@ -89,7 +87,9 @@ void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
         showError(registerJobQuery);
     }
 
-    int wallpapersChannel = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
+    int wallpapersChannel = writeChannel(QLatin1String("Wallpapers"),
+                                         QLatin1String("Wallpaper images"),
+                                         "default/wallpaper.png");
 
     QSqlQuery checkIfExists;
     checkIfExists.prepare("select id from assets where (path = :path and "
