@@ -22,7 +22,7 @@ describe('Redeeming points code', function(){
     var cookie;
     var testCode = 'NtTMi4EMBJugZu1hxTmv';
     var testPoints = 1000;
-    var startPoints = 0;
+    var startPoints = -1;
 
     before(function(done) {
         var insertQuery = 'INSERT INTO pointCodes (code, points, expires) \
@@ -40,8 +40,7 @@ describe('Redeeming points code', function(){
 
     after(function(done) {
         var deleteQuery = 'DELETE FROM pointCodes WHERE code=$1;';
-        var updateQuery = 'UPDATE people SET points=$1 WHERE \
-        email=\'zack@kde.org\'';
+        var updateQuery = 'UPDATE people SET points=$1 WHERE email=\'zack@kde.org\'';
 
         app.db.dbQuery(function (db) {
             db.query(deleteQuery, [testCode], function(err, result) {
@@ -49,13 +48,19 @@ describe('Redeeming points code', function(){
                     console.warn("Couldn't clean the db after the point redeem test!");
                     console.log(err);
                 }
-                db.query(updateQuery, [startPoints], function(err, result) {
-                    if (err) {
-                        console.warn("Couldn't clean the db for the point redeem test!");
-                        console.log(err);
-                    }
+
+                if (startPoints < 0) {
+                    // we didn't get to run our tests, so startPoints is not initialized
                     done();
-                });
+                } else {
+                    db.query(updateQuery, [startPoints], function(err, result) {
+                        if (err) {
+                            console.warn("Couldn't clean the db for the point redeem test!");
+                            console.log(err);
+                        }
+                        done();
+                    });
+                }
             });
         });
     });
