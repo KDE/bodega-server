@@ -1,4 +1,5 @@
 --begin;
+delete from pointtransactions;
 delete from people;
 delete from purchases;
 delete from downloads;
@@ -36,16 +37,18 @@ select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Content Creator');
 select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');
 
 
-insert into channels (image, partner, active, name, description)
-    values ('games.png', 2, true, 'Games', 'Fun and amusements');
-insert into channels (image, partner, active, name, description)
-    values ('utilities.png', 2, true, 'Utilities', 'Useful tools');
-insert into channels (image, partner, active, name, description)
-    values ('misc.png', 2, true, 'Other', 'Miscellaneous tools and toys');
-insert into channels (image, partner, active, parent, name, description)
-    values ('cardgames.png', 2, true, 2, 'Card Games', 'Bust out the deck of 52!');
-insert into channels (image, partner, active, name, description)
-    values ('loser.png', 3, true, 'Diamond Device Magic', 'Best of the best from Diamond');
+insert into channels (image, store, active, name, description)
+    values ('games.png', 'VIVALDI-1', true, 'Games', 'Fun and amusements');
+insert into channels (image, store, active, name, description, parent)
+    values ('cardgames.png', 'VIVALDI-1', true, 'Card Games', 'Bust out the deck of 52!', 2);
+insert into channels (image, store, active, name, description)
+    values ('plasmoa.png', 'KDE-1', true, 'KDE-1', 'Bust out the deck of 52!');
+insert into channels (image, store, active, name, description)
+    values ('utilities.png', 'DD-1', true, 'Utilities', 'Useful tools');
+insert into channels (image, store, active, name, description)
+    values ('misc.png', 'DD-1', true, 'Other', 'Miscellaneous tools and toys');
+insert into channels (image, store, active, name, description)
+    values ('loser.png', 'DD-2', true, 'Diamond Device Magic', 'Best of the best from Diamond');
 
 
 insert into tags (partner, type, title) values (2, 2, 'Approved by KDE');
@@ -58,16 +61,6 @@ insert into stores (id, partner, name, description) values ('VIVALDI-1', 2, 'MPL
 insert into stores (id, partner, name, description) values ('KDE-1', 2, 'Plasma Workspace', 'KDE Plasma user interfaces');
 insert into stores (id, partner, name, description) values ('DD-1', 3, 'Bling Media Center', 'Imaginary hifi for your home');
 insert into stores (id, partner, name, description) values ('DD-2', 3, 'Affordaphone', 'Finally a phone even you can afford');
-
-insert into storeChannels (store, channel) values ('VIVALDI-1', 2);
-insert into storeChannels (store, channel) values ('VIVALDI-1', 5);
-insert into storeChannels (store, channel) values ('KDE-1', 2);
-insert into storeChannels (store, channel) values ('DD-1', 3);
-insert into storeChannels (store, channel) values ('DD-1', 4);
-insert into storeChannels (store, channel) values ('DD-1', 5);
-insert into storeChannels (store, channel) values ('DD-2', 6);
-insert into storeChannels (store, channel) values ('DD-2', 6);
-insert into storeChannels (store, channel) values ('DD-2', 6);
 
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true, 'aquarium');
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true, 'dice');
