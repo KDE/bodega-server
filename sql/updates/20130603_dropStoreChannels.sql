@@ -4,3 +4,4 @@ update channels c set store = p.store from channels p where p.id = c.parent;
 alter table channels alter column store set not null;
 drop table storeChannels;
 \i core.plsql
+\i purchasing.plsql
