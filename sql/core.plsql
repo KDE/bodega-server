@@ -208,10 +208,6 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION ct_updateStorePrices() RETURNS TRIGGER AS $$
 DECLARE
 BEGIN
-    IF (NEW.markup = 0) THEN
-        RETURN NEW;
-    END IF;
-
     IF (TG_OP = 'UPDATE' AND
         NEW.markup = OLD.markup AND
         NEW.minMarkup = OLD.minMarkup AND
@@ -222,12 +218,12 @@ BEGIN
     END IF;
 
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
-           WHERE asset = assetId AND store = NEW.id AND ending IS NULL;
+           WHERE store = NEW.id AND ending IS NULL;
 
     INSERT INTO assetPrices (asset, store, points)
     SELECT a.id, NEW.id, ct_calcPoints(a.basePrice, NEW.flatMarkup, NEW.markup, NEW.minMarkup, NEW.maxMarkup)
         FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
-                      LEFT JOIN channels c ON (c.id = sc.channel)
+                      LEFT JOIN channels c ON (c.id = sa.channel)
         WHERE c.store = NEW.id AND c.parent IS NULL AND a.basePrice > 0;
     RETURN NEW;
 END;
