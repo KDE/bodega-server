@@ -89,8 +89,7 @@ function searchChannels(db, req, res, args, json)
     var query =
         'SELECT c.id, c.image, c.name, c.description FROM channels c \
          CROSS JOIN  plainto_tsquery(\'english\', $1) as query \
-         LEFT JOIN storeChannels sc  ON (c.topLevel = sc.channel) \
-         WHERE sc.store = $2 and c.en_index @@ query  \
+         WHERE c.store = $2 and c.en_index @@ query  \
          ORDER BY  ts_rank_cd(c.en_index, query) DESC, c.name  \
          LIMIT $3 OFFSET $4;';
 

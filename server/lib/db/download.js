@@ -22,9 +22,9 @@ function launchDownload(db, req, res)
 {
     var assetInfoQuery =
         "SELECT a.id, a.partner as partnerId, a.version, a.path, a.file, a.name \
-         FROM assets a LEFT JOIN channelAssets c ON (a.id = c.asset)  \
-         LEFT JOIN storeChannels sc ON (sc.channel = c.channel) \
-         WHERE a.id = $1 and sc.store = $2";
+         FROM assets a LEFT JOIN channelAssets ca ON (a.id = ca.asset)  \
+         LEFT JOIN channels c ON (c.id = ca.channel) \
+         WHERE a.id = $1 and c.store = $2";
 
     var q = db.query(
         assetInfoQuery, [req.params.assetId, req.session.user.store],

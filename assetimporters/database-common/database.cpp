@@ -28,12 +28,13 @@
 
 #include <QDebug>
 
-Database::Database(const QString &contentPath)
+Database::Database(const QString &contentPath, const QString &store)
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
       m_authorTagId(0),
       m_categoryTagId(0),
-      m_contentPath(contentPath)
+      m_contentPath(contentPath),
+      m_store(store)
 {
     //db.setHostName("localhost");
     m_db.setDatabaseName("bodega");
@@ -67,9 +68,6 @@ void Database::writeInit(bool clearOldData)
     if (clearOldData) {
         qDebug() << "deleting data first ... this can take a fair while as the database triggers run";
         QSqlQuery cleanupQuery;
-        cleanupQuery.prepare("delete from storeChannels where channel in (select id from channels where partner = :partner);");
-        cleanupQuery.bindValue(":partner", m_partnerId);
-        cleanupQuery.exec();
         cleanupQuery.prepare("delete from channels where partner = :partner;");
         cleanupQuery.bindValue(":partner", m_partnerId);
         cleanupQuery.exec();
@@ -79,11 +77,11 @@ void Database::writeInit(bool clearOldData)
     }
 }
 
-int Database::writeChannels(const QString &name, const QString &description, const QString& image, int parentId)
+int Database::writeChannel(const QString &name, const QString &description, const QString& image, int parentId)
 {
     QSqlDatabase::database().transaction();
 
-    int id = channelId(name, description,parentId);
+    int id = channelId(name, description, parentId);
 
     if (!id) {
         QSqlDatabase::database().rollback();
@@ -104,21 +102,6 @@ int Database::writeChannels(const QString &name, const QString &description, con
     QSqlDatabase::database().commit();
 
     return id;
-}
-
-void Database::writeStoreChannels(int channelId)
-{
-    QSqlQuery query;
-
-    query.prepare("insert into storeChannels (store, channel) "
-                  "values ('VIVALDI-1', :channelId);");
-
-
-    query.bindValue(":channelId", channelId);
-    if (!query.exec()) {
-        showError(query);
-        return;
-    }
 }
 
 int Database::authorQuery(const QString &author) const
@@ -268,20 +251,21 @@ int Database::channelCreate(const QString &name,
     QSqlQuery query;
     if (parentId) {
         query.prepare("insert into channels "
-                      "(partner, active, parent, name, description) "
+                      "(partner, store, active, parent, name, description) "
                       "values "
-                      "(:partner, :active, :parent, :name, :description) "
+                      "(:partner, :store, :active, :parent, :name, :description) "
                       "returning id;");
         query.bindValue(":parent", parentId);
     } else {
         query.prepare("insert into channels "
-                      "(partner, active, name, description) "
+                      "(partner, store, active, name, description) "
                       "values "
-                      "(:partner, :active, :name, :description) "
+                      "(:partner, :store, :active, :name, :description) "
                       "returning id;");
     }
 
     query.bindValue(":partner", m_partnerId);
+    query.bindValue(":store", m_store);
     query.bindValue(":active", true);
     query.bindValue(":name", name);
     query.bindValue(":description", description);
@@ -432,7 +416,7 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
     query.bindValue(":name", name);
     query.bindValue(":description", description);
     query.bindValue(":license", licenseId);
-    query.bindValue(":author", partnerId);
+    query.bindValue(":partner", partnerId);
     query.bindValue(":version", version);
     query.bindValue(":path", path);
     query.bindValue(":file", file);

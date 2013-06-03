@@ -8,10 +8,9 @@ BEGIN
                                    (ap.ending IS NULL OR ap.ending >= current_timestamp AT TIME ZONE 'UTC')
                             ORDER BY ap.starting DESC LIMIT 1;
     IF NOT FOUND THEN
-        PERFORM ap.asset FROM channelAssets ap LEFT JOIN channels c ON (ap.channel = c.id)
-                                              LEFT JOIN storeChannels sc ON (c.topLevel = sc.channel)
-                                              LEFT JOIN assets a ON (ap.asset = a.id)
-                                              WHERE ap.asset = what AND sc.store = fromStore;
+        PERFORM sca.asset FROM subChannelAssets sca LEFT JOIN channels c ON (sca.channel = c.id)
+                                                    LEFT JOIN assets a ON (sca.asset = a.id)
+                                                    WHERE sca.asset = what AND c.parent IS NULL AND c.store = fromStore;
         IF FOUND THEN
             price := 0;
         ELSE

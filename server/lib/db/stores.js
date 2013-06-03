@@ -20,7 +20,7 @@ var utils = require('../utils.js');
 
 function defaultPartnerId(db, req, res, fn)
 {
-    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
+    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Store Manager';",
             [req.session.user.id],
             function(err, result) {
                 if (err || !result.rows || result.rows.length === 0) {
@@ -38,7 +38,7 @@ function partnerId(db, req, res, fn)
     if (partner < 1) {
         defaultPartnerId(db, req, res, fn);
     } else {
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Store Manager';",
                 [partner, req.session.user.id],
                 function(err, result) {
                     if (err || !result.rows || result.rows.length === 0) {
@@ -51,24 +51,40 @@ function partnerId(db, req, res, fn)
     }
 }
 
-function returnStoreJson(id, db, req, res)
+function sendStoreJson(id, db, req, res)
 {
-    db.query("select s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.flatMarkup, s.markup from stores s join partners p on (s.partner = p.id) where s.id = $1",
-             [id], function(err, result) {
+    var query = "select s.id, s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.flatMarkup, s.markup \
+                 from stores s join partners p on (s.partner = p.id) \
+                 where p.id in (select distinct partner from affiliations where person = $1)";
+    var params = [req.session.user.id];
+    if (typeof id === 'string' && id.length > 0) {
+        query += " and s.id = $2";
+        params.push(id);
+    }
+    query += " order by s.id";
+
+    db.query(query, params, function(err, result) {
                  if (err || !result.rows || result.rows.length < 1) {
                      errors.report('Database', req, res, err);
                      return;
                  }
 
-                 var r = result.rows[0];
-                 var json = utils.standardJson(req, true);
-                 json.storeInfo = { 'id': id,
-                                    'name': r.name,
-                                    'desc': r.description,
-                                    'partner': { 'id': r.partnerid, 'name': r.partnername },
-                                    'markups': { 'min': r.minmarkup, 'max': r.maxmarkup,
-                                                 'flat': r.flatmarkup, 'markup': r.markup }
-                                 };
+                 var storeInfo = [];
+
+                 for (var i = 0; i < result.rows.length; ++i) {
+                     var r = result.rows[i];
+                     storeInfo.push(
+                         { 'id': r.id,
+                           'name': r.name,
+                           'desc': r.description,
+                           'partner': { 'id': r.partnerid, 'name': r.partnername },
+                           'markups': { 'min': r.minmarkup, 'max': r.maxmarkup,
+                           'flat': r.flatmarkup, 'markup': r.markup }
+                     });
+                 }
+
+                 var json = utils.standardJson(req);
+                 json.storeInfo = storeInfo;
                  res.json(json);
              });
 }
@@ -90,12 +106,12 @@ function createWithPartner(partner, db, req, res)
     db.query("select id from stores where id = $1;", [id],
              function(err, result) {
                  if (err) {
-                    errors.report('Database', req, res);
+                    errors.report('Database', req, res, err);
                     return;
                  }
 
                  if (result.rows && result.rows.length > 0) {
-                    errors.report('StoreIdExists', req, res, errors.create("Store id exists", "Attempted to create " + id + " for " + partner));
+                    errors.report('StoreIdExists', req, res);//, errors.create("Store id exists", "Attempted to create " + id + " for " + partner));
                     return;
                  }
 
@@ -111,7 +127,7 @@ function createWithPartner(partner, db, req, res)
                                 return;
                             }
 
-                            returnStoreJson(id, db, req, res);
+                            sendStoreJson(id, db, req, res);
                          });
             });
 }
@@ -120,14 +136,14 @@ function deleteWithPartner(partner, db, req, res)
 {
     var id = req.query.id;
     if (!id || id === '') {
-        errors.report('StoreIdInvalid', req, req, errors.create("Invalid Store Id", "Invalid store passed into store deletion: " + id));
+        errors.report('StoreIdInvalid', req, res, errors.create("Invalid Store Id", "Invalid store passed into store deletion: " + id));
         return;
     }
 
     db.query("delete from stores where id = $1 and partner = $2", [id, partner],
              function(err, result) {
                 if (err) {
-                    errors.report('Database', req, res);
+                    errors.report('Database', req, res, err);
                     return;
                 }
 
@@ -140,25 +156,167 @@ function deleteWithPartner(partner, db, req, res)
              });
 }
 
+function ifCanManageStore(db, req, res, fn)
+{
+    partnerId(db, req, res,
+              function(partner, db, req, res) {
+                  db.query("select id from stores where id = $1 and partner = $2", [req.query.id, partner],
+                        function(err, result) {
+                            if (err || !result) {
+                                errors.report('Database', req, res, err);
+                                return;
+                            }
 
+                            if (result.rowCount < 1) {
+                                errors.report('StoreIdInvalid', req, res);
+                                return;
+                            }
+
+                            fn(partner, result.rows[0].id, db, req, res);
+                        });
+              });
+}
+
+function setMarkups(partner, store, db, req, res)
+{
+    var query = "update stores set ";
+    var updates = [];
+    var params = [];
+    var count = 0;
+
+    var min = utils.parseNumber(req.query.minmarkup, -1);
+    if (min >= 0) {
+        updates.push("minMarkup = $" + ++count);
+        params.push(min);
+    }
+
+    var max = utils.parseNumber(req.query.maxmarkup, -1);
+    if (max >= 0) {
+        updates.push("maxMarkup = $" + ++count);
+        params.push(max);
+    }
+
+    var flat = req.query.flatmarkup;
+    if (flat) {
+        flat = utils.parseBool(flat);
+        updates.push("flatMarkup = $" + ++count);
+        params.push(flat);
+    }
+
+    var markup = utils.parseNumber(req.query.markup, -1);
+    if (markup >= 0) {
+        updates.push("markup = $" + ++count);
+        params.push(markup);
+    }
+
+    if (count > 0) {
+        query += updates.join(', ') + ' where id = $' + ++count;
+        params.push(store);
+        db.query(query, params,
+                 function(err, result) {
+                     if (err) {
+                         errors.report('Database', req, res, err);
+                         return;
+                     }
+
+                     sendStoreJson(store, db, req, res);
+                 });
+    } else {
+        sendStoreJson(store, db, req, res);
+    }
+}
+
+function createNewChannel(partner, store, db, req, res)
+{
+    //TODO:implement
+}
+
+function updateChannel(partner, store, db, req, res)
+{
+    var channelId = utils.parseNumber(req.channel.id);
+    var channelParent = utils.parseNumber(req.channel.id);
+    var channelName = req.channel.name;
+
+    if (channelId > 0) {
+        db.query("select partner, parent, toplevel from channels where id = $1;" [ channelId ],
+                 function(err, result) {
+                     if (err) {
+                         error.report('Database', req, res, err);
+                         return;
+                     }
+
+                     if (!result || !result.rows || result.rowCount < 1) {
+                         error.report('StoreChannelIdInvalid', req, res);
+                         return;
+                     }
+
+                     // check that the parent is not going to create a loop
+                     // check that the parent exists, associated with this partner?
+                     // set the name
+                     db.query('select ct_updateChannel($1, $2, $3);', [channelId, channelParent, channelName],
+                              function(err, result) {
+                                  if (req.tags) {
+                                       //TODO: implement tags
+                                  }
+                              });
+
+                 });
+    } else {
+        createNewChannel(partner, store, db, req, res);
+    }
+}
+
+/********************* PUBLIC API *********************/
+
+/**
+ * No arguments taken, returns an array containing all stores associated to this
+ * person's partner organizations
+ */
+module.exports.list = function(db, req, res) {
+    sendStoreJson(null, db, req, res);
+}
 
 /**
  * + int partner
  * + string name
- * * string ID
+ * * string id
  * * string description
  * * int minmarkup
  * * int maxmarkup
  * * int flatmarkup
+ * * int markup
  **/
 module.exports.create = function(db, req, res) {
     partnerId(db, req, res, createWithPartner);
 };
 
 /**
- * + string ID
+ * + string id
  */
 module.exports.delete = function(db, req, res) {
     partnerId(db, req, res, deleteWithPartner);
 };
 
+/**
+ * + string id
+ * + int minMarkup
+ * + int maxMarkup
+ * + bool flatMarkup
+ * + markup
+ */
+module.exports.setMarkups = function(db, req, res) {
+    ifCanManageStore(db, req, res, setMarkups);
+}
+
+/**
+ * + string id
+ * + channel {
+ *      * int id; if < 1 (or missing) a new channel will be created
+ *      * int parent; the parent channel for this one
+ *      * string name; the name for the channel
+ *      at least one of id or name must be provided
+ * * Array[int] tags
+ */
+module.exports.updateChannel = function(db, req, res) {
+    ifCanManageStore(db, req, res, updateChannel);
+}

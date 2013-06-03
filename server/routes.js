@@ -284,21 +284,27 @@ app.get(serverPath('stats/assets'), isAuthorized,
 
 //********************************
 // Store management
+app.get(serverPath('store/list'), isAuthorized,
+    function(req, res) {
+        app.db.listStores(req, res);
+    }
+);
+
 app.get(serverPath('store/create'), isAuthorized,
     function(req, res) {
         app.db.createStore(req, res);
     }
 );
 
-app.get(serverPath('store/info'), isAuthorized,
-    function(req, res) {
-//        app.db.storeInfo(req, res);
-    }
-);
-
 app.get(serverPath('store/delete'), isAuthorized,
     function(req, res) {
         app.db.deleteStore(req, res);
+    }
+);
+
+app.get(serverPath('store/setMarkups'), isAuthorized,
+    function(req, res) {
+        app.db.setMarkups(req, res);
     }
 );
 

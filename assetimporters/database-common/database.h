@@ -10,11 +10,10 @@ class Database
 {
 
 public:
-    Database(const QString &contentPath);
+    Database(const QString &contentPath, const QString &store);
 
 protected:
     void writeInit(bool clearOldData);
-    void writeStoreChannels(int channelId);
     int writeAsset(QSqlQuery query, const QString &name, const QString &description,
                    int licenseId, int partnerId,
                    const QString &version,
@@ -28,7 +27,7 @@ protected:
     int channelId(const QString &name,
                   const QString &description,
                   int parentId=0);
-    int writeChannels(const QString &name, const QString &description, const QString& image, int parentId = 0);
+    int writeChannel(const QString &name, const QString &description, const QString& image, int parentId = 0);
 
     virtual int partnerId();
     virtual int licenseId();
@@ -69,6 +68,7 @@ private:
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;
     QString m_contentPath;
+    QString m_store;
 };
 
 

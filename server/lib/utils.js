@@ -23,7 +23,7 @@ module.exports.parseBool = function(string)
     return (string === 'true' || string === '1') ? true : false;
 };
 
-module.exports.parseNumber = function(string)
+module.exports.parseNumber = function(string, defaultValue)
 {
     if (string === null) {
         return 0;
@@ -31,7 +31,7 @@ module.exports.parseNumber = function(string)
 
     var rv = parseInt(string, 10);
     if (isNaN(rv)) {
-        return 0;
+        return defaultValue ? defaultValue : 0;
     }
 
     return rv;

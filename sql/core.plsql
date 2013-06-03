@@ -208,10 +208,6 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION ct_updateStorePrices() RETURNS TRIGGER AS $$
 DECLARE
 BEGIN
-    IF (NEW.markup = 0) THEN
-        RETURN NEW;
-    END IF;
-
     IF (TG_OP = 'UPDATE' AND
         NEW.markup = OLD.markup AND
         NEW.minMarkup = OLD.minMarkup AND
@@ -221,12 +217,14 @@ BEGIN
         RETURN NEW;
     END IF;
 
+    UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
+           WHERE store = NEW.id AND ending IS NULL;
+
     INSERT INTO assetPrices (asset, store, points)
     SELECT a.id, NEW.id, ct_calcPoints(a.basePrice, NEW.flatMarkup, NEW.markup, NEW.minMarkup, NEW.maxMarkup)
         FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
-                      LEFT JOIN storeChannels sc ON (sc.channel = sa.channel)
-                      LEFT JOIN channels c ON (c.id = sc.channel)
-        WHERE dc.store = NEW.id AND c.parent IS NULL AND a.basePrice > 0;
+                      LEFT JOIN channels c ON (c.id = sa.channel)
+        WHERE c.store = NEW.id AND c.parent IS NULL AND a.basePrice > 0;
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -241,7 +239,8 @@ DECLARE
     storeRec  RECORD;
     price int := 0;
 BEGIN
-    UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC') WHERE asset = assetId;
+    UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
+    WHERE asset = assetId AND ending IS NULL;
 
     IF (basePrice <= 0) THEN
         RETURN;
@@ -249,8 +248,8 @@ BEGIN
 
     FOR storeRec IN
         SELECT DISTINCT d.id, d.minMarkup, d.maxMarkup, d.flatMarkup, d.markup
-        FROM stores d JOIN storeChannels c ON (d.id = c.store)
-                       JOIN channelAssets a ON (c.channel = a.channel AND a.asset = assetId)
+        FROM stores d JOIN channels c ON (d.id = c.store AND parent IS NULL)
+                      JOIN subChannelAssets a ON (a.channel = c.id AND a.asset = assetId)
     LOOP
         INSERT INTO assetPrices (asset, store, points) VALUES (assetId, storeRec.id, ct_calcPoints(basePrice, storeRec.flatMarkup, storeRec.markup, storeRec.minMarkup, storeRec.maxMarkup));
     END LOOP;
@@ -329,3 +328,41 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION ct_updateChannel(channelId int, channelParent int, channelName text) RETURNS BOOL
+AS
+$$
+DECLARE
+    parentTrace int;
+BEGIN
+    IF (channelParent > 0) THEN
+        IF (channelId = channelParent) THEN
+            RETURN FALSE;
+        END IF;
+
+        parentTrace := channelParent;
+        WHILE parentTrace > 0
+        LOOP
+            SELECT INTO parentTrace parent FROM channels WHERE id = parentTrace;
+            IF NOT FOUND THEN
+                RETURN FALSE;
+            END IF;
+
+            IF (parentTrace = channelId) THEN
+                -- Uh-oh .. we found a loop back to ourself
+                RETURN FALSE;
+            END IF;
+
+        END LOOP;
+
+        UPDATE channels SET parent = channelParent WHERE id = channelId;
+    ELSIF (channelParent = 0) THEN
+        UPDATE channels SET parent = null WHERE id = channelId;
+    END IF;
+
+    IF (length(channelName) > 0) THEN
+        UPDATE channels SET name = channelName WHERE id = channelId;
+    END IF;
+
+    RETURN TRUE;
+END;
+$$ LANGUAGE 'plpgsql';
