@@ -106,7 +106,7 @@ function createWithPartner(partner, db, req, res)
     db.query("select id from stores where id = $1;", [id],
              function(err, result) {
                  if (err) {
-                    errors.report('Database', req, res);
+                    errors.report('Database', req, res, err);
                     return;
                  }
 
@@ -143,7 +143,7 @@ function deleteWithPartner(partner, db, req, res)
     db.query("delete from stores where id = $1 and partner = $2", [id, partner],
              function(err, result) {
                 if (err) {
-                    errors.report('Database', req, res);
+                    errors.report('Database', req, res, err);
                     return;
                 }
 
@@ -163,7 +163,7 @@ function ifCanManageStore(db, req, res, fn)
                   db.query("select id from stores where id = $1 and partner = $2", [req.query.id, partner],
                         function(err, result) {
                             if (err || !result) {
-                                errors.report('Database', req, res);
+                                errors.report('Database', req, res, err);
                                 return;
                             }
 
@@ -215,7 +215,7 @@ function setMarkups(partner, store, db, req, res)
         db.query(query, params,
                  function(err, result) {
                      if (err) {
-                         errors.report('Database', req, res);
+                         errors.report('Database', req, res, err);
                          return;
                      }
 
@@ -241,7 +241,7 @@ function updateChannel(partner, store, db, req, res)
         db.query("select partner, parent, toplevel from channels where id = $1;" [ channelId ],
                  function(err, result) {
                      if (err) {
-                         error.report('Database', req, res);
+                         error.report('Database', req, res, err);
                          return;
                      }
 
