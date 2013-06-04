@@ -18,7 +18,7 @@
 var pg = require('pg');
 var server = require('../app.js');
 var utils = require('./support/http');
-var queryString = require('querystring');
+var queryString = require('qs');
 
 describe('Store management', function(){
     var cookie;
@@ -386,6 +386,34 @@ describe('Store management', function(){
         });
     });
 
+    describe('Channel manipulation', function() {
+        it('should allow adding a new channel', function(done) {
+            var query = {
+                'id': 'VIVALDI-1',
+                'channel': {
+                    'name': 'Test Channel',
+                    'parent': 2,
+                    'description': 'A test channel'
+                    'addTags': [130, 131]
+                }
+            };
+
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/updateChannel?' + queryString.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('channel');
+                    //TODO: check channel contents
+                    done();
+                },
+                cookie);
+            });
+        });
 
     describe('Store deletion', function() {
         it('should succeed with a valid store', function(done) {

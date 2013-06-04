@@ -310,7 +310,7 @@ app.get(serverPath('store/setMarkups'), isAuthorized,
 
 app.get(serverPath('store/updateChannel'), isAuthorized,
     function(req, res) {
-//        app.db.updateStoreChannel(req, res);
+        app.db.updateStoreChannel(req, res);
     }
 );
 
