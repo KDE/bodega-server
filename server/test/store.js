@@ -524,7 +524,10 @@ describe('Store management', function(){
         pg.connect(connectionString, function(err, client, finis) {
                    client.query("delete from stores where id = '2_FUN_TIMES_WITH_CLOWNS' or id = 'somethingcrazy'", [],
                    function(err, result) {
-                       done();
+                       client.query("delete from channels where name = 'Test Channel';", [],
+                       function(err, result) {
+                           done();
+                       });
                    });
         });
     });
