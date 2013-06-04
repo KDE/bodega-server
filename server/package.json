@@ -22,7 +22,8 @@
         "should": ">= 0.5.1",
         "jshint": ">= 0.5.8",
         "request" : "latest",
-        "querystring" : "latest"
+        "querystring" : "latest",
+        "qs" : "latest"
     },
     "engines": {
         "node": ">=0.10.0"
