@@ -48,9 +48,12 @@ app.db = new BodegaDb();
 app.assetStore = new AssetStore();
 app.contentPartner = new ContentPartner();
 
+// Configuration
+
 // We don't want an exception to kill our app, but we don't want
 //   to intercept exception in tests or during dev testing
 if (argv.production) {
+    app.use(express.compress());
     app.use(express.errorHandler());
     process.on('uncaughtException', function(err) {
         console.log("Uncaught exception: ");
@@ -61,8 +64,6 @@ if (argv.production) {
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 }
 
-// Configuration
-//app.use(express.logger());
 app.use(express.static(__dirname + '/public'));
 app.use(express.bodyParser());
 app.use(express.cookieParser());
