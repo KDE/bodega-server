@@ -60,3 +60,81 @@ RETURNS setof AssetInfo AS $$
 BEGIN
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ct_addTagsToChannel(channelId int, partnerId int, tags int[]) RETURNS VOID AS $$
+DECLARE
+    tagId   int;
+BEGIN
+    FOREACH tagId IN ARRAY tags LOOP
+        PERFORM * FROM tags WHERE id = tagId AND partner IS NULL OR partner = partnerId;
+        IF FOUND THEN
+            PERFORM * FROM channelTags WHERE channel = channelId AND tag = tagId;
+            IF NOT FOUND THEN
+                INSERT INTO channelTags (channel, tag) VALUES (channelId, tagId);
+            END IF;
+        END IF;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ct_rmTagsFromChannel(channelId int, tags int[]) RETURNS VOID AS $$
+DECLARE
+    tagId   int;
+BEGIN
+    DELETE FROM channelTags WHERE channel = channelId AND tag = ANY(tags);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ct_updateChannel(channelId int, channelParent int, channelName text) RETURNS BOOL AS $$
+DECLARE
+    parentTrace int;
+BEGIN
+    IF (channelParent > 0) THEN
+        IF (channelId = channelParent) THEN
+            RETURN FALSE;
+        END IF;
+
+        parentTrace := channelParent;
+        WHILE parentTrace > 0
+        LOOP
+            SELECT INTO parentTrace parent FROM channels WHERE id = parentTrace;
+            IF NOT FOUND THEN
+                RETURN FALSE;
+            END IF;
+
+            IF (parentTrace = channelId) THEN
+                -- Uh-oh .. we found a loop back to ourself
+                RETURN FALSE;
+            END IF;
+
+        END LOOP;
+
+        UPDATE channels SET parent = channelParent WHERE id = channelId;
+    ELSIF (channelParent = 0) THEN
+        UPDATE channels SET parent = null WHERE id = channelId;
+    END IF;
+
+    IF (length(channelName) > 0) THEN
+        UPDATE channels SET name = channelName WHERE id = channelId;
+    END IF;
+
+    RETURN TRUE;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION ct_addChannel(storeName text, channelParent int, channelName text) RETURNS INT AS $$
+DECLARE
+BEGIN
+    IF (channelParent > 0) THEN
+        INSERT INTO channels (store, parent, name) VALUES (storeName, channelParent, channelName);
+    ELSE
+        INSERT INTO channels (store, name) VALUES (storeName, channelName);
+    END IF;
+
+    IF FOUND THEN
+        RETURN currval('seq_channelIds');
+    ELSE
+        RETURN 0;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
