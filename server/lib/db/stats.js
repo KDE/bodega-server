@@ -34,10 +34,21 @@ module.exports.assetStats = function(db, req, res) {
         granularity = "year";
     }
 
+    if (req.query.assets && req.query.assets.length > 0) {
+            query += "select dateof";
+
+            for (i = 0; i < req.query.assets.length; ++i) {
+                query += ", asset" + req.query.assets[i];
+            }
+            query += " from (";
+    } else {
+        query += "select dateof, total from (";
+    }
+
     if (req.query.metric === "count") {
         if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
-            query = "select date_trunc('" + granularity + "', p.purchasedon) dateOf,";
+            query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate,";
 
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += "sum(CASE WHEN asset = $" + (i+2) + " THEN 1 ELSE 0 END) AS asset" + req.query.assets[i];
@@ -50,18 +61,18 @@ module.exports.assetStats = function(db, req, res) {
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
-            query += ") group by dateOf order by dateOf;";
+            query += ") group by assetdate order by assetdate";
         } else {
-            query += "select date_trunc('" + granularity + "', p.purchasedon) dateOf, \
+            query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate, \
                     count(*) AS total \
                     from purchases p left join assets a on (p.asset = a.id and a.partner = $1) \
-                    group by dateOf order by dateOf;";
+                    group by assetdate order by assetdate";
         }
 
     } else if (req.query.metric === "downloads") {
         if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
-            query = "select date_trunc('" + granularity + "', d.downloadedon) dateOf,";
+            query += "select date_trunc('" + granularity + "', d.downloadedon) assetdate,";
 
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += "sum(CASE WHEN asset = $" + (i+2) + " THEN 1 ELSE 0 END) AS asset" + req.query.assets[i];
@@ -74,18 +85,18 @@ module.exports.assetStats = function(db, req, res) {
             for ( i = 0; i < req.query.assets.length; ++i) {
                 query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
-            query += ") group by dateOf order by dateOf;";
+            query += ") group by assetdate order by assetdate";
 
         } else {
-            query += "select date_trunc('" + granularity + "', d.downloadedon) dateOf, \
+            query += "select date_trunc('" + granularity + "', d.downloadedon) assetdate, \
                     count(*) AS total \
                     from downloads d left join assets a on (d.asset = a.id and a.partner = $1) \
-                    group by dateOf order by dateOf;";
+                    group by assetdate order by assetdate";
         }
     } else {
         if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
-            query = "select date_trunc('" + granularity + "', p.purchasedon) dateOf,";
+            query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate,";
 
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += "SUM(CASE WHEN asset = $" + (i+2) + " THEN p.toparticipant ELSE 0 END) AS asset" + req.query.assets[i];
@@ -98,14 +109,20 @@ module.exports.assetStats = function(db, req, res) {
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
-            query += ") group by dateOf order by dateOf;";
+            query += ") group by assetdate order by assetdate";
         } else {
-            query += "select date_trunc('" + granularity + "', p.purchasedon) dateOf, \
+            query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate, \
                     SUM(p.toparticipant) AS total \
                     from purchases p left join assets a on (p.asset = a.id and a.partner = $1) \
-                    group by dateOf order by dateOf;";
+                    group by assetdate order by assetdate";
         }
     }
+
+    query += ") q \
+            right join (SELECT \
+            (date_trunc('" + granularity + "',CURRENT_DATE) + (\"Series\".\"Index\" || '" + granularity + "')::INTERVAL) AS \"dateof\" \
+            FROM \
+            generate_series(-12,1, 1) AS \"Series\"(\"Index\")) d on(d.dateof = assetdate)";
 
     var json = utils.standardJson(req);
     json.stats = [];
