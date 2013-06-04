@@ -424,6 +424,76 @@ describe('Store management', function(){
                 cookie);
             });
 
+        it('fetch the structure of the store', function(done) {
+           var query = {
+                'id': 'VIVALDI-1'
+           };
+
+           utils.getUrl(
+                server,
+                '/bodega/v1/json/store/structure?' + queryString.stringify(query),
+                function(res) {
+                    var channel2 =
+                        { "id": 2,
+                          "name": "Games",
+                          "description": "Fun and amusements",
+                          "image": "games.png",
+                          "active": true,
+                          "tags": [
+                            {
+                              "id": 1,
+                              "title": "application/x-plasma",
+                              "type": 7},
+                            {
+                              "id": 2,
+                              "title": "Early Childhood",
+                              "type": 8
+                            }
+                            ],
+                            "channels": [
+                              {
+                                "id": 3,
+                                "name": "Card Games",
+                                "description": "Bust out the deck of 52!",
+                                "image": "cardgames.png",
+                                "active": true,
+                                "tags": [
+                                    {
+                                      "id":1,
+                                      "title": "application/x-plasma",
+                                      "type": 7
+                                    },
+                                    {
+                                      "id": 3,
+                                      "title": "Everyone",
+                                      "type": 8
+                                    }
+                                ],
+                                "channels": []
+                              }
+                            ]
+                        };
+                    channel2.channels.push(
+                                    {
+                                        "id": newChannelId,
+                                        "name": "Test Channel",
+                                        "description": "A test channel",
+                                        "image": null,
+                                        "active": true,
+                                        "tags": [],
+                                        "channels": []
+                                    });
+                    var expected = [ channel2 ];
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    res.body.channels.should.eql(expected);
+                    done();
+                },
+                cookie);
+        });
+
         it('should be possible to delete that channel', function(done) {
             var query = { 'id': 'VIVALDI-1',
                           'channelId': newChannelId };

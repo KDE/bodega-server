@@ -253,12 +253,12 @@ function sendChannelInfo(channelId, db, req, res)
     db.query(query, [channelId],
             function(err, result) {
                 if (err) {
-                    error.report('Database', req, res, err);
+                    errors.report('Database', req, res, err);
                     return;
                 }
 
                 if (result.rowCount < 1) {
-                    error.report('StoreChannelIdInvalid', req, res);
+                    errors.report('StoreChannelIdInvalid', req, res);
                     return;
                 }
 
@@ -279,7 +279,7 @@ function addChannelTags(partner, store, channelId, db, req, res)
             db.query("select ct_addTagsToChannel($1, $2, '{" + addTags.join(', ') + "}'::INT);", [channelId, partner],
                      function(err, res) {
                          if (error) {
-                             error.report('Database', req, res, err);
+                             errors.report('Database', req, res, err);
                              return;
                          }
 
@@ -304,7 +304,7 @@ function rmChannelTags(partner, store, channelId, db, req, res)
             db.query("select ct_rmTagsFromChannel($1, $2, '{" + rmTags.join(', ') + "}'::INT);", [channelId, partner],
                      function(err, res) {
                          if (error) {
-                             error.report('Database', req, res, err);
+                             errors.report('Database', req, res, err);
                              return;
                          }
 
@@ -329,12 +329,12 @@ function updateChannel(partner, store, db, req, res)
         db.query("select partner, parent, toplevel from channels where id = $1;", [ channelId ],
                  function(err, result) {
                      if (err) {
-                         error.report('Database', req, res, err);
+                         errors.report('Database', req, res, err);
                          return;
                      }
 
                      if (!result || !result.rows || result.rowCount < 1) {
-                         error.report('StoreChannelIdInvalid', req, res);
+                         errors.report('StoreChannelIdInvalid', req, res);
                          return;
                      }
 
@@ -362,7 +362,7 @@ function deleteChannel(partner, store, db, req, res)
         db.query('delete from channels where id = $1 and store = $2;', [channelId, store],
                  function(err, results) {
                      if (err) {
-                         error.report('Database', req, res, err);
+                         errors.report('Database', req, res, err);
                          return;
                      }
 
@@ -373,67 +373,82 @@ function deleteChannel(partner, store, db, req, res)
     }
 }
 
-function channelStructureFetch(json, leafObj, parent, store, db, req, res)
+function channelStructureFetch(json, leafObj, parent, db, req, res)
 {
-    db.query('select id, parent, image, name, description, active, assetCount from channels where store = $1 and parent = $2',
-             [store, parent],
+    db.query('select t.id as id, t.title as title, t.type as type from channelTags ct left join tags t on (ct.tag = t.id) where ct.channel = $1',
+             [parent],
+    function(err, results) {
+    if (err) {
+        errors.report('Database', req, res, err);
+        return;
+    }
+
+    for (var i = 0; i < results.rowCount; ++i) {
+        leafObj.tags.push(results.rows[i]);
+    }
+
+    db.query('select id, parent, image, name, description, active, assetCount from channels where parent = $1 order by id',
+             [parent],
              function(err, results) {
                 if (err) {
-                    error.report('Databsae', req, res, err);
+                    errors.report('Databsae', req, res, err);
                     return;
                 }
 
-                if (results.rowCount > 0) {
-                    json.remaining +=  results.rowCount;
-                    for (var i = 0; i < results.rowCount; ++i) {
-                        var row = results.rows[i];
-                        leafObj.channels[row.id] = { 'name': row.name,
-                                                     'description': row.description,
-                                                     'image': row.image,
-                                                     'active': row.active,
-                                                     'assetCount': row.assetCount,
-                                                     'channels': {} };
-                        channelStructure(json, leafObj.channels[row.id], row.id, store, db, req, res);
-                    }
-                }
+                channelStructureLaunch(results, json, leafObj, db, req, res);
 
                 --json.remaining;
                 if (json.remaining < 1) {
                     delete json.remaining;
+                    //console.log(JSON.stringify(json, undefined, 2));
                     res.json(json);
                 }
             });
+    });
+}
+
+function channelStructureLaunch(results, json, leafObj, db, req, res)
+{
+    if (results.rowCount < 1) {
+        return;
+    }
+
+    json.remaining += results.rowCount;
+    for (var i = 0; i < results.rowCount; ++i) {
+        var row = results.rows[i];
+        var channel = { 'id': row.id,
+                        'name': row.name,
+                        'description': row.description,
+                        'image': row.image,
+                        'active': row.active,
+                        'assetCount': row.assetCount,
+                        'tags': [],
+                        'channels': []
+        };
+        leafObj.channels.push(channel);
+        channelStructureFetch(json, channel, channel.id, db, req, res);
+    }
 }
 
 function channelStructure(partner, store, db, req, res)
 {
-    db.query('select id, parent, image, name, description, active, assetCount from channels where store = $1 and parent is null', [store],
+    db.query('select id, parent, image, name, description, active, assetCount from channels where parent is null and store = $1 order by id', [store],
              function(err, results) {
                  if (err) {
-                    error.report('Database', req, res, err);
+                    errors.report('Database', req, res, err);
                     return;
                 }
 
-                var json = utils.standardJson();
-                json.remaining = results.rowCount;
-                json.channels = {};
+                var json = utils.standardJson(req);
+                json.channels = [];
 
                 if (results.rowCount < 1) {
                     res.json(json);
                     return;
                 }
 
-                for (var i = 0; i < results.rowCount; ++i) {
-                    var row = results.rows[i]
-                    json.channels[row.id] = { 'name': row.name,
-                                              'description': row.description,
-                                              'image': row.image,
-                                              'active': row.active,
-                                              'assetCount': row.assetCount,
-                                              'channels': {} };
-
-                    channelStructure(json, json.channels[row.id], row.id, store, db, req, res);
-                }
+                json.remaining = 0;
+                channelStructureLaunch(results, json, json, db, req, res);
             });
 }
 

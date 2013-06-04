@@ -308,7 +308,7 @@ app.get(serverPath('store/setMarkups'), isAuthorized,
     }
 );
 
-app.get(serverPath('store/channels'), isAuthorized,
+app.get(serverPath('store/structure'), isAuthorized,
     function(req, res) {
         app.db.storeChannelStructure(req, res);
     }
