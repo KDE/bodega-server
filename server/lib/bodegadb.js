@@ -191,12 +191,20 @@ var BodegaDb = (function() {
         this.dbQuery(dbStores.delete, req, res);
     };
 
-    BodegaDb.prototype.setMarkups = function(req, res) {
+    BodegaDb.prototype.setStoreMarkups = function(req, res) {
         this.dbQuery(dbStores.setMarkups, req, res);
+    };
+
+    BodegaDb.prototype.storeChannelStructure = function(req, res) {
+        this.dbQuery(dbStores.channelStructure, req, res);
     };
 
     BodegaDb.prototype.updateStoreChannel = function(req, res) {
         this.dbQuery(dbStores.updateChannel, req, res);
+    };
+
+    BodegaDb.prototype.deleteStoreChannel = function(req, res) {
+        this.dbQuery(dbStores.deleteChannel, req, res);
     };
 
     BodegaDb.prototype.hunt = function(req, res) {

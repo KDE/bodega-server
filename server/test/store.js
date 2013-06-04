@@ -387,6 +387,7 @@ describe('Store management', function(){
     });
 
     describe('Channel manipulation', function() {
+        var newChannelId = 0;
         it('should allow adding a new channel', function(done) {
             var query = {
                 'id': 'VIVALDI-1',
@@ -408,12 +409,39 @@ describe('Store management', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
-                    //TODO: check channel contents
+                    res.body.channel.should.have.property('id');
+                    res.body.channel.should.have.property('store', 'VIVALDI-1');
+                    res.body.channel.should.have.property('parent', 2);
+                    res.body.channel.should.have.property('image');
+                    res.body.channel.should.have.property('name', 'Test Channel');
+                    res.body.channel.should.have.property('description', 'A test channel');
+                    res.body.channel.should.have.property('active', true);
+                    res.body.channel.should.have.property('assetcount');
+                    newChannelId = res.body.channel.id;
+
                     done();
                 },
                 cookie);
             });
+
+        it('should be possible to delete that channel', function(done) {
+            var query = { 'id': 'VIVALDI-1',
+                          'channelId': newChannelId };
+
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/store/deleteChannel?' + queryString.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    done();
+                },
+                cookie);
         });
+    });
 
     describe('Store deletion', function() {
         it('should succeed with a valid store', function(done) {

@@ -304,7 +304,13 @@ app.get(serverPath('store/delete'), isAuthorized,
 
 app.get(serverPath('store/setMarkups'), isAuthorized,
     function(req, res) {
-        app.db.setMarkups(req, res);
+        app.db.setStoreMarkups(req, res);
+    }
+);
+
+app.get(serverPath('store/channels'), isAuthorized,
+    function(req, res) {
+        app.db.storeChannelStructure(req, res);
     }
 );
 
@@ -314,9 +320,9 @@ app.get(serverPath('store/updateChannel'), isAuthorized,
     }
 );
 
-app.get(serverPath('store/removeChannel'), isAuthorized,
+app.get(serverPath('store/deleteChannel'), isAuthorized,
     function(req, res) {
-//        app.db.removeStoreChannel(req, res);
+        app.db.deleteStoreChannel(req, res);
     }
 );
 

@@ -354,6 +354,89 @@ function updateChannel(partner, store, db, req, res)
     }
 }
 
+function deleteChannel(partner, store, db, req, res)
+{
+    var channelId = utils.parseNumber(req.query.channelId);
+
+    if (channelId > 0) {
+        db.query('delete from channels where id = $1 and store = $2;', [channelId, store],
+                 function(err, results) {
+                     if (err) {
+                         error.report('Database', req, res, err);
+                         return;
+                     }
+
+                     res.json(utils.standardJson(req));
+                 });
+    } else {
+        res.json(utils.standardJson(req));
+    }
+}
+
+function channelStructureFetch(json, leafObj, parent, store, db, req, res)
+{
+    db.query('select id, parent, image, name, description, active, assetCount from channels where store = $1 and parent = $2',
+             [store, parent],
+             function(err, results) {
+                if (err) {
+                    error.report('Databsae', req, res, err);
+                    return;
+                }
+
+                if (results.rowCount > 0) {
+                    json.remaining +=  results.rowCount;
+                    for (var i = 0; i < results.rowCount; ++i) {
+                        var row = results.rows[i];
+                        leafObj.channels[row.id] = { 'name': row.name,
+                                                     'description': row.description,
+                                                     'image': row.image,
+                                                     'active': row.active,
+                                                     'assetCount': row.assetCount,
+                                                     'channels': {} };
+                        channelStructure(json, leafObj.channels[row.id], row.id, store, db, req, res);
+                    }
+                }
+
+                --json.remaining;
+                if (json.remaining < 1) {
+                    delete json.remaining;
+                    res.json(json);
+                }
+            });
+}
+
+function channelStructure(partner, store, db, req, res)
+{
+    db.query('select id, parent, image, name, description, active, assetCount from channels where store = $1 and parent is null', [store],
+             function(err, results) {
+                 if (err) {
+                    error.report('Database', req, res, err);
+                    return;
+                }
+
+                var json = utils.standardJson();
+                json.remaining = results.rowCount;
+                json.channels = {};
+
+                if (results.rowCount < 1) {
+                    res.json(json);
+                    return;
+                }
+
+                for (var i = 0; i < results.rowCount; ++i) {
+                    var row = results.rows[i]
+                    json.channels[row.id] = { 'name': row.name,
+                                              'description': row.description,
+                                              'image': row.image,
+                                              'active': row.active,
+                                              'assetCount': row.assetCount,
+                                              'channels': {} };
+
+                    channelStructure(json, json.channels[row.id], row.id, store, db, req, res);
+                }
+            });
+}
+
 /********************* PUBLIC API *********************/
 
 /**
@@ -373,6 +456,8 @@ module.exports.list = function(db, req, res) {
  * * int maxmarkup
  * * int flatmarkup
  * * int markup
+ *
+ * Returns a store info structure
  **/
 module.exports.create = function(db, req, res) {
     partnerId(db, req, res, createWithPartner);
@@ -391,6 +476,8 @@ module.exports.delete = function(db, req, res) {
  * + int maxMarkup
  * + bool flatMarkup
  * + markup
+ *
+ * Returns a channel info structure
  */
 module.exports.setMarkups = function(db, req, res) {
     ifCanManageStore(db, req, res, setMarkups);
@@ -406,7 +493,26 @@ module.exports.setMarkups = function(db, req, res) {
  *      at least one of id or name must be provided
  *      * Array[int] addTags
  *      * Array[int] rmTags
+ *
+ * Returns a channel info structure
  */
 module.exports.updateChannel = function(db, req, res) {
     ifCanManageStore(db, req, res, updateChannel);
+}
+
+/**
+ * + string id
+ * + int channelId
+ */
+module.exports.deleteChannel = function(db, req, res) {
+    ifCanManageStore(db, req, res, deleteChannel);
+}
+
+/**
+ * + string id
+ *
+ * Returns a JSON object reflecting the channel structure of the store
+ */
+module.exports.channelStructure = function(db, req, res) {
+    ifCanManageStore(db, req, res, channelStructure);
 }
