@@ -85,7 +85,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION ct_updateChannel(channelId int, channelParent int, channelName text) RETURNS BOOL AS $$
+CREATE OR REPLACE FUNCTION ct_updateChannel(channelId int, channelParent int, channelName text, channelDescription text) RETURNS BOOL AS $$
 DECLARE
     parentTrace int;
 BEGIN
@@ -118,17 +118,21 @@ BEGIN
         UPDATE channels SET name = channelName WHERE id = channelId;
     END IF;
 
+    IF (length(channelDescription) > 0) THEN
+        UPDATE channels SET description = channelDescription WHERE id = channelId;
+    END IF;
+
     RETURN TRUE;
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION ct_addChannel(storeName text, channelParent int, channelName text) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION ct_addChannel(storeName text, channelParent int, channelName text, channelDescription text) RETURNS INT AS $$
 DECLARE
 BEGIN
     IF (channelParent > 0) THEN
-        INSERT INTO channels (store, parent, name) VALUES (storeName, channelParent, channelName);
+        INSERT INTO channels (store, parent, name, description) VALUES (storeName, channelParent, channelName, channelDescription);
     ELSE
-        INSERT INTO channels (store, name) VALUES (storeName, channelName);
+        INSERT INTO channels (store, name, description) VALUES (storeName, channelName, channelDescription);
     END IF;
 
     IF FOUND THEN

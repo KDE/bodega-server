@@ -393,7 +393,7 @@ describe('Store management', function(){
                 'channel': {
                     'name': 'Test Channel',
                     'parent': 2,
-                    'description': 'A test channel'
+                    'description': 'A test channel',
                     'addTags': [130, 131]
                 }
             };

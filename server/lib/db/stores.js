@@ -230,7 +230,8 @@ function createChannel(partner, store, db, req, res)
 {
     var channelParent = utils.parseNumber(req.query.channel.parent);
     var channelName = req.query.channel.name;
-    db.query("select ct_addChannel($1, $2, $3) as channel;", [store, channelParent, channelName],
+    var channelDescription = req.query.channel.description;
+    db.query("select ct_addChannel($1, $2, $3, $4) as channel;", [store, channelParent, channelName, channelDescription],
              function(err, results) {
                  if (err) {
                      errors.report('Database', req, res, err);
@@ -320,10 +321,11 @@ function rmChannelTags(partner, store, channelId, db, req, res)
 function updateChannel(partner, store, db, req, res)
 {
     var channelId = utils.parseNumber(req.query.channel.id);
-    var channelParent = utils.parseNumber(req.query.channel.parent);
-    var channelName = req.query.channel.name;
 
     if (channelId > 0) {
+        var channelParent = utils.parseNumber(req.query.channel.parent);
+        var channelName = req.query.channel.name;
+        var channelDescription = req.query.channel.description;
         db.query("select partner, parent, toplevel from channels where id = $1;", [ channelId ],
                  function(err, result) {
                      if (err) {
@@ -339,7 +341,7 @@ function updateChannel(partner, store, db, req, res)
                      // check that the parent is not going to create a loop
                      // check that the parent exists, associated with this partner?
                      // set the name
-                     db.query('select ct_updateChannel($1, $2, $3);', [channelId, channelParent, channelName],
+                     db.query('select ct_updateChannel($1, $2, $3, $4);', [channelId, channelParent, channelName, channelDescription],
                               function(err, result) {
                                   // the next two blocks will be process async, but we return right away
                                   // if a tagging fails, we don't both to send an error to the client
@@ -400,6 +402,7 @@ module.exports.setMarkups = function(db, req, res) {
  *      * int id; if < 1 (or missing) a new channel will be created
  *      * int parent; the parent channel for this one
  *      * string name; the name for the channel
+ *      * string description
  *      at least one of id or name must be provided
  *      * Array[int] addTags
  *      * Array[int] rmTags
