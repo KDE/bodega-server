@@ -32,6 +32,7 @@ app.config = JSON.parse(fs.readFileSync(argv.config ? argv.config : './config.js
 if (argv.production) {
     app.config.stripe.secretKey = app.config.stripe.liveSecretKey;
     app.production = true;
+    app.settings.env = 'production';
 } else {
     app.config.stripe.secretKey = app.config.stripe.testSecretKey;
     app.production = false;
