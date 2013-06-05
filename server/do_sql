@@ -6,7 +6,7 @@ var exec = require('child_process').exec;
 
 
 //those are the files that we use for the setup of the database
-var sql_commands = ['core.sql', 'core.plsql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql', 'upload.sql', 'vivaldi.sql'];
+var sql_commands = ['core.sql', 'core.plsql', 'api.sql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql', 'upload.sql', 'vivaldi.sql'];
 var test_sql_commands = ['testdata.sql'];
 
 var run = function(command, fn) {
