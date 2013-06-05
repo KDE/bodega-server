@@ -80,19 +80,6 @@ describe('Collections', function(){
     });
     describe('authenticate', function(){
         it('should succeed', function(done){
-            var expected = {
-                "store":"VIVALDI-1",
-                "authStatus":true,
-                "points" : 10000,
-                "imageUrls": {
-                    "tiny":"http://0.0.0.0:3000/images/22",
-                    "small":"http://0.0.0.0:3000/images/32",
-                    "medium":"http://0.0.0.0:3000/images/64",
-                    "large":"http://0.0.0.0:3000/images/128",
-                    "huge":"http://0.0.0.0:3000/images/512",
-                    "previews":"http://0.0.0.0:3000/images/previews"
-                }
-            };
             utils.getUrl(
                 server,
                 '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
