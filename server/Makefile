@@ -9,12 +9,12 @@ check:
 	@./node_modules/.bin/jshint --extra-ext .json . ; if [ $$? -eq 0 ] ; then echo "Done. Clean!" ; fi
 
 sql:
-	cd ../sql && ../server/do_sql ../server/config.json . setup
+	cd ../sql && ../server/bodegaDbHelper ../server/config.json . setup
 
 update_sql:
-	cd ../sql && ../server/do_sql ../server/config.json . update
+	cd ../sql && ../server/bodegaDbHelper ../server/config.json . update
 
 test_sql:
-	cd ../sql && ../server/do_sql ../server/config.json . testdata
+	cd ../sql && ../server/bodegaDbHelper ../server/config.json . testdata
 
 .PHONY: test check sql update_sql

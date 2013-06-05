@@ -117,7 +117,7 @@ function confirm(task, fn)
 
 function printUsage()
 {
-    console.log('Usage: do_sql <config.json filepath> <sql directory filepath> <command>');
+    console.log('Usage: bodegaDbHelper <config.json filepath> <sql directory filepath> <command>');
     console.log('Commands include: ');
     console.log('    setup: creates the database');
     console.log('   update: applies pending updates');
