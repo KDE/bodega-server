@@ -26,7 +26,7 @@ function series(list) {
     //this is out command for the sql files
     var command_list = list;
     var sql_command = function(fileName) {
-        var command = 'psql -d ' + config.database.name + ' -U ' +
+        var command = "PGOPTIONS='--client-min-messages=warning' psql -q -d " + config.database.name + ' -U ' +
             config.database.user + ' -f ';
         if (fileName.indexOf(sql_dir) === -1) {
             command += sql_dir
@@ -49,9 +49,13 @@ function series(list) {
                 //its already a command
                 command = element;
             }
-            console.log(command);
+            console.log(element);
+            //console.log(command);
             run(command, function(result) {
-                 console.log(result.trim());
+                 var res = result.trim();
+                 if (res.length > 0) {
+                    console.log(result.trim());
+                 }
                  next();
             });
         } else {
@@ -103,11 +107,11 @@ if (sql_argument == 'update') {
     }
 } else if (sql_argument == 'setup') {
     console.log('====Creating the database schema====');
-    console.log(sql_commands);
+    //console.log(sql_commands);
     sql_commands.unshift('createdb -O ' + config.database.name + ' ' +
                          config.database.name);
     sql_commands.unshift('dropdb ' + config.database.user);
-    console.log(sql_commands);
+    //console.log(sql_commands);
     series(sql_commands);
 } else if (sql_argument == 'testdata') {
     console.log('====Populating the database with testing data====');
