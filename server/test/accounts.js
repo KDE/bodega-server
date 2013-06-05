@@ -15,10 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var pg = require('pg');
+var queryString = require('querystring');
+
 var server = require('../app.js');
 var utils = require('./support/http.js');
 var assert = require('assert');
-var queryString = require('querystring');
 
 describe('Create user', function() {
     var userInfo;
@@ -99,6 +101,21 @@ describe('Deactivate user', function() {
                 },
                 cookie);
          });
+    });
+
+    after(function(done) {
+        var connectionString = app.config.database.protocol + "://" +
+                               app.config.database.user + ":" + app.config.database.password +
+                               "@" + app.config.database.host + "/" +
+                               app.config.database.name;
+
+        pg.connect(connectionString, function(err, client, finis) {
+                   client.query("delete from people where email = 'kok3rs@gmail.com'", [],
+                        function(err, res) {
+                           finis();
+                           done();
+                       });
+                   });
     });
 });
 
