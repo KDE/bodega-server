@@ -186,31 +186,31 @@ function setMarkups(partner, store, db, req, res)
 
     var min = utils.parseNumber(req.query.minmarkup, -1);
     if (min >= 0) {
-        updates.push("minMarkup = $" + ++count);
+        updates.push("minMarkup = $" + (++count));
         params.push(min);
     }
 
     var max = utils.parseNumber(req.query.maxmarkup, -1);
     if (max >= 0) {
-        updates.push("maxMarkup = $" + ++count);
+        updates.push("maxMarkup = $" + (++count));
         params.push(max);
     }
 
     var flat = req.query.flatmarkup;
     if (flat) {
         flat = utils.parseBool(flat);
-        updates.push("flatMarkup = $" + ++count);
+        updates.push("flatMarkup = $" + (++count));
         params.push(flat);
     }
 
     var markup = utils.parseNumber(req.query.markup, -1);
     if (markup >= 0) {
-        updates.push("markup = $" + ++count);
+        updates.push("markup = $" + (++count));
         params.push(markup);
     }
 
     if (count > 0) {
-        query += updates.join(', ') + ' where id = $' + ++count;
+        query += updates.join(', ') + ' where id = $' + (++count);
         params.push(store);
         db.query(query, params,
                  function(err, result) {
@@ -224,27 +224,6 @@ function setMarkups(partner, store, db, req, res)
     } else {
         sendStoreJson(store, db, req, res);
     }
-}
-
-function createChannel(partner, store, db, req, res)
-{
-    var channelParent = utils.parseNumber(req.query.channel.parent);
-    var channelName = req.query.channel.name;
-    var channelDescription = req.query.channel.description;
-    db.query("select ct_addChannel($1, $2, $3, $4) as channel;", [store, channelParent, channelName, channelDescription],
-             function(err, results) {
-                 if (err) {
-                     errors.report('Database', req, res, err);
-                     return;
-                 }
-
-                 if (results.rows[0].channel < 1) {
-                     errors.report('StoreCreateChannelFailed', req, res);
-                     return;
-                 }
-
-                 sendChannelInfo(results.rows[0].channel, db, req, res);
-             });
 }
 
 function sendChannelInfo(channelId, db, req, res)
@@ -268,29 +247,25 @@ function sendChannelInfo(channelId, db, req, res)
             });
 }
 
-function addChannelTags(partner, store, channelId, db, req, res)
+function createChannel(partner, store, db, req, res)
 {
-    var immediateRm = true;
-    if (req.query.addTags && Array.isArray(req.query.addTags)) {
-        var addTags = [];
-        req.query.addTags.each(function(val) { var tag = utils.parseNumber(val); if (tag > 0) { addTags.push(tag); } });
-        if (addTags.length > 0) {
-            immediateRm = false;
-            db.query("select ct_addTagsToChannel($1, $2, '{" + addTags.join(', ') + "}'::INT);", [channelId, partner],
-                     function(err, res) {
-                         if (error) {
-                             errors.report('Database', req, res, err);
-                             return;
-                         }
+    var channelParent = utils.parseNumber(req.query.channel.parent);
+    var channelName = req.query.channel.name;
+    var channelDescription = req.query.channel.description;
+    db.query("select ct_addChannel($1, $2, $3, $4) as channel;", [store, channelParent, channelName, channelDescription],
+             function(err, results) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                     return;
+                 }
 
-                         rmChannelTags(partner, store, channelId, db, req, res);
-                     });
-        }
-    }
+                 if (results.rows[0].channel < 1) {
+                     errors.report('StoreCreateChannelFailed', req, res);
+                     return;
+                 }
 
-    if (immediateRm) {
-        rmChannelTags(partner, store, channelId, db, req, res);
-    }
+                 sendChannelInfo(results.rows[0].channel, db, req, res);
+             });
 }
 
 function rmChannelTags(partner, store, channelId, db, req, res)
@@ -303,7 +278,7 @@ function rmChannelTags(partner, store, channelId, db, req, res)
             immediateSend = false;
             db.query("select ct_rmTagsFromChannel($1, $2, '{" + rmTags.join(', ') + "}'::INT);", [channelId, partner],
                      function(err, res) {
-                         if (error) {
+                         if (err) {
                              errors.report('Database', req, res, err);
                              return;
                          }
@@ -315,6 +290,31 @@ function rmChannelTags(partner, store, channelId, db, req, res)
 
     if (immediateSend) {
         sendChannelInfo(channelId, db, req, res);
+    }
+}
+
+function addChannelTags(partner, store, channelId, db, req, res)
+{
+    var immediateRm = true;
+    if (req.query.addTags && Array.isArray(req.query.addTags)) {
+        var addTags = [];
+        req.query.addTags.each(function(val) { var tag = utils.parseNumber(val); if (tag > 0) { addTags.push(tag); } });
+        if (addTags.length > 0) {
+            immediateRm = false;
+            db.query("select ct_addTagsToChannel($1, $2, '{" + addTags.join(', ') + "}'::INT);", [channelId, partner],
+                     function(err, res) {
+                         if (err) {
+                             errors.report('Database', req, res, err);
+                             return;
+                         }
+
+                         rmChannelTags(partner, store, channelId, db, req, res);
+                     });
+        }
+    }
+
+    if (immediateRm) {
+        rmChannelTags(partner, store, channelId, db, req, res);
     }
 }
 
@@ -345,7 +345,7 @@ function updateChannel(partner, store, db, req, res)
                               function(err, result) {
                                   // the next two blocks will be process async, but we return right away
                                   // if a tagging fails, we don't both to send an error to the client
-                                  addChannelTags(partner, store, channel, db, req, res);
+                                  addChannelTags(partner, store, channelId, db, req, res);
                               });
 
                  });
@@ -370,6 +370,30 @@ function deleteChannel(partner, store, db, req, res)
                  });
     } else {
         res.json(utils.standardJson(req));
+    }
+}
+
+function channelStructureLaunch(results, json, leafObj, db, req, res)
+{
+    /*global channelStructureFetch*/
+    if (results.rowCount < 1) {
+        return;
+    }
+
+    json.remaining += results.rowCount;
+    for (var i = 0; i < results.rowCount; ++i) {
+        var row = results.rows[i];
+        var channel = { 'id': row.id,
+                        'name': row.name,
+                        'description': row.description,
+                        'image': row.image,
+                        'active': row.active,
+                        'assetCount': row.assetCount,
+                        'tags': [],
+                        'channels': []
+        };
+        leafObj.channels.push(channel);
+        channelStructureFetch(json, channel, channel.id, db, req, res);
     }
 }
 
@@ -407,29 +431,6 @@ function channelStructureFetch(json, leafObj, parent, db, req, res)
     });
 }
 
-function channelStructureLaunch(results, json, leafObj, db, req, res)
-{
-    if (results.rowCount < 1) {
-        return;
-    }
-
-    json.remaining += results.rowCount;
-    for (var i = 0; i < results.rowCount; ++i) {
-        var row = results.rows[i];
-        var channel = { 'id': row.id,
-                        'name': row.name,
-                        'description': row.description,
-                        'image': row.image,
-                        'active': row.active,
-                        'assetCount': row.assetCount,
-                        'tags': [],
-                        'channels': []
-        };
-        leafObj.channels.push(channel);
-        channelStructureFetch(json, channel, channel.id, db, req, res);
-    }
-}
-
 function channelStructure(partner, store, db, req, res)
 {
     db.query('select id, parent, image, name, description, active, assetCount from channels where parent is null and store = $1 order by id', [store],
@@ -460,7 +461,7 @@ function channelStructure(partner, store, db, req, res)
  */
 module.exports.list = function(db, req, res) {
     sendStoreJson(null, db, req, res);
-}
+};
 
 /**
  * + int partner
@@ -481,7 +482,7 @@ module.exports.create = function(db, req, res) {
 /**
  * + string id
  */
-module.exports.delete = function(db, req, res) {
+module.exports.remove = function(db, req, res) {
     partnerId(db, req, res, deleteWithPartner);
 };
 
@@ -496,7 +497,7 @@ module.exports.delete = function(db, req, res) {
  */
 module.exports.setMarkups = function(db, req, res) {
     ifCanManageStore(db, req, res, setMarkups);
-}
+};
 
 /**
  * + string id
@@ -513,7 +514,7 @@ module.exports.setMarkups = function(db, req, res) {
  */
 module.exports.updateChannel = function(db, req, res) {
     ifCanManageStore(db, req, res, updateChannel);
-}
+};
 
 /**
  * + string id
@@ -521,7 +522,7 @@ module.exports.updateChannel = function(db, req, res) {
  */
 module.exports.deleteChannel = function(db, req, res) {
     ifCanManageStore(db, req, res, deleteChannel);
-}
+};
 
 /**
  * + string id
@@ -530,4 +531,4 @@ module.exports.deleteChannel = function(db, req, res) {
  */
 module.exports.channelStructure = function(db, req, res) {
     ifCanManageStore(db, req, res, channelStructure);
-}
+};

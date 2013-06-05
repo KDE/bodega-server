@@ -189,7 +189,7 @@ var BodegaDb = (function() {
     };
 
     BodegaDb.prototype.deleteStore = function(req, res) {
-        this.dbQuery(dbStores.delete, req, res);
+        this.dbQuery(dbStores.remove, req, res);
     };
 
     BodegaDb.prototype.setStoreMarkups = function(req, res) {
