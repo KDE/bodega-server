@@ -3,28 +3,28 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
-        "express": "> 2.4.6",
-        "connect-redis" : "latest",
-        "pg": ">= 0.6.10",
+        "async" : "latest",
         "bcrypt": ">= 0.5.0",
-        "nodemailer" : ">= 0.3.4",
+        "connect-redis" : "latest",
+        "express": "> 2.4.6",
         "jade" : ">= 0.20.3",
         "knox" : ">= 0.0.9",
         "mime" : ">= 1.2.5",
-        "validator" : ">= 0.4.5",
-        "stripe" : "latest",
-        "async" : "latest",
-        "optimist" : "latest",
         "marked" : "latest",
-        "prompt" : "latest"
+        "nodemailer" : ">= 0.3.4",
+        "optimist" : "latest",
+        "pg": ">= 0.6.10",
+        "prompt" : "latest",
+        "stripe" : "latest",
+        "validator" : ">= 0.4.5"
     },
     "devDependencies": {
-        "mocha": ">= 0.12.1",
-        "should": ">= 0.5.1",
         "jshint": ">= 0.5.8",
-        "request" : "latest",
+        "mocha": ">= 0.12.1",
         "querystring" : "latest",
-        "qs" : "latest"
+        "qs" : "latest",
+        "request" : "latest",
+        "should": ">= 0.5.1"
     },
     "engines": {
         "node": ">=0.10.0"
