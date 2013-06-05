@@ -218,7 +218,7 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.contactInfo = function(req, res) {
         this.dbQuery(dbContactInfo, req, res);
-    }
+    };
 
     return BodegaDb;
 })();
