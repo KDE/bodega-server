@@ -91,7 +91,7 @@ describe('Asset manipulation', function(){
         it('should succeed.', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=null',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
