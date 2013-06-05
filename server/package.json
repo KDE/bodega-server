@@ -15,7 +15,8 @@
         "stripe" : "latest",
         "async" : "latest",
         "optimist" : "latest",
-        "marked" : "latest"
+        "marked" : "latest",
+        "prompt" : "latest"
     },
     "devDependencies": {
         "mocha": ">= 0.12.1",
