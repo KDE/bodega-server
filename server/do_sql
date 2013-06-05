@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
+var prompt = require('prompt');
 var exec = require('child_process').exec;
 
 
@@ -66,19 +67,6 @@ function series(list, fn)
     next();
 }
 
-var config_json = process.argv[2];
-var sql_dir = process.argv[3];
-var sql_argument = process.argv[4];
-
-if (sql_dir === undefined || config_json === undefined ||
-    sql_argument === undefined) {
-    console.log('Missing arguments');
-    console.log('This scripts needs as arguments <config.json filepath> <sql directory filepath> <sql command>');
-    return;
-}
-
-var config = JSON.parse(fs.readFileSync((config_json), 'utf8'));
-
 function updateLogFilename()
 {
     return sql_dir + '/updates/completed';
@@ -104,54 +92,105 @@ function listUpdateFiles()
     return files;
 }
 
+function confirm(task, fn)
+{
+    prompt.start();
+    var schema = {
+        properties: {
+            confirm: {
+                description: 'Are you sure you wish to ' + task + '? (yes/no)',
+                type: 'string',
+                required: true
+             }
+        }
+    };
+
+    prompt.message = '';
+    prompt.delimiter = '';
+    prompt.get(schema,
+               function (err, result) {
+                   if (!err && result.confirm.toUpperCase() == 'YES') {
+                      fn();
+                   }
+                });
+}
+
+function printUsage()
+{
+    console.log('Usage: do_sql <config.json filepath> <sql directory filepath> <command>');
+    console.log('Commands include: ');
+    console.log('    setup: creates the database');
+    console.log('   update: applies pending updates');
+    console.log('     test: this removes all data from the database and loads the test suite data');
+}
+
+var config_json = process.argv[2];
+var sql_dir = process.argv[3];
+var sql_argument = process.argv[4];
+
+if (sql_dir === undefined || config_json === undefined || sql_argument === undefined) {
+    printUsage();
+    return;
+}
+
+var config = JSON.parse(fs.readFileSync((config_json), 'utf8'));
+
 if (sql_argument == 'update') {
-    console.log('Updating the database schema');
-    console.log('----------------------------');
-    //those are the migration files which we will use in order to migrate and update successfully the db
-    var updates = listUpdateFiles();
-    if (updates.length < 1) {
-        console.log('No updates to apply. Check the updates/completed file if you believe this is in error.');
-    } else {
-        console.log('Applying these updates ' + updates);
-        series(updates, function() {
+    confirm('run updates on the database', function()
+    {
+        console.log('Updating the database schema');
+        console.log('----------------------------');
+        //those are the migration files which we will use in order to migrate and update successfully the db
+        var updates = listUpdateFiles();
+        if (updates.length < 1) {
+            console.log('No updates to apply. Check the updates/completed file if you believe this is in error.');
+        } else {
+            console.log('Applying these updates ' + updates);
+            series(updates, function() {
             fs.appendFileSync(updateLogFilename(), "\n" +
                               updates.join("\n"),
                               { encoding: 'utf8' } );
             console.log('----------------------------');
         });
-    }
-} else if (sql_argument == 'setup') {
-    console.log('Creating the database schema');
-    console.log('----------------------------');
-    //console.log(sql_commands);
-    try {
-        fs.unlinkSync(updateLogFilename());
-    } catch (e) {
-    }
-    sql_commands.unshift('createdb -U postgres -O ' + config.database.name + ' ' +
-                         config.database.name);
-    sql_commands.unshift('dropdb -U postgres ' + config.database.user);
-    //console.log(sql_commands);
-    series(sql_commands, function() {
-        try {
-            fs.appendFileSync(updateLogFilename(), "\n" +
-                              listUpdateFiles().join("\n"),
-                              { encoding: 'utf8' } );
-        } catch (e) {
-            console.log('Could not write to the update log in sql/completed');
         }
+    });
+} else if (sql_argument == 'setup') {
+    confirm('drop the existing database (if any) and load the database from scratch', function()
+    {
+        console.log('Creating the database schema');
         console.log('----------------------------');
+        //console.log(sql_commands);
+        try {
+            fs.unlinkSync(updateLogFilename());
+        } catch (e) {
+        }
+
+        sql_commands.unshift('createdb -U postgres -O ' + config.database.name + ' ' + config.database.name);
+        sql_commands.unshift('dropdb -U postgres ' + config.database.user);
+        //console.log(sql_commands);
+        series(sql_commands, function() {
+            try {
+                fs.appendFileSync(updateLogFilename(), "\n" +
+                listUpdateFiles().join("\n"),
+                { encoding: 'utf8' } );
+            } catch (e) {
+                console.log('Could not write to the update log in sql/completed');
+            }
+
+            console.log('----------------------------');
+        });
     });
 } else if (sql_argument == 'testdata') {
-    console.log('Populating the database with testing data');
-    console.log('-----------------------------------------');
-    series(test_sql_commands, function() {
+    confirm('delete all data from the database and load the test suite data', function()
+    {
+        console.log('Populating the database with testing data');
         console.log('-----------------------------------------');
+        series(test_sql_commands, function() {
+            console.log('-----------------------------------------');
+        });
     });
 } else {
-    console.log('This script needs an argument, this can be either update or setup.');
-    console.log('setup: creates the database');
-    console.log('update: applies pending updates');
+    printUsage();
     return;
 }
 
