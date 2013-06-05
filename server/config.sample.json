@@ -4,7 +4,8 @@
         "user" :     "bodega",
         "password" : "bodega",
         "host" :     "localhost",
-        "name" :     "bodega"
+        "name" :     "bodega",
+        "adminuser" : "postgres"
     },
     "storeInfo" : {
         "name" : "Make Play Live",

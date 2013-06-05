@@ -135,6 +135,11 @@ if (sql_dir === undefined || config_json === undefined || sql_argument === undef
 
 var config = JSON.parse(fs.readFileSync((config_json), 'utf8'));
 
+function adminUser()
+{
+    return config.database.adminuser ? config.database.adminuser : config.database.user;
+}
+
 if (sql_argument == 'update') {
     confirm('run updates on the database', function()
     {
@@ -165,8 +170,8 @@ if (sql_argument == 'update') {
         } catch (e) {
         }
 
-        sql_commands.unshift('createdb -U postgres -O ' + config.database.name + ' ' + config.database.name);
-        sql_commands.unshift('dropdb -U postgres ' + config.database.user);
+        sql_commands.unshift('createdb -U ' + adminUser() + ' -O ' + config.database.name + ' ' + config.database.name);
+        sql_commands.unshift('dropdb -U ' + adminUser() + ' ' + config.database.name);
         //console.log(sql_commands);
         series(sql_commands, function() {
             try {
