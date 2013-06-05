@@ -26,6 +26,7 @@ insert into people (lastname, firstname, email, points, password, active)
     values ('Martin', 'Marco', 'mart@kde.org', 10000, '$2a$10$VYBi6invWdeT..wQ5FFXqu67HQI5Y8WVAhN5orzUIsWAeMaAItYrS', true);
 
 insert into partners (id, name, developer, distributor) values (0, 'Management', true, true);
+insert into partners (id, name, developer, distributor, homepage, supportEmail) values (1, 'Make Play Live', true, true, 'http://makeplaylive.com', 'support@makeplaylive.com');
 insert into partners (id, name, developer, distributor) values (2, 'KDE', false, true);
 insert into partners (id, name, developer, distributor) values (3, 'Diamond Devices', false, true);
 insert into partners (id, name, developer, distributor) values (4, 'Saphire Software', false, true);
@@ -39,7 +40,7 @@ select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');
 
 
 insert into stores (id, partner, name) values ('null', 0, 'No Store');
-insert into stores (id, partner, name, description) values ('VIVALDI-1', 2, 'MPL', 'Usage of PA');
+insert into stores (id, partner, name, description) values ('VIVALDI-1', 2, 'Vivaldi', 'Plasma Active tablet from Make Play Live');
 insert into stores (id, partner, name, description) values ('KDE-1', 2, 'Plasma Workspace', 'KDE Plasma user interfaces');
 insert into stores (id, partner, name, description) values ('DD-1', 3, 'Bling Media Center', 'Imaginary hifi for your home');
 insert into stores (id, partner, name, description) values ('DD-2', 3, 'Affordaphone', 'Finally a phone even you can afford');
