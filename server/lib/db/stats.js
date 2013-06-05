@@ -90,6 +90,9 @@ module.exports.assetStats = function(db, req, res) {
         }
 
     } else if (req.query.metric === "downloads") {
+        dateLimitQuery = " and date_trunc('" + granularity + "', d.downloadedon) >= to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')\
+                      and date_trunc('" + granularity + "', d.downloadedon) <= to_date('" + to.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS') ";
+
         if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
             query += "select date_trunc('" + granularity + "', d.downloadedon) assetdate,";
@@ -155,13 +158,13 @@ module.exports.assetStats = function(db, req, res) {
             right join (SELECT \
             (date_trunc('" + granularity + "',to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')) + (\"Series\".\"Index\" || '" + granularity + "')::INTERVAL) AS \"dateof\" \
             FROM \
-            generate_series(1," + iterations + ", 1) AS \"Series\"(\"Index\")) d on(d.dateof = assetdate)";
+            generate_series(0," + iterations + ", 1) AS \"Series\"(\"Index\")) d on(d.dateof = assetdate)";
 
     var json = utils.standardJson(req);
     json.stats = [];
 
     //console.log("trying " + query + " with " + params);
-    db.query(
+    var q = db.query(
         query,
         params,
         function(err, result) {
@@ -172,4 +175,12 @@ module.exports.assetStats = function(db, req, res) {
             json.stats = result.rows;
             res.json(json);
         });
+     //Change all nulls into zeros
+     q.on('row', function(row) {
+         for (i in row) {
+             if (row[i] === null) {
+                 row[i] = 0;
+            }
+        }
+     });
 };

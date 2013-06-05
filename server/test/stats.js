@@ -62,9 +62,13 @@ describe('Stats', function(){
         //Granularity: MONTH
         it('Points stats without asset numbers: month granularity', function(done){
             //not setting metrics there, assumes that without it goes to points by default
+            var query = {
+                from: "2013-05-01",
+                to: "2013-07-01"
+            };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets',
+                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -94,7 +98,9 @@ describe('Stats', function(){
         it('Points stats with one asset number: month granularity', function(done) {
             var query = {
                 assets: [3],
-                metric: "points"
+                metric: "points",
+                from: "2013-05-01",
+                to: "2013-07-01"
             };
             utils.getUrl(
                 server,
@@ -128,7 +134,9 @@ describe('Stats', function(){
         it('Points stats with four asset numbers: month granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "points"
+                metric: "points",
+                from: "2013-05-01",
+                to: "2013-07-01"
             };
             utils.getUrl(
                 server,
@@ -168,7 +176,9 @@ describe('Stats', function(){
         //Downloads
         it('Downloads stats without asset numbers: month granularity', function(done) {
             var query = {
-                metric: "downloads"
+                metric: "downloads",
+                from: "2013-05-01",
+                to: "2013-10-01"
             };
             utils.getUrl(
                 server,
@@ -181,11 +191,11 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
-                        total: [8, 3, 2, 1, 1]
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
+                        total: [8, 3, 2, 0, 1, 1]
                     };
 
-                    res.body.stats.length.should.equal(5);
+                    res.body.stats.length.should.equal(6);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         stats.dateof.should.be.eql(expected.dateof[i]);
@@ -199,7 +209,9 @@ describe('Stats', function(){
         it('Downloads stats with one asset numbers: month granularity', function(done) {
             var query = {
                 assets: [3],
-                metric: "downloads"
+                metric: "downloads",
+                from: "2013-05-01",
+                to: "2013-09-01"
             };
             utils.getUrl(
                 server,
@@ -212,11 +224,11 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z"],
-                        asset3: [6, 1, 2, 1]
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z"],
+                        asset3: [6, 1, 2, 0, 1]
                     };
 
-                    res.body.stats.length.should.equal(4);
+                    res.body.stats.length.should.equal(5);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -231,7 +243,9 @@ describe('Stats', function(){
         it('Downloads stats with four asset numbers: month granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "downloads"
+                metric: "downloads",
+                from: "2013-05-01",
+                to: "2013-09-01"
             };
             utils.getUrl(
                 server,
@@ -244,9 +258,9 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
-                        asset2: [0, 1, 0, 0, 1],
-                        asset3: [6, 1, 2, 1, 0],
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
+                        asset2: [0, 1, 0, 0, 0],
+                        asset3: [6, 1, 2, 0, 1],
                         asset4: [2, 1, 0, 0, 0],
                         asset7: [0, 0, 0, 0, 0]
                     };
@@ -267,7 +281,9 @@ describe('Stats', function(){
 
         it('Purchases count stats without numbers', function(done) {
             var query = {
-                metric: "count"
+                metric: "count",
+                from: "2013-05-01",
+                to: "2013-07-01"
             };
             utils.getUrl(
                 server,
@@ -298,7 +314,9 @@ describe('Stats', function(){
         it('Purchases count stats with four asset numbers: month granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "count"
+                metric: "count",
+                from: "2013-05-01",
+                to: "2013-07-01"
             };
             utils.getUrl(
                 server,
@@ -336,7 +354,9 @@ describe('Stats', function(){
         it('Points stats without asset numbers: day granularity', function(done){
             var query = {
                 metric: "points",
-                granularity: "day"
+                granularity: "day",
+                from: "2013-05-23",
+                to: "2013-05-27"
             };
             utils.getUrl(
                 server,
@@ -350,8 +370,8 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-07-02T00:00:00.000Z"],
-                        total: [180, 1425, 280, 190, 280]
+                        dateof: ["2013-05-23T00:00:00.000Z", "2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z"],
+                        total: [0, 0, 180, 1425, 0]
                     };
 
                     res.body.stats.length.should.equal(5);
@@ -371,7 +391,9 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "points",
-                granularity: "day"
+                granularity: "day",
+                from: "2013-05-31",
+                to: "2013-06-04"
             };
             utils.getUrl(
                 server,
@@ -384,10 +406,10 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-07-02T00:00:00.000Z"],
-                        asset2: [0, 0, 0, 190, 0],
-                        asset3: [0, 1425, 280, 0, 280],
-                        asset4: [180, 0, 0, 0, 0],
+                        dateof: ["2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z", "2013-06-04T00:00:00.000Z"],
+                        asset2: [0, 0, 0, 0, 0],
+                        asset3: [0, 0, 280, 0, 0],
+                        asset4: [0, 0, 0, 0, 0],
                         asset7: [0, 0, 0, 0, 0]
                     };
 
@@ -409,7 +431,9 @@ describe('Stats', function(){
         it('Downloads stats without asset numbers: day granularity', function(done){
             var query = {
                 metric: "downloads",
-                granularity: "day"
+                granularity: "day",
+                from: "2013-05-24",
+                to: "2013-06-03"
             };
             utils.getUrl(
                 server,
@@ -423,8 +447,8 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-06-12T00:00:00.000Z", "2013-07-02T00:00:00.000Z", "2013-07-23T00:00:00.000Z", "2013-09-30T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
-                        total: [2, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+                        dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
+                        total: [0, 2, 4, 1, 0, 1, 0, 0, 0, 1, 0]
                     };
 
                     res.body.stats.length.should.equal(11);
@@ -444,7 +468,9 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "downloads",
-                granularity: "day"
+                granularity: "day",
+                from: "2013-05-24",
+                to: "2013-06-03"
             };
             utils.getUrl(
                 server,
@@ -457,10 +483,10 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-06-12T00:00:00.000Z", "2013-07-02T00:00:00.000Z", "2013-07-23T00:00:00.000Z", "2013-09-30T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
-                        asset2: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-                        asset3: [0, 4, 1, 1, 1, 0, 0, 1, 1, 1, 0],
-                        asset4: [2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+                        dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
+                        asset2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        asset3: [0, 0, 4, 1, 0, 1, 0, 0, 0, 1, 0],
+                        asset4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         asset7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                     };
 
@@ -482,7 +508,9 @@ describe('Stats', function(){
         it('Purchases count stats without asset numbers: day granularity', function(done){
             var query = {
                 metric: "count",
-                granularity: "day"
+                granularity: "day",
+                from: "2013-05-24",
+                to: "2013-06-03"
             };
             utils.getUrl(
                 server,
@@ -496,11 +524,11 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-07-02T00:00:00.000Z"],
-                        total: [2, 3, 1, 1, 1]
+                        dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
+                        total: [0, 2, 3, 0, 0, 0, 0, 0, 0, 1, 0]
                     };
 
-                    res.body.stats.length.should.equal(5);
+                    res.body.stats.length.should.equal(11);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -517,7 +545,9 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "count",
-                granularity: "day"
+                granularity: "day",
+                from: "2013-05-24",
+                to: "2013-06-03"
             };
             utils.getUrl(
                 server,
@@ -530,14 +560,14 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-10T00:00:00.000Z", "2013-07-02T00:00:00.000Z"],
-                        asset2: [0, 0, 0, 1, 0],
-                        asset3: [0, 3, 1, 0, 1],
-                        asset4: [2, 0, 0, 0, 0],
-                        asset7: [0, 0, 0, 0, 0]
+                        dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
+                        asset2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        asset3: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                        asset4: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        asset7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                     };
 
-                    res.body.stats.length.should.equal(5);
+                    res.body.stats.length.should.equal(11);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -556,7 +586,9 @@ describe('Stats', function(){
         it('Points stats without asset numbers: year granularity', function(done){
             var query = {
                 metric: "points",
-                granularity: "year"
+                granularity: "year",
+                from: "2012-01-01",
+                to: "2014-01-01"
             };
             utils.getUrl(
                 server,
@@ -570,11 +602,11 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-01-01T00:00:00.000Z"],
-                        total: [2355]
+                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                        total: [0, 2355, 0]
                     };
 
-                    res.body.stats.length.should.equal(1);
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -591,7 +623,9 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "points",
-                granularity: "year"
+                granularity: "year",
+                from: "2012-01-01",
+                to: "2014-01-01"
             };
             utils.getUrl(
                 server,
@@ -604,14 +638,14 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-01-01T00:00:00.000Z"],
-                        asset2: [190],
-                        asset3: [1985],
-                        asset4: [180],
-                        asset7: [0]
+                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                        asset2: [0, 190, 0],
+                        asset3: [0, 1985, 0],
+                        asset4: [0, 180, 0],
+                        asset7: [0, 0, 0]
                     };
 
-                    res.body.stats.length.should.equal(1);
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -629,7 +663,9 @@ describe('Stats', function(){
         it('Downloads stats without asset numbers: year granularity', function(done){
             var query = {
                 metric: "downloads",
-                granularity: "year"
+                granularity: "year",
+                from: "2012-01-01",
+                to: "2014-01-01"
             };
             utils.getUrl(
                 server,
@@ -643,11 +679,11 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-01-01T00:00:00.000Z"],
-                        total: [15]
+                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                        total: [0, 15, 0]
                     };
 
-                    res.body.stats.length.should.equal(1);
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -664,7 +700,9 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "downloads",
-                granularity: "year"
+                granularity: "year",
+                from: "2012-01-01",
+                to: "2014-01-01"
             };
             utils.getUrl(
                 server,
@@ -677,14 +715,14 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-01-01T00:00:00.000Z"],
-                        asset2: [2],
-                        asset3: [10],
-                        asset4: [3],
-                        asset7: [0]
+                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                        asset2: [0, 2, 0],
+                        asset3: [0, 10, 0],
+                        asset4: [0, 3, 0],
+                        asset7: [0, 0, 0]
                     };
 
-                    res.body.stats.length.should.equal(1);
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -702,7 +740,9 @@ describe('Stats', function(){
         it('Purchases count stats without asset numbers: year granularity', function(done){
             var query = {
                 metric: "count",
-                granularity: "year"
+                granularity: "year",
+                from: "2012-01-01",
+                to: "2014-01-01"
             };
             utils.getUrl(
                 server,
@@ -716,11 +756,11 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
 
                     var expected = {
-                        dateof: ["2013-01-01T00:00:00.000Z"],
-                        total: [8]
+                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                        total: [0, 8, 0]
                     };
 
-                    res.body.stats.length.should.equal(1);
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
@@ -737,7 +777,9 @@ describe('Stats', function(){
             var query = {
                 assets: [2,3,4,7],
                 metric: "count",
-                granularity: "year"
+                granularity: "year",
+                from: "2012-01-01",
+                to: "2014-01-01"
             };
             utils.getUrl(
                 server,
@@ -750,14 +792,14 @@ describe('Stats', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('stats');
                     var expected = {
-                        dateof: ["2013-01-01T00:00:00.000Z"],
-                        asset2: [1],
-                        asset3: [5],
-                        asset4: [2],
-                        asset7: [0]
+                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                        asset2: [0, 1, 0],
+                        asset3: [0, 5, 0],
+                        asset4: [0, 2, 0],
+                        asset7: [0, 0, 0]
                     };
 
-                    res.body.stats.length.should.equal(1);
+                    res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
 
