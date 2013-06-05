@@ -290,7 +290,7 @@ app.get(serverPath('store/list'), isAuthorized,
     }
 );
 
-app.get(serverPath('store/create'), isAuthorized,
+app.post(serverPath('store/create'), isAuthorized,
     function(req, res) {
         app.db.createStore(req, res);
     }

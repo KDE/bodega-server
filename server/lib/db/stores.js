@@ -34,7 +34,7 @@ function defaultPartnerId(db, req, res, fn)
 
 function partnerId(db, req, res, fn)
 {
-    var partner = utils.parseNumber(req.query.partner);
+    var partner = utils.parseNumber(req.body.partner ? req.body.partner : req.query.partner);
     if (partner < 1) {
         defaultPartnerId(db, req, res, fn);
     } else {
@@ -91,13 +91,13 @@ function sendStoreJson(id, db, req, res)
 
 function createWithPartner(partner, db, req, res)
 {
-    var name = req.query.name;
+    var name = req.body.name;
     if (!name || name === '') {
         errors.report('StoreNameInvalid', req, res);
         return;
     }
 
-    var id = req.query.id;
+    var id = req.body.id;
     if (!id || id === '') {
         id = partner + '_' + name.toUpperCase().replace(/[^a-zA-Z0-9]/g, '_');
     }
@@ -115,12 +115,12 @@ function createWithPartner(partner, db, req, res)
                     return;
                  }
 
-                 var minMarkup = utils.parseNumber(req.query.minMarkup);
-                 var maxMarkup = utils.parseNumber(req.query.maxMarkup);
-                 var flatMarkup = utils.parseBool(req.query.flatMarkup);
-                 var markup = utils.parseNumber(req.query.markup);
+                 var minMarkup = utils.parseNumber(req.body.minMarkup);
+                 var maxMarkup = utils.parseNumber(req.body.maxMarkup);
+                 var flatMarkup = utils.parseBool(req.body.flatMarkup);
+                 var markup = utils.parseNumber(req.body.markup);
                  db.query("insert into stores (id, partner, name, description, minMarkup, maxMarkup, flatMarkup, markup) values ($1, $2, $3, $4, $5, $6, $7, $8);",
-                          [id, partner, name, req.query.desc, minMarkup, maxMarkup, flatMarkup, markup],
+                          [id, partner, name, req.body.desc, minMarkup, maxMarkup, flatMarkup, markup],
                           function(err, result) {
                             if (err) {
                                 errors.report('Database', req, res, err);

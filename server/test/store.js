@@ -16,18 +16,20 @@
 */
 
 var pg = require('pg');
+var queryString = require('qs');
+var request = require('pg');
+
 var server = require('../app.js');
 var utils = require('./support/http');
-var queryString = require('qs');
 
 describe('Store management', function(){
     var cookie;
 
     describe('Creating a store without authenticating', function(){
         it('should fail', function(done) {
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create',
+                '/bodega/v1/json/store/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -61,9 +63,9 @@ describe('Store management', function(){
                 });
         });
         it('Creation request should fail', function(done) {
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create',
+                '/bodega/v1/json/store/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -83,7 +85,7 @@ describe('Store management', function(){
         it('authorize correctly.', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
+                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=null',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -99,9 +101,10 @@ describe('Store management', function(){
 
     describe('Store creation', function(){
         it('should fail with an invalid partner', function(done){
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create?partner=3',
+                '/bodega/v1/json/store/create',
+                { partner: 3 },
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -116,9 +119,10 @@ describe('Store management', function(){
         });
 
         it('should fail without a name', function(done){
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create?partner=2',
+                '/bodega/v1/json/store/create',
+                { partner: 2 },
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -138,9 +142,10 @@ describe('Store management', function(){
                   'name': 'Fun Times With Clowns',
                   'desc': 'Clowns are actually scary'
                 };
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create?' + queryString.stringify(query),
+                '/bodega/v1/json/store/create',
+                query,
                 function(res) {
                     var expected = [ {
                         'id': '2_FUN_TIMES_WITH_CLOWNS',
@@ -168,9 +173,10 @@ describe('Store management', function(){
                   'name': 'More Fun',
                   'desc': ''
                 };
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create?' + queryString.stringify(query),
+                '/bodega/v1/json/store/create',
+                query,
                 function(res) {
                     var expected = [ {
                         'id': 'somethingcrazy',
@@ -197,9 +203,10 @@ describe('Store management', function(){
                 { 'partner' : 2,
                   'name': 'Fun Times With Clowns',
                 };
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create?' + queryString.stringify(query),
+                '/bodega/v1/json/store/create',
+                query,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
