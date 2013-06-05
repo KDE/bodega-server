@@ -201,7 +201,7 @@ describe('Store management', function(){
         it('should fail with an id that exists', function(done){
             var query =
                 { 'partner' : 2,
-                  'name': 'Fun Times With Clowns',
+                  'name': 'Fun Times With Clowns'
                 };
             utils.postUrl(
                 server,

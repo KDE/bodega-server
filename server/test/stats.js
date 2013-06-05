@@ -57,7 +57,7 @@ describe('Stats', function(){
                 });
         });
     });
- 
+
     describe('get statistics', function() {
         //Granularity: MONTH
         it('Points stats without asset numbers: month granularity', function(done){
@@ -659,7 +659,7 @@ describe('Stats', function(){
                 },
                 cookie);
         });
-        
+
         it('Downloads stats without asset numbers: year granularity', function(done){
             var query = {
                 metric: "downloads",
