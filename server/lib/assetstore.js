@@ -394,7 +394,7 @@ var AssetStore = (function() {
             }
             client.copyFile(incomingAssetPath, assetPath, fn);
         } else {
-            localMove(incomingAssetPath, assetPath, fn);
+            localPutStream(incomingAssetPath, assetPath, fn);
         }
     };
 
