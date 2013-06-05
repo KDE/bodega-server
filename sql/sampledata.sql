@@ -38,6 +38,13 @@ select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Content Creator');
 select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');
 
 
+insert into stores (id, partner, name) values ('null', 0, 'No Store');
+insert into stores (id, partner, name, description) values ('VIVALDI-1', 2, 'MPL', 'Usage of PA');
+insert into stores (id, partner, name, description) values ('KDE-1', 2, 'Plasma Workspace', 'KDE Plasma user interfaces');
+insert into stores (id, partner, name, description) values ('DD-1', 3, 'Bling Media Center', 'Imaginary hifi for your home');
+insert into stores (id, partner, name, description) values ('DD-2', 3, 'Affordaphone', 'Finally a phone even you can afford');
+
+insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true, 'aquarium');
 insert into channels (image, store, active, name, description)
     values ('games.png', 'VIVALDI-1', true, 'Games', 'Fun and amusements');
 insert into channels (image, store, active, name, description, parent)
@@ -58,13 +65,6 @@ insert into tags (partner, type, title) values (2, 3, 'Card Game');
 insert into tags (partner, type, title) values (2, 3, 'Util');
 insert into tags (partner, type, title) values (2, 3, 'Misc');
 
-insert into stores (id, partner, name) values ('null', 0, 'No Store');
-insert into stores (id, partner, name, description) values ('VIVALDI-1', 2, 'MPL', 'Usage of PA');
-insert into stores (id, partner, name, description) values ('KDE-1', 2, 'Plasma Workspace', 'KDE Plasma user interfaces');
-insert into stores (id, partner, name, description) values ('DD-1', 3, 'Bling Media Center', 'Imaginary hifi for your home');
-insert into stores (id, partner, name, description) values ('DD-2', 3, 'Affordaphone', 'Finally a phone even you can afford');
-
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true, 'aquarium');
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true, 'dice');
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Diamond Juice', 'Best app from Diamond to date', '0.1', 'com.diamondevices.juice.plasmoid', 'juice.png', true, 'juice');
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, '15 Puzzle', 'The classic puzzle game', '0.1', 'org.kde.15puzzle.plasmoid', '15puzzle.png', true, 'fifteenpuzzle');
