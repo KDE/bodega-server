@@ -42,16 +42,17 @@ select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');
 insert into stores (id, partner, name) values ('null', 0, 'No Store');
 insert into stores (id, partner, name, description) values ('VIVALDI-1', 1, 'Vivaldi', 'Plasma Active tablet from Make Play Live');
 insert into stores (id, partner, name, description) values ('KDE-1', 2, 'Plasma Workspace', 'KDE Plasma user interfaces');
+insert into stores (id, partner, name, description) values ('KDE-2', 2, 'KDE Applications', 'Variety of tools');
 insert into stores (id, partner, name, description) values ('DD-1', 3, 'Bling Media Center', 'Imaginary hifi for your home');
 insert into stores (id, partner, name, description) values ('DD-2', 3, 'Affordaphone', 'Finally a phone even you can afford');
 
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true, 'aquarium');
 insert into channels (image, store, active, name, description)
-    values ('games.png', 'VIVALDI-1', true, 'Games', 'Fun and amusements');
+    values ('games.png', 'KDE-1', true, 'Games', 'Fun and amusements');
 insert into channels (image, store, active, name, description, parent)
-    values ('cardgames.png', 'VIVALDI-1', true, 'Card Games', 'Bust out the deck of 52!', 2);
+    values ('cardgames.png', 'KDE-1', true, 'Card Games', 'Bust out the deck of 52!', 2);
 insert into channels (image, store, active, name, description)
-    values ('plasmoa.png', 'KDE-1', true, 'KDE-1', 'Bust out the deck of 52!');
+    values ('plasmoa.png', 'VIVALDI-1', true, 'Card Games', 'Bust out the deck of 52!');
 insert into channels (image, store, active, name, description)
     values ('utilities.png', 'DD-1', true, 'Utilities', 'Useful tools');
 insert into channels (image, store, active, name, description)

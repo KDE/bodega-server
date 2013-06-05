@@ -48,7 +48,7 @@ describe('Store management', function(){
         it('Authorize with a person who is NOT a Store Manager', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=aseigo@kde.org&auth_password=aseigo&auth_store=VIVALDI-1',
+                '/bodega/v1/json/auth?auth_user=aseigo@kde.org&auth_password=aseigo&auth_store=null',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -240,20 +240,20 @@ describe('Store management', function(){
                             'flat': true, 'markup': 0 }
                         },
                         {
+                            'id': 'KDE-2',
+                            'name': 'KDE Applications',
+                            'desc': 'Variety of tools',
+                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'markups': { 'min': 0, 'max': 0,
+                            'flat': true, 'markup': 0 }
+                        },
+                        {
                             'id': 'somethingcrazy',
                             'name': 'More Fun',
                             'desc': '',
                             'partner': { 'id': 2, 'name': 'KDE' },
                             'markups': { 'min': 0, 'max': 0,
                             'flat': false, 'markup': 0 }
-                        },
-                        {
-                            'id': 'VIVALDI-1',
-                            'name': 'MPL',
-                            'desc': 'Usage of PA',
-                            'partner': { 'id': 2, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0,
-                            'flat': true, 'markup': 0 }
                         }
                         ];
 
@@ -390,7 +390,7 @@ describe('Store management', function(){
         var newChannelId = 0;
         it('should allow adding a new channel', function(done) {
             var query = {
-                'id': 'VIVALDI-1',
+                'id': 'KDE-1',
                 'channel': {
                     'name': 'Test Channel',
                     'parent': 2,
@@ -410,7 +410,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
                     res.body.channel.should.have.property('id');
-                    res.body.channel.should.have.property('store', 'VIVALDI-1');
+                    res.body.channel.should.have.property('store', 'KDE-1');
                     res.body.channel.should.have.property('parent', 2);
                     res.body.channel.should.have.property('image');
                     res.body.channel.should.have.property('name', 'Test Channel');
@@ -426,7 +426,7 @@ describe('Store management', function(){
 
         it('fetch the structure of the store', function(done) {
            var query = {
-                'id': 'VIVALDI-1'
+                'id': 'KDE-1'
            };
 
            utils.getUrl(
@@ -495,7 +495,7 @@ describe('Store management', function(){
         });
 
         it('should be possible to delete that channel', function(done) {
-            var query = { 'id': 'VIVALDI-1',
+            var query = { 'id': 'KDE-1',
                           'channelId': newChannelId };
 
             utils.getUrl(
@@ -562,9 +562,9 @@ describe('Store management', function(){
                             'flat': true, 'markup': 0 }
                         },
                         {
-                            'id': 'VIVALDI-1',
-                            'name': 'MPL',
-                            'desc': 'Usage of PA',
+                            'id': 'KDE-2',
+                            'name': 'KDE Applications',
+                            'desc': 'Variety of tools',
                             'partner': { 'id': 2, 'name': 'KDE' },
                             'markups': { 'min': 0, 'max': 0,
                             'flat': true, 'markup': 0 }
