@@ -21,10 +21,12 @@ create sequence seq_partnerIds;
 -- addresses for billing, etc?
 create table partners
 (
-    id          int         primary key default nextval('seq_partnerIds'),
-    name        text        not null unique,
-    developer   bool        default false,
-    distributor bool        default false
+    id           int         primary key default nextval('seq_partnerIds'),
+    name         text        not null unique,
+    developer    bool        default false,
+    distributor  bool        default false,
+    supportEmail text        default null,
+    homepage     text        default null
 );
 
 create sequence seq_peopleIds;
