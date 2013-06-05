@@ -160,7 +160,8 @@ function ifCanManageStore(db, req, res, fn)
 {
     partnerId(db, req, res,
               function(partner, db, req, res) {
-                  db.query("select id from stores where id = $1 and partner = $2", [req.query.id, partner],
+                  var store = req.params.id ? req.params.id : req.query.id;
+                  db.query("select id from stores where id = $1 and partner = $2", [store, partner],
                         function(err, result) {
                             if (err || !result) {
                                 errors.report('Database', req, res, err);
@@ -184,26 +185,26 @@ function setMarkups(partner, store, db, req, res)
     var params = [];
     var count = 0;
 
-    var min = utils.parseNumber(req.query.minmarkup, -1);
+    var min = utils.parseNumber(req.body.minmarkup, -1);
     if (min >= 0) {
         updates.push("minMarkup = $" + (++count));
         params.push(min);
     }
 
-    var max = utils.parseNumber(req.query.maxmarkup, -1);
+    var max = utils.parseNumber(req.body.maxmarkup, -1);
     if (max >= 0) {
         updates.push("maxMarkup = $" + (++count));
         params.push(max);
     }
 
-    var flat = req.query.flatmarkup;
+    var flat = req.body.flatmarkup;
     if (flat) {
         flat = utils.parseBool(flat);
         updates.push("flatMarkup = $" + (++count));
         params.push(flat);
     }
 
-    var markup = utils.parseNumber(req.query.markup, -1);
+    var markup = utils.parseNumber(req.body.markup, -1);
     if (markup >= 0) {
         updates.push("markup = $" + (++count));
         params.push(markup);
@@ -249,9 +250,9 @@ function sendChannelInfo(channelId, db, req, res)
 
 function createChannel(partner, store, db, req, res)
 {
-    var channelParent = utils.parseNumber(req.query.channel.parent);
-    var channelName = req.query.channel.name;
-    var channelDescription = req.query.channel.description;
+    var channelParent = utils.parseNumber(req.body.channel.parent);
+    var channelName = req.body.channel.name;
+    var channelDescription = req.body.channel.description;
     db.query("select ct_addChannel($1, $2, $3, $4) as channel;", [store, channelParent, channelName, channelDescription],
              function(err, results) {
                  if (err) {
@@ -320,12 +321,12 @@ function addChannelTags(partner, store, channelId, db, req, res)
 
 function updateChannel(partner, store, db, req, res)
 {
-    var channelId = utils.parseNumber(req.query.channel.id);
+    var channelId = utils.parseNumber(req.param.channel);
 
     if (channelId > 0) {
-        var channelParent = utils.parseNumber(req.query.channel.parent);
-        var channelName = req.query.channel.name;
-        var channelDescription = req.query.channel.description;
+        var channelParent = utils.parseNumber(req.body.channel.parent);
+        var channelName = req.body.channel.name;
+        var channelDescription = req.body.channel.description;
         db.query("select partner, parent, toplevel from channels where id = $1;", [ channelId ],
                  function(err, result) {
                      if (err) {
@@ -356,7 +357,7 @@ function updateChannel(partner, store, db, req, res)
 
 function deleteChannel(partner, store, db, req, res)
 {
-    var channelId = utils.parseNumber(req.query.channelId);
+    var channelId = utils.parseNumber(req.param.channelId);
 
     if (channelId > 0) {
         db.query('delete from channels where id = $1 and store = $2;', [channelId, store],

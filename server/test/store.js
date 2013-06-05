@@ -280,16 +280,16 @@ describe('Store management', function(){
     describe('Setting markups', function() {
         it('should fail on a non-existant store', function(done) {
             var query = {
-                'id': 'does_not_exist',
                 'maxmarkup': 100,
                 'minmarkup': 10,
                 'flatmarkup': true,
                 'markup': 20
             };
 
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/setMarkups?' + queryString.stringify(query),
+                '/bodega/v1/json/store/does_not_exist/setMarkups',
+                query,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
@@ -304,16 +304,16 @@ describe('Store management', function(){
 
         it('should fail on a store that exists, but we are not authorized to manage', function(done) {
             var query = {
-                'id': 'DD-2',
                 'maxmarkup': 100,
                 'minmarkup': 10,
                 'flatmarkup': true,
                 'markup': 20
             };
 
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/setMarkups?' + queryString.stringify(query),
+                '/bodega/v1/json/store/does_not_exist/setMarkups',
+                query,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
@@ -328,16 +328,16 @@ describe('Store management', function(){
 
         it('should succeed on an existing store', function(done) {
             var query = {
-                'id': '2_FUN_TIMES_WITH_CLOWNS',
                 'maxmarkup': 100,
                 'minmarkup': 10,
                 'flatmarkup': true,
                 'markup': 20
             };
 
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/setMarkups?' + queryString.stringify(query),
+                '/bodega/v1/json/store/2_FUN_TIMES_WITH_CLOWNS/setMarkups',
+                query,
                 function(res) {
                     var expected = [
                         {
@@ -362,14 +362,14 @@ describe('Store management', function(){
 
         it('partial updates work as well', function(done) {
             var query = {
-                'id': '2_FUN_TIMES_WITH_CLOWNS',
                 'maxmarkup': 200,
                 'markup': 15
             };
 
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/setMarkups?' + queryString.stringify(query),
+                '/bodega/v1/json/store/2_FUN_TIMES_WITH_CLOWNS/setMarkups',
+                query,
                 function(res) {
                     var expected = [
                         {
@@ -406,9 +406,10 @@ describe('Store management', function(){
                 }
             };
 
-            utils.getUrl(
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/store/updateChannel?' + queryString.stringify(query),
+                '/bodega/v1/json/store/KDE-1/channel/create',
+                query,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
@@ -438,7 +439,7 @@ describe('Store management', function(){
 
            utils.getUrl(
                 server,
-                '/bodega/v1/json/store/structure?' + queryString.stringify(query),
+                '/bodega/v1/json/store/KDE-1/structure',
                 function(res) {
                     var channel2 =
                         { "id": 2,
@@ -507,7 +508,7 @@ describe('Store management', function(){
 
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/deleteChannel?' + queryString.stringify(query),
+                '/bodega/v1/json/store/KDE-1/channel/delete/' + newChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',

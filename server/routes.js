@@ -302,37 +302,43 @@ app.get(serverPath('store/:id/delete'), isAuthorized,
     }
 );
 
-app.get(serverPath('store/setMarkups'), isAuthorized,
+app.post(serverPath('store/:id/setMarkups'), isAuthorized,
     function(req, res) {
         app.db.setStoreMarkups(req, res);
     }
 );
 
-app.get(serverPath('store/structure'), isAuthorized,
+app.get(serverPath('store/:id/structure'), isAuthorized,
     function(req, res) {
         app.db.storeChannelStructure(req, res);
     }
 );
 
-app.get(serverPath('store/updateChannel'), isAuthorized,
+app.post(serverPath('store/:id/channel/create'), isAuthorized,
     function(req, res) {
         app.db.updateStoreChannel(req, res);
     }
 );
 
-app.get(serverPath('store/deleteChannel'), isAuthorized,
+app.post(serverPath('store/:id/channel/update/:channel'), isAuthorized,
+    function(req, res) {
+        app.db.updateStoreChannel(req, res);
+    }
+);
+
+app.get(serverPath('store/:id/channel/delete/:channel'), isAuthorized,
     function(req, res) {
         app.db.deleteStoreChannel(req, res);
     }
 );
 
-app.get(serverPath('store/addFeaturedCollection'), isAuthorized,
+app.get(serverPath('store/:id/collection/add/:collection'), isAuthorized,
     function(req, res) {
 //        app.db.addFeaturedCollection(req, res);
     }
 );
 
-app.get(serverPath('store/removeFeaturedCollection'), isAuthorized,
+app.get(serverPath('store/:id/collection/remove/:collection'), isAuthorized,
     function(req, res) {
 //        app.db.removeFeaturedCollection(req, res);
     }
