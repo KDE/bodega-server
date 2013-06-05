@@ -44,8 +44,8 @@ module.exports.assetStats = function(db, req, res) {
         from.setDate(to.getDay());
     }
 
-    console.log(from);
-    console.log(to);
+    var dateLimitQuery = " and date_trunc('" + granularity + "', p.purchasedon) >= to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')\
+                      and date_trunc('" + granularity + "', p.purchasedon) <= to_date('" + to.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS') ";
 
     //only other two allowed values are year and day
     if (req.query.granularity === "day") {
@@ -81,12 +81,12 @@ module.exports.assetStats = function(db, req, res) {
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
-            query += ") group by assetdate order by assetdate";
+            query += ") " + dateLimitQuery + " group by assetdate order by assetdate";
         } else {
             query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate, \
                     count(*) AS total \
                     from purchases p left join assets a on (p.asset = a.id and a.partner = $1) \
-                    group by assetdate order by assetdate";
+                  " + dateLimitQuery + " group by assetdate order by assetdate";
         }
 
     } else if (req.query.metric === "downloads") {
@@ -105,14 +105,15 @@ module.exports.assetStats = function(db, req, res) {
             for ( i = 0; i < req.query.assets.length; ++i) {
                 query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
-            query += ") group by assetdate order by assetdate";
+            query += ") " + dateLimitQuery + " group by assetdate order by assetdate";
 
         } else {
             query += "select date_trunc('" + granularity + "', d.downloadedon) assetdate, \
                     count(*) AS total \
                     from downloads d left join assets a on (d.asset = a.id and a.partner = $1) \
-                    group by assetdate order by assetdate";
+                  " + dateLimitQuery + " group by assetdate order by assetdate";
         }
+    //Points
     } else {
         if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
@@ -129,12 +130,12 @@ module.exports.assetStats = function(db, req, res) {
             for (i = 0; i < req.query.assets.length; ++i) {
                 query += (i > 0 ? ", ":"") + "$" + (i+2);
             }
-            query += ") group by assetdate order by assetdate";
+            query += ") " + dateLimitQuery + "group by assetdate order by assetdate";
         } else {
             query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate, \
                     SUM(p.toparticipant) AS total \
                     from purchases p left join assets a on (p.asset = a.id and a.partner = $1) \
-                    group by assetdate order by assetdate";
+                  " + dateLimitQuery + " group by assetdate order by assetdate";
         }
     }
 
