@@ -524,7 +524,7 @@ describe('Store management', function(){
         it('should succeed with a valid store', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/delete?id=2_FUN_TIMES_WITH_CLOWNS',
+                '/bodega/v1/json/store/2_FUN_TIMES_WITH_CLOWNS/delete',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -540,7 +540,7 @@ describe('Store management', function(){
         it('should succeed with another valid store', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/delete?id=somethingcrazy',
+                '/bodega/v1/json/store/somethingcrazy/delete',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

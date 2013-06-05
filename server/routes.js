@@ -296,7 +296,7 @@ app.post(serverPath('store/create'), isAuthorized,
     }
 );
 
-app.get(serverPath('store/delete'), isAuthorized,
+app.get(serverPath('store/:id/delete'), isAuthorized,
     function(req, res) {
         app.db.deleteStore(req, res);
     }
