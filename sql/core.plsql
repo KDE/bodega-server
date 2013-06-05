@@ -50,28 +50,28 @@ END;
 
 
 -- TRIGGER function to ensure channel parents remain coherent due to parent-child relationships between channels
-CREATE OR REPLACE FUNCTION ct_propagateChannelParent() RETURNS TRIGGER AS '
+CREATE OR REPLACE FUNCTION ct_propagateChannelParent() RETURNS TRIGGER AS $$
 DECLARE
     storeName text;
 BEGIN
     SELECT INTO storeName store FROM channels WHERE id = NEW.parent;
-    IF TG_OP = ''UPDATE'' THEN
-        IF NEW.parent != OLD.parent) THEN
+    IF TG_OP = 'UPDATE' THEN
+        IF NEW.parent != OLD.parent THEN
             RETURN OLD;
         END IF;
 
         -- enforce that we are not crossing channels between stores
-        IF (storeName != NEW.store) THEN
+        IF storeName != NEW.store THEN
             NEW.parent = OLD.parent;
-        END;
-    ELSE IF NEW.parent -- inserting, sync store name with parent
+        END IF;
+    ELSIF NEW.parent THEN -- inserting, sync store name with parent
         NEW.store = storeName;
     END IF;
 
     UPDATE channels SET partner = NEW.partner, topLevel = NEW.topLevel WHERE parent = NEW.id;
     RETURN NEW;
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_checkChannelParent ON channels;
 CREATE TRIGGER trg_ct_checkChannelParent BEFORE UPDATE OR INSERT ON channels

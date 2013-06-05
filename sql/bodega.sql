@@ -175,7 +175,7 @@ create sequence seq_channelIds;
 create table channels
 (
     id          int         primary key default nextval('seq_channelIds'),
-    store       text        not null references stores(id) on delete cascade
+    store       text        not null references stores(id) on delete cascade,
     partner     int         references partners(id),
     parent      int         references channels(id) on delete set null,
     topLevel    int         references channels(id) on delete set null,
