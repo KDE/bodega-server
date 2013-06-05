@@ -24,7 +24,11 @@ $$ LANGUAGE 'plpgsql';
 
 -- try to purchase
 -- PARAMETERS: int person, int asset
--- RETURNS: empty string on success, string explaining error on failure
+-- RETURNS:
+--          0 on success
+--          1 if the requested asset is not available for purchase
+--          2 if the purchaser account was not found
+--          3 if not enough points
 CREATE OR REPLACE FUNCTION ct_purchase(who int, fromStore text, what int) RETURNS INT AS $$
 DECLARE
     price   int := 0;
@@ -49,7 +53,7 @@ BEGIN
         RETURN 2;
     END IF;
 
-    -- note that to avoid problems with multiple simultaneously sales, which can happen
+    -- note that to avoid problems with multiple simultaneous sales, which can happen
     -- concurrently, the update must be done in an atomic fashion. fetching points
     -- totals and then doing an update introduces a race condition
     -- so what we do is deduct from points and if there is overflow, from owedpoints
