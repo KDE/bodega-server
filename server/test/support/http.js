@@ -3,7 +3,8 @@ var http = require('http');
 var paths = require('path');
 var request = require('request');
 
-function getUrl(app, url, fn, cookie) {
+function getUrl(app, url, fn, cookie)
+{
     var options = {
         host: app.config.host,
         port: app.config.port,
@@ -21,8 +22,6 @@ function getUrl(app, url, fn, cookie) {
             try {
                 res.body = JSON.parse(buf);
             } catch (e) {
-
-                console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
                 res.body = buf;
             }
             fn(res);
@@ -30,8 +29,33 @@ function getUrl(app, url, fn, cookie) {
     });
 }
 
-function auth(app, fn) {
+function postUrl(app, path, formData, fn, cookie)
+{
+    var options = {
+        uri: 'http://' + app.config.host + ':' + app.config.port + path,
+        form: formData,
+        jar: false,
+        headers : {
+            'Cookie': cookie
+        }
+    };
+    request.post(options,
+        function(err, res, body) {
+            if (err) {
+                console.log(err);
+            } else {
+                try {
+                    res.body = JSON.parse(body);
+                } catch (e) {
+                    res.body = body;
+                }
+            }
+            fn(res);
+        });
+}
 
+function auth(app, fn)
+{
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
     getUrl(app,
@@ -50,4 +74,5 @@ function auth(app, fn) {
 }
 
 module.exports.getUrl = getUrl;
+module.exports.postUrl = postUrl;
 module.exports.auth = auth;
