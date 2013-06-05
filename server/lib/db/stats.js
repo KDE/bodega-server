@@ -143,11 +143,11 @@ module.exports.assetStats = function(db, req, res) {
     }
 
     var iterations = 0;
-    if (granularity == "day") {
+    if (granularity === "day") {
         var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
 
         iterations = Math.round(Math.abs((to.getTime() - from.getTime())/(oneDay)));
-    } else if (granularity == "year") {
+    } else if (granularity === "year") {
         iterations = to.getFullYear() - from.getFullYear();
     //Month
     } else {
@@ -177,7 +177,7 @@ module.exports.assetStats = function(db, req, res) {
         });
      //Change all nulls into zeros
      q.on('row', function(row) {
-         for (i in row) {
+         for (var i in row) {
              if (row[i] === null) {
                  row[i] = 0;
             }
