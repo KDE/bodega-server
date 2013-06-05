@@ -116,7 +116,7 @@ module.exports = function(db, req, res) {
         'query'         : req.query.query,
         'pageSize'      : pageSize,
         'offset'        : offset,
-        'channelId'     : req.query.channelId,
+        'channelId'     : req.query.channelId
     };
     var json = utils.standardJson(req);
     json.channels = [];

@@ -282,7 +282,7 @@ describe('Asset manipulation', function(){
                 },
                 cookie);
         });
-        
+
         it('listing incoming after deletion shouldnt return any', function(done){
             utils.getUrl(
                 server,

@@ -88,7 +88,7 @@ describe('Asset info', function(){
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('tags');
                     var tags = res.body.asset.tags;
-                    tags.should.be.an.instanceof(Array);
+                    tags.should.be.an.instanceOf(Array);
                     tags.length.should.be.above(0);
                     done();
                 },

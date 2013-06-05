@@ -38,9 +38,9 @@ var AssetStore = (function() {
             console.error("Invalid content directory! Set storageConfig!");
             process.exit(1);
         }
-        
+
         stats = fs.statSync(dirpath);
-        
+
         if (!stats.isDirectory()) {
             try {
                 fs.mkdirSync(dirpath, "0700");
@@ -60,10 +60,10 @@ var AssetStore = (function() {
             }
         });
     }
-    
+
     function AssetStore() {
         var stats;
-        
+
         storageSystem = app.config.storageSystem;
         storageConfig = app.config[storageSystem];
 
@@ -121,9 +121,9 @@ var AssetStore = (function() {
                 //  so fallback to copying
                 var is = fs.createReadStream(fromFile);
                 var os = fs.createWriteStream(toFile);
-                
+
                 is.on('data', function(chunk) { os.write(chunk); })
-                    .on('end', function() {
+                  .on('end', function() {
                         os.end();
                         fs.unlink(fromFile);
                         fn(null);

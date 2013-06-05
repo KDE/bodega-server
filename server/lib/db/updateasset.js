@@ -62,7 +62,7 @@ function buildQueryString(assetInfo)
     addToStr(q, assetInfo, 'version');
     addToStr(q, assetInfo, 'file');
     addToStr(q, assetInfo, 'publish');
-    
+
     q.insertStr += ")";
     q.valuesStr += ")";
 

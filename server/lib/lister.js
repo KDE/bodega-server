@@ -24,7 +24,7 @@ var SortType = {
     'ByDate'      : 2,
     'ByAuthor'    : 4,
     'ByDownloads' : 8,
-    'ByFavorites' : 16,
+    'ByFavorites' : 16
 };
 module.exports.SortType = SortType;
 

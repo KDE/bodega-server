@@ -134,9 +134,7 @@ module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
         transport: transport, // transport method to use
         from: service.email,
         to: userEmail, // list of receivers
-        subject: "Activate your new account", // Subject line
-        //text: text, //set later
-        //html: "<b>Hello world!</b>" // html body
+        subject: "Activate your new account"
     };
 
     var query =

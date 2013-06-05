@@ -49,9 +49,7 @@ function sendResetEmail(db, req, res, args)
         transport: transport, // transport method to use
         from: service.email,
         to: args.email, // list of receivers
-        subject: "Reset your password", // Subject line
-        //text: text, //set later
-        //html: "<b>Hello world!</b>" // html body
+        subject: "Reset your password" // Subject line
     };
 
     var query =

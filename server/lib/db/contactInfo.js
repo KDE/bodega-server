@@ -19,7 +19,7 @@ var utils = require('../utils.js');
 var errors = require('../errors.js');
 
 module.exports = function(db, req, res) {
-    var json = {}
+    var json = {};
     var warehouse = {
         name: app.config.storeInfo.name,
         description: app.config.storeInfo.description,
