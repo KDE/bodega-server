@@ -338,6 +338,10 @@ app.get(serverPath('store/removeFeaturedCollection'), isAuthorized,
     }
 );
 
+app.get(serverPath('contact'), function(req, res) {
+    app.db.contactInfo(req, res);
+});
+
 app.get(serverPath('hunt'),
     function(req, res) {
         app.db.hunt(req, res);
@@ -364,15 +368,6 @@ app.get('/images/*', function(req, res) {
     res.sendfile(__dirname + '/public' + req.url);
 });
 
-
-app.get('/contact', function(req, res) {
-    res.json({
-        name: app.config.storeInfo.name,
-        desciption: app.config.storeInfo.desciption,
-        url: app.config.storeInfo.url,
-        contact: app.config.storeInfo.contact
-    });
-});
 
 app.get('/api/(*)', function(req, res) {
     var filename = path.normalize(req.params[0]);

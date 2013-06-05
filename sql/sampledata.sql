@@ -40,7 +40,7 @@ select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');
 
 
 insert into stores (id, partner, name) values ('null', 0, 'No Store');
-insert into stores (id, partner, name, description) values ('VIVALDI-1', 2, 'Vivaldi', 'Plasma Active tablet from Make Play Live');
+insert into stores (id, partner, name, description) values ('VIVALDI-1', 1, 'Vivaldi', 'Plasma Active tablet from Make Play Live');
 insert into stores (id, partner, name, description) values ('KDE-1', 2, 'Plasma Workspace', 'KDE Plasma user interfaces');
 insert into stores (id, partner, name, description) values ('DD-1', 3, 'Bling Media Center', 'Imaginary hifi for your home');
 insert into stores (id, partner, name, description) values ('DD-2', 3, 'Affordaphone', 'Finally a phone even you can afford');
