@@ -26,6 +26,26 @@ module.exports.assetStats = function(db, req, res) {
     var query = "";
     //default granularity is month
     var granularity = "month";
+    var from;
+    var to;
+
+    if (req.query.to) {
+        to = new Date(req.query.to);
+    } else {
+        to = new Date();
+    }
+
+    if (req.query.from) {
+        from = new Date(req.query.from);
+    } else {
+        from = new Date(to);
+        //defaults to a month before to
+        from.setDate(-1);
+        from.setDate(to.getDay());
+    }
+
+    console.log(from);
+    console.log(to);
 
     //only other two allowed values are year and day
     if (req.query.granularity === "day") {
@@ -118,11 +138,23 @@ module.exports.assetStats = function(db, req, res) {
         }
     }
 
+    var iterations = 0;
+    if (granularity == "day") {
+        var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+
+        iterations = Math.round(Math.abs((to.getTime() - from.getTime())/(oneDay)));
+    } else if (granularity == "year") {
+        iterations = to.getFullYear() - from.getFullYear();
+    //Month
+    } else {
+        iterations = to.getMonth() * (to.getFullYear() - from.getFullYear() + 1) - from.getMonth();
+    }
+
     query += ") q \
             right join (SELECT \
-            (date_trunc('" + granularity + "',CURRENT_DATE) + (\"Series\".\"Index\" || '" + granularity + "')::INTERVAL) AS \"dateof\" \
+            (date_trunc('" + granularity + "',to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')) + (\"Series\".\"Index\" || '" + granularity + "')::INTERVAL) AS \"dateof\" \
             FROM \
-            generate_series(-12,1, 1) AS \"Series\"(\"Index\")) d on(d.dateof = assetdate)";
+            generate_series(1," + iterations + ", 1) AS \"Series\"(\"Index\")) d on(d.dateof = assetdate)";
 
     var json = utils.standardJson(req);
     json.stats = [];
