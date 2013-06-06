@@ -93,8 +93,10 @@ insert into assets (license, partner, name, description, version, path, image, a
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Poker18', 'Poker 18', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true, 'poker1');
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Poker19', 'Poker 19', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true, 'poker1');
 
-insert into assetPreviews (asset, path) values (2, 'fishswimming.png');
-insert into assetPreviews (asset, path) values (2, 'fishmultiplying.png');
+insert into assetPreviews (asset, path, mimetype, type, subtype) values (2, 'fishswimming.png',
+       'image/png', 'screenshot', '1');
+insert into assetPreviews (asset, path, mimetype, type, subtype) values (2, 'fishmultiplying.png',
+       'image/png', 'screenshot', '2');
 
 update assets set version = '0.2' where id = 2;
 update assetChangelogs set changes = 'Bug fixes' where asset = 1 and version = '0.1';

@@ -39,14 +39,15 @@ module.exports.parseNumber = function(string, defaultValue)
 
 module.exports.findImagePaths = function(req)
 {
-    var serverUrl = "http://" + req.header('host') + '/';
+    var serverUrl = "http://" + req.header('host');
+    var previewPaths = app.previewStore.previewPaths();
     var imageUrls = {
-        tiny: serverUrl + 'images/22',
-        small: serverUrl + 'images/32',
-        medium: serverUrl + 'images/64',
-        large: serverUrl + 'images/128',
-        huge: serverUrl + 'images/512',
-        previews: serverUrl + 'images/previews'
+        tiny: serverUrl + previewPaths.icons.tiny,
+        small: serverUrl + previewPaths.icons.small,
+        medium: serverUrl + previewPaths.icons.medium,
+        large: serverUrl + previewPaths.icons.large,
+        huge: serverUrl + previewPaths.icons.huge,
+        previews: serverUrl + previewPaths.previews
     };
     return imageUrls;
 };

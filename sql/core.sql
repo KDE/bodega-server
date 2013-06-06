@@ -158,10 +158,14 @@ create table assetText
 
 create index idx_assetText_assetLang on assetText (asset, language);
 
+
 create table assetPreviews
 (
     asset       int         references assets(id) on delete cascade,
-    path        text
+    path        text        not null,
+    mimetype    text        not null,
+    type        text        not null,
+    subtype     text        not null
 );
 
 create table assetChangelogs

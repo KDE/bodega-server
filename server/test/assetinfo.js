@@ -27,12 +27,12 @@ describe('Asset info', function(){
                 "authStatus":true,
                 "points" : 10000,
                 "imageUrls": {
-                    "tiny":"http://0.0.0.0:3000/images/22",
-                    "small":"http://0.0.0.0:3000/images/32",
-                    "medium":"http://0.0.0.0:3000/images/64",
-                    "large":"http://0.0.0.0:3000/images/128",
-                    "huge":"http://0.0.0.0:3000/images/512",
-                    "previews":"http://0.0.0.0:3000/images/previews"
+                    "tiny":"http://0.0.0.0:3000/icons/22",
+                    "small":"http://0.0.0.0:3000/icons/32",
+                    "medium":"http://0.0.0.0:3000/icons/64",
+                    "large":"http://0.0.0.0:3000/icons/128",
+                    "huge":"http://0.0.0.0:3000/icons/512",
+                    "previews":"http://0.0.0.0:3000/previews"
                 }
             };
             utils.getUrl(

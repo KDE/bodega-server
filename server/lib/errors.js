@@ -69,6 +69,9 @@ var ErrorType = {
     "DeleteAssetMissing"     : 46, //the delete asset does not exist
     "InvalidUrl"             : 47, //the requested url is invalid
 
+    "PreviewFileMissing"     : 48, //one of the preview files is missing
+    "IconFileWrongSize"      : 49, //one of the icons is of the wrong size
+
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
     "StorePartnerInvalid"    : 61,//the partner provided is incorrect
     "StoreNameInvalid"       : 62,//an invalid (e.g. missing) store name

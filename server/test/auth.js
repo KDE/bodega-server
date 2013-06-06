@@ -144,12 +144,12 @@ describe('Authentication', function(){
                 "points": 10000,
                 "success": true,
                 "imageUrls": {
-                    "tiny":"http://localhost:3000/images/22",
-                    "small":"http://localhost:3000/images/32",
-                    "medium":"http://localhost:3000/images/64",
-                    "large":"http://localhost:3000/images/128",
-                    "huge":"http://localhost:3000/images/512",
-                    "previews":"http://localhost:3000/images/previews"
+                    "tiny":"http://localhost:3000/icons/22",
+                    "small":"http://localhost:3000/icons/32",
+                    "medium":"http://localhost:3000/icons/64",
+                    "large":"http://localhost:3000/icons/128",
+                    "huge":"http://localhost:3000/icons/512",
+                    "previews":"http://localhost:3000/previews"
                 },
                 "active": true
             };
