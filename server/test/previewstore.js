@@ -28,6 +28,7 @@ describe('Preview Store, ', function(){
     var tmpIcon64  = __dirname + "/sampleasset/tmpIcon64.png";
     var tmpIcon32  = __dirname + "/sampleasset/tmpIcon32.png;";
     var tmpIcon22  = __dirname + "/sampleasset/tmpIcon22.png";
+    var cleanupFiles = [];
     
     var sampleBookAsset = {
         id : 133,
@@ -60,6 +61,24 @@ describe('Preview Store, ', function(){
         copyFile(__dirname + "/sampleasset/icon64.png", tmpIcon64);
         copyFile(__dirname + "/sampleasset/icon128.png", tmpIcon128);
         copyFile(__dirname + "/sampleasset/icon512.png", tmpIcon512);
+        cleanupFiles.push(tmpCoverFile);
+        cleanupFiles.push(tmpIcon22);
+        cleanupFiles.push(tmpIcon32);
+        cleanupFiles.push(tmpIcon64);
+        cleanupFiles.push(tmpIcon128);
+        cleanupFiles.push(tmpIcon512);
+        done();
+    });
+
+    after(function(done) {
+        var i;
+        for (i = 0; i < cleanupFiles.length; ++i) {
+            try {
+                fs.unlinkSync(cleanupFiles[i]);
+            } catch (err) {
+                //do nothing
+            }
+        }
         done();
     });
 
