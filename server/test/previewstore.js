@@ -104,5 +104,13 @@ describe('Preview Store, ', function(){
             });
         });
 
+        it('upload previews for an app.', function(done){
+            app.previewStore.upload(sampleAppAsset, function(err) {
+                //console.log(res);
+                should.not.exist(err);
+                done();
+            });
+        });
+
     });
 });

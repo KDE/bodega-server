@@ -64,6 +64,34 @@ var PreviewStore = (function() {
         }
     }
 
+    function validateIcon(previews, i, size, cb) {
+        var preview = previews[i];
+        var e;
+        var expectedSize;
+        
+        if (!iconSizes.hasOwnProperty(preview.subtype)) {
+            e = errors.create('IconInvalidType',
+                              'Icon type ' + preview.subtype +
+                              ' is invalid!');
+            cb(e, preview, i);
+            return;
+        }
+
+        expectedSize = iconSizes[preview.subtype];
+        if (size.width !== expectedSize ||
+            size.height !== expectedSize) {
+            e = errors.create(
+                'IconFileWrongSize',
+                'Icon ' + preview.subtype  + " should be " +
+                    expectedSize + "x" + expectedSize +
+                    "!");
+            cb(e, previews, i);
+            return;
+        }
+        ++i;
+        cb(null, previews, i);
+    }
+    
     function validateFile(previews, i, cb) {
         var e;
         var mimetype;
@@ -104,20 +132,11 @@ var PreviewStore = (function() {
                         return;
                     }
                     if (preview.type === 'icon') {
-                        expectedSize = iconSizes[preview.subtype];
-                        if (result.width !== expectedSize ||
-                            result.height !== expectedSize) {
-                            e = errors.create(
-                                'IconFileWrongSize',
-                                'Icon ' + preview.subtype  + " should be " +
-                                    expectedSize + "x" + expectedSize +
-                                    "!");
-                            cb(e, previews, i);
-                            return;
-                        }
+                        validateIcon(previews, i, result, cb);
+                    } else {
+                        ++i;
+                        cb(err, previews, i);
                     }
-                    ++i;
-                    cb(err, previews, i);
                 });
                 return;
             }
@@ -162,16 +181,13 @@ var PreviewStore = (function() {
             var modeInt;
             var modesMatch;
             var len;
-            if (err) {
-                fn(err);
-                return;
-            }
             
-            if (!stat.isDirectory()) {
+            if (err || !stat.isDirectory()) {
                 fs.mkdir(dirpath, mode, function(err) {
                     fn(err);
                     return;
                 });
+                return;
             }
 
             modeInt = parseInt(stat.mode.toString(8), 10);
@@ -347,15 +363,18 @@ var PreviewStore = (function() {
     function handleIcon(assetInfo, icons, i, assetPaths, cb) {
         var icon = icons[i];
         var expectedSize = iconSizes[icon.subtype];
-        
-        
-        gm(icon.file).size(function(err, result) {
-            if (err) {
-                cb(err, assetInfo, icons, i, assetPaths);
-                return;
+        var extension = path.extname(icon.file);
+        var filename = "icon" + expectedSize + extension;
+        var relPath = path.join(assetInfo.id.toString(),
+                                filename);
+        var fullIncomingPath = path.join(
+            assetPaths.incoming, filename);
+
+        localMove(icon.file, fullIncomingPath, function(err) {
+            if (!err) {
+                icon.path = relPath;
             }
-            ++i;
-            cb(null, assetInfo, icons, i, assetPaths);
+            cb(err, assetInfo, icons, ++i, assetPaths);
         });
     }
 
@@ -365,19 +384,9 @@ var PreviewStore = (function() {
         var e;
         var funcs = [];
 
-        if (!icons || !objectIsEmpty(icons)) {
+        if (!icons || objectIsEmpty(icons)) {
             cb(null, assetInfo, previews, assetPaths);
             return;
-        }
-
-        for (j = 0; j < icons.length; ++j) {
-            if (!iconSizes.hasOwnProperty(icons[j].subtype)) {
-                e = errors.create('IconInvalidType',
-                                  'Icon type ' + icons[j].subtype +
-                                  ' is invalid!');
-                cb(e);
-                return;
-            }
         }
         funcs.push(function(cb) {
             cb(null, assetInfo, icons, 0, assetPaths);
