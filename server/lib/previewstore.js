@@ -321,23 +321,6 @@ var PreviewStore = (function() {
         localMove(fromFile, assetPath, fn);
     }
 
-    function checkImageSize(file, fn) {
-        var e;
-        fs.stat(file, function(err, stat) {
-            if (err || !stat.isFile()) {
-                e = errors.create('IconMissingFile',
-                                  'Icon file is missing!');
-                fn(e);
-                return;
-            }
-            gm(file).size(function(err, result) {
-                console.log(err);
-                console.log(result);
-                fn(err);
-            });
-        });
-    }
-
     function splitPreviews(rawPreviews) {
         var previews = {
             icons : [],
