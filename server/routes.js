@@ -211,6 +211,12 @@ app.get(serverPath('participant/resetPassword'), function(req, res) {
                });
 });
 
+app.post(serverPath('participant/resetPassword'),
+    function(req, res) {
+        app.db.resetConfirm(req, res);
+    }
+);
+
 app.get(serverPath('participant/changePassword'), isAuthorized,
     function(req, res) {
         app.db.setPassword(req, res);
@@ -236,11 +242,6 @@ app.get(serverPath('participant/deletePaymentMethod'),
     }
 );
 
-app.post(serverPath('participant/resetPassword'),
-    function(req, res) {
-        app.db.resetConfirm(req, res);
-    }
-);
 
 /************************************************
  * Asset management
