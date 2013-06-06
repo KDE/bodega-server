@@ -111,11 +111,11 @@ function deleteIncomingAsset(db, req, res, assetInfo)
 module.exports = function(db, req, res) {
     var assetInfo = {};
 
-    if (!req.query.assetId) {
+    assetInfo.id = utils.parseNumber(req.params.assetId);
+    if (!assetInfo.id) {
         errors.report('MissingParameters', req, res);
         return;
     }
-    assetInfo.id = req.query.assetId;
     assetInfo.partner = req.query.partner;
 
     createUtils.isContentCreator(

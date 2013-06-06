@@ -108,7 +108,7 @@ describe('Asset manipulation', function(){
     describe('Creation', function(){
         it('allow incomplete assets', function(done){
             postFiles(server.server,
-                    '/bodega/v1/json/create',
+                    '/bodega/v1/json/asset/create',
                     [{
                         "name" : "info",
                         "filename" : "sampleasset/sample-info-incomplete.json"
@@ -128,7 +128,7 @@ describe('Asset manipulation', function(){
 
         it('of a simple asset', function(done){
             postFiles(server.server,
-                    '/bodega/v1/json/create',
+                    '/bodega/v1/json/asset/create',
                     [{
                         "name" : "info",
                         "filename" : "sampleasset/sample-info.json"
@@ -161,7 +161,7 @@ describe('Asset manipulation', function(){
     describe('Updates', function(){
         it('works with incomplete assets', function(done){
             postFiles(server.server,
-                      '/bodega/v1/json/update?assetId='+incompleteAssetId,
+                      '/bodega/v1/json/asset/update/' + incompleteAssetId,
                       [{
                           "name" : "info",
                           "filename" : "sampleasset/sample-info-update1.json"
@@ -180,7 +180,7 @@ describe('Asset manipulation', function(){
         it('lists published by default', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/listAssets',
+                '/bodega/v1/json/asset/list',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -193,7 +193,7 @@ describe('Asset manipulation', function(){
         it('lists published when asked', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/listAssets?type=published',
+                '/bodega/v1/json/asset/list/published',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -206,7 +206,7 @@ describe('Asset manipulation', function(){
         it('lists incoming when asked', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/listAssets?type=incoming',
+                '/bodega/v1/json/asset/list/incoming',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -219,7 +219,7 @@ describe('Asset manipulation', function(){
         it('lists all when asked', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/listAssets?type=all',
+                '/bodega/v1/json/asset/list/all',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -235,7 +235,7 @@ describe('Asset manipulation', function(){
         it('should work a complete assets', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/delete?assetId='+completeAssetId,
+                '/bodega/v1/json/asset/delete/' + completeAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -252,7 +252,7 @@ describe('Asset manipulation', function(){
         it('should work with incomplete assets', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/delete?assetId='+incompleteAssetId,
+                '/bodega/v1/json/asset/delete/' + incompleteAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -269,7 +269,7 @@ describe('Asset manipulation', function(){
         it('should not work with already delete assets', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/delete?assetId='+incompleteAssetId,
+                '/bodega/v1/json/asset/delete/' + incompleteAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -286,7 +286,7 @@ describe('Asset manipulation', function(){
         it('listing incoming after deletion shouldnt return any', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/listAssets?type=incoming',
+                '/bodega/v1/json/asset/list/incoming',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -307,13 +307,13 @@ describe('Asset manipulation', function(){
         }
         utils.getUrl(
             server,
-            '/bodega/v1/json/delete?assetId='+completeAssetId,
+            '/bodega/v1/json/delete/' + completeAssetId,
             function(res) {
             },
             cookie);
         utils.getUrl(
             server,
-            '/bodega/v1/json/delete?assetId='+incompleteAssetId,
+            '/bodega/v1/json/delete/' + incompleteAssetId,
             function(res) {
                 done();
             },

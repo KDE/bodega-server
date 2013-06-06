@@ -174,8 +174,8 @@ module.exports = function(db, req, res) {
             return;
         }
 
-        if (req.query.assetId && !assetInfo.id) {
-            assetInfo.id = req.query.assetId;
+        if (req.params.assetId && !assetInfo.id) {
+            assetInfo.id = utils.parseNumber(req.params.assetId);
         }
 
         if (!assetInfo.id) {

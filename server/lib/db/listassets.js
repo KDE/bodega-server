@@ -69,6 +69,7 @@ function findIncomingAssets(db, req, res, partner, assets, cb)
             cb(e, db, req, res, partner, assets);
             return;
         }
+
         assets = assets.concat(results.rows);
         cb(null, db, req, res, partner, assets);
     });
@@ -79,15 +80,15 @@ module.exports = function(db, req, res) {
     var funcs = [];
     var assets = [];
 
-    if (req.query.type &&
-        req.query.type !== 'published' &&
-        req.query.type !== 'incoming' &&
-        req.query.type !== 'all') {
+    if (req.params.type &&
+        req.params.type !== 'published' &&
+        req.params.type !== 'incoming' &&
+        req.params.type !== 'all') {
         errors.report('InvalidAssetListing', req, res);
         return;
     }
 
-    switch (req.query.type) {
+    switch (req.params.type) {
     case 'all':
         funcs.push(findPublishedAssets);
         funcs.push(findIncomingAssets);

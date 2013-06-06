@@ -98,12 +98,6 @@ app.get(serverPath('channel/:parentChannel'), anonBrowsing, isAuthorized,
             app.db.listChannels(req, res);
         });
 
-app.get(serverPath('asset/:assetId'), anonBrowsing, isAuthorized,
-        function(req, res) {
-            //console.log(req.query);
-            app.db.assetInfo(req, res);
-        });
-
 app.get(serverPath('featured'), anonBrowsing, isAuthorized,
         function(req, res) {
             //console.log(req.query);
@@ -253,25 +247,35 @@ app.post(serverPath('participant/resetPassword'),
 /************************************************
  * Asset management
  */
-app.post(serverPath('create'), isAuthorized,
-         function(req, res) {
-             //console.log(req.query);
-             app.db.createAsset(req, res);
-         });
-app.get(serverPath('delete'), isAuthorized,
+app.post(serverPath('asset/create'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.createAsset(req, res);
+        });
+
+app.get(serverPath('asset/delete/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.deleteAsset(req, res);
-         });
-app.post(serverPath('update'), isAuthorized,
-         function(req, res) {
-             //console.log(req.query);
-             app.db.updateAsset(req, res);
-         });
-app.get(serverPath('listAssets'), isAuthorized, function(req, res) {
-    //console.log(req.query);
-    app.db.listAssets(req, res);
-});
+        });
+
+app.post(serverPath('asset/update/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.updateAsset(req, res);
+        });
+
+app.get(serverPath('asset/list/:type?*'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.listAssets(req, res);
+        });
+
+app.get(serverPath('asset/:assetId'), anonBrowsing, isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.assetInfo(req, res);
+        });
 
 //*******************************
 // Stats
@@ -280,6 +284,13 @@ app.get(serverPath('stats/assets'), isAuthorized,
         app.db.assetStats(req, res);
     }
 );
+
+app.get(serverPath('asset/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.assetInfo(req, res);
+        });
+
 
 
 //********************************
