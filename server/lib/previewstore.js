@@ -507,6 +507,44 @@ var PreviewStore = (function() {
             cb(err, assetInfo, previews, assetPaths);
         });
     }
+
+    function handleOther(assetInfo, others, i, assetPaths, cb) {
+        var other = others[i];
+        var filename = path.basename(other.file);
+        var relPath = path.join(assetInfo.id.toString(),
+                                filename);
+        var fullIncomingPath = path.join(
+            assetPaths.incoming, filename);
+
+        localMove(other.file, fullIncomingPath, function(err) {
+            if (!err) {
+                other.path = relPath;
+            }
+            cb(err, assetInfo, other, ++i, assetPaths);
+        });
+    }
+
+    function handleOthers(assetInfo, previews, assetPaths, cb) {
+        var others = previews.others;
+        var j;
+        var e;
+        var funcs = [];
+
+        if (!others || !others.length) {
+            cb(null, assetInfo, previews, assetPaths);
+            return;
+        }
+
+        funcs.push(function(cb) {
+            cb(null, assetInfo, others, 0, assetPaths);
+        });
+        for (j = 0; j < others.length; ++j) {
+            funcs.push(handleOther);
+        }
+        async.waterfall(funcs, function(err) {
+            cb(err, assetInfo, previews, assetPaths);
+        });
+    }
     
 
     PreviewStore.prototype.checkRequirements = function(assetInfo, previews, fn) {
@@ -554,6 +592,7 @@ var PreviewStore = (function() {
             funcs.push(handleIcons);
             funcs.push(handleCovers);
             funcs.push(handleScreenshots);
+            funcs.push(handleOthers);
 
             async.waterfall(
                 funcs,
