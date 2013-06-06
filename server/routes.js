@@ -146,7 +146,7 @@ app.get(serverPath('purchase/:assetId'), isAuthorized,
 
 //********************************
 // Collections
-app.get(serverPath('collections/list/:collectionId?'), isAuthorized,
+app.get(serverPath('collection/list/:collectionId?'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             if (req.params.collectionId) {
@@ -156,25 +156,25 @@ app.get(serverPath('collections/list/:collectionId?'), isAuthorized,
             }
         });
 
-app.post(serverPath('collections/create'), isAuthorized,
+app.post(serverPath('collection/create'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.createCollection(req, res);
         });
 
-app.get(serverPath('collections/delete/:collectionId'), isAuthorized,
+app.get(serverPath('collection/delete/:collectionId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.deleteCollection(req, res);
         });
 
-app.get(serverPath('collections/:collectionId/add/:assetId'), isAuthorized,
+app.get(serverPath('collection/:collectionId/add/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.collectionAddAsset(req, res);
         });
 
-app.get(serverPath('collections/:collectionId/remove/:assetId'), isAuthorized,
+app.get(serverPath('collection/:collectionId/remove/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.collectionRemoveAsset(req, res);

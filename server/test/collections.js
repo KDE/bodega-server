@@ -31,8 +31,8 @@ describe('Collections', function(){
         it('shouldnt allow listing collections', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/list',
-                function(res) {
+                '/bodega/v1/json/collection/list',
+                function(res){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -49,7 +49,7 @@ describe('Collections', function(){
             var params = { name: 'hello' };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/collections/create',
+                '/bodega/v1/json/collection/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -67,7 +67,7 @@ describe('Collections', function(){
         it('shouldnt allow deleting collections', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/delete/hello',
+                '/bodega/v1/json/collection/delete/hello',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -105,7 +105,7 @@ describe('Collections', function(){
             var params = { name: collectionName };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/collections/create',
+                '/bodega/v1/json/collection/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -123,7 +123,7 @@ describe('Collections', function(){
         it('should list', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/list',
+                '/bodega/v1/json/collection/list',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -154,7 +154,7 @@ describe('Collections', function(){
             for (var i = 0; i < assets.length; ++i) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/collections/' + collectionId + '/add/' + assets[i],
+                    '/bodega/v1/json/collection/' + collectionId + '/add/' + assets[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -178,7 +178,7 @@ describe('Collections', function(){
         it('should list added assets', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/list/' + collectionId,
+                '/bodega/v1/json/collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -201,7 +201,7 @@ describe('Collections', function(){
             for (var i = 0; i < assetsToRemove.length; ++i) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/collections/' + collectionId + '/remove/' + assetsToRemove[i],
+                    '/bodega/v1/json/collection/' + collectionId + '/remove/' + assetsToRemove[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -225,7 +225,7 @@ describe('Collections', function(){
         it('should list assets after removal', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/list/' + collectionId,
+                '/bodega/v1/json/collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -248,7 +248,7 @@ describe('Collections', function(){
             for (var i = 0; i < assetsToRemove.length; ++i) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/collections/' + collectionId + '/add/' + assetsToRemove[i],
+                    '/bodega/v1/json/collection/' + collectionId + '/add/' + assetsToRemove[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -272,7 +272,7 @@ describe('Collections', function(){
         it('should list assets after readding', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/list/' + collectionId,
+                '/bodega/v1/json/collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -292,7 +292,7 @@ describe('Collections', function(){
         it('should allow deletion of a collection', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/delete/' + collectionId,
+                '/bodega/v1/json/collection/delete/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -308,7 +308,7 @@ describe('Collections', function(){
         it('should not list collection after deletion', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/list',
+                '/bodega/v1/json/collection/list',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
