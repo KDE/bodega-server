@@ -164,8 +164,3 @@ module.exports.listAssets = function listAssets(db, req, res, args, json)
         });
 };
 
-module.exports.listFeatured = function listFeatured(db, req, res, args, json)
-{
-    console.warn("listFeatured not implemented!!!");
-    res.json(json);
-};

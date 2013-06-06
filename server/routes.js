@@ -98,12 +98,6 @@ app.get(serverPath('channel/:parentChannel'), anonBrowsing, isAuthorized,
             app.db.listChannels(req, res);
         });
 
-app.get(serverPath('featured'), anonBrowsing, isAuthorized,
-        function(req, res) {
-            //console.log(req.query);
-            app.db.listFeatured(req, res);
-        });
-
 app.get(serverPath('search'), anonBrowsing, isAuthorized,
         function(req, res) {
             //console.log(req.query);

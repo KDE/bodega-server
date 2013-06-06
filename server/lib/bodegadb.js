@@ -21,7 +21,6 @@ var errors = require('./errors.js');
 var dbAuthorize = require('./db/authorize.js');
 var dbListChannels = require('./db/channels.js');
 var dbAssetInfo = require('./db/assetinfo.js');
-var dbListFeatured = require('./db/featured.js');
 var dbRegister = require('./db/register.js');
 var dbPoints = require('./db/points.js');
 var dbSearch = require('./db/search.js');
@@ -70,10 +69,6 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.listChannels = function(req, res) {
         this.dbQuery(dbListChannels, req, res);
-    };
-
-    BodegaDb.prototype.listFeatured = function(req, res) {
-        this.dbQuery(dbListFeatured, req, res);
     };
 
     BodegaDb.prototype.assetInfo = function(req, res) {
