@@ -319,24 +319,6 @@ var PreviewStore = (function() {
         });
     }
 
-
-    function localPutStream(fromFile, assetPath, fn)
-    {
-        //console.log("Let the renaming begin!");
-        var dirname = path.dirname(assetPath);
-        try {
-            fs.mkdirSync(dirname, "0700");
-        } catch (err) {
-            if (!fs.existsSync(dirname)) {
-                fn(err);
-                return;
-            }
-        }
-
-        //console.log("going to rename " + fromFile + " to " + assetPath);
-        localMove(fromFile, assetPath, fn);
-    }
-
     function splitPreviews(rawPreviews) {
         var previews = {
             icons : [],
@@ -466,7 +448,6 @@ var PreviewStore = (function() {
                     fn(err);
                 });
         });
-        //localPutStream(previews[i].file, assetPaths.preview, fn);
     };
 
     PreviewStore.prototype.remove = function(assetInfo, fn) {
