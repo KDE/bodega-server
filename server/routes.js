@@ -285,14 +285,6 @@ app.get(serverPath('stats/assets'), isAuthorized,
     }
 );
 
-app.get(serverPath('asset/:assetId'), isAuthorized,
-        function(req, res) {
-            //console.log(req.query);
-            app.db.assetInfo(req, res);
-        });
-
-
-
 //********************************
 // Store management
 app.get(serverPath('store/list'), isAuthorized,
