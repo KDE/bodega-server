@@ -48,6 +48,12 @@ var PreviewStore = (function() {
         "large"  : 128,
         "huge"   : 512
     };
+    var coverConstraints = {
+        sizes : {
+            min : { w : 500, h : 500 },
+            max : { w : 2560, h : 4096 }
+        }
+    };
 
     function objectIsEmpty(obj) {
         return Object.keys(obj).length === 0;
@@ -88,10 +94,28 @@ var PreviewStore = (function() {
             cb(e, previews, i);
             return;
         }
-        ++i;
-        cb(null, previews, i);
+        cb(null, previews, ++i);
     }
-    
+
+    function validateCover(previews, i, size, cb) {
+        var preview = previews[i];
+        var e;
+
+        if (size.width < coverConstraints.sizes.min.w ||
+            size.width > coverConstraints.sizes.max.w ||
+            size.height < coverConstraints.sizes.min.h ||
+            size.height > coverConstraints.sizes.max.h) {
+            e = errors.create(
+                'CoverFileWrongSize',
+                'Cover ' + preview.subtype  + " size " +
+                    size.width + "x" + size.height +
+                    " is invalid!");
+            cb(e, previews, i);
+            return;
+        }
+        cb(null, previews, ++i);
+    }
+
     function validateFile(previews, i, cb) {
         var e;
         var mimetype;
@@ -133,6 +157,8 @@ var PreviewStore = (function() {
                     }
                     if (preview.type === 'icon') {
                         validateIcon(previews, i, result, cb);
+                    } else if (preview.type === 'cover') {
+                        validateCover(previews, i, result, cb);
                     } else {
                         ++i;
                         cb(err, previews, i);
@@ -362,7 +388,7 @@ var PreviewStore = (function() {
 
     function handleIcons(assetInfo, previews, assetPaths, cb) {
         var icons = previews.icons;
-        var i, j;
+        var j;
         var e;
         var funcs = [];
 
@@ -376,24 +402,47 @@ var PreviewStore = (function() {
         for (j = 0; j < icons.length; ++j) {
             funcs.push(handleIcon);
         }
-        async.waterfall(funcs, function(err, previews, i) {
+        async.waterfall(funcs, function(err) {
             cb(err, assetInfo, previews, assetPaths);
+        });
+    }
+
+    function handleCover(assetInfo, covers, i, assetPaths, cb) {
+        var cover = covers[i];
+        var filename = path.basename(cover.file);
+        var relPath = path.join(assetInfo.id.toString(),
+                                filename);
+        var fullIncomingPath = path.join(
+            assetPaths.incoming, filename);
+
+        localMove(cover.file, fullIncomingPath, function(err) {
+            if (!err) {
+                cover.path = relPath;
+            }
+            cb(err, assetInfo, covers, ++i, assetPaths);
         });
     }
     
     function handleCovers(assetInfo, previews, assetPaths, cb) {
         var covers = previews.covers;
-        var i, j;
+        var j;
         var e;
+        var funcs = [];
 
         if (!covers || !covers.length) {
             cb(null, assetInfo, previews, assetPaths);
             return;
         }
-        
+
+        funcs.push(function(cb) {
+            cb(null, assetInfo, covers, 0, assetPaths);
+        });
         for (j = 0; j < covers.length; ++j) {
+            funcs.push(handleCover);
         }
-        cb(null, assetPaths, previews, assetPaths);
+        async.waterfall(funcs, function(err) {
+            cb(err, assetInfo, previews, assetPaths);
+        });
     }
     
 

@@ -22,7 +22,7 @@ var fs = require('fs');
 
 describe('Preview Store, ', function(){
     var cookie;
-    var tmpCoverFile = __dirname + "/sampleasset/tmpcover.png";
+    var tmpCoverFile = __dirname + "/sampleasset/tmpcover.jpg";
     var tmpIcon512 = __dirname + "/sampleasset/tmpIcon512.png";
     var tmpIcon128 = __dirname + "/sampleasset/tmpIcon128.png";
     var tmpIcon64  = __dirname + "/sampleasset/tmpIcon64.png";

@@ -71,6 +71,7 @@ var ErrorType = {
 
     "PreviewFileMissing"     : 48, //one of the preview files is missing
     "IconFileWrongSize"      : 49, //one of the icons is of the wrong size
+    "CoverFileWrongSize"     : 50, //one of the covers is of the wrong size
 
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
     "StorePartnerInvalid"    : 61,//the partner provided is incorrect
