@@ -54,6 +54,12 @@ var PreviewStore = (function() {
             max : { w : 2560, h : 4096 }
         }
     };
+    var screenshotConstraints = {
+        sizes : {
+            min : { w : 400, h : 300 },
+            max : { w : 4096, h : 3072 }
+        }
+    };
 
     function objectIsEmpty(obj) {
         return Object.keys(obj).length === 0;
@@ -87,7 +93,7 @@ var PreviewStore = (function() {
         if (size.width !== expectedSize ||
             size.height !== expectedSize) {
             e = errors.create(
-                'IconFileWrongSize',
+                'IconWrongSize',
                 'Icon ' + preview.subtype  + " should be " +
                     expectedSize + "x" + expectedSize +
                     "!");
@@ -106,7 +112,26 @@ var PreviewStore = (function() {
             size.height < coverConstraints.sizes.min.h ||
             size.height > coverConstraints.sizes.max.h) {
             e = errors.create(
-                'CoverFileWrongSize',
+                'CoverWrongSize',
+                'Cover ' + preview.subtype  + " size " +
+                    size.width + "x" + size.height +
+                    " is invalid!");
+            cb(e, previews, i);
+            return;
+        }
+        cb(null, previews, ++i);
+    }
+
+    function validateScreenshot(previews, i, size, cb) {
+        var preview = previews[i];
+        var e;
+
+        if (size.width < screenshotConstraints.sizes.min.w ||
+            size.width > screenshotConstraints.sizes.max.w ||
+            size.height < screenshotConstraints.sizes.min.h ||
+            size.height > screenshotConstraints.sizes.max.h) {
+            e = errors.create(
+                'ScreenshotWrongSize',
                 'Cover ' + preview.subtype  + " size " +
                     size.width + "x" + size.height +
                     " is invalid!");
@@ -159,15 +184,15 @@ var PreviewStore = (function() {
                         validateIcon(previews, i, result, cb);
                     } else if (preview.type === 'cover') {
                         validateCover(previews, i, result, cb);
+                    } else if (preview.type === 'screenshot') {
+                        validateCover(previews, i, result, cb);
                     } else {
-                        ++i;
-                        cb(err, previews, i);
+                        cb(err, previews, ++i);
                     }
                 });
                 return;
             }
-            ++i;
-            cb(null, previews, i);
+            cb(null, previews, ++i);
         });
     }
 
@@ -444,6 +469,44 @@ var PreviewStore = (function() {
             cb(err, assetInfo, previews, assetPaths);
         });
     }
+
+    function handleScreenshot(assetInfo, screenshots, i, assetPaths, cb) {
+        var screenshot = screenshots[i];
+        var filename = path.basename(screenshot.file);
+        var relPath = path.join(assetInfo.id.toString(),
+                                filename);
+        var fullIncomingPath = path.join(
+            assetPaths.incoming, filename);
+
+        localMove(screenshot.file, fullIncomingPath, function(err) {
+            if (!err) {
+                screenshot.path = relPath;
+            }
+            cb(err, assetInfo, screenshots, ++i, assetPaths);
+        });
+    }
+
+    function handleScreenshots(assetInfo, previews, assetPaths, cb) {
+        var screenshots = previews.screenshots;
+        var j;
+        var e;
+        var funcs = [];
+
+        if (!screenshots || !screenshots.length) {
+            cb(null, assetInfo, previews, assetPaths);
+            return;
+        }
+
+        funcs.push(function(cb) {
+            cb(null, assetInfo, screenshots, 0, assetPaths);
+        });
+        for (j = 0; j < screenshots.length; ++j) {
+            funcs.push(handleScreenshot);
+        }
+        async.waterfall(funcs, function(err) {
+            cb(err, assetInfo, previews, assetPaths);
+        });
+    }
     
 
     PreviewStore.prototype.checkRequirements = function(assetInfo, previews, fn) {
@@ -490,6 +553,7 @@ var PreviewStore = (function() {
             });
             funcs.push(handleIcons);
             funcs.push(handleCovers);
+            funcs.push(handleScreenshots);
 
             async.waterfall(
                 funcs,

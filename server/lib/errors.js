@@ -70,8 +70,9 @@ var ErrorType = {
     "InvalidUrl"             : 47, //the requested url is invalid
 
     "PreviewFileMissing"     : 48, //one of the preview files is missing
-    "IconFileWrongSize"      : 49, //one of the icons is of the wrong size
-    "CoverFileWrongSize"     : 50, //one of the covers is of the wrong size
+    "IconWrongSize"          : 49, //one of the icons is of the wrong size
+    "CoverWrongSize"         : 50, //one of the covers is of the wrong size
+    "ScreenshotWrongSize"    : 51, //one of the screenshots is of the wrong size
 
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
     "StorePartnerInvalid"    : 61,//the partner provided is incorrect
