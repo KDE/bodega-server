@@ -146,37 +146,35 @@ app.get(serverPath('purchase/:assetId'), isAuthorized,
 
 //********************************
 // Collections
-app.get(serverPath('collections/list'), isAuthorized,
+app.get(serverPath('collections/list/:collectionId?'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
-            app.db.listCollections(req, res);
+            if (req.params.collectionId) {
+                app.db.collectionListAssets(req, res);
+            } else {
+                app.db.listCollections(req, res);
+            }
         });
 
-app.get(serverPath('collections/create'), isAuthorized,
+app.post(serverPath('collections/create'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.createCollection(req, res);
         });
 
-app.get(serverPath('collections/delete'), isAuthorized,
+app.get(serverPath('collections/delete/:collectionId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.deleteCollection(req, res);
         });
 
-app.get(serverPath('collections/listAssets'), isAuthorized,
-        function(req, res) {
-            //console.log(req.query);
-            app.db.collectionListAssets(req, res);
-        });
-
-app.get(serverPath('collections/addAsset'), isAuthorized,
+app.get(serverPath('collections/:collectionId/add/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.collectionAddAsset(req, res);
         });
 
-app.get(serverPath('collections/removeAsset'), isAuthorized,
+app.get(serverPath('collections/:collectionId/remove/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.collectionRemoveAsset(req, res);

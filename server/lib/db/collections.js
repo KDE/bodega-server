@@ -56,9 +56,9 @@ module.exports.create = function(db, req, res) {
     var searchQuery =
         'SELECT * FROM collections WHERE person = $1 AND name = $2;';
     var defaultPageSize = 25;
-    var name = req.query.name;
-    var isPublic = utils.parseBool(req.query.public);
-    var isWishList = utils.parseBool(req.query.wishlist);
+    var name = req.body.name;
+    var isPublic = utils.parseBool(req.body.public);
+    var isWishList = utils.parseBool(req.body.wishlist);
 
     if (!name) {
         // Name of the collection is missing.
@@ -105,7 +105,7 @@ module.exports.remove = function(db, req, res) {
     var searchQuery =
         'SELECT * FROM collections WHERE person = $1 AND id = $2;';
     var defaultPageSize = 25;
-    var collectionId = req.query.collectionId;
+    var collectionId = utils.parseNumber(req.params.collectionId);
 
     if (!collectionId) {
         //"Id of the collection is missing.",
@@ -158,7 +158,7 @@ module.exports.listAssets = function(db, req, res) {
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
     var offset = parseInt(req.query.offset, 10) || 0;
-    var collectionId = req.query.collectionId;
+    var collectionId = req.params.collectionId;
 
     var json = utils.standardJson(req);
     json.collection = {};
@@ -213,8 +213,8 @@ module.exports.addAsset = function(db, req, res) {
          WHERE bc.collection = $1 AND bc.asset = $2;';
     var assetInsertQuery =
         'INSERT INTO collectionsContent (collection, asset) VALUES ($1, $2);';
-    var collectionId = req.query.collectionId;
-    var assetId = req.query.assetId;
+    var collectionId = req.params.collectionId;
+    var assetId = req.params.assetId;
 
     var json = utils.standardJson(req);
     json.collection = [];
@@ -285,8 +285,8 @@ module.exports.removeAsset = function(db, req, res) {
          WHERE bc.collection = $1 AND bc.asset = $2;';
     var assetDeleteQuery =
         'DELETE FROM collectionsContent WHERE collection = $1 AND asset = $2;';
-    var collectionId = req.query.collectionId;
-    var assetId = req.query.assetId;
+    var collectionId = req.params.collectionId;
+    var assetId = req.params.assetId;
 
     var json = utils.standardJson(req);
     json.collection = [];

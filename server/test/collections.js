@@ -15,6 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var pg = require('pg');
+
 var server = require('../app.js');
 var utils = require('./support/http');
 
@@ -44,9 +46,11 @@ describe('Collections', function(){
                 });
         });
         it('shouldnt allow creating collections', function(done) {
-            utils.getUrl(
+            var params = { name: 'hello' };
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/collections/create?name=\'hello\'',
+                '/bodega/v1/json/collections/create',
+                params,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -63,7 +67,7 @@ describe('Collections', function(){
         it('shouldnt allow deleting collections', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/delete?name=\'hello\'',
+                '/bodega/v1/json/collections/delete/hello',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -98,9 +102,11 @@ describe('Collections', function(){
 
     describe('After authentication', function(){
         it('should create', function(done){
-            utils.getUrl(
+            var params = { name: collectionName };
+            utils.postUrl(
                 server,
-                '/bodega/v1/json/collections/create?name='+collectionName,
+                '/bodega/v1/json/collections/create',
+                params,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -148,8 +154,7 @@ describe('Collections', function(){
             for (var i = 0; i < assets.length; ++i) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/collections/addAsset?collectionId=' +
-                        collectionId+'&assetId=' + assets[i],
+                    '/bodega/v1/json/collections/' + collectionId + '/add/' + assets[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -173,7 +178,7 @@ describe('Collections', function(){
         it('should list added assets', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/listAssets?collectionId='+collectionId,
+                '/bodega/v1/json/collections/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -196,8 +201,7 @@ describe('Collections', function(){
             for (var i = 0; i < assetsToRemove.length; ++i) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/collections/removeAsset?collectionId=' +
-                        collectionId+'&assetId=' + assetsToRemove[i],
+                    '/bodega/v1/json/collections/' + collectionId + '/remove/' + assetsToRemove[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -221,7 +225,7 @@ describe('Collections', function(){
         it('should list assets after removal', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/listAssets?collectionId='+collectionId,
+                '/bodega/v1/json/collections/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -244,8 +248,7 @@ describe('Collections', function(){
             for (var i = 0; i < assetsToRemove.length; ++i) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/collections/addAsset?collectionId=' +
-                        collectionId+'&assetId=' + assetsToRemove[i],
+                    '/bodega/v1/json/collections/' + collectionId + '/add/' + assetsToRemove[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -269,7 +272,7 @@ describe('Collections', function(){
         it('should list assets after readding', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/listAssets?collectionId='+collectionId,
+                '/bodega/v1/json/collections/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -289,7 +292,7 @@ describe('Collections', function(){
         it('should allow deletion of a collection', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/collections/delete?collectionId='+collectionId,
+                '/bodega/v1/json/collections/delete/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -317,6 +320,21 @@ describe('Collections', function(){
                     done();
                 },
                 cookie);
+        });
+    });
+
+    // always delete the two collection we made, even on error
+    after(function(done) {
+        var connectionString = app.config.database.protocol + "://" +
+                               app.config.database.user + ":" + app.config.database.password +
+                               "@" + app.config.database.host + "/" +
+                               app.config.database.name;
+
+        pg.connect(connectionString, function(err, client, finis) {
+                   client.query('delete from cllections where name = $1', [ collectionName ],
+                   function(err, result) {
+                           done();
+                   });
         });
     });
 });
