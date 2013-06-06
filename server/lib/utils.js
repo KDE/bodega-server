@@ -182,7 +182,7 @@ module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
                 json.confirmationCode = confirmationCode;
                 json.text = text;
                 res.json(json);
-                console.log(text);
+                //console.log(text);
             }
         }
     );
