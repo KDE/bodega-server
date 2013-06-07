@@ -15,6 +15,7 @@ select setval('seq_languageids', 1);
 select setval('seq_peopleids', 1);
 select setval('seq_partnerids', 1);
 select setval('seq_channelids', 1);
+select setval('seq_purchaseids', 1);
 
 insert into people (lastname, firstname, email, points, password, active)
     values ('Rusin', 'Zack', 'zack@kde.org', 10000, '$2a$10$Iejk3uw6uGFCGR5OKaOOZO2tmnlIhPCsCvw7G1pLa81QH4fonDC.C', true);
@@ -256,14 +257,14 @@ select downloadBooksByAuthor('aseigo@kde.org', 'Tolstoy, Leo');
 
 
 --purchases sample data for the statistics test
-INSERT INTO purchases VALUES (1, 2, 'zack@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 20, '2013-05-26 00:00:00Z');
-INSERT INTO purchases VALUES (2, 3, 'aseigo@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 01:00:00Z');
-INSERT INTO purchases VALUES (3, 4, 'mart@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 02:00:00Z');
-INSERT INTO purchases VALUES (4, 2, 'zack@kde.org', 4, 'VIVALDI-1', 'diamond', 100, 90, 10, '2013-05-25 13:26:00Z');
-INSERT INTO purchases VALUES (5, 3, 'aseigo@kde.org', 4, 'VIVALDI-1', 'diamond', 100, 90, 10, '2013-05-25 09:35:24Z');
-INSERT INTO purchases VALUES (6, 3, 'aseigo@kde.rog', 3, 'VIVALDI-1', 'dice', 300, 280, 15, '2013-06-02 01:02:03Z');
-INSERT INTO purchases VALUES (7, 4, 'mart@kde.org', 3, 'VIVALDI-1', 'dice', 300, 280, 15, '2013-07-02 01:02:03Z');
-INSERT INTO purchases VALUES (8, 4, 'mart@kde.org', 2, 'VIVALDI-1', 'aquarium', 200, 190, 5, '2013-06-10 09:10:11Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (2, 'zack@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 20, '2013-05-26 00:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (3, 'aseigo@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 01:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (4, 'mart@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 02:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (2, 'zack@kde.org', 4, 'VIVALDI-1', 'diamond', 100, 90, 10, '2013-05-25 13:26:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (3, 'aseigo@kde.org', 4, 'VIVALDI-1', 'diamond', 100, 90, 10, '2013-05-25 09:35:24Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (3, 'aseigo@kde.rog', 3, 'VIVALDI-1', 'dice', 300, 280, 15, '2013-06-02 01:02:03Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (4, 'mart@kde.org', 3, 'VIVALDI-1', 'dice', 300, 280, 15, '2013-07-02 01:02:03Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (4, 'mart@kde.org', 2, 'VIVALDI-1', 'aquarium', 200, 190, 5, '2013-06-10 09:10:11Z');
 
 
 --downloads sample data for the statistics test
