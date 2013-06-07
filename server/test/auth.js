@@ -137,6 +137,7 @@ describe('Authentication', function(){
 
     describe('proper authorization', function(){
         it('authorize correctly.', function(done){
+            var hostname = 'http://' + app.config.host + ':' + app.config.port;
             var expected = {
                 "authStatus":true,
                 "device":"VIVALDI-1",
@@ -144,12 +145,12 @@ describe('Authentication', function(){
                 "points": 10000,
                 "success": true,
                 "imageUrls": {
-                    "tiny":"http://localhost:3000/icons/22",
-                    "small":"http://localhost:3000/icons/32",
-                    "medium":"http://localhost:3000/icons/64",
-                    "large":"http://localhost:3000/icons/128",
-                    "huge":"http://localhost:3000/icons/512",
-                    "previews":"http://localhost:3000/previews"
+                        "tiny": hostname + "/icons/22",
+                       "small": hostname + "/icons/32",
+                      "medium": hostname + "/icons/64",
+                       "large": hostname + "/icons/128",
+                        "huge": hostname + "/icons/512",
+                    "previews": hostname + "/previews"
                 },
                 "active": true
             };
