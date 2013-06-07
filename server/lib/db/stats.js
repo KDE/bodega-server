@@ -19,15 +19,15 @@ var utils = require('../utils.js');
 var errors = require('../errors.js');
 
 
-module.exports.assetStats = function(db, req, res) {
-    var params = [req.session.user.partner];
-
+function assetStats(partner, db, req, res)
+{
     var i;
     var query = "";
     //default granularity is month
     var granularity = "month";
     var from;
     var to;
+    var params = [ partner ];
 
     if (req.query.to) {
         to = new Date(req.query.to);
@@ -184,3 +184,8 @@ module.exports.assetStats = function(db, req, res) {
         }
      });
 };
+
+module.exports.assetStats = function(db, req, res) {
+    utils.partnerId(db, req, res, assetStats);
+}
+
