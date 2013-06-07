@@ -35,7 +35,7 @@ function authenticate(db, req, res)
 {
     var authQuery =
         "SELECT u.id, u.fullname, u.email, u.active, \
-         u.points + u.owedPoints as points, u.password, af.partner as partner FROM people u JOIN stores s ON (s.id = $1) LEFT JOIN affiliations af ON (u.id = af.person) WHERE u.email = $2;";
+         u.points + u.owedPoints as points, u.password FROM people u JOIN stores s ON (s.id = $1) WHERE u.email = $2;";
     var authUser = req.query.auth_user;
     var authPassword = req.query.auth_password;
     var authStore = utils.authStore(req);
@@ -70,7 +70,6 @@ function authenticate(db, req, res)
                         name: authUser,
                         id: userData.id,
                         store: authStore,
-                        partner: userData.partner,
                         points: userData.points
                     };
                     req.session.user = user;
