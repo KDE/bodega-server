@@ -34,6 +34,7 @@ var ErrorType = {
     "Download"               : 14,//problem with the download
     "AccessDenied"           : 15,//access denied to the requested asset
     "RedeemCodeFailure"      : 16,//could not redeem points code.
+    "InvalidEmailAddress"    : 1000,//email address not valid
 
     "PurchaseMethodCreation" : 17,//could not link credit card to customer
     "PurchaseMethodDeletion" : 18,//delete card details
