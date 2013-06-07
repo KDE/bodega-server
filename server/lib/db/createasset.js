@@ -181,7 +181,7 @@ function processInfo(data, db, req, res)
     }
     assetInfo.incoming = true;
     checkPartner(db, req, res, assetInfo);
-};
+}
 
 module.exports = function(db, req, res) {
     // asset info

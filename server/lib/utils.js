@@ -239,6 +239,6 @@ module.exports.partnerId = function(db, req, res, fn, role)
                     fn(partner, db, req, res);
                 });
     }
-}
+};
 
 

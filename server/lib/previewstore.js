@@ -453,7 +453,7 @@ var PreviewStore = (function() {
             cb(err, assetInfo, covers, ++i, assetPaths);
         });
     }
-    
+
     function handleCovers(assetInfo, previews, assetPaths, cb) {
         var covers = previews.covers;
         var j;

@@ -375,7 +375,7 @@ app.get('/api(/?*)', function(req, res) {
     var filename = path.normalize(req.params[0]);
     var filePath;
 
-    if (filename === '.' || filename == '/') {
+    if (filename === '.' || filename === '/') {
         //we are on /api/ so we are loading the /doc/index.markdown
         filePath = __dirname + '/doc/index.markdown';
     } else {

@@ -183,9 +183,9 @@ function assetStats(partner, db, req, res)
             }
         }
      });
-};
+}
 
 module.exports.assetStats = function(db, req, res) {
     utils.partnerId(db, req, res, assetStats);
-}
+};
 
