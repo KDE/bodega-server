@@ -15,9 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var BCrypt = require('bcrypt');
+var check = require('validator').check;
+
 var utils = require('../utils.js');
 var errors = require('../errors.js');
-var BCrypt = require('bcrypt');
 
 function createUser(db, req, res, args)
 {
@@ -101,6 +103,13 @@ module.exports = function(db, req, res) {
 
     if (!args.email || !args.password) {
         errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    try {
+        check(args.email).isEmail();
+    } catch (e) {
+        next(errors.create('InvalidEmailAddress', e.message));
         return;
     }
 
