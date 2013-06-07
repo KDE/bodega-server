@@ -213,7 +213,6 @@ module.exports.partnerId = function(db, req, res, fn, role)
         params.push(role);
     }
 
-    console.log("fetching partner .....");
     if (partner < 1) {
         // get the default (e.g. first) partner
         db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1" + roleQuery,
