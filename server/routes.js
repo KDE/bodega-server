@@ -371,11 +371,11 @@ app.get('/images/*', function(req, res) {
 });
 
 
-app.get('/api/(*)', function(req, res) {
+app.get('/api(/?*)', function(req, res) {
     var filename = path.normalize(req.params[0]);
     var filePath;
 
-    if (filename === 'api') {
+    if (filename === '.' || filename == '/') {
         //we are on /api/ so we are loading the /doc/index.markdown
         filePath = __dirname + '/doc/index.markdown';
     } else {

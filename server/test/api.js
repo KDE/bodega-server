@@ -20,6 +20,25 @@ var utils = require('./support/http');
 var assert = require('assert');
 
 describe('List api', function() {
+    describe('Request index page', function() {
+     it('should work with no trailing slash (/api)', function(done) {
+        utils.getUrl(server,
+            '/api',
+            function(res) {
+                res.statusCode.should.equal(200);
+                done();
+            });
+     });
+     it('should work with  atrailing slash (/api/)', function(done) {
+        utils.getUrl(server,
+            '/api/',
+            function(res) {
+                res.statusCode.should.equal(200);
+                done();
+            });
+     });
+    });
+
     describe('when markdown file is found', function() {
      it('should show the content', function(done) {
         utils.getUrl(server,
@@ -29,6 +48,7 @@ describe('List api', function() {
                 done();
             });
      });
+
     describe('when markdown file is not found', function() {
         it('should return the 404 page', function(done) {
             utils.getUrl(server,
