@@ -191,7 +191,7 @@ module.exports = function(db, req, res) {
 
     if (req.body.info) {
         processInfo(req.body.info, db, req, res);
-    } else if (req.files.info) {
+    } else if (req.files && req.files.info) {
         fs.readFile(req.files.info.path, function(err, data) {
             if (err) {
                 errors.report('UploadInvalidJson', req, res, err);
