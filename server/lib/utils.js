@@ -202,3 +202,44 @@ module.exports.authStore = function(req)
     return null;
 };
 
+module.exports.partnerId = function(db, req, res, fn, role)
+{
+    var partner = module.exports.parseNumber(req.body.partner ? req.body.partner : req.query.partner);
+    var params = [req.session.user.id];
+
+    var roleQuery = '';
+    if (role !== undefined) {
+        roleQuery = " and r.description = $2";
+        params.push(role);
+    }
+
+    console.log("fetching partner .....");
+    if (partner < 1) {
+        // get the default (e.g. first) partner
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1" + roleQuery,
+                params,
+                function(err, result) {
+                    if (err || !result.rows || result.rows.length === 0) {
+                        errors.report('StorePartnerInvalid', req, res, err);
+                        return -1;
+                    }
+
+                    fn(result.rows[0].partner, db, req, res);
+                });
+    } else {
+        params.push(partner);
+        var partnerIndex = params.length;
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $" + partnerIndex + " and a.person = $1 " + roleQuery,
+                params,
+                function(err, result) {
+                    if (err || !result.rows || result.rows.length === 0) {
+                        errors.report('StorePartnerInvalid', req, res, err);
+                        return;
+                    }
+
+                    fn(partner, db, req, res);
+                });
+    }
+}
+
+

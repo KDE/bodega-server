@@ -18,39 +18,6 @@
 var errors = require('../errors.js');
 var utils = require('../utils.js');
 
-function defaultPartnerId(db, req, res, fn)
-{
-    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Store Manager';",
-            [req.session.user.id],
-            function(err, result) {
-                if (err || !result.rows || result.rows.length === 0) {
-                    errors.report('StorePartnerInvalid', req, res);
-                    return -1;
-                }
-
-                fn(result.rows[0].partner, db, req, res);
-            });
-}
-
-function partnerId(db, req, res, fn)
-{
-    var partner = utils.parseNumber(req.body.partner ? req.body.partner : req.query.partner);
-    if (partner < 1) {
-        defaultPartnerId(db, req, res, fn);
-    } else {
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Store Manager';",
-                [partner, req.session.user.id],
-                function(err, result) {
-                    if (err || !result.rows || result.rows.length === 0) {
-                        errors.report('StorePartnerInvalid', req, res);
-                        return;
-                    }
-
-                    fn(partner, db, req, res);
-                });
-    }
-}
-
 function sendStoreJson(id, db, req, res)
 {
     var query = "select s.id, s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.flatMarkup, s.markup \
@@ -158,7 +125,7 @@ function deleteWithPartner(partner, db, req, res)
 
 function ifCanManageStore(db, req, res, fn)
 {
-    partnerId(db, req, res,
+    utils.partnerId(db, req, res,
               function(partner, db, req, res) {
                   var store = req.params.id ? req.params.id : req.query.id;
                   db.query("select id from stores where id = $1 and partner = $2", [store, partner],
@@ -175,7 +142,7 @@ function ifCanManageStore(db, req, res, fn)
 
                             fn(partner, result.rows[0].id, db, req, res);
                         });
-              });
+              }, 'Store Manager');
 }
 
 function setMarkups(partner, store, db, req, res)
@@ -477,14 +444,14 @@ module.exports.list = function(db, req, res) {
  * Returns a store info structure
  **/
 module.exports.create = function(db, req, res) {
-    partnerId(db, req, res, createWithPartner);
+    utils.partnerId(db, req, res, createWithPartner, 'Store Manager');
 };
 
 /**
  * + string id
  */
 module.exports.remove = function(db, req, res) {
-    partnerId(db, req, res, deleteWithPartner);
+    utils.partnerId(db, req, res, deleteWithPartner, 'Store Manager');
 };
 
 /**
