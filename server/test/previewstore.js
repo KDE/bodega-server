@@ -29,7 +29,7 @@ describe('Preview Store, ', function(){
     var tmpIcon32  = __dirname + "/sampleasset/tmpIcon32.png;";
     var tmpIcon22  = __dirname + "/sampleasset/tmpIcon22.png";
     var cleanupFiles = [];
-    
+
     var sampleBookAsset = {
         id : 133,
         incoming : true,
@@ -57,7 +57,7 @@ describe('Preview Store, ', function(){
         fs.createReadStream(from).pipe(
             fs.createWriteStream(to));
     }
-    
+
     before(function(done) {
         copyFile(__dirname + "/sampleasset/cover.jpg", tmpCoverFile);
         copyFile(__dirname + "/sampleasset/icon22.png", tmpIcon22);

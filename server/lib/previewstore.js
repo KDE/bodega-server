@@ -80,7 +80,7 @@ var PreviewStore = (function() {
         var preview = previews[i];
         var e;
         var expectedSize;
-        
+
         if (!iconSizes.hasOwnProperty(preview.subtype)) {
             e = errors.create('IconInvalidType',
                               'Icon type ' + preview.subtype +
@@ -170,7 +170,7 @@ var PreviewStore = (function() {
                     cb(e);
                     return;
                 }
-                
+
                 gm(preview.file).size(function(err, result) {
                     var expectedSize;
                     if (err) {
@@ -211,7 +211,7 @@ var PreviewStore = (function() {
             fn(err);
         });
     }
-    
+
     function findPreviewPaths() {
         var i;
         var previewPaths = {};
@@ -232,7 +232,7 @@ var PreviewStore = (function() {
             var modeInt;
             var modesMatch;
             var len;
-            
+
             if (err || !stat.isDirectory()) {
                 fs.mkdir(dirpath, mode, function(err) {
                     fn(err);
@@ -264,10 +264,10 @@ var PreviewStore = (function() {
             fn(null);
         });
     }
-    
+
     function PreviewStore() {
         var i;
-        
+
         storageSystem = app.config.storageSystem;
         storageConfig = app.config[storageSystem];
 
@@ -278,49 +278,55 @@ var PreviewStore = (function() {
         fullPreviewPaths.incoming =
             path.join(process.cwd(), previewPaths.incoming);
 
-        
         fullPreviewPaths.icons = {};
         for (i in iconSizes) {
             fullPreviewPaths.icons[i] =
                 path.join(process.cwd(), "public",
                           previewPaths.icons[i]);
         }
-        checkDirectory(fullPreviewPaths.icons.tiny, "0755", function(err){
+
+        checkDirectory(fullPreviewPaths.icons.tiny, "0755", function(err) {
             if (err) {
                 console.log(err);
                 process.exit(1);
             }
         });
-        checkDirectory(fullPreviewPaths.icons.small, "0755", function(err){
+
+        checkDirectory(fullPreviewPaths.icons.small, "0755", function(err) {
             if (err) {
                 console.log(err);
                 process.exit(1);
             }
         });
-        checkDirectory(fullPreviewPaths.icons.medium, "0755", function(err){
+
+        checkDirectory(fullPreviewPaths.icons.medium, "0755", function(err) {
             if (err) {
                 console.log(err);
                 process.exit(1);
             }
         });
-        checkDirectory(fullPreviewPaths.icons.large, "0755", function(err){
+
+        checkDirectory(fullPreviewPaths.icons.large, "0755", function(err) {
             if (err) {
                 console.log(err);
                 process.exit(1);
             }
         });
-        checkDirectory(fullPreviewPaths.icons.huge, "0755", function(err){
+
+        checkDirectory(fullPreviewPaths.icons.huge, "0755", function(err) {
             if (err) {
                 console.log(err);
                 process.exit(1);
             }
         });
+
         checkDirectory(fullPreviewPaths.previews, "0755", function(err) {
             if (err) {
                 console.log(err);
                 process.exit(1);
             }
         });
+
         checkDirectory(fullPreviewPaths.incoming, "0700", function(err) {
             if (err) {
                 console.log(err);
@@ -357,7 +363,7 @@ var PreviewStore = (function() {
                 //  so fallback to copying
                 var is = fs.createReadStream(fromFile);
                 var os = fs.createWriteStream(toFile);
-                
+
                 is.on('data', function(chunk) { os.write(chunk); })
                     .on('end', function() {
                         os.end();
@@ -546,7 +552,6 @@ var PreviewStore = (function() {
         });
     }
 
-    
     function findAssetType(assetInfo) {
         var i;
         var tag;
@@ -565,7 +570,7 @@ var PreviewStore = (function() {
         }
         return assetType;
     }
-    
+
     function checkAppRequirements(assetInfo, fn) {
         var previews = splitPreviews(assetInfo.previews);
         var preview;
@@ -678,7 +683,7 @@ var PreviewStore = (function() {
             checkGenericRequirements(assetInfo, fn);
         }
     };
-    
+
     PreviewStore.prototype.upload = function(assetInfo, fn) {
         var i;
         var assetPaths;
