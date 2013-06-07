@@ -170,7 +170,7 @@ if (sql_argument == 'update') {
         } catch (e) {
         }
 
-        sql_commands.unshift('createdb -U ' + adminUser() + ' -O ' + config.database.name + ' ' + config.database.name);
+        sql_commands.unshift('createdb -U ' + adminUser() + ' -O ' + config.database.user + ' ' + config.database.name);
         sql_commands.unshift('dropdb -U ' + adminUser() + ' ' + config.database.name);
         //console.log(sql_commands);
         series(sql_commands, function() {
