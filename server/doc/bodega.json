@@ -1,7 +1,7 @@
 {
   "endpoints": [
     {
-      "name": "Account and Authentication",
+      "name": "Accounts and Authentication",
       "methods": [
         {
           "MethodName": "Authenticate",
