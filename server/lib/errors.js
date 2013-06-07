@@ -73,6 +73,9 @@ var ErrorType = {
     "IconWrongSize"          : 49, //one of the icons is of the wrong size
     "CoverWrongSize"         : 50, //one of the covers is of the wrong size
     "ScreenshotWrongSize"    : 51, //one of the screenshots is of the wrong size
+    "AssetMissingIcons"      : 52, //asset is missing the required icons
+    "AssetMissingScreenshot" : 53, //asset is missing required screenshot
+    "AssetMissingCover"      : 54, //asset is missing required screenshot
 
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
     "StorePartnerInvalid"    : 61,//the partner provided is incorrect

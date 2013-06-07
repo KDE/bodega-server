@@ -545,21 +545,138 @@ var PreviewStore = (function() {
             cb(err, assetInfo, previews, assetPaths);
         });
     }
-    
 
-    PreviewStore.prototype.checkRequirements = function(assetInfo, previews, fn) {
-        if (!assetInfo.assetType) {
+    
+    function findAssetType(assetInfo) {
+        var i;
+        var tag;
+        var assetType;
+
+        if (!assetInfo || !assetInfo.tags) {
+            return null;
+        }
+
+        for (i = 0; i < assetInfo.tags.length; ++i) {
+            tag = assetInfo.tags[i];
+            if (tag.type === 'assetType') {
+                assetType = tag.title;
+                break;
+            }
+        }
+        return assetType;
+    }
+    
+    function checkAppRequirements(assetInfo, fn) {
+        var previews = splitPreviews(assetInfo.previews);
+        var preview;
+        var e;
+        var i;
+        var hasHugeIcon = false;
+
+        if (!previews.icons) {
+            e = errors.create('AssetMissingIcons');
+            fn(e, false);
+            return;
+        }
+        //Each app needs at least the huge icon and the others
+        //  can be created by scaling that one
+        for (i = 0; i < previews.icons.length; ++i) {
+            preview = previews.icons[i];
+            if (preview.type === 'icon' &&
+                preview.subtype === 'huge') {
+                hasHugeIcon = true;
+                break;
+            }
+        }
+        if (!hasHugeIcon) {
+            e = errors.create('AssetMissingIcons');
+            fn(e, false);
+            return;
+        }
+        if (!previews.screenshots || previews.screenshots.length < 1) {
+            e = errors.create('AssetMissingScreenshot');
+            fn(e, false);
+            return;
+        }
+        fn(null, true);
+    }
+    function checkBookRequirements(assetInfo, fn) {
+        var previews = splitPreviews(assetInfo.previews);
+        var preview;
+        var e;
+        var i;
+        var hasFrontCover = false;
+
+        if (!previews.covers) {
+            e = errors.create('AssetMissingCover');
+            fn(e, false);
+            return;
+        }
+        //Each book needs at least the front cover image - icons
+        //  can be created by scaling that one
+        for (i = 0; i < previews.covers.length; ++i) {
+            preview = previews.covers[i];
+            if (preview.type === 'cover' &&
+                preview.subtype === 'front') {
+                hasFrontCover = true;
+                break;
+            }
+        }
+        if (!hasFrontCover) {
+            e = errors.create('AssetMissingCover');
+            fn(e, false);
+            return;
+        }
+        fn(null, true);
+    }
+
+    function checkGenericRequirements(assetInfo, fn) {
+        var previews = splitPreviews(assetInfo.previews);
+        var preview;
+        var e;
+        var i;
+        var hasHugeIcon = false;
+
+        if (!previews.icons) {
+            e = errors.create('AssetMissingIcons');
+            fn(e, false);
+            return;
+        }
+        //Each app needs at least the huge icon and the others
+        //  can be created by scaling that one
+        for (i = 0; i < previews.icons.length; ++i) {
+            preview = previews.icons[i];
+            if (preview.type === 'icon' &&
+                preview.subtype === 'huge') {
+                hasHugeIcon = true;
+                break;
+            }
+        }
+        if (!hasHugeIcon) {
+            e = errors.create('AssetMissingIcons');
+            fn(e, false);
+            return;
+        }
+        fn(null, true);
+    }
+
+    PreviewStore.prototype.canPublish = function(assetInfo, fn) {
+        var assetType = findAssetType(assetInfo);
+
+        if (!assetType) {
             var err = errors.create('MissingParameters',
                                     'Asset is missing the assetType tag!');
             fn(err);
             return;
         }
 
-        if (assetInfo.assetType === 'book') {
-
-        } else if (assetInfo.assetType === 'app') {
+        if (assetType === 'application') {
+            checkAppRequirements(assetInfo, fn);
+        } else if (assetType === 'book') {
+            checkBookRequirements(assetInfo, fn);
+        } else {
+            checkGenericRequirements(assetInfo, fn);
         }
-        
     };
     
     PreviewStore.prototype.upload = function(assetInfo, fn) {
@@ -600,9 +717,6 @@ var PreviewStore = (function() {
                     fn(err);
                 });
         });
-    };
-
-    PreviewStore.prototype.remove = function(assetInfo, fn) {
     };
 
     PreviewStore.prototype.previewPaths = function() {

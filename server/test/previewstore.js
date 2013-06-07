@@ -33,19 +33,23 @@ describe('Preview Store, ', function(){
     var sampleBookAsset = {
         id : 133,
         incoming : true,
-        assetType : "book",
         previews : [
             {type : "cover", "subtype" : "front", file : tmpCoverFile }
+        ],
+        tags : [
+            {"type" : "assetType", "title" : "book" }
         ]
     };
     var sampleAppAsset = {
         id : 134,
         incoming : true,
-        assetType : "app",
         previews : [
             {type : "icon", "subtype" : "medium", file : tmpIcon64 },
             {type : "icon", "subtype" : "large", file : tmpIcon128 },
             {type : "icon", "subtype" : "huge", file : tmpIcon512 }
+        ],
+        tags : [
+            {"type" : "assetType", "title" : "application" }
         ]
     };
 
@@ -89,9 +93,7 @@ describe('Preview Store, ', function(){
                     JSON.parse(JSON.stringify(sampleBookAsset));
             sampleAsset.previews[0].file = "missing-file.jpg";
             app.previewStore.upload(sampleAsset, function(err) {
-                if (!err) {
-                    throw new Error('failed to detect missing file');
-                }
+                should.exist(err);
                 done();
             });
         });
@@ -108,6 +110,23 @@ describe('Preview Store, ', function(){
             app.previewStore.upload(sampleAppAsset, function(err) {
                 //console.log(res);
                 should.not.exist(err);
+                done();
+            });
+        });
+
+        it('can publish finished book.', function(done){
+            app.previewStore.canPublish(sampleBookAsset, function(err, result) {
+                //console.log(res);
+                should.not.exist(err);
+                done();
+            });
+        });
+
+        it('can not publish app without a screenshot.', function(done){
+            app.previewStore.canPublish(sampleAppAsset, function(err, result) {
+                //console.log(res);
+                should.exist(err);
+                err.name.should.equal('AssetMissingScreenshot');
                 done();
             });
         });
