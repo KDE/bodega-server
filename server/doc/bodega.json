@@ -5,14 +5,15 @@
       "methods": [
         {
           "MethodName": "Authenticate",
-          "Synopsis": "Authenticates a user. This is used for consumer access to stores, administration of stores and management of assets.",
+          "Synopsis": "Authenticates a person. This is used for consumer access to stores, administration of stores and management of assets",
           "HTTPMethod": "Get",
           "URI": "/auth",
           "parameters": [
             {
               "Name": "auth_user",
               "Location": "query",
-              "Description": "The user's login (the email address used with the account).",
+              "Description": "The person's login (the email address used with the account)",
+              "Default": "zack@kde.org",
               "Required": "Y",
               "Type": "string"
             },
@@ -21,6 +22,7 @@
               "Location": "query",
               "Description": "The password for the account",
               "Required": "Y",
+              "Default": "zack",
               "Type": "string"
             },
             {
@@ -28,6 +30,7 @@
               "Location": "query",
               "Description": "The store one wishes to access. For management and administration purposes, use the store \"null\"",
               "Required": "Y",
+              "Default": "null",
               "Type": "string"
             }
           ]
@@ -35,21 +38,72 @@
         {
           "MethodName": "Register",
           "read-only": "true",
-          "Synopsis": "Creates a new user account.",
+          "Synopsis": "Creates a new account",
           "HTTPMethod": "Get",
           "URI": "/register",
           "parameters": [
             {
-              "Name": "auth_user",
+              "Name": "email",
               "Location": "query",
-              "Description": "The user's login (the email address used with the account).",
+              "Description": "The email to use for this account. Must be unique, as only one account per email is permitted",
               "Required": "Y",
               "Type": "string"
             },
             {
-              "Name": "auth_password",
+              "Name": "password",
               "Location": "query",
-              "Description": "The password for the account",
+              "Description": "The password to be used with this account",
+              "Required": "Y",
+              "Type": "string"
+            },
+            {
+              "Name": "firstname",
+              "Location": "query",
+              "Description": "The person's first name",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "middlenames",
+              "Location": "query",
+              "Description": "The person's middle names",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "lastname",
+              "Location": "query",
+              "Description": "The person's last name",
+              "Required": "N",
+              "Type": "string"
+            }
+          ]
+        },
+        {
+          "MethodName": "Registration confirmation",
+          "read-only": "true",
+          "Synopsis": "Confirms a new (or reactivated) account",
+          "HTTPMethod": "Get",
+          "URI": "/register/confirm",
+          "parameters": [
+            {
+              "Name": "code",
+              "Location": "query",
+              "Description": "The code received in the confirmation email",
+              "Required": "Y",
+              "Type": "string"
+            },
+            {
+              "Name": "id",
+              "Location": "query",
+              "Description": "Numeric ID of the account to activate",
+              "Required": "Y",
+              "Type": "string"
+            },
+            {
+              "Name": "email",
+              "Location": "query",
+              "Description": "The email associated with the account",
               "Required": "Y",
               "Type": "string"
             }
@@ -69,7 +123,7 @@
             {
               "Name": "assetId",
               "Location": "URL",
-              "Description": "The id of the asset to delete. Must exist in the store you are authenticated against.",
+              "Description": "The id of the asset to delete. Must exist in the store you are authenticated against",
               "Required": "Y",
               "Type": "number"
             }
@@ -107,7 +161,7 @@
           "parameters": [
             {
               "Name": "assetId",
-              "Description": "The id of the asset to delete. Must be owned by a partner you are affiliated with.",
+              "Description": "The id of the asset to delete. Must be owned by a partner you are affiliated with",
               "Required": "Y",
               "Type": "number"
             }
@@ -131,6 +185,83 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Browsing stores",
+      "methods": [
+        {
+          "MethodName": "List top level categories",
+          "Synopsis": "Lists all top level categories in the store currently authenticated against",
+          "HTTPMethod": "Get",
+          "URI": "/channels",
+          "parameters": []
+        },
+        {
+          "MethodName": "List contents in a category",
+          "Synopsis": "Lists all sub-categories and assets in a given category",
+          "HTTPMethod": "Get",
+          "URI": "/channel/:channelId",
+          "parameters": [
+            {
+              "Name": "channelId",
+              "Location": "URL",
+              "Description": "The numeric id of category to list",
+              "Required": "Y",
+              "Type": "number"
+            },
+            {
+              "Name": "pageSize",
+              "Location": "query",
+              "Description": "The number of results to return at a time",
+              "Required": "N",
+              "Type": "number"
+            },
+            {
+              "Name": "offset",
+              "Location": "query",
+              "Description": "The search result offset to start listing from",
+              "Required": "N",
+              "Type": "number"
+            }
+          ]
+        },
+        {
+          "MethodName": "Search",
+          "Synopsis": "Searches through all assets in a given category, matching in names, metadata and relevant tags and returning paged results",
+          "HTTPMethod": "Get",
+          "URI": "/search",
+          "parameters": [
+            {
+              "Name": "channelId",
+              "Location": "URL",
+              "Description": "The numeric id of category to search in; will also search all sub-categories",
+              "Required": "Y",
+              "Type": "number"
+            },
+            {
+              "Name": "query",
+              "Location": "query",
+              "Description": "The text to search for",
+              "Required": "Y",
+              "Type": "string"
+            },
+            {
+              "Name": "pageSize",
+              "Location": "query",
+              "Description": "The number of results to return at a time",
+              "Required": "N",
+              "Type": "number"
+            },
+            {
+              "Name": "offset",
+              "Location": "query",
+              "Description": "The search result offset to start listing from",
+              "Required": "N",
+              "Type": "number"
+            }
+          ]
+        }
+        ]
     }
-  ]
+]
 }
