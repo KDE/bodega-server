@@ -90,9 +90,9 @@ insert into assets (license, partner, name, description, version, path, image, a
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Poker14', 'Poker 14', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true, 'poker1');
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Poker15', 'Poker 15', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true, 'poker1');
 insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Poker16', 'Poker 16', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Poker17', 'Poker 17', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Poker18', 'Poker 18', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, 2, 'Poker19', 'Poker 19', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true, 'poker1');
+insert into assets (license, partner, name, description, version, path, image, active, externid, baseprice) values (1, 2, 'Poker17', 'Poker 17', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true, 'poker1', 500);
+insert into assets (license, partner, name, description, version, path, image, active, externid, baseprice) values (1, 2, 'Poker18', 'Poker 18', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true, 'poker1', 1000);
+insert into assets (license, partner, name, description, version, path, image, active, externid, baseprice) values (1, 2, 'Poker19', 'Poker 19', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true, 'poker1', 20000);
 
 insert into assetPreviews (asset, path, mimetype, type, subtype) values (2, 'fishswimming.png',
        'image/png', 'screenshot', '1');
