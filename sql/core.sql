@@ -78,6 +78,9 @@ create table affiliations
     role        int         references personRoles(id) not null
 );
 
+create index idx_personaffiliations on affiliations (person);
+create index idx_personroles on affiliations (partner, person);
+
 create table stores
 (
     id          text        primary key,
