@@ -92,7 +92,7 @@ function performEmailUpdate(db, req, res, next)
         try {
             check(email).isEmail();
         } catch (e) {
-            next(errors.create('AccountUpdateFailed', e.message));
+            next(errors.create('InvalidEmailAddress', e.message));
             return;
         }
         var findQuery =
