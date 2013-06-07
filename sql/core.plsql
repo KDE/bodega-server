@@ -154,8 +154,10 @@ CREATE OR REPLACE FUNCTION ct_associateChannelWithAssets() RETURNS TRIGGER AS '
 DECLARE
     alteredChannel   int;
     tagCount         int;
-    asset            RECORD;
+    assetRow         RECORD;
+    markupRow        RECORD;
     noJobsInProgress bool;
+    assetPrice       int;
 BEGIN
     IF (TG_OP = ''DELETE'') THEN
         alteredChannel := OLD.channel;
@@ -163,14 +165,33 @@ BEGIN
         alteredChannel := NEW.channel;
     END IF;
     SELECT INTO tagCount count(tag) FROM channelTags c WHERE c.channel = alteredChannel;
+    SELECT INTO markupRow s.minMarkup as minMarkup, s.maxMarkup as  maxMarkup,
+                        s.flatMarkup as flatMarkup, s.markup as markup, s.id as store
+                        FROM stores s LEFT JOIN channels c ON (s.id = c.store)
+                        WHERE c.id = alteredChannel;
+
     DELETE FROM channelAssets c WHERE c.channel = alteredChannel;
     DELETE FROM subChannelAssets sc WHERE sc.channel = alteredChannel OR sc.leafChannel = alteredChannel;
-    FOR asset IN SELECT a.asset as id, count(a.tag) = tagCount as matches
+    FOR assetRow IN SELECT a.asset as id, count(a.tag) = tagCount as matches
             FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
             WHERE a.asset IS NOT NULL GROUP BY a.asset LOOP
-        IF (asset.matches) THEN
-            INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, asset.id);
-            PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, asset.id);
+        IF (assetRow.matches) THEN
+            INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
+            PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
+            SELECT INTO assetPrice ct_calcPoints(baseprice, markupRow.flatMarkup,
+                                                 markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup)
+                        FROM assets WHERE id = assetRow.id;
+            IF assetPrice > 0 THEN
+                DELETE FROM assetPrices where asset = assetRow.id AND store = markupRow.store;
+                INSERT INTO assetPrices (asset, store, points)
+                       VALUES (assetRow.id, markupRow.store, assetPrice);
+            ELSE
+                PERFORM asset FROM channelAssets ca LEFT JOIN channels c ON (ca.channel = c.id)
+                        WHERE c.store = markupRow.store;
+                IF NOT FOUND THEN
+                    DELETE FROM assetPrices where asset = assetRow.id AND store = markupRow.store;
+                END IF;
+            END IF;
         END IF;
     END LOOP;
 
