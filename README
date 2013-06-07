@@ -32,11 +32,11 @@ All commands that follow are done relative to the server/ directory.
 
    $ npm install
 
-Move config.sample.json to config.json and update/edit it if necessary.
+Move config.json.sample to config.json and update/edit it if necessary.
 
 ## Configuration
 
-Copy the config.sample.json file to config.json and customize the values within it. The configuration
+Copy the config.json.sample file to config.json and customize the values within it. The configuration
 keys should be self-explanatory, and if you do not use a given service (e.g. S3 or Stripe) you can
 safely ignore those blocks completely.
 
