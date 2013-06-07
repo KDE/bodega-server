@@ -1,14 +1,5 @@
-Asset Importers
-===============
-These small command line, Qt-based helpers automate the processes of getting external
-catalogs and importing them locally.
-
-Configure and install with:
-
-cmake -DBODEGA_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/opt/something /bodega/src
-
-Server
-======
+Server Setup
+============
 This directory contians the content distribution server. It is based on node.js, postgresql and redis.
 
 Node modules are installed using npm from within the server directory and the server can be started with
@@ -106,4 +97,14 @@ Use a simple.
    $ make check
 
 The configuration is stored in the .jshintrc file and the files which should be skipped are stored in the .jshintignore .
+
+Asset Importers
+===============
+These small command line, Qt-based helpers automate the processes of getting external
+catalogs and importing them locally.
+
+Configure and install with:
+
+cmake -DBODEGA_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/opt/something /bodega/src
+
 
