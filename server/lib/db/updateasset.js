@@ -134,10 +134,17 @@ function setupPreviews(db, req, res, assetInfo)
 function updatePublishedAsset(db, req, res, assetInfo)
 {
     var incomingAssetQuery =
-            "insert into incomingAssets (id) values ($1)";
+            "insert into incomingAssets (id, license, partner, baseprice, \
+                                         name, description, version, versionts, \
+                                         path, file, image, publish)\
+                                         values ($1, $2, $3, $4, $5, $6, $7, \
+                                                 $8, $9, $10, $11, false)";
 
     db.query(
-        incomingAssetQuery, [assetInfo.id],
+        incomingAssetQuery, [assetInfo.id, assetInfo.license, assetInfo.partner,
+                             assetInfo.baseprice, assetInfo.name, assetInfo.description,
+                             assetInfo.version, assetInfo.versionts, assetInfo.path,
+                             assetInfo.file, assetInfo.image],
         function (err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
