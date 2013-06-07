@@ -1,3 +1,12 @@
+System Requirements
+===================
+The Bodega server requires the following software to be installed on the system prior to use:
+
+* node.js (0.10 or better)
+* PostgreSQL (v9.1 or better)
+* Redis (used for user session data)
+* GraphicsMagick (used to manipulate images uploaded for icons, covers, previews, etc)
+
 Server Setup
 ============
 This directory contians the content distribution server. It is based on node.js, postgresql and redis.
@@ -5,7 +14,7 @@ This directory contians the content distribution server. It is based on node.js,
 Node modules are installed using npm from within the server directory and the server can be started with
 the main.sh file.
 
-All commands that follow are done relative to the server directory.
+All commands that follow are done relative to the server/ directory.
 
 ## Database setup
 
