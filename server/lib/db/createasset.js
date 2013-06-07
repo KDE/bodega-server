@@ -164,37 +164,45 @@ function checkPartner(db, req, res, assetInfo)
     }
 }
 
+function processInfo(data, db, req, res)
+{
+    var assetInfo;
+    try {
+        assetInfo = JSON.parse(data);
+    } catch (err) {
+        //JSON parser failed
+        assetInfo = null;
+    }
+
+    if (!assetInfo || !assetInfo.file || assetInfo.id) {
+        //"Unable to parse the asset info file.",
+        errors.report('UploadInvalidJson', req, res);
+        return;
+    }
+    assetInfo.incoming = true;
+    checkPartner(db, req, res, assetInfo);
+};
+
 module.exports = function(db, req, res) {
     // asset info
     //   icons
     //   previews
     //   asset
-    var assetInfo;
 
-    if (!req.files.info) {
-        //"The asset info file is missing.",
+    if (req.body.files) {
+        processInfo(req.body.files, db, req, res);
+    } else if (req.files.info) {
+        fs.readFile(req.files.info.path, function(err, data) {
+            if (err) {
+                errors.report('UploadInvalidJson', req, res, err);
+                return;
+            }
+
+            processInfo(data, db, req, res);
+        });
+    } else {
+        //"The asset info is missing.",
         errors.report('MissingParameters', req, res);
         return;
     }
-
-    fs.readFile(req.files.info.path, function (err, data) {
-        if (err) {
-            errors.report('UploadInvalidJson', req, res, err);
-            return;
-        }
-        try {
-            assetInfo = JSON.parse(data);
-        } catch (err) {
-            //JSON parser failed
-            assetInfo = null;
-        }
-
-        if (!assetInfo || !assetInfo.file || assetInfo.id) {
-            //"Unable to parse the asset info file.",
-            errors.report('UploadInvalidJson', req, res);
-            return;
-        }
-        assetInfo.incoming = true;
-        checkPartner(db, req, res, assetInfo);
-    });
 };

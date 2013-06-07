@@ -147,63 +147,71 @@ function updatePublishedAsset(db, req, res, assetInfo)
         });
 }
 
+function processInfo(assetInfo, db, req, res)
+{
+    if (!assetInfo) {
+        //"Unable to parse the asset info file.",
+        errors.report('UploadInvalidJson', req, res);
+        return;
+    }
+
+    if (req.params.assetId && !assetInfo.id) {
+        assetInfo.id = utils.parseNumber(req.params.assetId);
+    }
+
+    if (!assetInfo.id) {
+        errors.report('UploadInvalidJson', req, res);
+        return;
+    }
+
+    createUtils.isContentCreator(
+        db, req, res, assetInfo,
+        function(err, db, req, res, assetInfo) {
+            if (err) {
+                errors.report('UploadPartnerInvalid', req, res, err);
+                return;
+            }
+            createUtils.findAsset(
+                db, req, res, assetInfo, false,
+                function(err, db, req, res, assetInfo) {
+                    if (err) {
+                        errors.report('DeleteAssetMissing', req, res, err);
+                        return;
+                    }
+                    if (assetInfo.incoming) {
+                        updateIncomingAsset(db, req, res, assetInfo);
+                    } else {
+                        updatePublishedAsset(db, req, res, assetInfo);
+                    }
+                }
+            );
+        });
+}
+
 module.exports = function(db, req, res) {
     var assetInfo;
 
-    if (!req.files.info) {
+    if (req.body.info) {
+        processInfo(req.body.info, db, req, res);
+    } else if (req.files.info) {
+        fs.readFile(req.files.info.path, function (err, data) {
+            if (err) {
+                errors.report('UploadInvalidJson', req, res, err);
+                return;
+            }
+            try {
+                assetInfo = JSON.parse(data);
+            } catch (err) {
+                //JSON parser failed
+                assetInfo = null;
+            }
+
+            processInfo(assetInfo, db, req, res);
+        });
+    } else {
         //"The asset info file is missing.",
         errors.report('MissingParameters', req, res);
         return;
     }
-
-    fs.readFile(req.files.info.path, function (err, data) {
-        if (err) {
-            errors.report('UploadInvalidJson', req, res, err);
-            return;
-        }
-        try {
-            assetInfo = JSON.parse(data);
-        } catch (err) {
-            //JSON parser failed
-            assetInfo = null;
-        }
-
-        if (!assetInfo) {
-            //"Unable to parse the asset info file.",
-            errors.report('UploadInvalidJson', req, res);
-            return;
-        }
-
-        if (req.params.assetId && !assetInfo.id) {
-            assetInfo.id = utils.parseNumber(req.params.assetId);
-        }
-
-        if (!assetInfo.id) {
-            errors.report('UploadInvalidJson', req, res);
-            return;
-        }
-
-        createUtils.isContentCreator(
-            db, req, res, assetInfo,
-            function(err, db, req, res, assetInfo) {
-                if (err) {
-                    errors.report('UploadPartnerInvalid', req, res, err);
-                    return;
-                }
-                createUtils.findAsset(
-                    db, req, res, assetInfo, false,
-                    function(err, db, req, res, assetInfo) {
-                        if (err) {
-                            errors.report('DeleteAssetMissing', req, res, err);
-                            return;
-                        }
-                        if (assetInfo.incoming) {
-                            updateIncomingAsset(db, req, res, assetInfo);
-                        } else {
-                            updatePublishedAsset(db, req, res, assetInfo);
-                        }
-                    }
-                );
-            });
-    });
 };
+
