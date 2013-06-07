@@ -1,0 +1,136 @@
+{
+  "endpoints": [
+    {
+      "name": "Account and Authentication",
+      "methods": [
+        {
+          "MethodName": "Authenticate",
+          "Synopsis": "Authenticates a user. This is used for consumer access to stores, administration of stores and management of assets.",
+          "HTTPMethod": "Get",
+          "URI": "/auth",
+          "parameters": [
+            {
+              "Name": "auth_user",
+              "Location": "query",
+              "Description": "The user's login (the email address used with the account).",
+              "Required": "Y",
+              "Type": "string"
+            },
+            {
+              "Name": "auth_password",
+              "Location": "query",
+              "Description": "The password for the account",
+              "Required": "Y",
+              "Type": "string"
+            },
+            {
+              "Name": "auth_store",
+              "Location": "query",
+              "Description": "The store one wishes to access. For management and administration purposes, use the store \"null\"",
+              "Required": "Y",
+              "Type": "string"
+            }
+          ]
+        },
+        {
+          "MethodName": "Register",
+          "read-only": "true",
+          "Synopsis": "Creates a new user account.",
+          "HTTPMethod": "Get",
+          "URI": "/register",
+          "parameters": [
+            {
+              "Name": "auth_user",
+              "Location": "query",
+              "Description": "The user's login (the email address used with the account).",
+              "Required": "Y",
+              "Type": "string"
+            },
+            {
+              "Name": "auth_password",
+              "Location": "query",
+              "Description": "The password for the account",
+              "Required": "Y",
+              "Type": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Assets",
+      "methods": [
+        {
+          "MethodName": "Information",
+          "Synopsis": "Creates a new asset owned by you. A file named \"info\" must be uploaded that contains all the metadata for the asset, a file named \"asset\" which is the actual asset, ",
+          "HTTPMethod": "Get",
+          "URI": "/asset/:assetId",
+          "parameters": [
+            {
+              "Name": "assetId",
+              "Location": "URL",
+              "Description": "The id of the asset to delete. Must exist in the store you are authenticated against.",
+              "Required": "Y",
+              "Type": "number"
+            }
+          ]
+        },
+        {
+          "MethodName": "Create",
+          "read-only": "true",
+          "Synopsis": "Creates a new asset owned by you. A file named \"info\" must be uploaded that contains all the metadata for the asset, a file named \"asset\" which is the actual asset, ",
+          "HTTPMethod": "POST",
+          "URI": "/asset/create",
+          "parameters": []
+        },
+        {
+          "MethodName": "Delete",
+          "read-only": "true",
+          "Synopsis": "Deletes an asset",
+          "HTTPMethod": "GET",
+          "URI": "/asset/delete/:assetId",
+          "parameters": [
+            {
+              "Name": "assetId",
+              "Description": "Updates a new asset owned by you. A file named \"info\" must be uploaded that contains all the metadata for the asset, a file named \"asset\" which is the actual asset, ",
+              "Required": "Y",
+              "Type": "number"
+            }
+          ]
+        },
+        {
+          "MethodName": "Update",
+          "read-only": "true",
+          "Synopsis": "Updates an asset ",
+          "HTTPMethod": "POST",
+          "URI": "/asset/update/:assetId",
+          "parameters": [
+            {
+              "Name": "assetId",
+              "Description": "The id of the asset to delete. Must be owned by a partner you are affiliated with.",
+              "Required": "Y",
+              "Type": "number"
+            }
+          ]
+        },
+        {
+          "MethodName": "List",
+          "read-only": "true",
+          "Synopsis": "Lists the assets that belong to you",
+          "HTTPMethod": "GET",
+          "URI": "/asset/list/",
+          "parameters": [
+            {
+              "Name": "type",
+              "Description": "Which kind of listing to use",
+              "Required": "N",
+              "Default": "published",
+              "Type": "enumerated",
+              "EnumeratedList": ["published", "incoming", "all"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+diff --git a/app.js b/app.js
+index 4e3b375..004e101 100755
+--- a/app.js
++++ b/app.js
+@@ -129,7 +129,48 @@ app.configure('production', function() {
+ //
+ // Middleware
+ //
++app.bodegaCookie = '';
++function bodegaAuth(apiConfig, req, res, next) {
++    if (app.bodegaCookie) {
++        next();
++        return;
++    }
++
++    var baseHostInfo = apiConfig.baseURL.split(':');
++    var baseHostUrl = baseHostInfo[0],
++        baseHostPort = (baseHostInfo.length > 1) ? baseHostInfo[1] : "";
++
++    var queryArgs = {
++        auth_user: apiConfig.bodegaAuth.username,
++        auth_password: apiConfig.bodegaAuth.password,
++        auth_store: apiConfig.bodegaAuth.store
++    };
++    var options = {
++        host: baseHostUrl,
++        port: baseHostPort,
++        path: apiConfig.publicPath + '/auth?' + query.stringify(queryArgs)
++    };
++
++    http.get(options, function(remote) {
++        var buf = '';
++        remote.on('data', function(chunk) {
++            buf += chunk;
++        });
++
++        remote.on('end', function() {
++            app.bodegaCookie = remote.headers['set-cookie']
++            next();
++        });
++    }).on('error', function(e) {
++        console.log('HEADERS: ' + JSON.stringify(res.headers));
++        console.log("Got error: " + e.message);
++        console.log("Error: " + util.inspect(e));
++    });
++}
++
+ function oauth(req, res, next) {
++    next();
++    return;
+     console.log('OAuth process started');
+     var apiName = req.body.apiName,
+         apiConfig = apisConfig[apiName];
+@@ -351,7 +392,17 @@ function processRequest(req, res, next) {
+         var requestBody = query.stringify(params);
+     }
+ 
+-    if (apiConfig.oauth) {
++    if (apiConfig.bodegaAuth) {
++        bodegaAuth(apiConfig, req, res, function() {
++                if (!reqQuery.headerNames) {
++                    reqQuery.headerNames = [];
++                    reqQuery.headerValues = [];
++                }
++                reqQuery.headerNames.push('Cookie');
++                reqQuery.headerValues.push(app.bodegaCookie);
++                unsecuredCall();
++        } );
++    } else if (apiConfig.oauth) {
+         console.log('Using OAuth');
+ 
+         // Three legged OAuth
