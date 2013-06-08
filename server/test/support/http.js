@@ -19,9 +19,14 @@ function getUrl(app, url, fn, cookie)
             buf += chunk;
         });
         res.on("end", function(chunk) {
-            try {
-                res.body = JSON.parse(buf);
-            } catch (e) {
+            var pageType = res.headers['content-type'];
+            if (pageType === 'application/json; charset=utf-8') {
+                try {
+                    res.body = JSON.parse(buf);
+                } catch (e) {
+                    console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
+                }
+            } else if (pageType === 'text/html; charset=utf-8') {
                 res.body = buf;
             }
             fn(res);
