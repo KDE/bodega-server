@@ -74,11 +74,8 @@ function performMiddleNameUpdate(db, req, res, next)
         middleNames = sanitize(req.query.middleNames).trim();
     }
 
-    if (middleNames !== '') {
-        performUpdate(db, 'middleNames', middleNames, req.session.user.id, next);
-    } else {
-        next();
-    }
+    // middleNames can be null, so we don't check if middelNames !== ''
+    performUpdate(db, 'middleNames', middleNames, req.session.user.id, next);
 }
 
 function performLastNameUpdate(db, req, res, next)
@@ -130,6 +127,8 @@ function performEmailUpdate(db, req, res, next)
                 }
             }
         );
+    } else {
+        next();
     }
 }
 
@@ -225,6 +224,7 @@ module.exports.changeDetails = function(db, req, res) {
     series([
         performEmailUpdate,
         performFirstNameUpdate,
+        performMiddleNameUpdate,
         performLastNameUpdate,
         performCardUpdate,
         performAccountStatusUpdate,
