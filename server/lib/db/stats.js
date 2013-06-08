@@ -65,7 +65,8 @@ function assetStats(partner, db, req, res)
         query += "select dateof, total from (";
     }
 
-    if (req.query.metric === "count") {
+    var metric = req.params.metric ? req.params.metric : req.query.metric;
+    if (metric === "count") {
         if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
             query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate,";
@@ -89,7 +90,7 @@ function assetStats(partner, db, req, res)
                   " + dateLimitQuery + " group by assetdate order by assetdate";
         }
 
-    } else if (req.query.metric === "downloads") {
+    } else if (metric === "downloads") {
         dateLimitQuery = " and date_trunc('" + granularity + "', d.downloadedon) >= to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')\
                       and date_trunc('" + granularity + "', d.downloadedon) <= to_date('" + to.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS') ";
 
@@ -116,8 +117,8 @@ function assetStats(partner, db, req, res)
                     from downloads d left join assets a on (d.asset = a.id and a.partner = $1) \
                   " + dateLimitQuery + " group by assetdate order by assetdate";
         }
-    //Points
     } else {
+        //Points
         if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
             query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate,";

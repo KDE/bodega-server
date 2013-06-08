@@ -304,7 +304,7 @@ app.get(serverPath('asset/:assetId'), anonBrowsing, isAuthorized,
 
 //*******************************
 // Stats
-app.get(serverPath('stats/assets'), isAuthorized,
+app.get(serverPath('stats/assets/:metric'), isAuthorized,
     function(req, res) {
         app.db.assetStats(req, res);
     }
