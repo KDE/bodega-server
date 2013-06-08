@@ -223,7 +223,13 @@ app.get(serverPath('participant/paymentMethod'),
     }
 );
 
+app.get(serverPath('participant/paymentMethod/delete'),
+    function(req, res) {
+        app.db.deletePaymentMethod(req, res);
+    }
+);
 
+// deprecated, use participant/paymentMethod/delete
 app.get(serverPath('participant/deletePaymentMethod'),
     function(req, res) {
         app.db.deletePaymentMethod(req, res);
