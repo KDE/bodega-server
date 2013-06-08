@@ -45,7 +45,7 @@ describe('Create user', function() {
     });
     describe('needs to activate', function() {
         it('should activate', function(done) {
-            utils.getUrl(
+            utils.getHtml(
                 server,
                 '/bodega/v1/json/register/confirm?' + queryString.stringify(userInfo),
                 function(res) {

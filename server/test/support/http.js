@@ -2,8 +2,9 @@ var fs = require('fs');
 var http = require('http');
 var paths = require('path');
 var request = require('request');
+var assert = require('assert');
 
-function getUrl(app, url, fn, cookie)
+function getUrl(app, url, fn, cookie, expectsHtml)
 {
     var options = {
         host: app.config.host,
@@ -19,19 +20,27 @@ function getUrl(app, url, fn, cookie)
             buf += chunk;
         });
         res.on("end", function(chunk) {
-            var pageType = res.headers['content-type'];
-            if (pageType === 'application/json; charset=utf-8') {
+            var contentType = res.headers['content-type'];
+            if (expectsHtml) {
+                assert.deepEqual(contentType, 'text/html; charset=utf-8');
+                res.body = buf;
+            } else {
+                assert.deepEqual(contentType,
+                                 'application/json; charset=utf-8');
                 try {
                     res.body = JSON.parse(buf);
                 } catch (e) {
                     console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
                 }
-            } else if (pageType === 'text/html; charset=utf-8') {
-                res.body = buf;
             }
             fn(res);
         });
     });
+}
+
+function getHtml(app, url, fn, cookie)
+{
+    getUrl(app, url, fn, cookie, true);
 }
 
 function postUrl(app, path, formData, fn, cookie)
@@ -79,5 +88,6 @@ function auth(app, fn)
 }
 
 module.exports.getUrl = getUrl;
+module.exports.getHtml = getHtml;
 module.exports.postUrl = postUrl;
 module.exports.auth = auth;
