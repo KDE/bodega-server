@@ -154,7 +154,7 @@ describe('Changing account information', function() {
                 done();
             });
     });
-    
+
     it('change first name to "Bunny"', function(done) {
         var query = {
             firstName: 'Bunny'
@@ -172,7 +172,7 @@ describe('Changing account information', function() {
             },
             cookie);
     });
-    
+
     it('change middle name to "Rabbit"', function(done) {
         var query = {
             middleNames: 'Rabbit'
