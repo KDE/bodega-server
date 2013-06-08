@@ -204,7 +204,14 @@ app.get(serverPath('participant/changePassword'), isAuthorized,
     }
 );
 
+// deprecated; use the POST version
 app.get(serverPath('participant/changeAccountDetails'), isAuthorized,
+    function(req, res) {
+        app.db.changeAccountDetails(req, res);
+    }
+);
+
+app.post(serverPath('participant/changeAccountDetails'), isAuthorized,
     function(req, res) {
         app.db.changeAccountDetails(req, res);
     }
