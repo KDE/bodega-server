@@ -68,7 +68,7 @@ describe('Stats', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -98,13 +98,12 @@ describe('Stats', function(){
         it('Points stats with one asset number: month granularity', function(done) {
             var query = {
                 assets: [3],
-                metric: "points",
                 from: "2013-05-01",
                 to: "2013-07-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -134,13 +133,12 @@ describe('Stats', function(){
         it('Points stats with four asset numbers: month granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "points",
                 from: "2013-05-01",
                 to: "2013-07-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/points?'+querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -176,13 +174,12 @@ describe('Stats', function(){
         //Downloads
         it('Downloads stats without asset numbers: month granularity', function(done) {
             var query = {
-                metric: "downloads",
                 from: "2013-05-01",
                 to: "2013-10-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?' + querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -209,13 +206,12 @@ describe('Stats', function(){
         it('Downloads stats with one asset numbers: month granularity', function(done) {
             var query = {
                 assets: [3],
-                metric: "downloads",
                 from: "2013-05-01",
                 to: "2013-09-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?' + querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -243,13 +239,12 @@ describe('Stats', function(){
         it('Downloads stats with four asset numbers: month granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "downloads",
                 from: "2013-05-01",
                 to: "2013-09-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -281,13 +276,12 @@ describe('Stats', function(){
 
         it('Purchases count stats without numbers', function(done) {
             var query = {
-                metric: "count",
                 from: "2013-05-01",
                 to: "2013-07-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -314,13 +308,12 @@ describe('Stats', function(){
         it('Purchases count stats with four asset numbers: month granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "count",
                 from: "2013-05-01",
                 to: "2013-07-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/count?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -353,14 +346,13 @@ describe('Stats', function(){
         //different Granularity: DAY
         it('Points stats without asset numbers: day granularity', function(done){
             var query = {
-                metric: "points",
                 granularity: "day",
                 from: "2013-05-23",
                 to: "2013-05-27"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -390,14 +382,13 @@ describe('Stats', function(){
         it('Points stats with four asset numbers: day granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "points",
                 granularity: "day",
                 from: "2013-05-31",
                 to: "2013-06-04"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -430,14 +421,13 @@ describe('Stats', function(){
 
         it('Downloads stats without asset numbers: day granularity', function(done){
             var query = {
-                metric: "downloads",
                 granularity: "day",
                 from: "2013-05-24",
                 to: "2013-06-03"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -467,14 +457,13 @@ describe('Stats', function(){
         it('Downloads stats with four asset numbers: day granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "downloads",
                 granularity: "day",
                 from: "2013-05-24",
                 to: "2013-06-03"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -507,14 +496,13 @@ describe('Stats', function(){
 
         it('Purchases count stats without asset numbers: day granularity', function(done){
             var query = {
-                metric: "count",
                 granularity: "day",
                 from: "2013-05-24",
                 to: "2013-06-03"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -544,14 +532,13 @@ describe('Stats', function(){
         it('Purchases count stats with four asset numbers: day granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "count",
                 granularity: "day",
                 from: "2013-05-24",
                 to: "2013-06-03"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -585,14 +572,13 @@ describe('Stats', function(){
         //different Granularity: YEAR
         it('Points stats without asset numbers: year granularity', function(done){
             var query = {
-                metric: "points",
                 granularity: "year",
                 from: "2012-01-01",
                 to: "2014-01-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -622,14 +608,13 @@ describe('Stats', function(){
         it('Points stats with four asset numbers: year granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "points",
                 granularity: "year",
                 from: "2012-01-01",
                 to: "2014-01-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -662,14 +647,13 @@ describe('Stats', function(){
 
         it('Downloads stats without asset numbers: year granularity', function(done){
             var query = {
-                metric: "downloads",
                 granularity: "year",
                 from: "2012-01-01",
                 to: "2014-01-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -699,14 +683,13 @@ describe('Stats', function(){
         it('Downloads stats with four asset numbers: year granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "downloads",
                 granularity: "year",
                 from: "2012-01-01",
                 to: "2014-01-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -739,14 +722,13 @@ describe('Stats', function(){
 
         it('Purchases count stats without asset numbers: year granularity', function(done){
             var query = {
-                metric: "count",
                 granularity: "year",
                 from: "2012-01-01",
                 to: "2014-01-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -776,14 +758,13 @@ describe('Stats', function(){
         it('Purchases count stats with four asset numbers: year granularity', function(done) {
             var query = {
                 assets: [2,3,4,7],
-                metric: "count",
                 granularity: "year",
                 from: "2012-01-01",
                 to: "2014-01-01"
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/stats/assets?'+querystring.stringify(query),
+                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

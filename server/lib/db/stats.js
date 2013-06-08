@@ -66,7 +66,7 @@ function assetStats(partner, db, req, res)
     }
 
     var metric = req.params.metric ? req.params.metric : req.query.metric;
-    if (metric === "count") {
+    if (metric === "purchases" || metric === "count") {
         if (req.query.assets && req.query.assets.length > 0) {
             params = params.concat(req.query.assets);
             query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate,";
