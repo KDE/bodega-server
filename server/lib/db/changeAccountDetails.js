@@ -55,11 +55,11 @@ function performUpdate(db, field, value, user, next)
 
 function performFirstNameUpdate(db, req, res, next)
 {
-    if (!req.query.firstName) {
-        next();
-        return;
+    var firstName = sanitize(req.body.firstName).trim();
+    if (firstName === '') {
+        firstName = sanitize(req.query.firstName).trim();
     }
-    var firstName = sanitize(req.query.firstName).trim();
+
     if (firstName !== '') {
         performUpdate(db, 'firstName', firstName, req.session.user.id, next);
     } else {
@@ -67,13 +67,27 @@ function performFirstNameUpdate(db, req, res, next)
     }
 }
 
+function performMiddleNameUpdate(db, req, res, next)
+{
+    var middleNames = sanitize(req.body.middleNames).trim();
+    if (middleNames === '') {
+        middleNames = sanitize(req.query.middleNames).trim();
+    }
+
+    if (middleNames !== '') {
+        performUpdate(db, 'middleNames', middleNames, req.session.user.id, next);
+    } else {
+        next();
+    }
+}
+
 function performLastNameUpdate(db, req, res, next)
 {
-    if (!req.query.lastName) {
-        next();
-        return;
+    var lastName = sanitize(req.body.lastName).trim();
+    if (lastName === '') {
+        lastName = sanitize(req.query.lastName).trim();
     }
-    var lastName = sanitize(req.query.lastName).trim();
+
     if (lastName !== '') {
         performUpdate(db, 'lastName', lastName, req.session.user.id, next);
     } else {
@@ -83,11 +97,11 @@ function performLastNameUpdate(db, req, res, next)
 
 function performEmailUpdate(db, req, res, next)
 {
-    if (!req.query.email) {
-        next();
-        return;
+    var email = sanitize(req.body.email).trim();
+    if (email === '') {
+        email = sanitize(req.query.email).trim();
     }
-    var email = sanitize(req.query.email).trim();
+
     if (email !== '') {
         try {
             check(email).isEmail();
@@ -121,7 +135,8 @@ function performEmailUpdate(db, req, res, next)
 
 function performCardUpdate(db, req, res, next)
 {
-    var card = req.query.card;
+    var card = req.body.card ? req.body.card : req.query.card;
+
     if (card) {
         var query =
             "SELECT u.id, u.email, u.active FROM people u WHERE u.id = $1;";
@@ -155,14 +170,15 @@ function performCardUpdate(db, req, res, next)
     }
 }
 
-function performAccountStatusUpdate(db, req, res, next) {
-    var stat = req.query.active;
+function performAccountStatusUpdate(db, req, res, next)
+{
+    var stat = req.body.active ? req.body.active : req.query.active;
 
-    if (!stat) {
+    if (stat) {
+        performUpdate(db, 'active', stat, req.session.user.id, next);
+    } else {
         next();
-        return;
     }
-    performUpdate(db, 'active', stat, req.session.user.id, next);
 }
 
 function completeUpdate(db, req, res, next)
