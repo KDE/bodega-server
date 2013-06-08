@@ -223,6 +223,12 @@ app.get(serverPath('participant/paymentMethod'),
     }
 );
 
+app.post(serverPath('participant/paymentMethod/update'),
+    function(req, res) {
+        app.db.updatePaymentMethod(req, res);
+    }
+);
+
 app.get(serverPath('participant/paymentMethod/delete'),
     function(req, res) {
         app.db.deletePaymentMethod(req, res);

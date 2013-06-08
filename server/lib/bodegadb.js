@@ -111,6 +111,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbChangeAccountDetails.paymentMethod, req, res);
     };
 
+    BodegaDb.prototype.updatePaymentMethod = function(req, res) {
+        this.dbQuery(dbChangeAccountDetails.updatePaymentMethod, req, res);
+    };
+
     BodegaDb.prototype.deletePaymentMethod = function(req, res) {
         this.dbQuery(dbChangeAccountDetails.deletePaymentMethod, req, res);
     };

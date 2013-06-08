@@ -219,6 +219,17 @@ module.exports.deletePaymentMethod = function(db, req, res) {
     });
 };
 
+module.exports.updatePaymentMethod = function(db, req, res) {
+    performCardUpdate(db, req, res,
+            function(err) {
+                if (err) {
+                    errorHandler(db, req, res, err);
+                } else {
+                    completeUpdate(db, req, res, function() {});
+                }
+            });
+};
+
 module.exports.changeDetails = function(db, req, res) {
     //Execute updates serially
     series([
@@ -231,3 +242,4 @@ module.exports.changeDetails = function(db, req, res) {
         completeUpdate
         ], errorHandler, db, req, res);
 };
+
