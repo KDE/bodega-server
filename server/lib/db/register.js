@@ -109,7 +109,7 @@ module.exports = function(db, req, res) {
     try {
         check(args.email).isEmail();
     } catch (e) {
-        next(errors.create('InvalidEmailAddress', e.message));
+        errors.report('InvalidEmailAddress', req, res, e);
         return;
     }
 
