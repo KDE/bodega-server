@@ -163,6 +163,87 @@
           ]
         },
         {
+          "MethodName": "Change password",
+          "read-only": true,
+          "Synopsis": "Changes the password for the account currently authenticated",
+          "HTTPMethod": "GET",
+          "URI": "/participant/changePassword",
+          "parameters": [
+            {
+              "Name": "newPassword",
+              "Location": "query",
+              "Description": "The new password; must be at least eight characters in length",
+              "Required": "Y",
+              "Type": "string"
+            }
+          ]
+        },
+        {
+          "MethodName": "Change personal information",
+          "read-only": true,
+          "Synopsis": "Allows changing information for the account currently authenticated (except passwords; see the 'Change password' method)",
+          "HTTPMethod": "POST",
+          "URI": "/participant/changeAccountDetails",
+          "parameters": [
+            {
+              "Name": "email",
+              "Location": "body",
+              "Description": "The email address to use with this account; it must not be associated with any other account since it is used as the username for authentication",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "firstName",
+              "Location": "body",
+              "Description": "First name of the person this account belongs to",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "middelNames",
+              "Location": "body",
+              "Description": "Middle names of the person this account belongs to",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "lastName",
+              "Location": "body",
+              "Description": "Last name of the person this account belongs to",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "card[number]",
+              "Location": "body",
+              "Description": "Credit card number to use; must be present with all other card information",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "card[exp_month]",
+              "Location": "body",
+              "Description": "Credit card expiry month; must be present with all other card information",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "card[exp_year]",
+              "Location": "body",
+              "Description": "Credit card expiry year; must be present with all other card information",
+              "Required": "N",
+              "Type": "string"
+            },
+            {
+              "Name": "active",
+              "Location": "body",
+              "Description": "Whether or not the account should be activated (otherwise log ins for this account will be denied)",
+              "Required": "N",
+              "Type": "boolean"
+            }
+          ]
+        },
+        {
           "MethodName": "Personal information",
           "Synopsis": "Fetches the information (name, etc) associated with the currently authenticated account",
           "HTTPMethod": "GET",
