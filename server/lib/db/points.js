@@ -89,12 +89,12 @@ function addOtherCurrency(req, res, json, points)
 
 module.exports.price = function(db, req, res)
 {
-    var points = +req.query.amount;
-    if (isNaN(points) || points < 100) {
+    var points = utils.parseNumber(req.query.amount);
+    if (points < 100) {
         points = 100;
     }
-    // get points to the nearest 100 (we only sell in blocks of 100)
-    points = (points - (points % 100)) / 100;
+    // round upwards to the next 100 (we only sell in blocks of 100)
+    points = (points + (100 - (points % 100))) / 100;
 
     var json = {
         'USD': (Math.round((app.config.pointConversionRate / 100 * points) * 100) / 100)
