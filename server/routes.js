@@ -405,13 +405,17 @@ app.get('/images/*', function(req, res) {
 
 app.get('/api(/?*)', function(req, res) {
     var filename = path.normalize(req.params[0]);
+    var suffix = '.markdown';
     var filePath;
 
     if (filename === '.' || filename === '/') {
         //we are on /api/ so we are loading the /doc/index.markdown
         filePath = __dirname + '/doc/index.markdown';
     } else {
-        filePath = __dirname + '/doc/' + filename + '.markdown';
+        filePath = __dirname + '/doc/' + filename;
+        if (!fs.existsSync(filePath)) {
+            filePath += '.markdown';
+        }
     }
 
     fs.readFile(filePath, 'utf8', function(err, data) {
@@ -420,8 +424,10 @@ app.get('/api(/?*)', function(req, res) {
                 storeName: app.config.storeInfo.name,
                 storeUrl: app.config.storeInfo.url
             });
-        } else {
+        } else if (filePath.substr(filePath.length - suffix.length) === suffix) {
             res.send(markdown(data));
+        } else {
+            res.send(data);
         }
     });
 });
