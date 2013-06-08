@@ -19,20 +19,18 @@ var utils = require('../utils.js');
 var errors = require('../errors.js');
 
 module.exports = function(db, req, res) {
-    var json = {
-        authStatus: req.session.authorized,
-        assetCount: 0,
-        channelCount: 0,
-        storeCount: 0,
-        pointsEarned: 0,
-        pointsOwed: 0,
-        points: 0,
-        organization: '',
-        firstName: '',
-        lastName: '',
-        email: '',
-        active: ''
-    };
+    var json = utils.standardJson(req);
+    json.assetCount =  0;
+    json.channelCount =  0;
+    json.storeCount =  0;
+    json.pointsEarned =  0;
+    json.pointsOwed =  0;
+    json.points =  0;
+    json.organization =  '';
+    json.firstName =  '';
+    json.lastName =  '';
+    json.email =  '';
+    json.active =  '';
 
     if (req.session.authorized) {
         var accountInfoQuery = "SELECT firstName, lastName, email, active FROM people WHERE id = $1;";
