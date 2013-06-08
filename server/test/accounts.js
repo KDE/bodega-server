@@ -190,7 +190,7 @@ describe('Changing account information', function() {
             },
             cookie);
     });
-    
+
     it('change last name to "Foofoo"', function(done) {
         var query = {
             lastName: 'Foofoo'
@@ -208,7 +208,7 @@ describe('Changing account information', function() {
             },
             cookie);
     });
-    
+
     it('change email to "bunny_rabbit@foofoo.com"', function(done) {
         var query = {
             email: 'bunny_rabbit@foofoo.com'
@@ -226,7 +226,7 @@ describe('Changing account information', function() {
             },
             cookie);
     });
-    
+
     it('invalid email should fail', function(done) {
         var query = {
             email: 'bunny_rabbit'
@@ -246,7 +246,7 @@ describe('Changing account information', function() {
             },
             cookie);
     });
-    
+
     it('duplicate email should fail', function(done) {
         var query = {
             email: 'aseigo@kde.org'
@@ -266,7 +266,7 @@ describe('Changing account information', function() {
             },
             cookie);
     });
-    
+
     after(function(done) {
         var connectionString = app.config.database.protocol + "://" +
                                app.config.database.user + ":" + app.config.database.password +
@@ -319,7 +319,7 @@ describe('Changing passwords', function() {
             },
             cookie);
     });
-    
+
     it('authorizes correctly with password "alphabetical"', function(done) {
         utils.getUrl(
             server,

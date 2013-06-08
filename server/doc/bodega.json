@@ -314,7 +314,7 @@
               "Description": "The search result offset to start listing from",
               "Required": "N",
               "Type": "number"
-            }  
+            }
         ]
         }
       ]
