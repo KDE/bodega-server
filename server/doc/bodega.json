@@ -244,7 +244,52 @@
           ]
         },
         {
-          "MethodName": "Personal information",
+          "MethodName": "Get payment method",
+          "Synopsis": "Fetches the current payment method (limited to last digits of card)",
+          "HTTPMethod": "GET",
+          "URI": "participant/paymentMethod",
+          "parameters": [
+           ]
+        },
+        {
+          "MethodName": "Update payment method",
+          "Synopsis": "Updates the current payment method",
+          "HTTPMethod": "POST",
+          "URI": "participant/paymentMethod/update",
+          "parameters": [
+             {
+               "Name": "card[number]",
+               "Location": "body",
+               "Description": "Credit card number to use; must be present with all other card information",
+               "Required": "N",
+               "Type": "string"
+             },
+             {
+               "Name": "card[exp_month]",
+               "Location": "body",
+               "Description": "Credit card expiry month; must be present with all other card information",
+               "Required": "N",
+               "Type": "string"
+             },
+             {
+               "Name": "card[exp_year]",
+               "Location": "body",
+               "Description": "Credit card expiry year; must be present with all other card information",
+               "Required": "N",
+               "Type": "string"
+             }
+           ]
+        },
+        {
+          "MethodName": "Delete payment method",
+          "Synopsis": "Delete the registered payment method from the account",
+          "HTTPMethod": "GET",
+          "URI": "participant/paymentMethod/delete",
+          "parameters": [
+          ]
+        },
+        {
+          "MethodName": "Get personal information",
           "Synopsis": "Fetches the information (name, etc) associated with the currently authenticated account",
           "HTTPMethod": "GET",
           "URI": "/participant/info",
