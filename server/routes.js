@@ -125,19 +125,6 @@ app.get(serverPath('points/redeemCode/:code'), isAuthorized,
             app.db.redeemPointsCode(req, res);
         });
 
-app.get(serverPath('download/:assetId'), isAuthorized,
-        function(req, res) {
-            //console.log(req.query);
-            app.db.download(req, res);
-        });
-
-app.get(serverPath('purchase/:assetId'), isAuthorized,
-        function(req, res) {
-            //console.log(req.query);
-            app.db.purchaseAsset(req, res);
-        });
-
-
 //********************************
 // Collections
 app.get(serverPath('collection/list/:collectionId?'), isAuthorized,
@@ -244,6 +231,32 @@ app.post(serverPath('asset/create'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.createAsset(req, res);
+        });
+
+app.get(serverPath('asset/download/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.download(req, res);
+        });
+
+// deprecated by above route
+app.get(serverPath('download/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.download(req, res);
+        });
+
+app.get(serverPath('asset/purchase/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.purchaseAsset(req, res);
+        });
+
+// deprecated by above route
+app.get(serverPath('purchase/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.purchaseAsset(req, res);
         });
 
 app.get(serverPath('asset/delete/:assetId'), isAuthorized,
