@@ -28,8 +28,8 @@ module.exports = function(db, req, res) {
         SELECT 'Points' AS category, points::text AS what, created AS date, comment FROM pointTransactions WHERE person = $1 \
         ORDER BY date DESC LIMIT $2 OFFSET $3;";
     var defaultPageSize = 50;
-    var pageSize = (req.query.pageSize || defaultPageSize) + 1;
-    var offset = req.query.offset || 0;
+    var pageSize = (Math.max(utils.parseNumber(req.query.pageSize), 0) || defaultPageSize) + 1;
+    var offset = Math.max(utils.parseNumber(req.query.offset), 0);
 
     db.query(
         historyQuery, [req.session.user.id, pageSize, offset],
