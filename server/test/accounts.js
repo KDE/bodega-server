@@ -119,7 +119,172 @@ describe('Deactivate user', function() {
     });
 });
 
+function checkPersonInfo(cookie, key, value, done)
+{
+    //console.log("checking " + key + " == " + value);
+    utils.getUrl(
+        server,
+        '/bodega/v1/json/participant/info',
+        function(res) {
+            res.statusCode.should.equal(200);
+            res.headers.should.have.property(
+                'content-type',
+                'application/json; charset=utf-8');
+            res.body.should.have.property('success', true);
+            res.body.should.have.property(key, value);
+            done();
+        },
+        cookie);
+}
+
 describe('Changing account information', function() {
+    var cookie;
+    it('must authorize first', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.headers.should.have.property('set-cookie');
+                cookie = res.headers['set-cookie'];
+                res.body.should.have.property('authStatus', true);
+                done();
+            });
+    });
+    
+    it('change first name to "Bunny"', function(done) {
+        var query = {
+            firstName: 'Bunny'
+        };
+        utils.postUrl(
+            server,
+            '/bodega/v1/json/participant/changeAccountDetails', query,
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', true);
+                checkPersonInfo(cookie, 'firstName', 'Bunny', done);
+            },
+            cookie);
+    });
+    
+    it('change middle name to "Rabbit"', function(done) {
+        var query = {
+            middleNames: 'Rabbit'
+        };
+        utils.postUrl(
+            server,
+            '/bodega/v1/json/participant/changeAccountDetails', query,
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', true);
+                checkPersonInfo(cookie, 'middleNames', 'Rabbit', done);
+            },
+            cookie);
+    });
+    
+    it('change last name to "Foofoo"', function(done) {
+        var query = {
+            lastName: 'Foofoo'
+        };
+        utils.postUrl(
+            server,
+            '/bodega/v1/json/participant/changeAccountDetails', query,
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', true);
+                checkPersonInfo(cookie, 'lastName', 'Foofoo', done);
+            },
+            cookie);
+    });
+    
+    it('change email to "bunny_rabbit@foofoo.com"', function(done) {
+        var query = {
+            email: 'bunny_rabbit@foofoo.com'
+        };
+        utils.postUrl(
+            server,
+            '/bodega/v1/json/participant/changeAccountDetails', query,
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', true);
+                checkPersonInfo(cookie, 'email', 'bunny_rabbit@foofoo.com', done);
+            },
+            cookie);
+    });
+    
+    it('invalid email should fail', function(done) {
+        var query = {
+            email: 'bunny_rabbit'
+        };
+        utils.postUrl(
+            server,
+            '/bodega/v1/json/participant/changeAccountDetails', query,
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', false);
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'InvalidEmailAddress');
+                done();
+            },
+            cookie);
+    });
+    
+    it('duplicate email should fail', function(done) {
+        var query = {
+            email: 'aseigo@kde.org'
+        };
+        utils.postUrl(
+            server,
+            '/bodega/v1/json/participant/changeAccountDetails', query,
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', false);
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'AccountExists');
+                done();
+            },
+            cookie);
+    });
+    
+    after(function(done) {
+        var connectionString = app.config.database.protocol + "://" +
+                               app.config.database.user + ":" + app.config.database.password +
+                               "@" + app.config.database.host + "/" +
+                               app.config.database.name;
+
+        pg.connect(connectionString, function(err, client, finis) {
+                   client.query("update people set email = $1, firstname = $2, middlenames = $3, lastname = $4 where id = 2",
+                   ['zack@kde.org', 'Zack', null, 'Rusin'],
+                        function(err, res) {
+                           finis();
+                           done();
+                       });
+                   });
+    });
+});
+
+describe('Changing passwords', function() {
     var cookie;
     it('authorizes correctly with password "zack"', function(done) {
         utils.getUrl(
