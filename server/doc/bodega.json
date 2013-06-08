@@ -115,15 +115,45 @@
       "name": "Assets",
       "methods": [
         {
-          "MethodName": "Information",
-          "Synopsis": "Creates a new asset owned by you. A file named \"info\" must be uploaded that contains all the metadata for the asset, a file named \"asset\" which is the actual asset, ",
+          "MethodName": "Fetch information",
+          "Synopsis": "Retrieves all public information related to an asset including the name, description, license, version, partner (owner/publisher), tags and related images and whether or not the currentl authenticated account can download it",
           "HTTPMethod": "Get",
           "URI": "/asset/:assetId",
           "parameters": [
             {
               "Name": "assetId",
               "Location": "URL",
-              "Description": "The id of the asset to delete. Must exist in the store you are authenticated against",
+              "Description": "The id of the asset, which must exist in the store you are authenticated against",
+              "Required": "Y",
+              "Type": "number"
+            }
+          ]
+        },
+        {
+          "MethodName": "Download",
+          "Synopsis": "Attempts to download an asset; if the asset is not available or not yet purchased an error with that informaton is returned. It is up to the client to decide how to install or otherwise put to use the downloaded asset",
+          "HTTPMethod": "Get",
+          "URI": "/asset/download/:assetId",
+          "parameters": [
+            {
+              "Name": "assetId",
+              "Location": "URL",
+              "Description": "The id of the asset to download, which must exist in the store you are authenticated against",
+              "Required": "Y",
+              "Type": "number"
+            }
+          ]
+        },
+        {
+          "MethodName": "Purchase",
+          "Synopsis": "Attempts to purchase an asset; if the asset is not available in the store currently authenticated against or the account does not have enough ponts, an error with that informaton is returned",
+          "HTTPMethod": "Get",
+          "URI": "/asset/purchase/:assetId",
+          "parameters": [
+            {
+              "Name": "assetId",
+              "Location": "URL",
+              "Description": "The id of the asset to download, which must exist in the store you are authenticated against",
               "Required": "Y",
               "Type": "number"
             }
@@ -260,6 +290,57 @@
               "Type": "number"
             }
           ]
+        }
+        ]
+    },
+    {
+        "name": "Points",
+        "methods": [
+        {
+            "MethodName": "Purchase Points",
+            "Synopsis": "Purchases a given number of points using a registered payment method.",
+            "HTTPMethod": "Get",
+            "URI": "/points/buy",
+            "parameters": [
+            {
+                "Name": "points",
+                "Location": "query",
+                "Description": "The number of points to purchase",
+                "Required": "Y",
+                "Type": "number"
+            }
+            ]
+        },
+        {
+            "MethodName": "Point price",
+            "Synopsis": "Fetches the amount a given number of points costs",
+            "HTTPMethod": "Get",
+            "URI": "/points/price",
+            "parameters": [
+            {
+                "Name": "amount",
+                "Location": "query",
+                "Default": 100,
+                "Description": "The number of points to purchase. Minimum 100, will be rounded upward to the nearest 100",
+                "Required": "N",
+                "Type": "number"
+            }
+            ]
+        },
+        {
+            "MethodName": "Redeem points code",
+            "Synopsis": "Redeems a code for the number of points it is worth, which then gets added to the currently authenticated account. These codes are created and stored in the database and redeemable only once",
+            "HTTPMethod": "Get",
+            "URI": "/points/redeemCode/:code",
+            "parameters": [
+            {
+                "Name": "code",
+                "Location": "URL",
+                "Description": "The alphanumeric code",
+                "Required": "N",
+                "Type": "number"
+            }
+            ]
         }
         ]
     }
