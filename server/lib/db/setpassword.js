@@ -27,6 +27,12 @@ module.exports = function(db, req, res) {
         return;
     }
 
+    if (req.query.newPassword.length < 8) {
+        //"Password has to have at least 8 characters.",
+        errors.report('PasswordTooShort', req, res);
+        return;
+    }
+
     BCrypt.genSalt(10, function(err, salt) {
         if (err) {
             errors.report('EncryptionFailure', req, res, err);
@@ -47,10 +53,7 @@ module.exports = function(db, req, res) {
                             return;
                         }
 
-                        var json = { success: true,
-                                     authStatus: true
-                                   };
-                        res.json(json);
+                        res.json(utils.standardJson(req));
                         return;
                      }
                     );
