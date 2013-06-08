@@ -1,0 +1,22 @@
+{
+    "name" : "Just A Sample",
+    "version" : "2.1",
+    "license" : "6",
+    "description" : "description of the book",
+    "partner" : "2",
+    "basePrice" : "0",
+    "file" : "sample.pdf",
+    "languages" : ["en"],
+    "previews" : [
+        { "type" : "cover", "subtype" : "front", "file" : "cover.jpg" },
+        { "type" : "cover", "subtype" : "back", "file" : "sample-1.png" }
+    ],
+    "tags" : [
+        {"type" : "assetType", "title" : "book" },
+        {"type" : "author", "title" : "Zack Rusin"},
+        {"type" : "publisher", "title" : "Coherent Theory" },
+        {"type" : "isbn", "title" : "00000000"},
+        {"type" : "created", "title" : "2013"},
+        {"type" : "url", "title" : "http://makeplaylive.com"}
+    ]
+}
