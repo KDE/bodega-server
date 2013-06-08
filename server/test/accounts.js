@@ -119,3 +119,125 @@ describe('Deactivate user', function() {
     });
 });
 
+
+describe('getting account information', function() {
+    var cookie;
+    it('should fail to get personal information before authorization', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/info',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'Unauthorized');
+                done();
+            });
+    });
+
+    it('should fail to get a history before authorization', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/history',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'Unauthorized');
+                done();
+            });
+    });
+
+    it('authorizes correctly', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.headers.should.have.property('set-cookie');
+                cookie = res.headers['set-cookie'];
+                res.body.should.have.property('authStatus', true);
+                done();
+            });
+    });
+
+    it('fetches personal information', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/info',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', true);
+                res.body.should.have.property('storeCount');
+                res.body.should.have.property('pointsEarned');
+                res.body.should.have.property('pointsOwed');
+                res.body.should.have.property('points');
+                res.body.should.have.property('organization');
+                res.body.should.have.property('firstName', 'Zack');
+                res.body.should.have.property('lastName', 'Rusin');
+                res.body.should.have.property('email', 'zack@kde.org');
+                res.body.should.have.property('active', true);
+                done();
+            },
+            cookie);
+    });
+
+    it('fetch history', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/history',
+            function(res) {
+                var expected = [
+                    {
+                        "category": "Download",
+                        "what": "dice",
+                        "date": "2013-05-26T02:00:00.000Z",
+                        "comment": "Version: 1"
+                    },
+                    {
+                        "category": "Purchase",
+                        "what": "dice",
+                        "date": "2013-05-26T00:00:00.000Z",
+                        "comment": ""
+                    },
+                    {
+                        "category": "Download",
+                        "what": "dice",
+                        "date": "2013-05-26T00:00:00.000Z",
+                        "comment": "Version: 1"
+                    },
+                    {
+                        "category": "Download",
+                        "what": "diamond",
+                        "date": "2013-05-25T13:26:00.000Z",
+                        "comment": "Version: 1"
+                    },
+                    {
+                        "category": "Purchase",
+                        "what": "diamond",
+                        "date": "2013-05-25T13:26:00.000Z",
+                        "comment": ""
+                    }
+                ];
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                res.body.should.have.property('success', true);
+                res.body.should.have.property('history');
+                res.body.history.should.eql(expected);
+                done();
+            },
+            cookie);
+    });
+});
