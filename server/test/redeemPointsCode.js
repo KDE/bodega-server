@@ -39,11 +39,12 @@ describe('Redeeming points code', function(){
     });
 
     after(function(done) {
-        var deleteQuery = 'DELETE FROM pointCodes WHERE code=$1;';
+        var deleteCodeQuery = 'DELETE FROM pointCodes WHERE code=$1;';
+        var deleteTransactionQuery = "DELETE FROM pointTransactions WHERE person = 2 AND comment ~ 'Code redeemed:'";
         var updateQuery = 'UPDATE people SET points=$1 WHERE email=\'zack@kde.org\'';
 
         app.db.dbQuery(function (db) {
-            db.query(deleteQuery, [testCode], function(err, result) {
+            db.query(deleteCodeQuery, [testCode], function(err, result) {
                 if (err) {
                     console.warn("Couldn't clean the db after the point redeem test!");
                     console.log(err);
@@ -58,7 +59,15 @@ describe('Redeeming points code', function(){
                             console.warn("Couldn't clean the db for the point redeem test!");
                             console.log(err);
                         }
-                        done();
+
+                        db.query(deleteTransactionQuery, function(err, result) {
+                            if (err) {
+                                console.warn("Couldn't clean the redemption transaction from the db!");
+                                console.log(err);
+                            }
+
+                            done();
+                        });
                     });
                 }
             });
