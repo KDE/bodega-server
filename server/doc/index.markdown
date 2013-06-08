@@ -1,3 +1,3 @@
 Bodega Api Index
 ----------------
-* [Bodega Json Api V1](/api/json_api)
+* [Bodega Json Api V1](http://apidocs.makeplaylive.com/bodega)

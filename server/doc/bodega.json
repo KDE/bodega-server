@@ -370,7 +370,7 @@
         {
           "MethodName": "Create",
           "read-only": "true",
-          "Synopsis": "Creates a new asset owned by you. A file named \"info\" may be uploaded that contains all the metadata for the asset in lieue of the info body, a file named \"asset\" which is the actual asset. A file can be uploaded with the request",
+          "Synopsis": "Creates a new asset owned by you. A file named \"info\" may be uploaded that contains all the metadata for the asset in lieue of the info body. A file named \"asset\"  can be uploaded with the request as well. An example of the asset info json can be seen here: http://testons.makeplaylive.com/api/sample-asset-info.json",
           "HTTPMethod": "POST",
           "URI": "/asset/create",
           "parameters": [
