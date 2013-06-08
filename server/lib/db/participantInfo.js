@@ -28,12 +28,13 @@ module.exports = function(db, req, res) {
     json.points =  0;
     json.organization =  '';
     json.firstName =  '';
+    json.middleNames =  '';
     json.lastName =  '';
     json.email =  '';
     json.active =  '';
 
     if (req.session.authorized) {
-        var accountInfoQuery = "SELECT firstName, lastName, email, active FROM people WHERE id = $1;";
+        var accountInfoQuery = "SELECT firstName, middleNames, lastName, email, active FROM people WHERE id = $1;";
         var q = db.query(accountInfoQuery, [req.session.user.id],
                          function(err, result)
                          {
@@ -43,6 +44,7 @@ module.exports = function(db, req, res) {
                              }
 
                             json.firstName = result.rows[0].firstname;
+                            json.middleNames = result.rows[0].middlenames;
                             json.lastName = result.rows[0].lastname;
                             json.email = result.rows[0].email;
                             json.active = result.rows[0].active;
