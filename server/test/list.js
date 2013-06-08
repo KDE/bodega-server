@@ -19,7 +19,7 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 var authedBrowsing = !(app.config.anonAccess && app.config.anonAccess.browsing === true);
-console.log("Testing with " + (authedBrowsing ? "authenticated" : "anonymous" ) + " browsing");
+//console.log("Testing with " + (authedBrowsing ? "authenticated" : "anonymous" ) + " browsing");
 
 describe('Listing', function(){
     var cookie;
