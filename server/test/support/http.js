@@ -58,7 +58,7 @@ function auth(app, fn)
 {
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
-    getUrl(app,
+         getUrl(app,
            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
            function(res) {
                res.statusCode.should.equal(200);
