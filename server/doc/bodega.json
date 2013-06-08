@@ -244,10 +244,26 @@
         {
           "MethodName": "Create",
           "read-only": "true",
-          "Synopsis": "Creates a new asset owned by you. A file named \"info\" must be uploaded that contains all the metadata for the asset, a file named \"asset\" which is the actual asset, ",
+          "Synopsis": "Creates a new asset owned by you. A file named \"info\" may be uploaded that contains all the metadata for the asset in lieue of the info body, a file named \"asset\" which is the actual asset. A file can be uploaded with the request",
           "HTTPMethod": "POST",
           "URI": "/asset/create",
-          "parameters": []
+          "parameters": [
+                {
+                    "Name": "info",
+                    "Location": "body",
+                    "Description": "A json document that contains the name, license, partner ID, base price, description and version of the new asset. It may also include a set of tags.",
+                    "Required": "N",
+                    "Type": "string"
+                },
+                {
+                    "Name": "asset",
+                    "Location": "body",
+                    "Description": "The asset itself",
+                    "Required": "N",
+                    "Type": "file"
+                }
+
+           ]
         },
         {
           "MethodName": "Delete",
@@ -258,7 +274,8 @@
           "parameters": [
             {
               "Name": "assetId",
-              "Description": "Updates a new asset owned by you. A file named \"info\" must be uploaded that contains all the metadata for the asset, a file named \"asset\" which is the actual asset, ",
+              "Location": "URL",
+              "Description": "Deletes an asset owned by you",
               "Required": "Y",
               "Type": "number"
             }
@@ -267,15 +284,23 @@
         {
           "MethodName": "Update",
           "read-only": "true",
-          "Synopsis": "Updates an asset ",
+          "Synopsis": "Updates an asset owned by you. Otherwise identical to create.",
           "HTTPMethod": "POST",
           "URI": "/asset/update/:assetId",
           "parameters": [
             {
               "Name": "assetId",
+              "Location": "URL",
               "Description": "The id of the asset to delete. Must be owned by a partner you are affiliated with",
               "Required": "Y",
               "Type": "number"
+            },
+            {
+                "Name": "info",
+                "Location": "body",
+                "Description": "A json document that contains the name, license, partner ID, base price, description and version of the new asset. It may also include a set of tags.",
+                "Required": "N",
+                "Type": "string"
             }
           ]
         },
