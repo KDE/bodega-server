@@ -119,6 +119,109 @@ describe('Deactivate user', function() {
     });
 });
 
+describe('Changing account information', function() {
+    var cookie;
+    it('authorizes correctly with password "zack"', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.headers.should.have.property('set-cookie');
+                cookie = res.headers['set-cookie'];
+                res.body.should.have.property('authStatus', true);
+                done();
+            });
+    });
+
+    it('change the password to "alphabetical"', function(done) {
+        var query = {
+            newPassword: 'alphabetical'
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/changePassword?' + queryString.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', true);
+                done();
+            },
+            cookie);
+    });
+    
+    it('authorizes correctly with password "alphabetical"', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=alphabetical&auth_store=KDE-1',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.headers.should.have.property('set-cookie');
+                cookie = res.headers['set-cookie'];
+                res.body.should.have.property('authStatus', true);
+                done();
+            });
+    });
+
+    it('rejects short passwords', function(done) {
+        var query = {
+            newPassword: 'zack'
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/changePassword?' + queryString.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', false);
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'PasswordTooShort');
+                done();
+            },
+            cookie);
+    });
+
+    it('rejects changing to no password', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/changePassword',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('success', false);
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'MissingParameters');
+                done();
+            },
+            cookie);
+    });
+
+    after(function(done) {
+        var connectionString = app.config.database.protocol + "://" +
+                               app.config.database.user + ":" + app.config.database.password +
+                               "@" + app.config.database.host + "/" +
+                               app.config.database.name;
+
+        pg.connect(connectionString, function(err, client, finis) {
+                   client.query("update people set password = '$2a$10$Iejk3uw6uGFCGR5OKaOOZO2tmnlIhPCsCvw7G1pLa81QH4fonDC.C' where id = 2", [],
+                   function(err, result) {
+                           done();
+                   });
+        });
+    });
+});
 
 describe('getting account information', function() {
     var cookie;
