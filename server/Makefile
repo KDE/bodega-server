@@ -1,9 +1,9 @@
 REPORTER = spec
 
 test:
-	./node_modules/.bin/mocha --reporter $(REPORTER)
+	@NODE_ENV=testing ./node_modules/.bin/mocha --reporter $(REPORTER)
 test/%:
-	./node_modules/.bin/mocha $@.js --reporter $(REPORTER)
+	@NODE_ENV=testing ./node_modules/.bin/mocha $@.js --reporter $(REPORTER)
 
 check:
 	@./node_modules/.bin/jshint --extra-ext .json . ; if [ $$? -eq 0 ] ; then echo "Done. Clean!" ; fi
