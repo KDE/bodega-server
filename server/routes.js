@@ -324,49 +324,49 @@ app.post(serverPath('store/create'), isAuthorized,
     }
 );
 
-app.get(serverPath('store/:id/delete'), isAuthorized,
+app.get(serverPath('store/delete/:id'), isAuthorized,
     function(req, res) {
         app.db.deleteStore(req, res);
     }
 );
 
-app.post(serverPath('store/:id/setMarkups'), isAuthorized,
+app.post(serverPath('store/update/:id'), isAuthorized,
     function(req, res) {
-        app.db.setStoreMarkups(req, res);
+        app.db.updateStore(req, res);
     }
 );
 
-app.get(serverPath('store/:id/structure'), isAuthorized,
+app.get(serverPath('store/structure/:id'), isAuthorized,
     function(req, res) {
         app.db.storeChannelStructure(req, res);
     }
 );
 
-app.post(serverPath('store/:id/channel/create'), isAuthorized,
+app.post(serverPath('store/channel/create/:id'), isAuthorized,
     function(req, res) {
         app.db.updateStoreChannel(req, res);
     }
 );
 
-app.post(serverPath('store/:id/channel/update/:channel'), isAuthorized,
+app.post(serverPath('store/channel/update/:id/:channel'), isAuthorized,
     function(req, res) {
         app.db.updateStoreChannel(req, res);
     }
 );
 
-app.get(serverPath('store/:id/channel/delete/:channel'), isAuthorized,
+app.get(serverPath('store/channel/delete/:id/:channel'), isAuthorized,
     function(req, res) {
         app.db.deleteStoreChannel(req, res);
     }
 );
 
-app.get(serverPath('store/:id/collection/add/:collection'), isAuthorized,
+app.get(serverPath('store/collection/add/:id/:collection'), isAuthorized,
     function(req, res) {
 //        app.db.addFeaturedCollection(req, res);
     }
 );
 
-app.get(serverPath('store/:id/collection/remove/:collection'), isAuthorized,
+app.get(serverPath('store/collection/remove/:id/:collection'), isAuthorized,
     function(req, res) {
 //        app.db.removeFeaturedCollection(req, res);
     }

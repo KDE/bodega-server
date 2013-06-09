@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var sanitize = require('validator').sanitize;
 var errors = require('../errors.js');
 var utils = require('../utils.js');
 
@@ -145,12 +146,18 @@ function ifCanManageStore(db, req, res, fn)
               }, 'Store Manager');
 }
 
-function setMarkups(partner, store, db, req, res)
+function updateStore(partner, store, db, req, res)
 {
     var query = "update stores set ";
     var updates = [];
     var params = [];
     var count = 0;
+
+    var name = sanitize(req.body.name).trim();
+    if (name.length > 0) {
+        updates.push("name = $" + (++count));
+        params.push(name);
+    }
 
     var min = utils.parseNumber(req.body.minmarkup, -1);
     if (min >= 0) {
@@ -463,8 +470,8 @@ module.exports.remove = function(db, req, res) {
  *
  * Returns a channel info structure
  */
-module.exports.setMarkups = function(db, req, res) {
-    ifCanManageStore(db, req, res, setMarkups);
+module.exports.updateStore = function(db, req, res) {
+    ifCanManageStore(db, req, res, updateStore);
 };
 
 /**

@@ -191,8 +191,8 @@ var BodegaDb = (function() {
         this.dbQuery(dbStores.remove, req, res);
     };
 
-    BodegaDb.prototype.setStoreMarkups = function(req, res) {
-        this.dbQuery(dbStores.setMarkups, req, res);
+    BodegaDb.prototype.updateStore = function(req, res) {
+        this.dbQuery(dbStores.updateStore, req, res);
     };
 
     BodegaDb.prototype.storeChannelStructure = function(req, res) {
