@@ -807,11 +807,298 @@
                     "Location": "query",
                     "Description": "The assets to fetch data for; if not provided then data for all assets owned by you are fetched",
                     "Required": "N",
-                    "Type": "Array[int]"
+                    "Type": "Array[number]"
                 }
             ]
         }
 
+        ]
+    },
+    {
+        "name": "Stores",
+        "methods": [
+        {
+            "MethodName": "List",
+            "Synopsis": "Lists all stores owned by partner organizations your account is affiliated with. The listing includes id, name, partner and markups",
+            "HTTPMethod": "GET",
+            "URI": "/store/list",
+            "parameters": []
+        },
+        {
+            "MethodName": "Structure",
+            "Synopsis": "Fetches the channel structure of a store as a single JSON object",
+            "HTTPMethod": "GET",
+            "URI": "/store/structure/:id",
+            "parameters": [
+                {
+                    "Name": "id",
+                    "Location": "URL",
+                    "Description": "The internal of the store",
+                    "Required": "Y",
+                    "Type": "string"
+                }
+            ]
+        },
+        {
+            "MethodName": "Create",
+            "Synopsis": "Creates a new store; the account must be a 'Store Manager' to use this method",
+            "HTTPMethod": "POST",
+            "URI": "/store/create",
+            "parameters": [
+                {
+                    "Name": "name",
+                    "Location": "body",
+                    "Description": "The name of the store",
+                    "Required": "Y",
+                    "Type": "string"
+                },
+                {
+                    "Name": "id",
+                    "Location": "body",
+                    "Description": "The internal id for the store; If not provided it is based on the name. The id must be unique across all stores",
+                    "Required": "N",
+                    "Type": "string"
+                },
+                {
+                    "Name": "partner",
+                    "Location": "body",
+                    "Description": "The partner organization that should own the store; if left empty it selects the default partner",
+                    "Required": "N",
+                    "Type": "number"
+                },
+                {
+                    "Name": "minMarkup",
+                    "Location": "body",
+                    "Description": "The minimum markup (in points) to put on all assets in this store",
+                    "Required": "N",
+                    "Default": 0,
+                    "Type": "number"
+                },
+                {
+                    "Name": "maxMarkup",
+                    "Location": "body",
+                    "Description": "The maximum markup (in points) to put on any given asset in this store; a value of zero means no maximum",
+                    "Required": "N",
+                    "Default": 0,
+                    "Type": "number"
+                },
+                {
+                    "Name": "flatMarkup",
+                    "Location": "body",
+                    "Description": "If true, then markup is interpreted as a flat point rate, otherwise as a percentage. See the markup parameter below for more details",
+                    "Required": "N",
+                    "Default": false,
+                    "Type": "boolean"
+                },
+                {
+                    "Name": "markup",
+                    "Location": "body",
+                    "Description": "The markup to apply to assets in the store; if flatMarkup is true, then this is a number of points to add to each asset otherwise it is interpreted as a percentage to mark up the base price of assets by (e.g. 15 = 15%, so an asset with a base price of 100 points would cost 115 points in the store)",
+                    "Required": "N",
+                    "Default": 0,
+                    "Type": "number"
+                }
+            ]
+        },
+        {
+            "MethodName": "Update",
+            "Synopsis": "Updates the name and markup rates of a store",
+            "HTTPMethod": "POST",
+            "URI": "/store/update/:store",
+            "parameters": [
+                {
+                    "Name": "store",
+                    "Location": "URL",
+                    "Description": "The id of the store to update",
+                    "Required": "Y",
+                    "Type": "string"
+                },
+                {
+                    "Name": "name",
+                    "Location": "body",
+                    "Description": "The new name of the store; if empty the name is unchanged",
+                    "Required": "N",
+                    "Type": "string"
+                },
+                {
+                    "Name": "minMarkup",
+                    "Location": "body",
+                    "Description": "The minimum markup (in points) to put on all assets in this store; if not provided the rate is unchanged",
+                    "Required": "N",
+                    "Type": "number"
+                },
+                {
+                    "Name": "maxMarkup",
+                    "Location": "body",
+                    "Description": "The maximum markup (in points) to put on any given asset in this store; a value of zero means no maximum; if not provided the rate is unchanged",
+                    "Required": "N",
+                    "Type": "number"
+                },
+                {
+                    "Name": "flatMarkup",
+                    "Location": "body",
+                    "Description": "If true, then markup is interpreted as a flat point rate, otherwise as a percentage. See the markup parameter below for more details. If not provided the value of flatMarkup is not changed",
+                    "Required": "N",
+                    "Type": "boolean"
+                },
+                {
+                    "Name": "markup",
+                    "Location": "body",
+                    "Description": "The markup to apply to assets in the store; if flatMarkup is true, then this is a number of points to add to each asset otherwise it is interpreted as a percentage to mark up the base price of assets by (e.g. 15 = 15%, so an asset with a base price of 100 points would cost 115 points in the store); if not provided the rate is unchanged",
+                    "Required": "N",
+                    "Type": "number"
+                }
+            ]
+        },
+        {
+            "MethodName": "Delete",
+            "Synopsis": "Deletes a store",
+            "HTTPMethod": "GET",
+            "URI": "/store/delete/:store",
+            "parameters": [
+                {
+                    "Name": "store",
+                    "Location": "URL",
+                    "Description": "The id of the store",
+                    "Required": "Y",
+                    "Type": "string"
+                }
+            ]
+        }
+        ]
+    },
+    {
+        "name": "Store channels",
+        "methods": [
+        {
+            "MethodName": "Create",
+            "Synopsis": "Adds a channel to a store",
+            "HTTPMethod": "POST",
+            "URI": "/store/channel/create/:store",
+            "parameters": [
+                {
+                    "Name": "store",
+                    "Location": "URL",
+                    "Description": "The id of the store to add the channel to",
+                    "Required": "Y",
+                    "Type": "string"
+                },
+                {
+                    "Name": "channel.parent",
+                    "Location": "body",
+                    "Description": "The parent channel for this channel; if less than 1 or not provided the channel is created as a top-level channel in the store",
+                    "Required": "N",
+                    "Type": "number"
+                },
+                {
+                    "Name": "channel.name",
+                    "Location": "body",
+                    "Description": "The name for the channel",
+                    "Required": "Y",
+                    "Type": "string"
+                },
+                {
+                    "Name": "channel.description",
+                    "Location": "body",
+                    "Description": "A descriptive text for the channel",
+                    "Required": "N",
+                    "Type": "string"
+                },
+                {
+                    "Name": "channel.parent",
+                    "Location": "body",
+                    "Description": "The parent channel for this channel; if less than 1 or not provided the channel is created as a top-level channel in the store",
+                    "Required": "N",
+                    "Type": "number"
+                },
+                {
+                    "Name": "channel.tags",
+                    "Location": "body",
+                    "Description": "Tags (by id) to associate with the channel",
+                    "Required": "N",
+                    "Type": "Array[number}"
+                }
+            ]
+        },
+        {
+            "MethodName": "Update",
+            "Synopsis": "Updates and existing channel in a store",
+            "HTTPMethod": "POST",
+            "URI": "/store/channel/create/:store",
+            "parameters": [
+                {
+                    "Name": "store",
+                    "Location": "URL",
+                    "Description": "The id of the store to add the channel to",
+                    "Required": "Y",
+                    "Type": "string"
+                },
+                {
+                    "Name": "channel.parent",
+                    "Location": "body",
+                    "Description": "The parent channel for this channel; if less than 1 or not provided the channel is created as a top-level channel in the store",
+                    "Required": "N",
+                    "Type": "number"
+                },
+                {
+                    "Name": "channel.name",
+                    "Location": "body",
+                    "Description": "The name for the channel",
+                    "Required": "Y",
+                    "Type": "string"
+                },
+                {
+                    "Name": "channel.description",
+                    "Location": "body",
+                    "Description": "A descriptive text for the channel",
+                    "Required": "N",
+                    "Type": "string"
+                },
+                {
+                    "Name": "channel.parent",
+                    "Location": "body",
+                    "Description": "The parent channel for this channel; if less than 1 or not provided the channel is created as a top-level channel in the store",
+                    "Required": "N",
+                    "Type": "number"
+                },
+                {
+                    "Name": "channel.addTags",
+                    "Location": "body",
+                    "Description": "Tags (by id) to associate with the channel",
+                    "Required": "N",
+                    "Type": "Array[number}"
+                },
+                {
+                    "Name": "channel.rmTags",
+                    "Location": "body",
+                    "Description": "Tags (by id) to disassociate with the channel",
+                    "Required": "N",
+                    "Type": "Array[number}"
+                }
+            ]
+        },
+        {
+            "MethodName": "Delete",
+            "Synopsis": "Deletes a channel from a store",
+            "HTTPMethod": "GET",
+            "URI": "/store/delete/:store/:channel",
+            "parameters": [
+                {
+                    "Name": "store",
+                    "Location": "URL",
+                    "Description": "The id of the store",
+                    "Required": "Y",
+                    "Type": "string"
+                },
+                {
+                    "Name": "channel",
+                    "Location": "URL",
+                    "Description": "The id of the channel to delete",
+                    "Required": "Y",
+                    "Type": "string"
+                }
+            ]
+        }
         ]
     }
 ]
