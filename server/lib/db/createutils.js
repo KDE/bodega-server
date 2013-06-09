@@ -253,34 +253,15 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
     }
 };
 
-
-function findPublishedAsset(db, req, res, assetInfo, fillIn, fn)
+function mergeObjects(a, b)
 {
-    var q = "select * from assets where id = $1 and partner = $2;";
-    var e;
-    db.query(
-        q, [assetInfo.id, assetInfo.partner],
-        function(err, result) {
-            if (err) {
-                e = errors.create('Database', err.message);
-                fn(e, db, req, res, assetInfo);
-                return;
-            }
-            if (!result.rows || result.rows.length !== 1) {
-                e = errors.create('UpdateAssetMissing',
-                                  'Unable to find the update asset ' +
-                                  assetInfo.id);
-                fn(e, db, req, res, assetInfo);
-                return;
-            } else {
-                if (fillIn) {
-                    assetInfo = result.rows[0];
-                }
-                assetInfo.incoming = false;
-                fn(null, db, req, res, assetInfo);
-            }
+    var key;
+    if (a && b) {
+        for (key in b) {
+            a[key] = b[key];
         }
-    );
+    }
+    return a;
 }
 
 function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
@@ -296,13 +277,47 @@ function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
                 return;
             }
             if (!result.rows || result.rows.length !== 1) {
-                findPublishedAsset(db, req, res, assetInfo, fillIn, fn);
+                if (!assetInfo.published) {
+                    e = errors.create('UpdateAssetMissing',
+                                      'Unable to find the update asset ' +
+                                      assetInfo.id);
+                    fn(e, db, req, res, assetInfo);
+                } else {
+                    fn(null, db, req, res, assetInfo);
+                }
+            } else {
+                if (fillIn) {
+                    assetInfo = mergeObjects(assetInfo, result.rows[0]);
+                }
+                assetInfo.incoming = true;
+                fn(null, db, req, res, assetInfo);
+            }
+        }
+    );
+}
+
+
+function findPublishedAsset(db, req, res, assetInfo, fillIn, fn)
+{
+    var q = "select * from assets where id = $1 and partner = $2;";
+    var e;
+    db.query(
+        q, [assetInfo.id, assetInfo.partner],
+        function(err, result) {
+            if (err) {
+                e = errors.create('Database', err.message);
+                fn(e, db, req, res, assetInfo);
+                return;
+            }
+            if (!result.rows || result.rows.length !== 1) {
+                findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
+                return;
             } else {
                 if (fillIn) {
                     assetInfo = result.rows[0];
                 }
-                assetInfo.incoming = true;
-                fn(null, db, req, res, assetInfo);
+                assetInfo.published = true;
+                findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
             }
         }
     );
@@ -320,5 +335,8 @@ module.exports.findAsset = function(db, req, res, assetInfo, fillIn, fn)
         fn(e, db, req, res, assetInfo);
         return;
     }
+    
+    assetInfo.incoming  = false;
+    assetInfo.published = false;
     findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
 };
