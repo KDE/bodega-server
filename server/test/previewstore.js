@@ -22,12 +22,13 @@ var fs = require('fs');
 
 describe('Preview Store, ', function(){
     var cookie;
-    var tmpCoverFile = __dirname + "/sampleasset/tmpcover.jpg";
-    var tmpIcon512 = __dirname + "/sampleasset/tmpIcon512.png";
-    var tmpIcon128 = __dirname + "/sampleasset/tmpIcon128.png";
-    var tmpIcon64  = __dirname + "/sampleasset/tmpIcon64.png";
-    var tmpIcon32  = __dirname + "/sampleasset/tmpIcon32.png;";
-    var tmpIcon22  = __dirname + "/sampleasset/tmpIcon22.png";
+    var tmpCoverFile  = __dirname + "/sampleasset/tmpcover.jpg";
+    var tmpScreenshot = __dirname + "/sampleasset/tmpscreen.png";
+    var tmpIcon512    = __dirname + "/sampleasset/tmpIcon512.png";
+    var tmpIcon128    = __dirname + "/sampleasset/tmpIcon128.png";
+    var tmpIcon64     = __dirname + "/sampleasset/tmpIcon64.png";
+    var tmpIcon32     = __dirname + "/sampleasset/tmpIcon32.png;";
+    var tmpIcon22     = __dirname + "/sampleasset/tmpIcon22.png";
     var cleanupFiles = [];
 
     var sampleBookAsset = {
@@ -46,7 +47,8 @@ describe('Preview Store, ', function(){
         previews : [
             {type : "icon", "subtype" : "medium", file : tmpIcon64 },
             {type : "icon", "subtype" : "large", file : tmpIcon128 },
-            {type : "icon", "subtype" : "huge", file : tmpIcon512 }
+            {type : "icon", "subtype" : "huge", file : tmpIcon512 },
+            {type : "screenshot", "subtype" : "screen1", file : tmpScreenshot }
         ],
         tags : [
             {"type" : "assetType", "title" : "application" }
@@ -60,6 +62,7 @@ describe('Preview Store, ', function(){
 
     before(function(done) {
         copyFile(__dirname + "/sampleasset/cover.jpg", tmpCoverFile);
+        copyFile(__dirname + "/sampleasset/sample-0.png", tmpScreenshot);
         copyFile(__dirname + "/sampleasset/icon22.png", tmpIcon22);
         copyFile(__dirname + "/sampleasset/icon32.png", tmpIcon32);
         copyFile(__dirname + "/sampleasset/icon64.png", tmpIcon64);
@@ -122,11 +125,18 @@ describe('Preview Store, ', function(){
             });
         });
 
-        it('can not publish app without a screenshot.', function(done){
-            app.previewStore.canPublish(sampleAppAsset, function(err, result) {
+        it('can publish an app.', function(done){
+            app.previewStore.canPublish(sampleAppAsset, function(err) {
                 //console.log(res);
-                should.exist(err);
-                err.name.should.equal('AssetMissingScreenshot');
+                should.not.exist(err);
+                done();
+            });
+        });
+
+        it('will publish app.', function(done){
+            app.previewStore.publish(sampleAppAsset, function(err) {
+                //console.log(res);
+                should.not.exist(err);
                 done();
             });
         });

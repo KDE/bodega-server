@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2013 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -29,17 +29,6 @@ var PreviewStore = (function() {
     var storageSystem;
     var previewPaths = {};
     var fullPreviewPaths = {};
-
-    var previewTypes = {
-        "article"    : [],
-        "chapter"    : [],
-        "clip"       : [],
-        "icon"       : ["tiny", "small", "medium", "large", "huge"],
-        "cover"      : ["front", "back"],
-        "excerpt"    : [],
-        "screenshot" : [],
-        "trailer"    : []
-    };
 
     var iconSizes = {
         "tiny"   : 22,
@@ -391,7 +380,7 @@ var PreviewStore = (function() {
             } else if (rawPreviews[i].type === "cover") {
                 previews.covers.push(rawPreviews[i]);
             } else if (rawPreviews[i].type === "screenshot") {
-                previews.screenshot.push(rawPreviews[i]);
+                previews.screenshots.push(rawPreviews[i]);
             } else {
                 previews.others.push(rawPreviews[i]);
             }
@@ -399,7 +388,7 @@ var PreviewStore = (function() {
         return previews;
     }
 
-    function handleIcon(assetInfo, icons, i, assetPaths, cb) {
+    function handleIcon(assetInfo, assetPaths, icons, i, cb) {
         var icon = icons[i];
         var expectedSize = iconSizes[icon.subtype];
         var extension = path.extname(icon.file);
@@ -413,32 +402,32 @@ var PreviewStore = (function() {
             if (!err) {
                 icon.path = relPath;
             }
-            cb(err, assetInfo, icons, ++i, assetPaths);
+            cb(err, assetInfo, assetPaths, icons, ++i);
         });
     }
 
-    function handleIcons(assetInfo, previews, assetPaths, cb) {
+    function handleIcons(assetInfo, assetPaths, previews, cb) {
         var icons = previews.icons;
         var j;
         var e;
         var funcs = [];
 
         if (!icons || objectIsEmpty(icons)) {
-            cb(null, assetInfo, previews, assetPaths);
+            cb(null, assetInfo, assetPaths, previews);
             return;
         }
         funcs.push(function(cb) {
-            cb(null, assetInfo, icons, 0, assetPaths);
+            cb(null, assetInfo, assetPaths, icons, 0);
         });
         for (j = 0; j < icons.length; ++j) {
             funcs.push(handleIcon);
         }
         async.waterfall(funcs, function(err) {
-            cb(err, assetInfo, previews, assetPaths);
+            cb(err, assetInfo, assetPaths, previews);
         });
     }
 
-    function handleCover(assetInfo, covers, i, assetPaths, cb) {
+    function handleCover(assetInfo, assetPaths, covers, i, cb) {
         var cover = covers[i];
         var filename = path.basename(cover.file);
         var relPath = path.join(assetInfo.id.toString(),
@@ -450,33 +439,33 @@ var PreviewStore = (function() {
             if (!err) {
                 cover.path = relPath;
             }
-            cb(err, assetInfo, covers, ++i, assetPaths);
+            cb(err, assetInfo, assetPaths, covers, ++i);
         });
     }
 
-    function handleCovers(assetInfo, previews, assetPaths, cb) {
+    function handleCovers(assetInfo, assetPaths, previews, cb) {
         var covers = previews.covers;
         var j;
         var e;
         var funcs = [];
 
         if (!covers || !covers.length) {
-            cb(null, assetInfo, previews, assetPaths);
+            cb(null, assetInfo, assetPaths, previews);
             return;
         }
 
         funcs.push(function(cb) {
-            cb(null, assetInfo, covers, 0, assetPaths);
+            cb(null, assetInfo, assetPaths, covers, 0);
         });
         for (j = 0; j < covers.length; ++j) {
             funcs.push(handleCover);
         }
         async.waterfall(funcs, function(err) {
-            cb(err, assetInfo, previews, assetPaths);
+            cb(err, assetInfo, assetPaths, previews);
         });
     }
 
-    function handleScreenshot(assetInfo, screenshots, i, assetPaths, cb) {
+    function handleScreenshot(assetInfo, assetPaths, screenshots, i, cb) {
         var screenshot = screenshots[i];
         var filename = path.basename(screenshot.file);
         var relPath = path.join(assetInfo.id.toString(),
@@ -488,33 +477,33 @@ var PreviewStore = (function() {
             if (!err) {
                 screenshot.path = relPath;
             }
-            cb(err, assetInfo, screenshots, ++i, assetPaths);
+            cb(err, assetInfo, assetPaths, screenshots, ++i);
         });
     }
 
-    function handleScreenshots(assetInfo, previews, assetPaths, cb) {
+    function handleScreenshots(assetInfo, assetPaths, previews, cb) {
         var screenshots = previews.screenshots;
         var j;
         var e;
         var funcs = [];
 
         if (!screenshots || !screenshots.length) {
-            cb(null, assetInfo, previews, assetPaths);
+            cb(null, assetInfo, assetPaths, previews);
             return;
         }
 
         funcs.push(function(cb) {
-            cb(null, assetInfo, screenshots, 0, assetPaths);
+            cb(null, assetInfo, assetPaths, screenshots, 0);
         });
         for (j = 0; j < screenshots.length; ++j) {
             funcs.push(handleScreenshot);
         }
         async.waterfall(funcs, function(err) {
-            cb(err, assetInfo, previews, assetPaths);
+            cb(err, assetInfo, assetPaths, previews);
         });
     }
 
-    function handleOther(assetInfo, others, i, assetPaths, cb) {
+    function handleOther(assetInfo, assetPaths, others, i, cb) {
         var other = others[i];
         var filename = path.basename(other.file);
         var relPath = path.join(assetInfo.id.toString(),
@@ -526,29 +515,29 @@ var PreviewStore = (function() {
             if (!err) {
                 other.path = relPath;
             }
-            cb(err, assetInfo, other, ++i, assetPaths);
+            cb(err, assetInfo, assetPaths, other, ++i);
         });
     }
 
-    function handleOthers(assetInfo, previews, assetPaths, cb) {
+    function handleOthers(assetInfo, assetPaths, previews, cb) {
         var others = previews.others;
         var j;
         var e;
         var funcs = [];
 
         if (!others || !others.length) {
-            cb(null, assetInfo, previews, assetPaths);
+            cb(null, assetInfo, assetPaths, previews);
             return;
         }
 
         funcs.push(function(cb) {
-            cb(null, assetInfo, others, 0, assetPaths);
+            cb(null, assetInfo, assetPaths, others, 0);
         });
         for (j = 0; j < others.length; ++j) {
             funcs.push(handleOther);
         }
         async.waterfall(funcs, function(err) {
-            cb(err, assetInfo, previews, assetPaths);
+            cb(err, assetInfo, assetPaths, previews);
         });
     }
 
@@ -705,20 +694,18 @@ var PreviewStore = (function() {
                 fn(err);
                 return;
             }
-
             funcs.push(function(cb) {
                 checkDirectory(assetPaths.incoming, "0700", function(err) {
-                    cb(err, assetInfo, previews, assetPaths);
+                    cb(err, assetInfo, assetPaths, previews);
                 });
             });
             funcs.push(handleIcons);
             funcs.push(handleCovers);
             funcs.push(handleScreenshots);
             funcs.push(handleOthers);
-
             async.waterfall(
                 funcs,
-                function(err, assetInfo, previews, assetPaths) {
+                function(err, assetInfo, assetPaths, previews) {
                     fn(err);
                 });
         });
@@ -728,7 +715,135 @@ var PreviewStore = (function() {
         return findPreviewPaths();
     };
 
+    PreviewStore.prototype.generateCoverIcons = function(assetInfo, fn) {
+    };
+
+    PreviewStore.prototype.generateScaledIcons = function(assetInfo, fn) {
+    };
+
+    function publishIcon(assetInfo, assetPaths, icons, i, cb) {
+        var icon = icons[i];
+        var dirpath = assetPaths.icons[icon.subtype];
+
+        checkDirectory(dirpath, "0755", function(err) {
+            var incomingIconFile;
+            var iconFile;
+            var relPath;
+            var filename;
+            if (err) {
+                cb(err, assetInfo, assetPaths, icons, i);
+                return;
+            }
+            filename = "icon" + path.extname(icon.path);
+            incomingIconFile = path.join(assetPaths.incoming,
+                                        path.basename(icon.path));
+            relPath = path.join(assetInfo.id.toString(), filename);
+            iconFile = path.join(assetPaths.icons[icon.subtype],
+                                 filename);
+            //console.log("  filename = " + filename);
+            //console.log("      from = " + incomingIconFile);
+            //console.log("        to = " + iconFile);
+            localMove(incomingIconFile, iconFile, function(err) {
+                if (!err) {
+                    icon.path = relPath;
+                    icon.image = relPath;
+                }
+                cb(err, assetInfo, assetPaths, icons, ++i);
+            });
+        });
+    }
+
+    function publishIcons(assetInfo, assetPaths, splitPreviews, cb) {
+        var icons = splitPreviews.icons;
+        var i;
+        var preview;
+        var funcs = [function(cb) {
+            cb(null, assetInfo, assetPaths, icons, 0);
+        }];
+
+        for (i = 0; i < icons.length; ++i) {
+            funcs.push(publishIcon);
+        }
+        async.waterfall(funcs, function(err, assetInfo, assetPaths) {
+            cb(err, assetInfo, assetPaths, splitPreviews);
+        });
+    }
+
+    function publishPreview(assetInfo, assetPaths, previews, i, cb) {
+        var preview = previews[i];
+        var dirpath = assetPaths.previews;
+
+        checkDirectory(dirpath, "0755", function(err) {
+            var incomingPreviewFile;
+            var previewFile;
+            var relPath;
+            var filename;
+            if (err) {
+                cb(err, assetInfo, assetPaths, previews, i);
+                return;
+            }
+            filename = path.basename(preview.path);
+            incomingPreviewFile = path.join(assetPaths.incoming,
+                                            filename);
+            relPath = path.join(assetInfo.id.toString(), filename);
+            previewFile = path.join(dirpath, filename);
+            //console.log("  filename = " + filename);
+            //console.log("      from = " + incomingPreviewFile);
+            //console.log("        to = " + previewFile);
+            localMove(incomingPreviewFile, previewFile, function(err) {
+                if (!err) {
+                    preview.path = relPath;
+                }
+                cb(err, assetInfo, assetPaths, previews, ++i);
+            });
+        });
+    }
+
+    function publishPreviews(assetInfo, assetPaths, splitPreviews, cb) {
+        var previews = splitPreviews.others;
+        var i;
+        var preview;
+        var funcs = [function(cb) {
+            cb(null, assetInfo, assetPaths, previews, 0);
+        }];
+
+        for (i = 0; i < previews.length; ++i) {
+            funcs.push(publishPreview);
+        }
+        async.waterfall(funcs, function(err, assetInfo, assetPaths) {
+            cb(err, assetInfo, assetPaths, splitPreviews);
+        });
+    }
+
     PreviewStore.prototype.publish = function(assetInfo, fn) {
+        var assetPaths= fillPathsForAsset(assetInfo);
+        var funcs = [];
+        var splitPreviews = {
+            icons : [],
+            others : []
+        };
+        var preview;
+        var i;
+
+        for (i = 0; i < assetInfo.previews.length; ++i) {
+            preview = assetInfo.previews[i];
+            if (preview.type === 'icon') {
+                splitPreviews.icons.push(preview);
+            } else {
+                splitPreviews.others.push(preview);
+            }
+        }
+
+        funcs.push(function(cb) {
+            cb(null, assetInfo, assetPaths, splitPreviews);
+        });
+        //cp incoming/asset icons/size/asset
+        funcs.push(publishIcons);
+        //cp incoming/asset content/asset
+        funcs.push(publishPreviews);
+        async.waterfall(funcs, function(err, assetInfo, assetPaths, prevs) {
+            fn(err);
+        });
     };
 
     return PreviewStore;
