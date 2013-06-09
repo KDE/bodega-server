@@ -20,12 +20,12 @@ var errors = require('../errors.js');
 
 function addChangelogAndFinish(db, req, res, json)
 {
-    var tagsQuery =
+    var changeQuery =
         "SELECT version, versionts as timestamp, changes FROM assetChangelogs log \
          WHERE log.asset=$1 AND log.changes IS NOT NULL ORDER BY versionts;";
 
     var q = db.query(
-        tagsQuery, [req.params.assetId],
+        changeQuery, [req.params.assetId],
         function(err, result) {
             var i;
             if (err) {
