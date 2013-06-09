@@ -339,7 +339,7 @@
         },
         {
           "MethodName": "Download",
-          "Synopsis": "Attempts to download an asset; if the asset is not available or not yet purchased an error with that informaton is returned. It is up to the client to decide how to install or otherwise put to use the downloaded asset",
+          "Synopsis": "Attempts to download an asset; if the asset is not available or not yet purchased an error with that information is returned. It is up to the client to decide how to install or otherwise put to use the downloaded asset",
           "HTTPMethod": "Get",
           "URI": "/asset/download/:assetId",
           "parameters": [
@@ -354,7 +354,7 @@
         },
         {
           "MethodName": "Purchase",
-          "Synopsis": "Attempts to purchase an asset; if the asset is not available in the store currently authenticated against or the account does not have enough ponts, an error with that informaton is returned",
+          "Synopsis": "Attempts to purchase an asset; if the asset is not available in the store currently authenticated against or the account does not have enough ponts, an error with that information is returned",
           "HTTPMethod": "Get",
           "URI": "/asset/purchase/:assetId",
           "parameters": [
@@ -527,7 +527,7 @@
         ]
     },
     {
-      "name": "Contact informaton",
+      "name": "Contact information",
       "methods": [
         {
           "MethodName": "List collections",
