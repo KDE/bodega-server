@@ -376,7 +376,7 @@ app.get(serverPath('contact'), function(req, res) {
     app.db.contactInfo(req, res);
 });
 
-app.get(serverPath('hunt'),
+app.get(serverPath('hunt/:store/:code'),
     function(req, res) {
         app.db.hunt(req, res);
     }

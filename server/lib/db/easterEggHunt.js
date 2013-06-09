@@ -26,7 +26,7 @@ module.exports = function(db, req, res) {
 
     db.query(
         query,
-        [req.query.code, req.query.store],
+        [req.params.code, req.params.store],
         function(err, result) {
             if (!err && result && result.rows.length > 0) {
                 json.egg = result.rows[0].egg;
