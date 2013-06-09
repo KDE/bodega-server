@@ -527,6 +527,18 @@
         ]
     },
     {
+      "name": "Contact informaton",
+      "methods": [
+        {
+          "MethodName": "List collections",
+          "Synopsis": "Returns contact information for both the warehouse and, if a session is action, the store",
+          "HTTPMethod": "Get",
+          "URI": "/contact",
+          "parameters": []
+        }
+      ]
+    },
+    {
       "name": "Collections",
       "methods": [
         {
@@ -644,11 +656,38 @@
         ]
     },
     {
+        "name": "Easter eggs",
+        "methods": [
+        {
+            "MethodName": "Hunt",
+            "Synopsis": "Wouldn't you like to know ...",
+            "HTTPMethod": "Get",
+            "URI": "/hunt/:store/:code",
+            "parameters": [
+            {
+                "Name": "store",
+                "Location": "URL",
+                "Description": "The id of a store",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "code",
+                "Location": "URL",
+                "Description": "A ... code?",
+                "Required": "Y",
+                "Type": "string"
+            }
+            ]
+        }
+        ]
+    },
+    {
         "name": "Points",
         "methods": [
         {
             "MethodName": "Purchase Points",
-            "Synopsis": "Purchases a given number of points using a registered payment method.",
+            "Synopsis": "Purchases a given number of points using a registered payment method",
             "HTTPMethod": "Get",
             "URI": "/points/buy",
             "parameters": [
