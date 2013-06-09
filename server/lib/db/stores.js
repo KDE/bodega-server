@@ -102,7 +102,7 @@ function createWithPartner(partner, db, req, res)
 
 function deleteWithPartner(partner, db, req, res)
 {
-    var id = req.params.id;
+    var id = req.params.store;
     if (!id || id === '') {
         errors.report('StoreIdInvalid', req, res, errors.create("Invalid Store Id", "Invalid store passed into store deletion: " + id));
         return;
@@ -128,7 +128,7 @@ function ifCanManageStore(db, req, res, fn)
 {
     utils.partnerId(db, req, res,
               function(partner, db, req, res) {
-                  var store = req.params.id ? req.params.id : req.query.id;
+                  var store = req.params.store ? req.params.store : req.query.id;
                   db.query("select id from stores where id = $1 and partner = $2", [store, partner],
                         function(err, result) {
                             if (err || !result) {
