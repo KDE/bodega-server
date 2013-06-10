@@ -18,16 +18,16 @@
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
-
-function assetStats(partner, db, req, res)
+/**
+ * creates all the date related parts of the query:
+ *  - limit: the where query clause limiting the dates included
+ *  - granularity: month/day/year
+ *  - generator: a query that generates a complete time series over the given period at the desired granularity
+ */
+function dateQueryParts(req)
 {
-    var i;
-    var query = "";
-    //default granularity is month
-    var granularity = "month";
     var from;
     var to;
-    var params = [ partner ];
 
     if (req.query.to) {
         to = new Date(req.query.to);
@@ -43,131 +43,111 @@ function assetStats(partner, db, req, res)
         from.setDate(-1);
         from.setDate(to.getDay());
     }
+    
+    var dates = {};
 
-    var dateLimitQuery = " and date_trunc('" + granularity + "', p.purchasedon) >= to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')\
-                      and date_trunc('" + granularity + "', p.purchasedon) <= to_date('" + to.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS') ";
+    dates.granularity = "month";
 
     //only other two allowed values are year and day
     if (req.query.granularity === "day") {
-        granularity = "day";
+        dates.granularity = "day";
     } else if (req.query.granularity === "year") {
-        granularity = "year";
+        dates.granularity = "year";
     }
 
-    if (req.query.assets && req.query.assets.length > 0) {
-            query += "select dateof";
-
-            for (i = 0; i < req.query.assets.length; ++i) {
-                query += ", asset" + req.query.assets[i];
-            }
-            query += " from (";
-    } else {
-        query += "select dateof, total from (";
-    }
-
-    var metric = req.params.metric ? req.params.metric : req.query.metric;
-    if (metric === "purchases" || metric === "count") {
-        if (req.query.assets && req.query.assets.length > 0) {
-            params = params.concat(req.query.assets);
-            query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate,";
-
-            for (i = 0; i < req.query.assets.length; ++i) {
-                query += "sum(CASE WHEN asset = $" + (i+2) + " THEN 1 ELSE 0 END) AS asset" + req.query.assets[i];
-                if (i < req.query.assets.length - 1) {
-                    query += ", ";
-                }
-            }
-
-            query += " from purchases p left join assets a on (p.asset = a.id and a.partner = $1) where asset in (";
-            for (i = 0; i < req.query.assets.length; ++i) {
-                query += (i > 0 ? ", ":"") + "$" + (i+2);
-            }
-            query += ") " + dateLimitQuery + " group by assetdate order by assetdate";
-        } else {
-            query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate, \
-                    count(*) AS total \
-                    from purchases p left join assets a on (p.asset = a.id and a.partner = $1) \
-                  " + dateLimitQuery + " group by assetdate order by assetdate";
-        }
-
-    } else if (metric === "downloads") {
-        dateLimitQuery = " and date_trunc('" + granularity + "', d.downloadedon) >= to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')\
-                      and date_trunc('" + granularity + "', d.downloadedon) <= to_date('" + to.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS') ";
-
-        if (req.query.assets && req.query.assets.length > 0) {
-            params = params.concat(req.query.assets);
-            query += "select date_trunc('" + granularity + "', d.downloadedon) assetdate,";
-
-            for (i = 0; i < req.query.assets.length; ++i) {
-                query += "sum(CASE WHEN asset = $" + (i+2) + " THEN 1 ELSE 0 END) AS asset" + req.query.assets[i];
-                if (i < req.query.assets.length - 1) {
-                    query += ", ";
-                }
-            }
-
-            query += " from downloads d left join assets a on (d.asset = a.id and a.partner = $1) where asset in (";
-            for ( i = 0; i < req.query.assets.length; ++i) {
-                query += (i > 0 ? ", ":"") + "$" + (i+2);
-            }
-            query += ") " + dateLimitQuery + " group by assetdate order by assetdate";
-
-        } else {
-            query += "select date_trunc('" + granularity + "', d.downloadedon) assetdate, \
-                    count(*) AS total \
-                    from downloads d left join assets a on (d.asset = a.id and a.partner = $1) \
-                  " + dateLimitQuery + " group by assetdate order by assetdate";
-        }
-    } else {
-        //Points
-        if (req.query.assets && req.query.assets.length > 0) {
-            params = params.concat(req.query.assets);
-            query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate,";
-
-            for (i = 0; i < req.query.assets.length; ++i) {
-                query += "SUM(CASE WHEN asset = $" + (i+2) + " THEN p.toparticipant ELSE 0 END) AS asset" + req.query.assets[i];
-                if (i < req.query.assets.length - 1) {
-                    query += ", ";
-                }
-            }
-
-            query += " from purchases p left join assets a on (p.asset = a.id and a.partner = $1) where asset in (";
-            for (i = 0; i < req.query.assets.length; ++i) {
-                query += (i > 0 ? ", ":"") + "$" + (i+2);
-            }
-            query += ") " + dateLimitQuery + "group by assetdate order by assetdate";
-        } else {
-            query += "select date_trunc('" + granularity + "', p.purchasedon) assetdate, \
-                    SUM(p.toparticipant) AS total \
-                    from purchases p left join assets a on (p.asset = a.id and a.partner = $1) \
-                  " + dateLimitQuery + " group by assetdate order by assetdate";
-        }
-    }
-
+    var column = req.params.metric === "downloads" ? "m.downloadedOn" : "m.purchasedOn";
+    dates.limit =
+           " and date_trunc('" + dates.granularity + "', " + column + ") >= to_date('" +
+           from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS') and date_trunc('" +
+           dates.granularity + "', " + column + ") <= to_date('" + to.toUTCString() +
+           "', 'DY, DD Mon YYYY HH24:MI:SS') ";           
+    
     var iterations = 0;
-    if (granularity === "day") {
+    if (dates.granularity === "day") {
         var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-
         iterations = Math.round(Math.abs((to.getTime() - from.getTime())/(oneDay)));
-    } else if (granularity === "year") {
+    } else if (dates.granularity === "year") {
         iterations = to.getFullYear() - from.getFullYear();
-    //Month
     } else {
+        //Month
         iterations = to.getMonth() * (to.getFullYear() - from.getFullYear() + 1) - from.getMonth();
     }
 
-    query += ") q \
-            right join (SELECT \
-            (date_trunc('" + granularity + "',to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')) + (\"Series\".\"Index\" || '" + granularity + "')::INTERVAL) AS \"dateof\" \
-            FROM \
-            generate_series(0," + iterations + ", 1) AS \"Series\"(\"Index\")) d on(d.dateof = assetdate)";
+    dates.generator = "SELECT (date_trunc('" + dates.granularity + "',to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')) + (\"Series\".\"Index\" || '" + 
+                      dates.granularity + "')::INTERVAL) AS \"dateof\" FROM generate_series(0," + iterations + ", 1) AS \"Series\"(\"Index\")";
+    return dates;
+}
 
+/**
+ * Creates the main crostab query
+ */
+function summationQuery(req, dateParts, partner)
+{
+    var i;
+    var query = '';
+    var assetDateColumn = 'purchasedOn';
+    var joinTable = 'purchases';
+    var crossTabSum = '1';
+    var totalSum = "count(*)";
+    if (req.params.metric === "downloads") {
+        assetDateColumn = 'downloadedOn';
+        joinTable = 'downloads';
+    } else if (req.params.metric === "points") {
+        crossTabSum = 'toParticipant';
+        totalSum = "sum(toParticipant)";
+    }
+
+    var params = [ partner ];
+
+    if (req.query.assets && req.query.assets.length > 0) {
+        query += "select dateof";
+
+        for (i = 0; i < req.query.assets.length; ++i) {
+            var name = "asset" + req.query.assets[i];
+            query += ", CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END AS " + name;
+        }
+
+        query += " from (";
+
+        params = params.concat(req.query.assets);
+        query += "select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + ") assetdate,";
+
+        for (i = 0; i < req.query.assets.length; ++i) {
+            query += "sum(CASE WHEN asset = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS asset" + req.query.assets[i];
+            if (i < req.query.assets.length - 1) {
+                query += ", ";
+            }
+        }
+
+        query += " from " + joinTable + " m left join assets a on (m.asset = a.id and a.partner = $1) where asset in (";
+        for ( i = 0; i < req.query.assets.length; ++i) {
+            query += (i > 0 ? ", ":"") + "$" + (i+2);
+        }
+        query += ") " + dateParts.limit + " group by assetdate order by assetdate)";
+    } else {
+        query += "select dateof, CASE WHEN total IS NULL THEN 0 ELSE total END AS total from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + 
+                 ") AS assetdate, " + totalSum + " AS total from  " +  joinTable +
+                 " m left join assets a on (m.asset = a.id and a.partner = $1) " +
+                 dateParts.limit + " group by assetdate order by assetdate)";
+    }
+
+    var sql = { "query": query, "params": params }
+    return sql;
+}
+
+function assetStats(partner, db, req, res)
+{
+    //default granularity is month
+    var dateParts = dateQueryParts(req);
+    var sql = summationQuery(req, dateParts, partner);
+    sql.query += " q right join (" + dateParts.generator + ") d on(d.dateof = assetdate)";
     var json = utils.standardJson(req);
     json.stats = [];
 
-    //console.log("trying " + query + " with " + params);
+    //console.log("trying " + sql.query + " with " + sql.params);
     var q = db.query(
-        query,
-        params,
+        sql.query,
+        sql.params,
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
@@ -176,17 +156,14 @@ function assetStats(partner, db, req, res)
             json.stats = result.rows;
             res.json(json);
         });
-     //Change all nulls into zeros
-     q.on('row', function(row) {
-         for (var i in row) {
-             if (row[i] === null) {
-                 row[i] = 0;
-            }
-        }
-     });
 }
 
 module.exports.assetStats = function(db, req, res) {
     utils.partnerId(db, req, res, assetStats);
+};
+
+
+module.exports.assetStores = function(db, req, res) {
+    //utils.partnerId(db, req, res, storeStats);
 };
 
