@@ -798,3 +798,43 @@ describe('Asset statistics', function(){
         });
     });
 });
+
+describe('Store statistics', function(){
+    describe('get statistics', function() {
+        //Granularity: MONTH
+        it('Points stats without store ids: month granularity', function(done){
+            //not setting metrics there, assumes that without it goes to points by default
+            var query = {
+                from: "2013-05-01",
+                to: "2013-07-01"
+            };
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/stats/stores/points?' + querystring.stringify(query),
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('stats');
+
+                    var expected = {
+                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
+                        total: [1605, 470, 280]
+                    };
+
+                    res.body.stats.length.should.equal(3);
+                    for (var i in res.body.stats) {
+                        var stats = res.body.stats[i];
+
+                        stats.dateof.should.be.eql(expected.dateof[i]);
+                        stats.total.should.be.eql(expected.total[i]);
+                    }
+
+                    done();
+                },
+                cookie);
+        });
+    });
+});

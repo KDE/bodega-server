@@ -215,6 +215,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbStats.assetStats, req, res);
     };
 
+    BodegaDb.prototype.storeStats = function(req, res) {
+        this.dbQuery(dbStats.storeStats, req, res);
+    };
+
     BodegaDb.prototype.contactInfo = function(req, res) {
         this.dbQuery(dbContactInfo, req, res);
     };

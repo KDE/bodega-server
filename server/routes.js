@@ -310,6 +310,12 @@ app.get(serverPath('stats/assets/?:metric?'), isAuthorized,
     }
 );
 
+app.get(serverPath('stats/stores/?:metric?'), isAuthorized,
+    function(req, res) {
+        app.db.storeStats(req, res);
+    }
+);
+
 //********************************
 // Store management
 app.get(serverPath('store/list'), isAuthorized,

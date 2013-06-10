@@ -183,7 +183,7 @@ function storeStats(partner, db, req, res)
     var json = utils.standardJson(req);
     json.stats = [];
 
-    //console.log("trying " + sql.query + " with " + sql.params);
+    console.log("trying " + sql.query + " with " + sql.params);
     var q = db.query(
         sql.query,
         sql.params,
@@ -202,7 +202,7 @@ module.exports.assetStats = function(db, req, res) {
 };
 
 
-module.exports.assetStores = function(db, req, res) {
+module.exports.storeStats = function(db, req, res) {
     utils.partnerId(db, req, res, storeStats);
 };
 
