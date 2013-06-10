@@ -81,7 +81,7 @@ function dateQueryParts(req)
 /**
  * Creates the main crostab query
  */
-function summationQuery(req, dateParts, partner)
+function summationQuery(req, dateParts, partner, assetStats)
 {
     var i;
     var query = '';
@@ -97,8 +97,18 @@ function summationQuery(req, dateParts, partner)
         totalSum = "sum(toParticipant)";
     }
 
-    var params = [ partner ];
-
+    var params = [partner];
+    var partnerJoin;
+    var sumColumn;
+    
+    if (assetStats === true) {
+        sumColumn = 'asset';
+        partnerJoin = ' assets a on (m.asset = a.id and a.partner = $1) ';
+    } else {
+        sumColumn = 'store';
+        partnerJoin = ' stores s on (m.store = s.id and s.partner = $1) ';
+    }
+    
     if (req.query.assets && req.query.assets.length > 0) {
         query += "select dateof";
 
@@ -117,14 +127,14 @@ function summationQuery(req, dateParts, partner)
             var id = utils.parseNumber(req.query.assets[i]);
             if (id > 0) {
                 var name = '"' + id + '"';
-                query += "sum(CASE WHEN asset = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS " + name;
+                query += "sum(CASE WHEN " + sumColumn + " = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS " + name;
                 if (i < req.query.assets.length - 1) {
                     query += ", ";
                 }
             }
         }
 
-        query += " from " + joinTable + " m left join assets a on (m.asset = a.id and a.partner = $1) where asset in (";
+        query += " from " + joinTable + " m left join " + partnerJoin + " where " + sumColumn + " in (";
         for ( i = 0; i < req.query.assets.length; ++i) {
             query += (i > 0 ? ", ":"") + "$" + (i+2);
         }
@@ -132,10 +142,11 @@ function summationQuery(req, dateParts, partner)
     } else {
         query += "select dateof, CASE WHEN total IS NULL THEN 0 ELSE total END AS total from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + 
                  ") AS assetdate, " + totalSum + " AS total from  " +  joinTable +
-                 " m left join assets a on (m.asset = a.id and a.partner = $1) " +
+                 " m left join " + partnerJoin + 
                  dateParts.limit + " group by assetdate order by assetdate)";
     }
 
+    query += " q right join (" + dateParts.generator + ") d on(d.dateof = assetdate)";
     var sql = { "query": query, "params": params }
     return sql;
 }
@@ -144,8 +155,8 @@ function assetStats(partner, db, req, res)
 {
     //default granularity is month
     var dateParts = dateQueryParts(req);
-    var sql = summationQuery(req, dateParts, partner);
-    sql.query += " q right join (" + dateParts.generator + ") d on(d.dateof = assetdate)";
+    var sql = summationQuery(req, dateParts, partner, true);
+
     var json = utils.standardJson(req);
     json.stats = [];
 
@@ -167,8 +178,8 @@ function storeStats(partner, db, req, res)
 {
     //default granularity is month
     var dateParts = dateQueryParts(req);
-    var sql = summationQuery(req, dateParts, partner);
-    sql.query += " q right join (" + dateParts.generator + ") d on(d.dateof = assetdate)";
+    var sql = summationQuery(req, dateParts, partner, false);
+
     var json = utils.standardJson(req);
     json.stats = [];
 

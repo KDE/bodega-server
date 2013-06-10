@@ -19,9 +19,9 @@ var pg = require('pg');
 var server = require('../app.js');
 var utils = require('./support/http');
 var querystring = require('querystring');
+var cookie;
 
-describe('Stats', function(){
-    var cookie;
+describe('Statistic query preconditions', function(){
     describe('database environment', function() {
         it('timezone set to UTC in postgresql.conf or db session', function(done) {
             var connectionString = app.config.database.protocol + "://" +
@@ -57,7 +57,9 @@ describe('Stats', function(){
                 });
         });
     });
+});
 
+describe('Asset statistics', function(){
     describe('get statistics', function() {
         //Granularity: MONTH
         it('Points stats without asset numbers: month granularity', function(done){
