@@ -3,9 +3,7 @@ assetimporters/kdeartwork-wallpapers/wallpapersSvn/
 server/content/*/*
 server/incoming/*
 server/incoming/*/*
-server/public/images/*/*/*
-server/public/icons/*/*/*
-server/public/previews
+server/public
 server/config.json
 server/node_modules
 server/incoming/[0-9]*
