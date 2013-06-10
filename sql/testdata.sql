@@ -197,20 +197,21 @@ BEGIN
     select id into personId from people where people.email=$1;
     select id into favoriteCollectionId from collections where person=personId and name='favorites';
     IF NOT FOUND THEN
-       insert into collections (person, name, public, wishlist) VALUES
-       	      (personId, 'favorites', false, false);
+       insert into collections (person, name, public, wishlist)
+                        VALUES (personId, 'favorites', false, false);
        select id into favoriteCollectionId from collections where person=personId and name='favorites';
     END IF;
 
     FOR foundTag IN SELECT tags.id, tags.title
             FROM tags WHERE tags.type=authorTagId AND tags.en_index @@ plainto_tsquery('english', $2)
     LOOP
---	RAISE NOTICE 'tag is %', foundTag;
-	FOR foundAsset IN SELECT atags.asset
-	    from assetTags atags WHERE atags.tag=foundTag.id
-	LOOP
-	    INSERT INTO collectionscontent (collection, asset) VALUES (favoriteCollectionId, foundAsset.asset);
-	END LOOP;
+        -- RAISE NOTICE 'tag is %', foundTag;
+        FOR foundAsset IN SELECT atags.asset
+                          from assetTags atags WHERE atags.tag=foundTag.id
+        LOOP
+            INSERT INTO collectionscontent (collection, asset)
+                                    VALUES (favoriteCollectionId, foundAsset.asset);
+        END LOOP;
     END LOOP;
 END;
 $$
@@ -232,12 +233,13 @@ BEGIN
     FOR foundTag IN SELECT tags.id, tags.title
             FROM tags WHERE tags.type=authorTagId AND tags.en_index @@ plainto_tsquery('english', $2)
     LOOP
---	RAISE NOTICE 'tag is %', foundTag;
-	FOR foundAsset IN SELECT atags.asset
-	    from assetTags atags WHERE atags.tag=foundTag.id
-	LOOP
-	    INSERT INTO downloads (asset, person, address) VALUES (foundAsset.asset, personId, '68.63.112.46');
-	END LOOP;
+        -- RAISE NOTICE 'tag is %', foundTag;
+        FOR foundAsset IN SELECT atags.asset
+            from assetTags atags WHERE atags.tag=foundTag.id
+        LOOP
+            INSERT INTO downloads (asset, person, address)
+                           VALUES (foundAsset.asset, personId, '68.63.112.46');
+        END LOOP;
     END LOOP;
 END;
 $$
