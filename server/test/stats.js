@@ -114,7 +114,7 @@ describe('Stats', function(){
 
                     var expected = {
                         dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
-                        asset3: [1425, 280, 280]
+                        3: [1425, 280, 280]
                     };
 
                     res.body.stats.length.should.equal(3);
@@ -122,7 +122,7 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
+                        stats[3].should.be.eql(expected[3][i]);
                     }
 
                     done();
@@ -148,10 +148,10 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
-                        asset2: [0, 190, 0],
-                        asset3: [1425, 280, 280],
-                        asset4: [180, 0, 0],
-                        asset7: [0, 0, 0]
+                        2: [0, 190, 0],
+                        3: [1425, 280, 280],
+                        4: [180, 0, 0],
+                        7: [0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(3);
@@ -159,10 +159,10 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },
@@ -221,7 +221,7 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z"],
-                        asset3: [6, 1, 2, 0, 1]
+                        3: [6, 1, 2, 0, 1]
                     };
 
                     res.body.stats.length.should.equal(5);
@@ -229,7 +229,7 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
+                        stats[3].should.be.eql(expected[3][i]);
                     }
                     done();
                 },
@@ -254,20 +254,20 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
-                        asset2: [0, 1, 0, 0, 0],
-                        asset3: [6, 1, 2, 0, 1],
-                        asset4: [2, 1, 0, 0, 0],
-                        asset7: [0, 0, 0, 0, 0]
+                        2: [0, 1, 0, 0, 0],
+                        3: [6, 1, 2, 0, 1],
+                        4: [2, 1, 0, 0, 0],
+                        7: [0, 0, 0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(5);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },
@@ -323,20 +323,20 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z"],
-                        asset2: [0, 1, 0],
-                        asset3: [3, 1, 1],
-                        asset4: [2, 0, 0],
-                        asset7: [0, 0, 0]
+                        2: [0, 1, 0],
+                        3: [3, 1, 1],
+                        4: [2, 0, 0],
+                        7: [0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(3);
                     for (var i in res.body.stats) {
                         var stats = res.body.stats[i];
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },
@@ -398,10 +398,10 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z", "2013-06-04T00:00:00.000Z"],
-                        asset2: [0, 0, 0, 0, 0],
-                        asset3: [0, 0, 280, 0, 0],
-                        asset4: [0, 0, 0, 0, 0],
-                        asset7: [0, 0, 0, 0, 0]
+                        2: [0, 0, 0, 0, 0],
+                        3: [0, 0, 280, 0, 0],
+                        4: [0, 0, 0, 0, 0],
+                        7: [0, 0, 0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(5);
@@ -409,10 +409,10 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },
@@ -473,10 +473,10 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
-                        asset2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        asset3: [0, 0, 4, 1, 0, 1, 0, 0, 0, 1, 0],
-                        asset4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        asset7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                        2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        3: [0, 0, 4, 1, 0, 1, 0, 0, 0, 1, 0],
+                        4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(11);
@@ -484,10 +484,10 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },
@@ -548,10 +548,10 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
-                        asset2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        asset3: [0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0],
-                        asset4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        asset7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                        2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        3: [0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0],
+                        4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                        7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(11);
@@ -559,10 +559,10 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },
@@ -624,10 +624,10 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        asset2: [0, 190, 0],
-                        asset3: [0, 1985, 0],
-                        asset4: [0, 180, 0],
-                        asset7: [0, 0, 0]
+                        2: [0, 190, 0],
+                        3: [0, 1985, 0],
+                        4: [0, 180, 0],
+                        7: [0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(3);
@@ -635,10 +635,10 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },
@@ -699,10 +699,10 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        asset2: [0, 2, 0],
-                        asset3: [0, 10, 0],
-                        asset4: [0, 3, 0],
-                        asset7: [0, 0, 0]
+                        2: [0, 2, 0],
+                        3: [0, 10, 0],
+                        4: [0, 3, 0],
+                        7: [0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(3);
@@ -710,10 +710,10 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },
@@ -774,10 +774,10 @@ describe('Stats', function(){
                     res.body.should.have.property('stats');
                     var expected = {
                         dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        asset2: [0, 1, 0],
-                        asset3: [0, 5, 0],
-                        asset4: [0, 2, 0],
-                        asset7: [0, 0, 0]
+                        2: [0, 1, 0],
+                        3: [0, 5, 0],
+                        4: [0, 2, 0],
+                        7: [0, 0, 0]
                     };
 
                     res.body.stats.length.should.equal(3);
@@ -785,10 +785,10 @@ describe('Stats', function(){
                         var stats = res.body.stats[i];
 
                         stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.asset2.should.be.eql(expected.asset2[i]);
-                        stats.asset3.should.be.eql(expected.asset3[i]);
-                        stats.asset4.should.be.eql(expected.asset4[i]);
-                        stats.asset7.should.be.eql(expected.asset7[i]);
+                        stats[2].should.be.eql(expected[2][i]);
+                        stats[3].should.be.eql(expected[3][i]);
+                        stats[4].should.be.eql(expected[4][i]);
+                        stats[7].should.be.eql(expected[7][i]);
                     }
                     done();
                 },

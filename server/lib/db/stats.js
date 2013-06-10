@@ -103,19 +103,24 @@ function summationQuery(req, dateParts, partner)
         query += "select dateof";
 
         for (i = 0; i < req.query.assets.length; ++i) {
-            var name = "asset" + req.query.assets[i];
-            query += ", CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END AS " + name;
+            var id = utils.parseNumber(req.query.assets[i]);
+            if (id > 0) {
+                var name = '"' + id + '"';
+                query += ", CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END AS " + name;
+                params.push(id);
+            }
         }
 
-        query += " from (";
-
-        params = params.concat(req.query.assets);
-        query += "select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + ") assetdate,";
+        query += " from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + ") assetdate,";
 
         for (i = 0; i < req.query.assets.length; ++i) {
-            query += "sum(CASE WHEN asset = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS asset" + req.query.assets[i];
-            if (i < req.query.assets.length - 1) {
-                query += ", ";
+            var id = utils.parseNumber(req.query.assets[i]);
+            if (id > 0) {
+                var name = '"' + id + '"';
+                query += "sum(CASE WHEN asset = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS " + name;
+                if (i < req.query.assets.length - 1) {
+                    query += ", ";
+                }
             }
         }
 
@@ -158,12 +163,35 @@ function assetStats(partner, db, req, res)
         });
 }
 
+function storeStats(partner, db, req, res)
+{
+    //default granularity is month
+    var dateParts = dateQueryParts(req);
+    var sql = summationQuery(req, dateParts, partner);
+    sql.query += " q right join (" + dateParts.generator + ") d on(d.dateof = assetdate)";
+    var json = utils.standardJson(req);
+    json.stats = [];
+
+    //console.log("trying " + sql.query + " with " + sql.params);
+    var q = db.query(
+        sql.query,
+        sql.params,
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+            json.stats = result.rows;
+            res.json(json);
+        });
+}
+
 module.exports.assetStats = function(db, req, res) {
     utils.partnerId(db, req, res, assetStats);
 };
 
 
 module.exports.assetStores = function(db, req, res) {
-    //utils.partnerId(db, req, res, storeStats);
+    utils.partnerId(db, req, res, storeStats);
 };
 
