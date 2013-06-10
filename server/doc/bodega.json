@@ -690,6 +690,7 @@
             "Synopsis": "Purchases a given number of points using a registered payment method",
             "HTTPMethod": "Get",
             "URI": "/points/buy",
+            "read-only": true,
             "parameters": [
             {
                 "Name": "points",
@@ -720,6 +721,7 @@
             "MethodName": "Redeem points code",
             "Synopsis": "Redeems a code for the number of points it is worth, which then gets added to the currently authenticated account. These codes are created and stored in the database and redeemable only once",
             "HTTPMethod": "Get",
+            "read-only": true,
             "URI": "/points/redeemCode/:code",
             "parameters": [
             {
