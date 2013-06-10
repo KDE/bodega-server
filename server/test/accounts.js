@@ -471,13 +471,19 @@ describe('getting account information', function() {
                 var expected = [
                     {
                         "category": "Download",
+                        "what": "15 Puzzle",
+                        "date": "2013-05-26T02:00:00.000Z",
+                        "comment": "Version: 1"
+                    },
+                    {
+                        "category": "Download",
                         "what": "dice",
                         "date": "2013-05-26T02:00:00.000Z",
                         "comment": "Version: 1"
                     },
                     {
                         "category": "Purchase",
-                        "what": "dice",
+                        "what": "15 Puzzle",
                         "date": "2013-05-26T00:00:00.000Z",
                         "comment": ""
                     },
@@ -487,9 +493,15 @@ describe('getting account information', function() {
                         "date": "2013-05-26T00:00:00.000Z",
                         "comment": "Version: 1"
                     },
+                     {
+                        "category": "Purchase",
+                        "what": "dice",
+                        "date": "2013-05-26T00:00:00.000Z",
+                        "comment": ""
+                    },
                     {
                         "category": "Download",
-                        "what": "diamond",
+                        "what": "Diamond Juice",
                         "date": "2013-05-25T13:26:00.000Z",
                         "comment": "Version: 1"
                     },
