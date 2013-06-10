@@ -93,8 +93,8 @@ function summationQuery(req, dateParts, partner, assetStats)
         assetDateColumn = 'downloadedOn';
         joinTable = 'downloads';
     } else if (req.params.metric === "points") {
-        crossTabSum = 'toParticipant';
-        totalSum = "sum(toParticipant)";
+        crossTabSum = assetStats ? 'toParticipant' : 'toStore';
+        totalSum = assetStats ? "sum(toParticipant)" : "sum(toStore)";
     }
 
     var params = [partner];
@@ -189,7 +189,7 @@ function storeStats(partner, db, req, res)
     var json = utils.standardJson(req);
     json.stats = [];
 
-    console.log("trying " + sql.query + " with " + sql.params);
+    //console.log("trying " + sql.query + " with " + sql.params);
     var q = db.query(
         sql.query,
         sql.params,
