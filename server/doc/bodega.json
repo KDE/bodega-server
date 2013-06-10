@@ -851,8 +851,121 @@
                     "Type": "Array[number]"
                 }
             ]
+        },
+        {
+            "MethodName": "Store purchases",
+            "Synopsis": "The number of times assets were purchased in stores owned by you",
+            "HTTPMethod": "Get",
+            "URI": "/stats/stores/purchases",
+            "parameters": [
+                {
+                    "Name": "from",
+                    "Location": "query",
+                    "Description": "The date to start the data set from",
+                    "Required": "N",
+                    "Type": "date"
+                },
+                {
+                    "Name": "to",
+                    "Location": "query",
+                    "Description": "The date to end the data set at",
+                    "Required": "N",
+                    "Type": "date"
+                },
+                {
+                    "Name": "granularity",
+                    "Location": "query",
+                    "Description": "The time span to group the stastic into",
+                    "Required": "N",
+                    "Type": "enumerated",
+                    "Default": "month",
+                    "EnumeratedList": ["day", "month", "year"]
+                },
+                {
+                    "Name": "assets",
+                    "Location": "query",
+                    "Description": "The assets to fetch data for; if not provided then data for all assets owned by you are fetched",
+                    "Required": "N",
+                    "Type": "Array[int]"
+                }
+            ]
+        },
+        {
+            "MethodName": "Stores downloads",
+            "Synopsis": "The number of times assets were downloaded in stores owned by you",
+            "HTTPMethod": "Get",
+            "URI": "/stats/stores/downloads",
+            "parameters": [
+                {
+                    "Name": "from",
+                    "Location": "query",
+                    "Description": "The date to start the data set from",
+                    "Required": "N",
+                    "Type": "date"
+                },
+                {
+                    "Name": "to",
+                    "Location": "query",
+                    "Description": "The date to end the data set at",
+                    "Required": "N",
+                    "Type": "date"
+                },
+                {
+                    "Name": "granularity",
+                    "Location": "query",
+                    "Description": "The time span to group the stastic into",
+                    "Required": "N",
+                    "Type": "enumerated",
+                    "Default": "month",
+                    "EnumeratedList": ["day", "month", "year"]
+                },
+                {
+                    "Name": "assets",
+                    "Location": "query",
+                    "Description": "The assets to fetch data for; if not provided then data for all assets owned by you are fetched",
+                    "Required": "N",
+                    "Type": "Array[int]"
+                }
+            ]
+        },
+        {
+            "MethodName": "Store points earned",
+            "Synopsis": "The number of points earned in sales of assets in stores owned by you",
+            "HTTPMethod": "Get",
+            "URI": "/stats/stores/points",
+            "parameters": [
+                {
+                    "Name": "from",
+                    "Location": "query",
+                    "Description": "The date to start the data set from",
+                    "Required": "N",
+                    "Type": "date"
+                },
+                {
+                    "Name": "to",
+                    "Location": "query",
+                    "Description": "The date to end the data set at",
+                    "Required": "N",
+                    "Type": "date"
+                },
+                {
+                    "Name": "granularity",
+                    "Location": "query",
+                    "Description": "The time span to group the stastic into",
+                    "Required": "N",
+                    "Type": "enumerated",
+                    "Default": "month",
+                    "EnumeratedList": ["day", "month", "year"]
+                },
+                {
+                    "Name": "assets",
+                    "Location": "query",
+                    "Description": "The assets to fetch data for; if not provided then data for all assets owned by you are fetched",
+                    "Required": "N",
+                    "Type": "Array[number]"
+                }
+            ]
         }
-
         ]
     },
     {
