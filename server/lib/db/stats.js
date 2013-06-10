@@ -100,49 +100,55 @@ function summationQuery(req, dateParts, partner, assetStats)
     var params = [partner];
     var partnerJoin;
     var sumColumn;
+    var array;
     
     if (assetStats === true) {
         sumColumn = 'asset';
+        array = req.query.assets;
         partnerJoin = ' assets a on (m.asset = a.id and a.partner = $1) ';
     } else {
         sumColumn = 'store';
+        
+        // assigning a string to an array? yes, length > 0 and you get one char at a time
+        if (Array.isArray(req.query.stores)) {
+            array = req.query.stores;
+        } else if (typeof req.query.stores === 'string') {
+            array = new Array(req.query.stores);
+        }
+
         partnerJoin = ' stores s on (m.store = s.id and s.partner = $1) ';
     }
     
-    if (req.query.assets && req.query.assets.length > 0) {
+    if (array && array.length > 0) {
         query += "select dateof";
 
-        for (i = 0; i < req.query.assets.length; ++i) {
-            var id = utils.parseNumber(req.query.assets[i]);
-            if (id > 0) {
-                var name = '"' + id + '"';
-                query += ", CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END AS " + name;
-                params.push(id);
-            }
+        for (i = 0; i < array.length; ++i) {
+            var id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
+            var name = '"' + id + '"';
+            query += ", CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END AS " + name;
+            params.push(id);
         }
 
         query += " from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + ") assetdate,";
 
-        for (i = 0; i < req.query.assets.length; ++i) {
-            var id = utils.parseNumber(req.query.assets[i]);
-            if (id > 0) {
-                var name = '"' + id + '"';
-                query += "sum(CASE WHEN " + sumColumn + " = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS " + name;
-                if (i < req.query.assets.length - 1) {
-                    query += ", ";
-                }
+        for (i = 0; i < array.length; ++i) {
+            var id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
+            var name = '"' + id + '"';
+            query += "sum(CASE WHEN " + sumColumn + " = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS " + name;
+            if (i < array.length - 1) {
+                query += ", ";
             }
         }
 
-        query += " from " + joinTable + " m left join " + partnerJoin + " where " + sumColumn + " in (";
-        for ( i = 0; i < req.query.assets.length; ++i) {
-            query += (i > 0 ? ", ":"") + "$" + (i+2);
+        query += " from " + joinTable + " m join " + partnerJoin + " where " + sumColumn + " in (";
+        for ( i = 0; i < array.length; ++i) {
+            query += (i > 0 ? ", " : "") + "$" + (i+2);
         }
         query += ") " + dateParts.limit + " group by assetdate order by assetdate)";
     } else {
         query += "select dateof, CASE WHEN total IS NULL THEN 0 ELSE total END AS total from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + 
                  ") AS assetdate, " + totalSum + " AS total from  " +  joinTable +
-                 " m left join " + partnerJoin + 
+                 " m join " + partnerJoin + 
                  dateParts.limit + " group by assetdate order by assetdate)";
     }
 
@@ -192,6 +198,7 @@ function storeStats(partner, db, req, res)
                 errors.report('Database', req, res, err);
                 return;
             }
+
             json.stats = result.rows;
             res.json(json);
         });
