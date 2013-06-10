@@ -60,742 +60,740 @@ describe('Statistic query preconditions', function(){
 });
 
 describe('Asset statistics', function(){
-    describe('get statistics', function() {
-        //Granularity: MONTH
-        it('Points stats without asset numbers: month granularity', function(done){
-            //not setting metrics there, assumes that without it goes to points by default
-            var query = {
-                from: "2013-05-01",
-                to: "2013-07-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-
-                    var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
-                        total: [3030, 940, 280]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-
-                    done();
-                },
-                cookie);
-        });
-
-        it('Points stats with one asset number: month granularity', function(done) {
-            var query = {
-                assets: [3],
-                from: "2013-05-01",
-                to: "2013-07-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-
-                    var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
-                        3: [1425, 280, 280]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                    }
-
-                    done();
-                },
-                cookie);
-        });
-
-        it('Points stats with four asset numbers: month granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                from: "2013-05-01",
-                to: "2013-07-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/points?'+querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
-                        2: [0, 190, 0],
-                        3: [1425, 280, 280],
-                        4: [180, 280, 0],
-                        7: [0, 0, 0]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-
-
-        //Downloads
-        it('Downloads stats without asset numbers: month granularity', function(done) {
-            var query = {
-                from: "2013-05-01",
-                to: "2013-10-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
-                        total: [11, 4, 3, 0, 2, 2]
-                    };
-
-                    res.body.stats.length.should.equal(6);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        it('Downloads stats with one asset numbers: month granularity', function(done) {
-            var query = {
-                assets: [3],
-                from: "2013-05-01",
-                to: "2013-09-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z"],
-                        3: [6, 1, 2, 0, 1]
-                    };
-
-                    res.body.stats.length.should.equal(5);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        it('Downloads stats with four asset numbers: month granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                from: "2013-05-01",
-                to: "2013-09-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
-                        2: [0, 1, 0, 0, 0],
-                        3: [6, 1, 2, 0, 1],
-                        4: [2, 2, 0, 0, 0],
-                        7: [0, 0, 0, 0, 0]
-                    };
-
-                    res.body.stats.length.should.equal(5);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        it('Purchases count stats without numbers', function(done) {
-            var query = {
-                from: "2013-05-01",
-                to: "2013-07-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z"],
-                        total: [8, 4, 1]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        it('Purchases count stats with four asset numbers: month granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                from: "2013-05-01",
-                to: "2013-07-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/count?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z"],
-                        2: [0, 1, 0],
-                        3: [3, 1, 1],
-                        4: [2, 1, 0],
-                        7: [0, 0, 0]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        //different Granularity: DAY
-        it('Points stats without asset numbers: day granularity', function(done){
-            var query = {
-                granularity: "day",
-                from: "2013-05-23",
-                to: "2013-05-27"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-
-                    var expected = {
-                        dateof: ["2013-05-23T00:00:00.000Z", "2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z"],
-                        total: [0, 0, 180, 2850, 0]
-                    };
-
-                    res.body.stats.length.should.equal(5);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-
-                    done();
-                },
-                cookie);
-        });
-
-        it('Points stats with four asset numbers: day granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                granularity: "day",
-                from: "2013-05-31",
-                to: "2013-06-04"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z", "2013-06-04T00:00:00.000Z"],
-                        2: [0, 0, 0, 0, 0],
-                        3: [0, 0, 280, 0, 0],
-                        4: [0, 0, 280, 0, 0],
-                        7: [0, 0, 0, 0, 0]
-                    };
-
-                    res.body.stats.length.should.equal(5);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        it('Downloads stats without asset numbers: day granularity', function(done){
-            var query = {
-                granularity: "day",
-                from: "2013-05-24",
-                to: "2013-06-03"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-
-                    var expected = {
-                        dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
-                        total: [0, 2, 5, 2, 0, 2, 0, 0, 0, 1, 0]
-                    };
-
-                    res.body.stats.length.should.equal(11);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-
-                    done();
-                },
-                cookie);
-        });
-
-        it('Downloads stats with four asset numbers: day granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                granularity: "day",
-                from: "2013-05-24",
-                to: "2013-06-03"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
-                        2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        3: [0, 0, 4, 1, 0, 1, 0, 0, 0, 1, 0],
-                        4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                    };
-
-                    res.body.stats.length.should.equal(11);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        it('Purchases count stats without asset numbers: day granularity', function(done){
-            var query = {
-                granularity: "day",
-                from: "2013-05-24",
-                to: "2013-06-03"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-
-                    var expected = {
-                        dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
-                        total: [0, 2, 6, 0, 0, 0, 0, 0, 0, 2, 0]
-                    };
-
-                    res.body.stats.length.should.equal(11);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-
-                    done();
-                },
-                cookie);
-        });
-
-        it('Purchases count stats with four asset numbers: day granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                granularity: "day",
-                from: "2013-05-24",
-                to: "2013-06-03"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
-                        2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        3: [0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0],
-                        4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-                        7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                    };
-
-                    res.body.stats.length.should.equal(11);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        //different Granularity: YEAR
-        it('Points stats without asset numbers: year granularity', function(done){
-            var query = {
-                granularity: "year",
-                from: "2012-01-01",
-                to: "2014-01-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-
-                    var expected = {
-                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        total: [0, 4250, 0]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-
-                    done();
-                },
-                cookie);
-        });
-
-        it('Points stats with four asset numbers: year granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                granularity: "year",
-                from: "2012-01-01",
-                to: "2014-01-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        2: [0, 190, 0],
-                        3: [0, 1985, 0],
-                        4: [0, 460, 0],
-                        7: [0, 0, 0]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        it('Downloads stats without asset numbers: year granularity', function(done){
-            var query = {
-                granularity: "year",
-                from: "2012-01-01",
-                to: "2014-01-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-
-                    var expected = {
-                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        total: [0, 22, 0]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-
-                    done();
-                },
-                cookie);
-        });
-
-        it('Downloads stats with four asset numbers: year granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                granularity: "year",
-                from: "2012-01-01",
-                to: "2014-01-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        2: [0, 2, 0],
-                        3: [0, 10, 0],
-                        4: [0, 4, 0],
-                        7: [0, 1, 0]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
-
-        it('Purchases count stats without asset numbers: year granularity', function(done){
-            var query = {
-                granularity: "year",
-                from: "2012-01-01",
-                to: "2014-01-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-
-                    var expected = {
-                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        total: [0, 13, 0]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats.total.should.be.eql(expected.total[i]);
-                    }
-
-                    done();
-                },
-                cookie);
-        });
-
-        it('Purchases count stats with four asset numbers: year granularity', function(done) {
-            var query = {
-                assets: [2,3,4,7],
-                granularity: "year",
-                from: "2012-01-01",
-                to: "2014-01-01"
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('stats');
-                    var expected = {
-                        dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
-                        2: [0, 1, 0],
-                        3: [0, 5, 0],
-                        4: [0, 3, 0],
-                        7: [0, 0, 0]
-                    };
-
-                    res.body.stats.length.should.equal(3);
-                    for (var i in res.body.stats) {
-                        var stats = res.body.stats[i];
-
-                        stats.dateof.should.be.eql(expected.dateof[i]);
-                        stats[2].should.be.eql(expected[2][i]);
-                        stats[3].should.be.eql(expected[3][i]);
-                        stats[4].should.be.eql(expected[4][i]);
-                        stats[7].should.be.eql(expected[7][i]);
-                    }
-                    done();
-                },
-                cookie);
-        });
+    //Granularity: MONTH
+    it('Points stats without asset numbers: month granularity', function(done){
+        //not setting metrics there, assumes that without it goes to points by default
+        var query = {
+            from: "2013-05-01",
+            to: "2013-07-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+
+                var expected = {
+                    dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
+                    total: [3030, 940, 280]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+
+                done();
+            },
+            cookie);
+    });
+
+    it('Points stats with one asset number: month granularity', function(done) {
+        var query = {
+            assets: [3],
+            from: "2013-05-01",
+            to: "2013-07-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+
+                var expected = {
+                    dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
+                    3: [1425, 280, 280]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                }
+
+                done();
+            },
+            cookie);
+    });
+
+    it('Points stats with four asset numbers: month granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            from: "2013-05-01",
+            to: "2013-07-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/points?'+querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z" ],
+                    2: [0, 190, 0],
+                    3: [1425, 280, 280],
+                    4: [180, 280, 0],
+                    7: [0, 0, 0]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+
+
+    //Downloads
+    it('Downloads stats without asset numbers: month granularity', function(done) {
+        var query = {
+            from: "2013-05-01",
+            to: "2013-10-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
+                    total: [11, 4, 3, 0, 2, 2]
+                };
+
+                res.body.stats.length.should.equal(6);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    it('Downloads stats with one asset numbers: month granularity', function(done) {
+        var query = {
+            assets: [3],
+            from: "2013-05-01",
+            to: "2013-09-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z"],
+                    3: [6, 1, 2, 0, 1]
+                };
+
+                res.body.stats.length.should.equal(5);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    it('Downloads stats with four asset numbers: month granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            from: "2013-05-01",
+            to: "2013-09-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z", "2013-08-01T00:00:00.000Z", "2013-09-01T00:00:00.000Z", "2013-10-01T00:00:00.000Z"],
+                    2: [0, 1, 0, 0, 0],
+                    3: [6, 1, 2, 0, 1],
+                    4: [2, 2, 0, 0, 0],
+                    7: [0, 0, 0, 0, 0]
+                };
+
+                res.body.stats.length.should.equal(5);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    it('Purchases count stats without numbers', function(done) {
+        var query = {
+            from: "2013-05-01",
+            to: "2013-07-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z"],
+                    total: [8, 4, 1]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    it('Purchases count stats with four asset numbers: month granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            from: "2013-05-01",
+            to: "2013-07-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/count?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-01T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-07-01T00:00:00.000Z"],
+                    2: [0, 1, 0],
+                    3: [3, 1, 1],
+                    4: [2, 1, 0],
+                    7: [0, 0, 0]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    //different Granularity: DAY
+    it('Points stats without asset numbers: day granularity', function(done){
+        var query = {
+            granularity: "day",
+            from: "2013-05-23",
+            to: "2013-05-27"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+
+                var expected = {
+                    dateof: ["2013-05-23T00:00:00.000Z", "2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z"],
+                    total: [0, 0, 180, 2850, 0]
+                };
+
+                res.body.stats.length.should.equal(5);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+
+                done();
+            },
+            cookie);
+    });
+
+    it('Points stats with four asset numbers: day granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            granularity: "day",
+            from: "2013-05-31",
+            to: "2013-06-04"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z", "2013-06-04T00:00:00.000Z"],
+                    2: [0, 0, 0, 0, 0],
+                    3: [0, 0, 280, 0, 0],
+                    4: [0, 0, 280, 0, 0],
+                    7: [0, 0, 0, 0, 0]
+                };
+
+                res.body.stats.length.should.equal(5);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    it('Downloads stats without asset numbers: day granularity', function(done){
+        var query = {
+            granularity: "day",
+            from: "2013-05-24",
+            to: "2013-06-03"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+
+                var expected = {
+                    dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
+                    total: [0, 2, 5, 2, 0, 2, 0, 0, 0, 1, 0]
+                };
+
+                res.body.stats.length.should.equal(11);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+
+                done();
+            },
+            cookie);
+    });
+
+    it('Downloads stats with four asset numbers: day granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            granularity: "day",
+            from: "2013-05-24",
+            to: "2013-06-03"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
+                    2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    3: [0, 0, 4, 1, 0, 1, 0, 0, 0, 1, 0],
+                    4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                };
+
+                res.body.stats.length.should.equal(11);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    it('Purchases count stats without asset numbers: day granularity', function(done){
+        var query = {
+            granularity: "day",
+            from: "2013-05-24",
+            to: "2013-06-03"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+
+                var expected = {
+                    dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
+                    total: [0, 2, 6, 0, 0, 0, 0, 0, 0, 2, 0]
+                };
+
+                res.body.stats.length.should.equal(11);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+
+                done();
+            },
+            cookie);
+    });
+
+    it('Purchases count stats with four asset numbers: day granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            granularity: "day",
+            from: "2013-05-24",
+            to: "2013-06-03"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2013-05-24T00:00:00.000Z", "2013-05-25T00:00:00.000Z", "2013-05-26T00:00:00.000Z", "2013-05-27T00:00:00.000Z", "2013-05-28T00:00:00.000Z", "2013-05-29T00:00:00.000Z", "2013-05-30T00:00:00.000Z", "2013-05-31T00:00:00.000Z", "2013-06-01T00:00:00.000Z", "2013-06-02T00:00:00.000Z", "2013-06-03T00:00:00.000Z"],
+                    2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    3: [0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0],
+                    4: [0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                    7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                };
+
+                res.body.stats.length.should.equal(11);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    //different Granularity: YEAR
+    it('Points stats without asset numbers: year granularity', function(done){
+        var query = {
+            granularity: "year",
+            from: "2012-01-01",
+            to: "2014-01-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+
+                var expected = {
+                    dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                    total: [0, 4250, 0]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+
+                done();
+            },
+            cookie);
+    });
+
+    it('Points stats with four asset numbers: year granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            granularity: "year",
+            from: "2012-01-01",
+            to: "2014-01-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                    2: [0, 190, 0],
+                    3: [0, 1985, 0],
+                    4: [0, 460, 0],
+                    7: [0, 0, 0]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    it('Downloads stats without asset numbers: year granularity', function(done){
+        var query = {
+            granularity: "year",
+            from: "2012-01-01",
+            to: "2014-01-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+
+                var expected = {
+                    dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                    total: [0, 22, 0]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+
+                done();
+            },
+            cookie);
+    });
+
+    it('Downloads stats with four asset numbers: year granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            granularity: "year",
+            from: "2012-01-01",
+            to: "2014-01-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                    2: [0, 2, 0],
+                    3: [0, 10, 0],
+                    4: [0, 4, 0],
+                    7: [0, 1, 0]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
+    });
+
+    it('Purchases count stats without asset numbers: year granularity', function(done){
+        var query = {
+            granularity: "year",
+            from: "2012-01-01",
+            to: "2014-01-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+
+                var expected = {
+                    dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                    total: [0, 13, 0]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats.total.should.be.eql(expected.total[i]);
+                }
+
+                done();
+            },
+            cookie);
+    });
+
+    it('Purchases count stats with four asset numbers: year granularity', function(done) {
+        var query = {
+            assets: [2,3,4,7],
+            granularity: "year",
+            from: "2012-01-01",
+            to: "2014-01-01"
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('stats');
+                var expected = {
+                    dateof: ["2012-01-01T00:00:00.000Z", "2013-01-01T00:00:00.000Z", "2014-01-01T00:00:00.000Z"],
+                    2: [0, 1, 0],
+                    3: [0, 5, 0],
+                    4: [0, 3, 0],
+                    7: [0, 0, 0]
+                };
+
+                res.body.stats.length.should.equal(3);
+                for (var i in res.body.stats) {
+                    var stats = res.body.stats[i];
+
+                    stats.dateof.should.be.eql(expected.dateof[i]);
+                    stats[2].should.be.eql(expected[2][i]);
+                    stats[3].should.be.eql(expected[3][i]);
+                    stats[4].should.be.eql(expected[4][i]);
+                    stats[7].should.be.eql(expected[7][i]);
+                }
+                done();
+            },
+            cookie);
     });
 });
 
