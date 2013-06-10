@@ -231,6 +231,8 @@ describe('Changing account information', function() {
         var query = {
             email: 'bunny_rabbit'
         };
+
+        server.config.printErrors = false;
         utils.postUrl(
             server,
             '/bodega/v1/json/participant/changeAccountDetails', query,
@@ -243,6 +245,7 @@ describe('Changing account information', function() {
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'InvalidEmailAddress');
                 done();
+                server.config.printErrors = true;
             },
             cookie);
     });

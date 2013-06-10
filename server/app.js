@@ -28,6 +28,7 @@ process.env.TZ = 'UTC';
 
 GLOBAL.app = app;
 app.config = JSON.parse(fs.readFileSync(argv.config ? argv.config : './config.json', 'utf8'));
+app.config.printErrors = true;
 
 if (argv.production) {
     app.config.stripe.secretKey = app.config.stripe.liveSecretKey;

@@ -110,7 +110,7 @@ module.exports.report = function(type, req, res, err)
         'type' : type
     };
 
-    if (err && err.message) {
+    if (app.config.printErrors && err && err.message) {
         console.warn('-- Error:');
         console.trace();
         console.warn(err);
