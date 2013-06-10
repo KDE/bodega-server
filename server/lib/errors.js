@@ -110,7 +110,7 @@ module.exports.report = function(type, req, res, err)
         'type' : type
     };
 
-    if (app.settings.env !== 'testing' && err && err.message) {
+    if (err && err.message) {
         console.warn('-- Error:');
         console.trace();
         console.warn(err);
