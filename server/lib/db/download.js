@@ -33,7 +33,7 @@ function launchDownload(db, req, res)
                 errors.report('Database', req, res, err);
                 return;
             }
-            if (!result || !result.rows || result.rows.length !== 1) {
+            if (!result || !result.rows || result.rows.length < 1) {
                 //"Could not find the specified asset.",
                 errors.report('NoMatch', req, res);
                 return;
