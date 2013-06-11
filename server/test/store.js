@@ -279,7 +279,7 @@ describe('Store management', function(){
            });
     });
 
-    describe('Setting markups', function() {
+    describe('Updating store information', function() {
         it('should fail on a non-existant store', function(done) {
             var query = {
                 'maxmarkup': 100,
