@@ -220,11 +220,22 @@ DECLARE
     warehouse record;
     wareMarkup int := 0;
 BEGIN
-    SELECT INTO warehouse minMarkup, maxMarkup, markup FROM warehouses WHERE id = 'main';
-    -- RAISE NOTICE 'markups for the store are % % %', storeMarkup, storeMinMarkup, storeMinMarkup;
-    -- RAISE NOTICE 'markups for the warehosue are % % %', warehouse.markup, warehouse.minMarkup, warehouse.minMarkup;
-    wareMarkup := warehouse.markup;
-    price := ceil(points / (1 - ((storeMarkup + wareMarkup) / 100.0)))::int;
+    SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
+    RETURN ct_calcPoints(points, storeMarkup, storeMinMarkup, storeMaxMarkup,
+                         warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup);
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION ct_calcPoints(points int, 
+                                         storeMarkup int, storeMinMarkup int, storeMaxMarkup int,                                          wareMarkup int, wareMinMarkup int, wareMaxMarkup int) RETURNS INT AS $$
+DECLARE
+    price int := 0;
+    storeCut int := 0;
+    wareCut int := 0;
+BEGIN
+    -- RAISE NOTICE 'markups for the store are % % %', storeMarkup, storeMinMarkup, storeMaxMarkup;
+    -- RAISE NOTICE 'markups for the warehosue are % % %', wareMarkup, wareMinMarkup, wareMaxMarkup;
+    price := (points / (1 - ((storeMarkup + wareMarkup) / 100.0)))::int;
     storeCut := (price * (storeMarkup / 100.0))::int;
     wareCut := (price * (wareMarkup / 100.0))::int;
     -- RAISE NOTICE 'cuts are % % %', price, storeCut, wareCut;
@@ -237,12 +248,12 @@ BEGIN
         storeCut := storeMaxMarkup;
     END IF;
 
-    IF wareCut < warehouse.minMarkup THEN
-        -- RAISE  notice 'did not make the min warehouse markup of %  with %', wareHouse.minMarkup, wareCut;
-        wareCut := warehouse.minMarkup;
-    ELSIF wareHouse.maxMarkup > 0 AND wareCut > warehouse.maxMarkup THEN
-        -- RAISE  notice 'hit the max warehouse markup ceiling of %  with %', wareHouse.maxMarkup, wareCut;
-        wareCut := warehouse.maxMarkup;
+    IF wareCut < wareMinMarkup THEN
+        -- RAISE  notice 'did not make the min warehouse markup of %  with %', wareMinMarkup, wareCut;
+        wareCut := wareMinMarkup;
+    ELSIF wareMaxMarkup > 0 AND wareCut > wareMaxMarkup THEN
+        -- RAISE  notice 'hit the max warehouse markup ceiling of %  with %', wareMarkup, wareCut;
+        wareCut := wareMaxMarkup;
     END IF;
 
     -- now calc markups based on the actual cut relative to the base points price
@@ -250,8 +261,9 @@ BEGIN
     wareMarkup := ((wareCut / points::float) * 100)::int;
     -- raise notice 'final markups are % % % %', storeMarkup, storeCut, wareMarkup, wareCut;
 
-    price := ceil(points * (1 + ((storeMarkup + wareMarkup) / 100.0)))::int;
+    price := (points * (1 + ((storeMarkup + wareMarkup) / 100.0)))::int;
 
+    raise notice 'final price is %', price;
     -- finally, make sure it is multiple of 10
     IF price % 10 > 0 THEN
         price := price + (10 - price % 10);
@@ -290,6 +302,36 @@ $$ LANGUAGE 'plpgsql';
 DROP TRIGGER IF EXISTS trg_ct_updateStorePricesOnStoreUpdate ON stores;
 CREATE TRIGGER trg_ct_updateStorePricesOnStoreUpdate AFTER INSERT OR UPDATE ON stores
 FOR EACH ROW EXECUTE PROCEDURE ct_updateStorePrices();
+
+-- updates prices in stores when the warehouse markup changes
+CREATE OR REPLACE FUNCTION ct_updateWarehousePrices() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    IF (TG_OP = 'UPDATE' AND
+        NEW.markup = OLD.markup AND
+        NEW.minMarkup = OLD.minMarkup AND
+        NEW.maxMarkup = OLD.maxMarkup)
+    THEN
+        RETURN NEW;
+    END IF;
+
+    UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
+           WHERE ending IS NULL;
+
+    INSERT INTO assetPrices (asset, store, points)
+    SELECT DISTINCT a.id, s.id, ct_calcPoints(a.basePrice, s.markup, s.minMarkup, s.maxMarkup,
+                                                NEW.markup, NEW.minMarkup, NEW.maxMarkup)
+        FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
+                      LEFT JOIN channels c ON (c.id = sa.channel)
+                      LEFT JOIN stores s ON (c.store = s.id)
+        WHERE c.parent IS NULL AND a.basePrice > 0;
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_ct_updateWarehousePricesOnStoreUpdate ON warehouses;
+CREATE TRIGGER trg_ct_updateWarehousePricesOnStoreUpdate AFTER INSERT OR UPDATE ON warehouses
+FOR EACH ROW EXECUTE PROCEDURE ct_updateWarehousePrices();
 
 -- sets prices in stores for a given asset
 CREATE OR REPLACE FUNCTION ct_updateAssetPrices(assetId int, basePrice int) RETURNS VOID AS $$
