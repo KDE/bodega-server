@@ -159,6 +159,12 @@ function updateStore(partner, store, db, req, res)
         params.push(name);
     }
 
+    var description = sanitize(req.body.desc).trim();
+    if (description.length > 0) {
+        updates.push("description = $" + (++count));
+        params.push(description);
+    }
+
     var min = utils.parseNumber(req.body.minmarkup, -1);
     if (min >= 0) {
         updates.push("minMarkup = $" + (++count));
