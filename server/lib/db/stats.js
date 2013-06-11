@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ function dateQueryParts(req)
         from.setDate(-1);
         from.setDate(to.getDay());
     }
-    
+
     var dates = {};
 
     dates.granularity = "month";
@@ -60,8 +60,8 @@ function dateQueryParts(req)
            " and date_trunc('" + dates.granularity + "', " + column + ") >= to_date('" +
            from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS') and date_trunc('" +
            dates.granularity + "', " + column + ") <= to_date('" + to.toUTCString() +
-           "', 'DY, DD Mon YYYY HH24:MI:SS') ";           
-    
+           "', 'DY, DD Mon YYYY HH24:MI:SS') ";
+
     var iterations = 0;
     if (dates.granularity === "day") {
         var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
@@ -73,7 +73,7 @@ function dateQueryParts(req)
         iterations = to.getMonth() * (to.getFullYear() - from.getFullYear() + 1) - from.getMonth();
     }
 
-    dates.generator = "SELECT (date_trunc('" + dates.granularity + "',to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')) + (\"Series\".\"Index\" || '" + 
+    dates.generator = "SELECT (date_trunc('" + dates.granularity + "',to_date('" + from.toUTCString() + "', 'DY, DD Mon YYYY HH24:MI:SS')) + (\"Series\".\"Index\" || '" +
                       dates.granularity + "')::INTERVAL) AS \"dateof\" FROM generate_series(0," + iterations + ", 1) AS \"Series\"(\"Index\")";
     return dates;
 }
@@ -101,14 +101,16 @@ function summationQuery(req, dateParts, partner, assetStats)
     var partnerJoin;
     var sumColumn;
     var array;
-    
+    var id;
+    var name;
+
     if (assetStats === true) {
         sumColumn = 'asset';
         array = req.query.assets;
         partnerJoin = ' assets a on (m.asset = a.id and a.partner = $1) ';
     } else {
         sumColumn = 'store';
-        
+
         // assigning a string to an array? yes, length > 0 and you get one char at a time
         if (Array.isArray(req.query.stores)) {
             array = req.query.stores;
@@ -118,13 +120,13 @@ function summationQuery(req, dateParts, partner, assetStats)
 
         partnerJoin = ' stores s on (m.store = s.id and s.partner = $1) ';
     }
-    
+
     if (array && array.length > 0) {
         query += "select dateof";
 
         for (i = 0; i < array.length; ++i) {
-            var id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
-            var name = '"' + id + '"';
+            id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
+            name = '"' + id + '"';
             query += ", CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END AS " + name;
             params.push(id);
         }
@@ -132,8 +134,8 @@ function summationQuery(req, dateParts, partner, assetStats)
         query += " from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + ") assetdate,";
 
         for (i = 0; i < array.length; ++i) {
-            var id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
-            var name = '"' + id + '"';
+            id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
+            name = '"' + id + '"';
             query += "sum(CASE WHEN " + sumColumn + " = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS " + name;
             if (i < array.length - 1) {
                 query += ", ";
@@ -146,14 +148,14 @@ function summationQuery(req, dateParts, partner, assetStats)
         }
         query += ") " + dateParts.limit + " group by assetdate order by assetdate)";
     } else {
-        query += "select dateof, CASE WHEN total IS NULL THEN 0 ELSE total END AS total from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn + 
+        query += "select dateof, CASE WHEN total IS NULL THEN 0 ELSE total END AS total from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn +
                  ") AS assetdate, " + totalSum + " AS total from  " +  joinTable +
-                 " m join " + partnerJoin + 
+                 " m join " + partnerJoin +
                  dateParts.limit + " group by assetdate order by assetdate)";
     }
 
     query += " q right join (" + dateParts.generator + ") d on(d.dateof = assetdate)";
-    var sql = { "query": query, "params": params }
+    var sql = { "query": query, "params": params };
     return sql;
 }
 

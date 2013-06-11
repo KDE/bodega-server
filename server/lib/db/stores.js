@@ -222,29 +222,6 @@ function sendChannelInfo(channelId, db, req, res)
              });
 }
 
-function createChannel(partner, store, db, req, res)
-{
-    var channelParent = utils.parseNumber(req.body.channel.parent);
-    var channelName = req.body.channel.name;
-    var channelDescription = req.body.channel.description;
-    db.query("select ct_addChannel($1, $2, $3, $4) as channel;",
-             [store, channelParent, channelName, channelDescription],
-             function(err, results) {
-                 if (err) {
-                     errors.report('Database', req, res, err);
-                     return;
-                 }
-
-                 var channelId = results.rows[0].channel;
-                 if (channelId < 1) {
-                     errors.report('StoreCreateChannelFailed', req, res);
-                     return;
-                 }
-
-                 addChannelTags(req.body.tags, partner, store, channelId, db, req, res);
-             });
-}
-
 function rmChannelTags(partner, store, channelId, db, req, res)
 {
     var immediateSend = true;
@@ -298,6 +275,29 @@ function addChannelTags(tags, partner, store, channelId, db, req, res)
     if (immediateRm) {
         rmChannelTags(partner, store, channelId, db, req, res);
     }
+}
+
+function createChannel(partner, store, db, req, res)
+{
+    var channelParent = utils.parseNumber(req.body.channel.parent);
+    var channelName = req.body.channel.name;
+    var channelDescription = req.body.channel.description;
+    db.query("select ct_addChannel($1, $2, $3, $4) as channel;",
+             [store, channelParent, channelName, channelDescription],
+             function(err, results) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                     return;
+                 }
+
+                 var channelId = results.rows[0].channel;
+                 if (channelId < 1) {
+                     errors.report('StoreCreateChannelFailed', req, res);
+                     return;
+                 }
+
+                 addChannelTags(req.body.tags, partner, store, channelId, db, req, res);
+             });
 }
 
 function updateChannel(partner, store, db, req, res)

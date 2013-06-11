@@ -335,7 +335,7 @@ module.exports.findAsset = function(db, req, res, assetInfo, fillIn, fn)
         fn(e, db, req, res, assetInfo);
         return;
     }
-    
+
     assetInfo.incoming  = false;
     assetInfo.published = false;
     findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
