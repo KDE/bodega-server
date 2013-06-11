@@ -77,7 +77,7 @@ describe('Fetch contact information', function() {
                          },
                          {
                              "type": "identi.ca",
-                             "url": "undefinedaseigo",
+                             "url": "https://identi.ca/aseigo",
                              "icon": "extern/identica.png"
                          },
                          {

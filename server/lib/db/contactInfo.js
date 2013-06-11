@@ -60,7 +60,7 @@ module.exports = function(db, req, res) {
                 }
 
                 // now we look to see if there are any social media etc. links
-                db.query("select p.service, p.account, p.url, s.icon, s.baseUrl from partnerContacts p left join partnerContactServices s on (p.service = s.service) where partner = $1",
+                db.query("select p.service, p.account, p.url, s.icon, s.baseurl from partnerContacts p left join partnerContactServices s on (p.service = s.service) where partner = $1",
                          [partner],
                          function (err, result) {
                              if (err) {
@@ -75,7 +75,7 @@ module.exports = function(db, req, res) {
                                  if (contact.url && contact.url !== '') {
                                      url = contact.url;
                                  } else {
-                                     url = contact.baseUrl + contact.account;
+                                     url = contact.baseurl + contact.account;
                                  }
 
                                  json.store.links.push({ type: contact.service, url: url, icon: contact.icon});
