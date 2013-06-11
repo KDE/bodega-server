@@ -365,3 +365,18 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE function ct_partnerId(text) RETURNS INT
+AS
+$$
+DECLARE
+    partnerId   int;
+BEGIN
+    SELECT INTO partnerId id FROM partners WHERE name = $1;
+    IF NOT FOUND THEN
+        RETURN null;
+    END IF;
+
+    RETURN partnerId;
+END
+$$ LANGUAGE 'plpgsql';
+
