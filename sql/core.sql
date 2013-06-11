@@ -18,7 +18,6 @@ create table licenses
 
 create sequence seq_partnerIds;
 
--- addresses for billing, etc?
 create table partners
 (
     id           int         primary key default nextval('seq_partnerIds'),
@@ -27,6 +26,32 @@ create table partners
     distributor  bool        default false,
     supportEmail text        default null,
     homepage     text        default null
+);
+
+create table partnerBanking
+(
+    partner     int         not null references partners(id) on delete cascade,
+    type        text        not null,
+    name        text,
+    account     text,
+    swift       text,
+    iban        text,
+    address     text
+);
+
+create table partnerContactServices
+(
+    service     text        primary key,
+    icon        text,
+    baseUrl     text
+);
+
+create table partnerContacts
+(
+    partner     int         not null references partners(id) on delete cascade,
+    service     text        not null,
+    account     text,
+    url         text
 );
 
 create sequence seq_peopleIds;

@@ -59,6 +59,13 @@ INSERT INTO partners (id, name, developer, distributor) VALUES (0, 'Management G
 INSERT INTO stores (partner, name, id) VALUES (0, 'No Store', 'null');
 INSERT INTO warehouses VALUES ('main', 15, 10000, false, 15);
 
+-- some social media contact end points
+INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('facebook', 'extern/facebook.png', 'https://www.facebook.com/pages/');
+INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('twitter', 'extern/twitter.png', 'https://www.twitter.com/');
+INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('identi.ca', 'extern/identica.png', 'https://identi.ca/');
+INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('google+', 'extern/googleplus.png', 'https://plus.google.com/');
+INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('blog', 'extern/blog.png', null);
+
 -- default roles for the accounts
 INSERT INTO personRoles (description) VALUES ('Store Manager');
 INSERT INTO personRoles (description) VALUES ('Content Creator');
