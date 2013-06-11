@@ -55,11 +55,7 @@ BEGIN
 
     -- note that to avoid problems with multiple simultaneous sales, which can happen
     -- concurrently, the update must be done in an atomic fashion. fetching points
-    -- totals and then doing an update introduces a race condition
-    -- so what we do is deduct from points and if there is overflow, from owedpoints
-    UPDATE people SET points = case when points > price THEN points - price ELSE 0 END,
-                      owedpoints = CASE WHEN points > price THEN owedPoints ELSE owedPoints - (price - points) END
-                  WHERE id = who AND (points + owedPoints) >= price;
+    UPDATE people SET points = points - price WHERE id = who AND points >= price;
     IF NOT FOUND THEN
         RETURN 3;
     END IF;
@@ -71,7 +67,7 @@ BEGIN
             assetInfo.basePrice = price;
         END IF;
         storeEarns := price - assetInfo.basePrice;
-        UPDATE people SET earnedPoints = earnedPoints + assetInfo.basePrice, owedPoints = owedPoints + assetInfo.basePrice WHERE id = assetInfo.partner;
+        UPDATE partners SET earnedPoints = earnedPoints + assetInfo.basePrice, owedPoints = owedPoints + assetInfo.basePrice WHERE id = assetInfo.partner;
     END IF;
 
     -- insert into the purchases recording table
@@ -134,7 +130,7 @@ BEGIN
     UPDATE people SET points = points + addpoints WHERE id = who;
     IF FOUND THEN
         INSERT INTO pointTransactions (person, points, comment) VALUES (who, addpoints, description);
-        SELECT INTO rv (points + owedPoints) FROM people WHERE id = who;
+        SELECT INTO rv points FROM people WHERE id = who;
     END  IF;
 
     RETURN rv;

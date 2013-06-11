@@ -25,7 +25,9 @@ create table partners
     developer    bool        default false,
     distributor  bool        default false,
     supportEmail text        default null,
-    homepage     text        default null
+    homepage     text        default null,
+    earnedPoints int         not null default 0 constraint ct_personEarnedPoints check (points > -1),
+    owedPoints   int         not null default 0 constraint ct_personOwedPoints check (points > -1),
 );
 
 create table partnerBanking
@@ -67,8 +69,6 @@ create table people
     email        text        not null unique,
     password     text,
     points       int         not null default 0 constraint ct_personPoints check (points > -1),
-    earnedPoints int         not null default 0 constraint ct_personEarnedPoints check (points > -1),
-    owedPoints   int         not null default 0 constraint ct_personOwedPoints check (points > -1),
     active       bool        not null default false,
     created      timestamp   default(current_timestamp)
 );
