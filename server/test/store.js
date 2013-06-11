@@ -104,7 +104,7 @@ describe('Store management', function(){
             utils.postUrl(
                 server,
                 '/bodega/v1/json/store/create',
-                { partner: 3 },
+                { partner: 1003 },
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -122,7 +122,7 @@ describe('Store management', function(){
             utils.postUrl(
                 server,
                 '/bodega/v1/json/store/create',
-                { partner: 2 },
+                { partner: 1002 },
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -138,7 +138,8 @@ describe('Store management', function(){
 
         it('should succeed with a valid partner and name', function(done){
             var query =
-                { 'partner' : 2,
+                {
+                  'partner' : 1002,
                   'name': 'Fun Times With Clowns',
                   'desc': 'Clowns are actually scary'
                 };
@@ -148,10 +149,10 @@ describe('Store management', function(){
                 query,
                 function(res) {
                     var expected = [ {
-                        'id': '2_FUN_TIMES_WITH_CLOWNS',
+                        'id': '1002_FUN_TIMES_WITH_CLOWNS',
                         'name': 'Fun Times With Clowns',
                         'desc': 'Clowns are actually scary',
-                        'partner': { 'id': 2, 'name': 'KDE' },
+                        'partner': { 'id': 1002, 'name': 'KDE' },
                         'markups': { 'min': 0, 'max': 0,
                                      'flat': false, 'markup': 0 }
                     } ];
@@ -182,7 +183,7 @@ describe('Store management', function(){
                         'id': 'somethingcrazy',
                         'name': 'More Fun',
                         'desc': '',
-                        'partner': { 'id': 2, 'name': 'KDE' },
+                        'partner': { 'id': 1002, 'name': 'KDE' },
                         'markups': { 'min': 0, 'max': 0,
                                      'flat': false, 'markup': 0 }
                     } ];
@@ -200,7 +201,8 @@ describe('Store management', function(){
 
         it('should fail with an id that exists', function(done){
             var query =
-                { 'partner' : 2,
+                {
+                  'partner' : 1002,
                   'name': 'Fun Times With Clowns'
                 };
             utils.postUrl(
@@ -231,10 +233,10 @@ describe('Store management', function(){
                     function(res) {
                         var expected = [
                         {
-                            'id': '2_FUN_TIMES_WITH_CLOWNS',
+                            'id': '1002_FUN_TIMES_WITH_CLOWNS',
                             'name': 'Fun Times With Clowns',
                             'desc': 'Clowns are actually scary',
-                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 0, 'max': 0,
                             'flat': false, 'markup': 0 }
                         },
@@ -242,7 +244,7 @@ describe('Store management', function(){
                             'id': 'KDE-1',
                             'name': 'Plasma Workspace',
                             'desc': 'KDE Plasma user interfaces',
-                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 0, 'max': 0,
                             'flat': true, 'markup': 0 }
                         },
@@ -250,7 +252,7 @@ describe('Store management', function(){
                             'id': 'KDE-2',
                             'name': 'KDE Applications',
                             'desc': 'Variety of tools',
-                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 0, 'max': 0,
                             'flat': true, 'markup': 0 }
                         },
@@ -258,7 +260,7 @@ describe('Store management', function(){
                             'id': 'somethingcrazy',
                             'name': 'More Fun',
                             'desc': '',
-                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 0, 'max': 0,
                             'flat': false, 'markup': 0 }
                         }
@@ -336,15 +338,15 @@ describe('Store management', function(){
 
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/update/2_FUN_TIMES_WITH_CLOWNS',
+                '/bodega/v1/json/store/update/1002_FUN_TIMES_WITH_CLOWNS',
                 query,
                 function(res) {
                     var expected = [
                         {
-                            'id': '2_FUN_TIMES_WITH_CLOWNS',
+                            'id': '1002_FUN_TIMES_WITH_CLOWNS',
                             'name': 'Fun Times With Clowns',
                             'desc': 'Clowns are actually scary',
-                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 10, 'max': 100,
                                          'flat': true, 'markup': 20 }
                         }
@@ -368,15 +370,15 @@ describe('Store management', function(){
 
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/update/2_FUN_TIMES_WITH_CLOWNS',
+                '/bodega/v1/json/store/update/1002_FUN_TIMES_WITH_CLOWNS',
                 query,
                 function(res) {
                     var expected = [
                         {
-                            'id': '2_FUN_TIMES_WITH_CLOWNS',
+                            'id': '1002_FUN_TIMES_WITH_CLOWNS',
                             'name': 'Fun Times With Clowns',
                             'desc': 'Clowns are actually scary',
-                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 10, 'max': 200,
                                          'flat': true, 'markup': 15 }
                         }
@@ -518,7 +520,7 @@ describe('Store management', function(){
         it('should succeed with a valid store', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/delete/2_FUN_TIMES_WITH_CLOWNS',
+                '/bodega/v1/json/store/delete/1002_FUN_TIMES_WITH_CLOWNS',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -558,7 +560,7 @@ describe('Store management', function(){
                             'id': 'KDE-1',
                             'name': 'Plasma Workspace',
                             'desc': 'KDE Plasma user interfaces',
-                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 0, 'max': 0,
                             'flat': true, 'markup': 0 }
                         },
@@ -566,7 +568,7 @@ describe('Store management', function(){
                             'id': 'KDE-2',
                             'name': 'KDE Applications',
                             'desc': 'Variety of tools',
-                            'partner': { 'id': 2, 'name': 'KDE' },
+                            'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 0, 'max': 0,
                             'flat': true, 'markup': 0 }
                         }
@@ -593,7 +595,7 @@ describe('Store management', function(){
                                app.config.database.name;
 
         pg.connect(connectionString, function(err, client, finis) {
-                   client.query("delete from stores where id = '2_FUN_TIMES_WITH_CLOWNS' or id = 'somethingcrazy'", [],
+                   client.query("delete from stores where id = '1002_FUN_TIMES_WITH_CLOWNS' or id = 'somethingcrazy'", [],
                    function(err, result) {
                        client.query("delete from channels where name = 'Test Channel';", [],
                        function(err, result) {
