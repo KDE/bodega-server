@@ -73,3 +73,42 @@ DROP TRIGGER IF EXISTS trg_ct_createUserInDiscourse ON people;
 CREATE TRIGGER trg_ct_createUserInDiscourse AFTER UPDATE OR INSERT ON people
 FOR EACH ROW EXECUTE PROCEDURE ct_createUserInDiscourse();
 
+CREATE OR REPLACE FUNCTION ct_createForumInDiscourse() RETURNS TRIGGER AS $$
+DECLARE
+    currentTime TIMESTAMP;
+    categoryName TEXT;
+    categoryDescription TEXT;
+    userId INTEGER;
+    categorySlug TEXT;
+BEGIN
+        currentTime := current_timestamp AT TIME ZONE 'UTC';
+        PERFORM dblink_connect('dbname=discourse_development');
+        IF (TG_OP = 'INSERT') THEN
+            -- we will create forums only for the partners who have id > 1000
+
+           --IF (NEW.partner < 1000) THEN
+            --    RETURN NEW;
+           -- END IF;
+
+            categoryName := 'Forum for' || NEW.name;
+            categoryDescription := 'In this forum you can contact the author of' || NEW.name;
+            userId := 0; -- this is the root of discourse
+            categorySlug := categoryName;
+
+            PERFORM dblink_exec('INSERT INTO categories (name, created_at, updated_at, description, user_id, slug)
+                                 VALUES ('''||categoryName||''', '''||currentTime||''',
+                                 '''||currentTime||''', '''||categoryDescription||''',
+                                 '''||userId||''', '''||categorySlug||''');' );
+        ELSIF (TG_OP = 'UPDATE') THEN
+        END IF;
+
+    PERFORM dblink_disconnect();
+
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_ct_createForumInDiscourse ON assets;
+CREATE TRIGGER trg_ct_createForumInDiscourse AFTER UPDATE OR INSERT ON assets
+FOR EACH ROW EXECUTE PROCEDURE ct_createForumInDiscourse();
+
