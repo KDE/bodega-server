@@ -27,7 +27,7 @@ create table partners
     supportEmail text        default null,
     homepage     text        default null,
     earnedPoints int         not null default 0 constraint ct_personEarnedPoints check (points > -1),
-    owedPoints   int         not null default 0 constraint ct_personOwedPoints check (points > -1),
+    owedPoints   int         not null default 0 constraint ct_personOwedPoints check (points > -1)
 );
 
 create table partnerBanking
