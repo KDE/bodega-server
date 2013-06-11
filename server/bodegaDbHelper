@@ -94,6 +94,7 @@ function listUpdateFiles()
 
 function confirm(task, fn)
 {
+    console.log("Bodega Database Helper, operating on database " + config.database.host + ":" + config.database.name);
     prompt.start();
     var schema = {
         properties: {
