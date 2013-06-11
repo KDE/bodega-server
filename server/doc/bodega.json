@@ -530,7 +530,7 @@
       "name": "Contact information",
       "methods": [
         {
-          "MethodName": "List collections",
+          "MethodName": "List",
           "Synopsis": "Returns contact information for both the warehouse and, if a session is action, the store",
           "HTTPMethod": "Get",
           "URI": "/contact",
