@@ -166,7 +166,7 @@ BEGIN
     END IF;
     SELECT INTO tagCount count(tag) FROM channelTags c WHERE c.channel = alteredChannel;
     SELECT INTO markupRow s.minMarkup as minMarkup, s.maxMarkup as  maxMarkup,
-                        s.flatMarkup as flatMarkup, s.markup as markup, s.id as store
+                        s.markup as markup, s.id as store
                         FROM stores s LEFT JOIN channels c ON (s.id = c.store)
                         WHERE c.id = alteredChannel;
 
@@ -178,8 +178,8 @@ BEGIN
         IF (assetRow.matches) THEN
             INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
             PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
-            SELECT INTO assetPrice ct_calcPoints(baseprice, markupRow.flatMarkup,
-                                                 markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup)
+            SELECT INTO assetPrice
+                        ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup)
                         FROM assets WHERE id = assetRow.id;
             IF assetPrice > 0 THEN
                 DELETE FROM assetPrices where asset = assetRow.id AND store = markupRow.store;
@@ -212,30 +212,52 @@ DROP TRIGGER IF EXISTS trg_ct_associateChannelWithAssets ON channelTags;
 CREATE TRIGGER trg_ct_associateChannelWithAssets AFTER INSERT OR UPDATE OR DELETE ON channelTags
 FOR EACH ROW EXECUTE PROCEDURE ct_associateChannelWithAssets();
 
-CREATE OR REPLACE FUNCTION ct_calcPoints(points int, flatMarkup bool, markup int, minMarkup int, maxMarkup int) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION ct_calcPoints(points int, storeMarkup int, storeMinMarkup int, storeMaxMarkup int) RETURNS INT AS $$
 DECLARE
     price int := 0;
+    storeCut int := 0;
+    wareCut int := 0;
+    warehouse record;
+    wareMarkup int := 0;
 BEGIN
-    IF markup <= 0 THEN
-        RETURN points;
+    SELECT INTO warehouse minMarkup, maxMarkup, markup FROM warehouses WHERE id = 'main';
+    -- RAISE NOTICE 'markups for the store are % % %', storeMarkup, storeMinMarkup, storeMinMarkup;
+    -- RAISE NOTICE 'markups for the warehosue are % % %', warehouse.markup, warehouse.minMarkup, warehouse.minMarkup;
+    wareMarkup := warehouse.markup;
+    price := ceil(points / (1 - ((storeMarkup + wareMarkup) / 100.0)))::int;
+    storeCut := (price * (storeMarkup / 100.0))::int;
+    wareCut := (price * (wareMarkup / 100.0))::int;
+    -- RAISE NOTICE 'cuts are % % %', price, storeCut, wareCut;
+
+    IF storeCut < storeMinMarkup THEN
+        -- RAISE  notice 'did not make the min store markup of %  with %', storeMinMarkup, storeCut;
+        storeCut := storeMinMarkup;
+    ELSIF storeMaxMarkup > 0 AND storeCut > storeMaxMarkup THEN
+        -- RAISE  notice 'hit the max store markup ceiling of %  with %', storeMaxMarkup, storeCut;
+        storeCut := storeMaxMarkup;
     END IF;
 
-    IF flatMarkup THEN
-        price := markup;
-    ELSE
-        price := ((markup / 100.0) * points)::int;
+    IF wareCut < warehouse.minMarkup THEN
+        -- RAISE  notice 'did not make the min warehouse markup of %  with %', wareHouse.minMarkup, wareCut;
+        wareCut := warehouse.minMarkup;
+    ELSIF wareHouse.maxMarkup > 0 AND wareCut > warehouse.maxMarkup THEN
+        -- RAISE  notice 'hit the max warehouse markup ceiling of %  with %', wareHouse.maxMarkup, wareCut;
+        wareCut := warehouse.maxMarkup;
     END IF;
 
-    IF price < minMarkup THEN
-        price := minMarkup;
-    ELSIF maxMarkup > 0 AND price > maxMarkup THEN
-        price := maxMarkup;
+    -- now calc markups based on the actual cut relative to the base points price
+    storeMarkup := ((storeCut / points::float) * 100)::int;
+    wareMarkup := ((wareCut / points::float) * 100)::int;
+    -- raise notice 'final markups are % % % %', storeMarkup, storeCut, wareMarkup, wareCut;
+
+    price := ceil(points * (1 + ((storeMarkup + wareMarkup) / 100.0)))::int;
+
+    -- finally, make sure it is multiple of 10
+    IF price % 10 > 0 THEN
+        price := price + (10 - price % 10);
     END IF;
 
-    price := price + points;
-    IF price % 5 > 0 THEN
-        price := price + (5 - price % 5);
-    END IF;
+    -- raise notice '==================';
 
     RETURN price;
 END;
@@ -248,8 +270,7 @@ BEGIN
     IF (TG_OP = 'UPDATE' AND
         NEW.markup = OLD.markup AND
         NEW.minMarkup = OLD.minMarkup AND
-        NEW.maxMarkup = OLD.maxMarkup AND
-        NEW.flatMarkup = OLD.flatMarkup)
+        NEW.maxMarkup = OLD.maxMarkup)
     THEN
         RETURN NEW;
     END IF;
@@ -258,7 +279,7 @@ BEGIN
            WHERE store = NEW.id AND ending IS NULL;
 
     INSERT INTO assetPrices (asset, store, points)
-    SELECT a.id, NEW.id, ct_calcPoints(a.basePrice, NEW.flatMarkup, NEW.markup, NEW.minMarkup, NEW.maxMarkup)
+    SELECT a.id, NEW.id, ct_calcPoints(a.basePrice, NEW.markup, NEW.minMarkup, NEW.maxMarkup)
         FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
                       LEFT JOIN channels c ON (c.id = sa.channel)
         WHERE c.store = NEW.id AND c.parent IS NULL AND a.basePrice > 0;
@@ -284,11 +305,11 @@ BEGIN
     END IF;
 
     FOR storeRec IN
-        SELECT DISTINCT d.id, d.minMarkup, d.maxMarkup, d.flatMarkup, d.markup
+        SELECT DISTINCT d.id, d.minMarkup, d.maxMarkup, d.markup
         FROM stores d JOIN channels c ON (d.id = c.store AND parent IS NULL)
                       JOIN subChannelAssets a ON (a.channel = c.id AND a.asset = assetId)
     LOOP
-        INSERT INTO assetPrices (asset, store, points) VALUES (assetId, storeRec.id, ct_calcPoints(basePrice, storeRec.flatMarkup, storeRec.markup, storeRec.minMarkup, storeRec.maxMarkup));
+        INSERT INTO assetPrices (asset, store, points) VALUES (assetId, storeRec.id, ct_calcPoints(basePrice, storeRec.storeRec.markup, storeRec.minMarkup, storeRec.maxMarkup));
     END LOOP;
 END;
 $$ LANGUAGE 'plpgsql';

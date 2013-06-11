@@ -57,7 +57,7 @@ INSERT INTO licenses (name, text) VALUES ('Proprietary', '');
 SELECT setval('seq_partnerIds', 1000);
 INSERT INTO partners (id, name, developer, distributor) VALUES (0, 'Management Group', true, true);
 INSERT INTO stores (partner, name, id) VALUES (0, 'No Store', 'null');
-
+INSERT INTO warehouses VALUES ('main', 15, 10000, false, 15);
 
 -- default roles for the accounts
 INSERT INTO personRoles (description) VALUES ('Store Manager');
