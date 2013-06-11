@@ -212,20 +212,6 @@ DROP TRIGGER IF EXISTS trg_ct_associateChannelWithAssets ON channelTags;
 CREATE TRIGGER trg_ct_associateChannelWithAssets AFTER INSERT OR UPDATE OR DELETE ON channelTags
 FOR EACH ROW EXECUTE PROCEDURE ct_associateChannelWithAssets();
 
-CREATE OR REPLACE FUNCTION ct_calcPoints(points int, storeMarkup int, storeMinMarkup int, storeMaxMarkup int) RETURNS INT AS $$
-DECLARE
-    price int := 0;
-    storeCut int := 0;
-    wareCut int := 0;
-    warehouse record;
-    wareMarkup int := 0;
-BEGIN
-    SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
-    RETURN ct_calcPoints(points, storeMarkup, storeMinMarkup, storeMaxMarkup,
-                         warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup);
-END;
-$$ LANGUAGE 'plpgsql';
-
 CREATE OR REPLACE FUNCTION ct_calcPoints(points int, 
                                          storeMarkup int, storeMinMarkup int, storeMaxMarkup int,                                          wareMarkup int, wareMinMarkup int, wareMaxMarkup int) RETURNS INT AS $$
 DECLARE
@@ -233,6 +219,10 @@ DECLARE
     storeCut int := 0;
     wareCut int := 0;
 BEGIN
+    IF points < 1 THEN
+        return storeMinMarkup + wareMinMarkup;
+    END IF;
+
     -- RAISE NOTICE 'markups for the store are % % %', storeMarkup, storeMinMarkup, storeMaxMarkup;
     -- RAISE NOTICE 'markups for the warehosue are % % %', wareMarkup, wareMinMarkup, wareMaxMarkup;
     price := (points / (1 - ((storeMarkup + wareMarkup) / 100.0)))::int;
@@ -272,6 +262,20 @@ BEGIN
     -- raise notice '==================';
 
     RETURN price;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION ct_calcPoints(points int, storeMarkup int, storeMinMarkup int, storeMaxMarkup int) RETURNS INT AS $$
+DECLARE
+    price int := 0;
+    storeCut int := 0;
+    wareCut int := 0;
+    warehouse record;
+    wareMarkup int := 0;
+BEGIN
+    SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
+    RETURN ct_calcPoints(points, storeMarkup, storeMinMarkup, storeMaxMarkup,
+                         warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup);
 END;
 $$ LANGUAGE 'plpgsql';
 
