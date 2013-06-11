@@ -54,8 +54,8 @@ INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NonComme
 INSERT INTO licenses (name, text) VALUES ('Proprietary', '');
 
 -- a "NULL" store for use with e.g. the bodegamarket log ins
-insert into partners (id, name, developer, distributor)
-       values (0, 'Management Group', true, true);
+SELECT setval('seq_partnerIds', 1000);
+INSERT INTO partners (id, name, developer, distributor) VALUES (0, 'Management Group', true, true);
 INSERT INTO stores (partner, name, id) VALUES (0, 'No Store', 'null');
 
 
