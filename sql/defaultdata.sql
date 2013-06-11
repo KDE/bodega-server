@@ -71,6 +71,7 @@ INSERT INTO personRoles (description) VALUES ('Store Manager');
 INSERT INTO personRoles (description) VALUES ('Content Creator');
 INSERT INTO personRoles (description) VALUES ('Validator');
 INSERT INTO personRoles (description) VALUES ('Accounts');
+INSERT INTO personRoles (description) VALUES ('Partner Manager');
 
 INSERT INTO batchJobsInProgress (job, dowork) VALUES ('gutenberg', false);
 

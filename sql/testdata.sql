@@ -38,6 +38,7 @@ select affiliatePerson('zack@kde.org', 'KDE', 'Content Creator');
 select affiliatePerson('zack@kde.org', 'KDE', 'Store Manager');
 select affiliatePerson('zack@kde.org', 'KDE', 'Validator');
 select affiliatePerson('aseigo@kde.org', 'KDE', 'Content Creator');
+select affiliatePerson('aseigo@kde.org', 'KDE', 'Partner Manager');
 select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Content Creator');
 select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');
 
