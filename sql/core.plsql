@@ -150,20 +150,22 @@ CREATE TRIGGER trg_ct_associateAssetWithChannels AFTER INSERT OR UPDATE OR DELET
 FOR EACH ROW EXECUTE PROCEDURE ct_associateAssetWithChannels();
 
 
-CREATE OR REPLACE FUNCTION ct_associateChannelWithAssets() RETURNS TRIGGER AS '
+CREATE OR REPLACE FUNCTION ct_associateChannelWithAssets() RETURNS TRIGGER AS $$
 DECLARE
     alteredChannel   int;
     tagCount         int;
     assetRow         RECORD;
     markupRow        RECORD;
+    warehouse        RECORD;
+    pricesRow        RECORD;
     noJobsInProgress bool;
-    assetPrice       int;
 BEGIN
-    IF (TG_OP = ''DELETE'') THEN
+    IF (TG_OP = 'DELETE') THEN
         alteredChannel := OLD.channel;
     ELSE
         alteredChannel := NEW.channel;
     END IF;
+    SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
     SELECT INTO tagCount count(tag) FROM channelTags c WHERE c.channel = alteredChannel;
     SELECT INTO markupRow s.minMarkup as minMarkup, s.maxMarkup as  maxMarkup,
                         s.markup as markup, s.id as store
@@ -172,25 +174,22 @@ BEGIN
 
     DELETE FROM channelAssets c WHERE c.channel = alteredChannel;
     DELETE FROM subChannelAssets sc WHERE sc.channel = alteredChannel OR sc.leafChannel = alteredChannel;
+
     FOR assetRow IN SELECT a.asset as id, count(a.tag) = tagCount as matches
             FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
             WHERE a.asset IS NOT NULL GROUP BY a.asset LOOP
         IF (assetRow.matches) THEN
             INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
             PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
-            SELECT INTO assetPrice
-                        ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup)
+            SELECT INTO pricesRow
+                        (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
+                                      warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
                         FROM assets WHERE id = assetRow.id;
-            IF assetPrice > 0 THEN
-                DELETE FROM assetPrices where asset = assetRow.id AND store = markupRow.store;
-                INSERT INTO assetPrices (asset, store, points)
-                       VALUES (assetRow.id, markupRow.store, assetPrice);
-            ELSE
-                PERFORM asset FROM channelAssets ca LEFT JOIN channels c ON (ca.channel = c.id)
-                        WHERE c.store = markupRow.store;
-                IF NOT FOUND THEN
-                    DELETE FROM assetPrices where asset = assetRow.id AND store = markupRow.store;
-                END IF;
+            UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
+                   WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
+            IF pricesRow.retailpoints > 0 THEN
+                INSERT INTO assetPrices (asset, store, points, toStore)
+                       VALUES (assetRow.id, markupRow.store, pricesRow.retailpoints, pricesRow.tostorepoints);
             END IF;
         END IF;
     END LOOP;
@@ -200,27 +199,31 @@ BEGIN
         UPDATE channels SET assetCount = (SELECT count(channel) FROM subChannelAssets WHERE channel = channels.id);
     END IF;
 
-    IF (TG_OP = ''DELETE'') THEN
+    IF (TG_OP = 'DELETE') THEN
         RETURN OLD;
     ELSE
         RETURN NEW;
     END IF;
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_associateChannelWithAssets ON channelTags;
 CREATE TRIGGER trg_ct_associateChannelWithAssets AFTER INSERT OR UPDATE OR DELETE ON channelTags
 FOR EACH ROW EXECUTE PROCEDURE ct_associateChannelWithAssets();
 
-CREATE OR REPLACE FUNCTION ct_calcPoints(points int, 
-                                         storeMarkup int, storeMinMarkup int, storeMaxMarkup int,                                          wareMarkup int, wareMinMarkup int, wareMaxMarkup int) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION ct_calcPoints(points int,
+                                         storeMarkup int, storeMinMarkup int, storeMaxMarkup int,
+                                         wareMarkup int, wareMinMarkup int, wareMaxMarkup int,
+                                         OUT retailPoints int, OUT toStorePoints int) AS $$
 DECLARE
     price int := 0;
     storeCut int := 0;
     wareCut int := 0;
 BEGIN
     IF points < 1 THEN
-        return storeMinMarkup + wareMinMarkup;
+        retailPoints = storeMinMarkup + wareMinMarkup;
+        toStorePoints = storeMinMarkup;
+        RETURN;
     END IF;
 
     -- RAISE NOTICE 'markups for the store are % % %', storeMarkup, storeMinMarkup, storeMaxMarkup;
@@ -251,37 +254,23 @@ BEGIN
     wareMarkup := ((wareCut / points::float) * 100)::int;
     -- raise notice 'final markups are % % % %', storeMarkup, storeCut, wareMarkup, wareCut;
 
-    price := (points * (1 + ((storeMarkup + wareMarkup) / 100.0)))::int;
+    toStorePoints := storeCut;
+    retailPoints := (points * (1 + ((storeMarkup + wareMarkup) / 100.0)))::int;
 
-    raise notice 'final price is %', price;
+    -- raise notice 'final price is %', retailPoints;
     -- finally, make sure it is multiple of 10
-    IF price % 10 > 0 THEN
-        price := price + (10 - price % 10);
+    IF retailPoints % 10 > 0 THEN
+        retailPoints := retailPoints + (10 - retailPoints % 10);
     END IF;
 
     -- raise notice '==================';
-
-    RETURN price;
-END;
-$$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION ct_calcPoints(points int, storeMarkup int, storeMinMarkup int, storeMaxMarkup int) RETURNS INT AS $$
-DECLARE
-    price int := 0;
-    storeCut int := 0;
-    wareCut int := 0;
-    warehouse record;
-    wareMarkup int := 0;
-BEGIN
-    SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
-    RETURN ct_calcPoints(points, storeMarkup, storeMinMarkup, storeMaxMarkup,
-                         warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup);
 END;
 $$ LANGUAGE 'plpgsql';
 
 -- updates prices in stores when the store markup changes
 CREATE OR REPLACE FUNCTION ct_updateStorePrices() RETURNS TRIGGER AS $$
 DECLARE
+    warehouse record;
 BEGIN
     IF (TG_OP = 'UPDATE' AND
         NEW.markup = OLD.markup AND
@@ -294,8 +283,10 @@ BEGIN
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
            WHERE store = NEW.id AND ending IS NULL;
 
-    INSERT INTO assetPrices (asset, store, points)
-    SELECT a.id, NEW.id, ct_calcPoints(a.basePrice, NEW.markup, NEW.minMarkup, NEW.maxMarkup)
+    SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
+    INSERT INTO assetPrices (asset, store, points, tostore)
+    SELECT a.id, NEW.id, (ct_calcPoints(a.basePrice, NEW.markup, NEW.minMarkup, NEW.maxMarkup,
+                                       warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
         FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
                       LEFT JOIN channels c ON (c.id = sa.channel)
         WHERE c.store = NEW.id AND c.parent IS NULL AND a.basePrice > 0;
@@ -322,9 +313,9 @@ BEGIN
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
            WHERE ending IS NULL;
 
-    INSERT INTO assetPrices (asset, store, points)
-    SELECT DISTINCT a.id, s.id, ct_calcPoints(a.basePrice, s.markup, s.minMarkup, s.maxMarkup,
-                                                NEW.markup, NEW.minMarkup, NEW.maxMarkup)
+    INSERT INTO assetPrices (asset, store, points, toStore)
+    SELECT DISTINCT a.id, s.id, (ct_calcPoints(a.basePrice, s.markup, s.minMarkup, s.maxMarkup,
+                                                NEW.markup, NEW.minMarkup, NEW.maxMarkup)).*
         FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
                       LEFT JOIN channels c ON (c.id = sa.channel)
                       LEFT JOIN stores s ON (c.store = s.id)
@@ -340,6 +331,7 @@ FOR EACH ROW EXECUTE PROCEDURE ct_updateWarehousePrices();
 -- sets prices in stores for a given asset
 CREATE OR REPLACE FUNCTION ct_updateAssetPrices(assetId int, basePrice int) RETURNS VOID AS $$
 DECLARE
+    warehouse record;
     storeRec  RECORD;
     price int := 0;
 BEGIN
@@ -350,12 +342,17 @@ BEGIN
         RETURN;
     END IF;
 
+    SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
+
     FOR storeRec IN
         SELECT DISTINCT d.id, d.minMarkup, d.maxMarkup, d.markup
         FROM stores d JOIN channels c ON (d.id = c.store AND parent IS NULL)
                       JOIN subChannelAssets a ON (a.channel = c.id AND a.asset = assetId)
     LOOP
-        INSERT INTO assetPrices (asset, store, points) VALUES (assetId, storeRec.id, ct_calcPoints(basePrice, storeRec.storeRec.markup, storeRec.minMarkup, storeRec.maxMarkup));
+        INSERT INTO assetPrices (asset, store, points, toStore)
+                         VALUES (assetId, storeRec.id,
+                                 (ct_calcPoints(basePrice, storeRec.markup, storeRec.minMarkup, storeRec.maxMarkup,
+                                               warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*);
     END LOOP;
 END;
 $$ LANGUAGE 'plpgsql';
