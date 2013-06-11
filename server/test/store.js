@@ -333,7 +333,8 @@ describe('Store management', function(){
                 'maxmarkup': 100,
                 'minmarkup': 10,
                 'flatmarkup': true,
-                'markup': 20
+                'markup': 20,
+                'desc': 'Clowns are not scary'
             };
 
             utils.postUrl(
@@ -345,7 +346,7 @@ describe('Store management', function(){
                         {
                             'id': '1002_FUN_TIMES_WITH_CLOWNS',
                             'name': 'Fun Times With Clowns',
-                            'desc': 'Clowns are actually scary',
+                            'desc': 'Clowns are not scary',
                             'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 10, 'max': 100,
                                          'flat': true, 'markup': 20 }
@@ -377,7 +378,7 @@ describe('Store management', function(){
                         {
                             'id': '1002_FUN_TIMES_WITH_CLOWNS',
                             'name': 'Fun Times With Clowns',
-                            'desc': 'Clowns are actually scary',
+                            'desc': 'Clowns are not scary',
                             'partner': { 'id': 1002, 'name': 'KDE' },
                             'markups': { 'min': 10, 'max': 200,
                                          'flat': true, 'markup': 15 }
