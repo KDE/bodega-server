@@ -1007,6 +1007,13 @@
                     "Type": "string"
                 },
                 {
+                    "Name": "desc",
+                    "Location": "body",
+                    "Description": "Descriptive text for the store",
+                    "Required": "N",
+                    "Type": "string"
+                },
+                {
                     "Name": "id",
                     "Location": "body",
                     "Description": "The internal id for the store; If not provided it is based on the name. The id must be unique across all stores",
@@ -1071,6 +1078,13 @@
                     "Name": "name",
                     "Location": "body",
                     "Description": "The new name of the store; if empty the name is unchanged",
+                    "Required": "N",
+                    "Type": "string"
+                },
+                {
+                    "Name": "desc",
+                    "Location": "body",
+                    "Description": "Descriptive text for the store",
                     "Required": "N",
                     "Type": "string"
                 },
