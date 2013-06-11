@@ -27,12 +27,13 @@ module.exports = function(db, req, res) {
         contact: app.config.storeInfo.contact
     };
 
+    // if we are authenticated against a store, fetch store info
     if (req.session !== undefined && req.session.authorized) {
         json = utils.standardJson(req);
         json.warehouse = warehouse;
 
         db.query(
-            "select s.name, s.description, p.name as owner, p.homepage as url, p.supportEmail as contact from stores s left join partners p on (s.partner = p.id) where s.id = $1", [req.session.user.store],
+            "select s.name, s.description, p.name as owner, p.homepage as url, p.supportEmail as contact, s.partner as partner from stores s left join partners p on (s.partner = p.id) where s.id = $1", [req.session.user.store],
             function(err, result) {
                 if (err) {
                     errors.report('Database', req, res, err);
@@ -44,8 +45,45 @@ module.exports = function(db, req, res) {
                     return;
                 }
 
-                json.store = result.rows[0];
-                res.json(json);
+                json.store = {
+                    name: result.rows[0].name,
+                    description: result.rows[0].description,
+                    owner: result.rows[0].owner,
+                    contact: result.rows[0].contact
+                };
+
+                var partner = result.rows[0].partner;
+
+                json.store.links = [];
+                if (result.rows[0].url  && result.rows[0].url !== '') {
+                    json.store.links.push({ type: "Website", url: result.rows[0].url, icon: ''});
+                }
+
+                // now we look to see if there are any social media etc. links
+                db.query("select p.service, p.account, p.url, s.icon, s.baseUrl from partnerContacts p left join partnerContactServices s on (p.service = s.service) where partner = $1",
+                         [partner],
+                         function (err, result) {
+                             if (err) {
+                                 errors.report('Database', req, res, err);
+                                 return;
+                             }
+
+
+                             for (var i = 0; i < result.rowCount; ++i) {
+                                 var contact = result.rows[i];
+                                 var url;
+                                 if (contact.url && contact.url !== '') {
+                                     url = contact.url;
+                                 } else {
+                                     url = contact.baseUrl + contact.account;
+                                 }
+
+                                 json.store.links.push({ type: contact.service, url: url, icon: contact.icon});
+                             }
+
+                             res.json(json);
+
+                         });
             });
     } else {
         res.json(warehouse);

@@ -28,6 +28,8 @@ insert into people (lastname, firstname, email, points, password, active)
 
 insert into partners (id, name, developer, distributor) values (0, 'Management', true, true);
 insert into partners (id, name, developer, distributor, homepage, supportEmail) values (1000, 'Make Play Live', true, true, 'http://makeplaylive.com', 'support@makeplaylive.com');
+insert into partnerContacts (partner, service, account, url) values (1000, 'identi.ca', 'aseigo', null);
+insert into partnerContacts (partner, service, account, url) values (1000, 'blog', '', 'http://aseigo.blogspot.com');
 insert into partners (id, name, developer, distributor) values (1002, 'KDE', false, true);
 insert into partners (id, name, developer, distributor) values (1003, 'Diamond Devices', false, true);
 insert into partners (id, name, developer, distributor) values (1004, 'Saphire Software', false, true);

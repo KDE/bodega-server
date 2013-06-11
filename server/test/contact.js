@@ -68,8 +68,24 @@ describe('Fetch contact information', function() {
                     name: 'Vivaldi',
                     description: 'Plasma Active tablet from Make Play Live',
                     owner: 'Make Play Live',
-                    url: 'http://makeplaylive.com',
-                    contact: 'support@makeplaylive.com'
+                    contact: 'support@makeplaylive.com',
+                    links: [
+                         {
+                             "type": "Website",
+                             "url": "http://makeplaylive.com",
+                             "icon": ""
+                         },
+                         {
+                             "type": "identi.ca",
+                             "url": "undefinedaseigo",
+                             "icon": "extern/identica.png"
+                         },
+                         {
+                             "type": "blog",
+                             "url": "http://aseigo.blogspot.com",
+                         "icon": "extern/blog.png"
+                         }
+                  ]
                 };
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property( 'content-type', 'application/json; charset=utf-8');
