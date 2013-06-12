@@ -285,6 +285,11 @@ function addChannelTags(tags, partner, store, channelId, db, req, res)
 
 function createChannel(partner, store, db, req, res)
 {
+    if (!req.body.channel) {
+        errors.report("MissingParameters", req, res);
+        return;
+    }
+
     var channelParent = utils.parseNumber(req.body.channel.parent);
     var channelName = req.body.channel.name;
     var channelDescription = req.body.channel.description;
@@ -308,13 +313,18 @@ function createChannel(partner, store, db, req, res)
 
 function updateChannel(partner, store, db, req, res)
 {
-    var channelId = utils.parseNumber(req.param.channel);
+    if (!req.body.channel) {
+        errors.report("MissingParameters", req, res);
+        return;
+    }
+
+    var channelId = utils.parseNumber(req.params.channel);
 
     if (channelId > 0) {
         var channelParent = utils.parseNumber(req.body.channel.parent);
         var channelName = req.body.channel.name;
         var channelDescription = req.body.channel.description;
-        db.query("select partner, parent, toplevel from channels where id = $1;", [ channelId ],
+         db.query("select partner, parent, toplevel from channels where id = $1;", [ channelId ],
                  function(err, result) {
                      if (err) {
                          errors.report('Database', req, res, err);
@@ -325,7 +335,6 @@ function updateChannel(partner, store, db, req, res)
                          errors.report('StoreChannelIdInvalid', req, res);
                          return;
                      }
-
                      // check that the parent is not going to create a loop
                      // check that the parent exists, associated with this partner?
                      // set the name
@@ -344,7 +353,7 @@ function updateChannel(partner, store, db, req, res)
 
 function deleteChannel(partner, store, db, req, res)
 {
-    var channelId = utils.parseNumber(req.param.channelId);
+    var channelId = utils.parseNumber(req.params.channelId);
 
     if (channelId > 0) {
         db.query('delete from channels where id = $1 and store = $2;', [channelId, store],
