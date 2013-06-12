@@ -79,7 +79,9 @@ var ErrorType = {
     "AssetMissingCover"      : 54, //asset is missing required screenshot
     "AssetInfoMissing"       : 55, //asset info is missing
     "AssetFileMissing"       : 56, //the specified asset file doesn't exist
-    "InvalidAssetListing"    : 57, //the specified asset listing is invalid
+    "AssetPosted"            : 57, //can't edit a posted asset!
+    "InvalidAssetListing"    : 58, //the specified asset listing is invalid
+    "NotAValidator"          : 59, //person is not a validator
 
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
     "StorePartnerInvalid"    : 61,//the partner provided is incorrect

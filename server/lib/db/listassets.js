@@ -20,7 +20,7 @@ var errors = require('../errors.js');
 var createUtils = require('./createutils.js');
 var async = require('async');
 
-function sendResponse(err, db, req, res, partner, assets)
+function sendResponse(err, db, req, res, assetInfo, assets)
 {
     if (err) {
         errors.report(err.name, req, res, err);
@@ -31,37 +31,87 @@ function sendResponse(err, db, req, res, partner, assets)
     }
 }
 
-function findPublishedAssets(db, req, res, partner, assets, cb)
+function findPublishedAssets(db, req, res, assetInfo, assets, cb)
 {
     var query = 'select * from assets where partner=$1 and active=true';
     var e;
 
-    db.query(query, [partner], function(err, results) {
+    db.query(query, [assetInfo.partner], function(err, results) {
         if (err) {
             e = errors.create('Database', err.message);
-            cb(e, db, req, res, partner, assets);
+            cb(e, db, req, res, assetInfo, assets);
             return;
         }
         assets = assets.concat(results.rows);
-        cb(null, db, req, res, partner, assets);
+        cb(null, db, req, res, assetInfo, assets);
     });
 }
 
-function findIncomingAssets(db, req, res, partner, assets, cb)
+function findIncomingAssets(db, req, res, assetInfo, assets, cb)
 {
     var query = 'select * from incomingAssets where partner=$1';
     var e;
 
-    db.query(query, [partner], function(err, results) {
+    db.query(query, [assetInfo.partner], function(err, results) {
         if (err) {
             e = errors.create('Database', err.message);
-            cb(e, db, req, res, partner, assets);
+            cb(e, db, req, res, assetInfo, assets);
             return;
         }
 
         assets = assets.concat(results.rows);
-        cb(null, db, req, res, partner, assets);
+        cb(null, db, req, res, assetInfo, assets);
     });
+}
+
+function findPostedAssets(db, req, res, assetInfo, assets, cb)
+{
+    var query = 'select * from incomingAssets where posted=true';
+    var e;
+
+    db.query(query, [], function(err, results) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo, assets);
+            return;
+        }
+
+        assets = assets.concat(results.rows);
+        cb(null, db, req, res, assetInfo, assets);
+    });
+}
+
+
+function checkIfIsContentCreator(db, req, res, assetInfo, assets, cb)
+{
+    
+    createUtils.isContentCreator(
+        db, req, res, assetInfo,
+        function(err, db, req, res, assetInfo) {
+            var e;
+            if (err) {
+                e = errors.create('PartnerInvalid', err.message);
+                cb(e, db, req, res, assetInfo, assets);
+                return;
+            }
+            cb(null, db, req, res, assetInfo, assets);
+        });
+}
+
+function checkIfIsValidator(db, req, res, assetInfo, assets, cb)
+{
+    
+    createUtils.isValidator(
+        db, req, res, assetInfo,
+        function(err, db, req, res, assetInfo) {
+            var e;
+            if (err) {
+                e = errors.create('NotAValidator', err.message);
+                cb(e, db, req, res, assetInfo, assets);
+                return;
+            }
+            cb(null, db, req, res, assetInfo, assets);
+        });
 }
 
 module.exports = function(db, req, res) {
@@ -72,11 +122,22 @@ module.exports = function(db, req, res) {
     if (req.params.type &&
         req.params.type !== 'published' &&
         req.params.type !== 'incoming' &&
+        req.params.type !== 'posted' &&
         req.params.type !== 'all') {
         errors.report('InvalidAssetListing', req, res);
         return;
     }
 
+    funcs.push(function (callback) {
+        callback(null, db, req, res, assetInfo, assets);
+    });
+
+    if (req.params.type === 'posted') {
+        funcs.push(checkIfIsValidator);
+    } else {
+        funcs.push(checkIfIsContentCreator);
+    }
+    
     switch (req.params.type) {
     case 'all':
         funcs.push(findPublishedAssets);
@@ -88,23 +149,14 @@ module.exports = function(db, req, res) {
     case 'published':
         funcs.push(findPublishedAssets);
         break;
+    case 'posted':
+        funcs.push(findPostedAssets);
+        break;
     default:
         /* By default show only published assets */
         funcs.push(findPublishedAssets);
         break;
     }
 
-    createUtils.isContentCreator(
-        db, req, res, assetInfo,
-        function(err, db, req, res, assetInfo) {
-            if (err) {
-                errors.report('PartnerInvalid', req, res, err);
-                return;
-            }
-            /* Our starter function that just passes the things we need */
-            funcs.unshift(function (callback) {
-                callback(null, db, req, res, assetInfo.partner, assets);
-            });
-            async.waterfall(funcs, sendResponse);
-        });
+    async.waterfall(funcs, sendResponse);
 };

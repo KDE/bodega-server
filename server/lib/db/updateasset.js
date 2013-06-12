@@ -186,6 +186,12 @@ function processInfo(assetInfo, db, req, res)
                         errors.report('AssetMissing', req, res, err);
                         return;
                     }
+                    //Can't edit a posted asset
+                    if (assetInfo.posted) {
+                        errors.report('AssetPosted', req, res, err);
+                        return;
+                    }
+                    
                     if (assetInfo.incoming) {
                         updateIncomingAsset(db, req, res, assetInfo);
                     } else {

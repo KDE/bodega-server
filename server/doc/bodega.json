@@ -433,7 +433,7 @@
         {
           "MethodName": "List",
           "read-only": "true",
-          "Synopsis": "Lists the assets that belong to you",
+          "Synopsis": "Lists the assets that either belong to you or have been posted and you are a content validator.",
           "HTTPMethod": "GET",
           "URI": "/asset/list/",
           "parameters": [
@@ -443,7 +443,7 @@
               "Required": "N",
               "Default": "published",
               "Type": "enumerated",
-              "EnumeratedList": ["published", "incoming", "all"]
+              "EnumeratedList": ["published", "incoming", "all", "posted"]
             }
           ]
         }
