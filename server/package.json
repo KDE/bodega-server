@@ -20,6 +20,7 @@
         "validator" : ">= 0.4.5"
     },
     "devDependencies": {
+        "cookie-jar": "latest",
         "jshint": ">= 0.5.8",
         "mocha": ">= 0.12.1",
         "querystring" : "latest",

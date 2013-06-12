@@ -41,6 +41,7 @@ var dbListAssets = require('./db/listassets.js');
 var dbStats = require('./db/stats.js');
 var dbStores = require('./db/stores.js');
 var dbContactInfo = require('./db/contactInfo.js');
+var dbPostAsset = require('./db/postasset.js');
 
 var BodegaDb = (function() {
     var connectionString;
@@ -145,6 +146,10 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.updateAsset = function(req, res) {
         this.dbQuery(dbUpdateAsset, req, res);
+    };
+
+    BodegaDb.prototype.postAsset = function(req, res) {
+        this.dbQuery(dbPostAsset, req, res);
     };
 
     BodegaDb.prototype.listAssets = function(req, res) {

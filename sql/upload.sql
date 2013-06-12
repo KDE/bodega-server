@@ -8,26 +8,26 @@ create table incomingAssets
     description text,
     version     text        default null,
     versionTs   timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
-    path        text,
+    externPath  text,
     file        text        not null,
+    size        int         default 0 not null,
     image       text,
-    publish     bool        not null default false
+    posted      bool        not null default false
 );
-
-create type action as enum ('add', 'remove');
 
 create table incomingAssetTags
 (
     asset       int         references incomingAssets(id) on delete cascade,
-    tag         int         references tags(id) on delete cascade,
-    action      action      not null default 'add'
+    tag         int         references tags(id) on delete cascade
 );
 
 create table incomingAssetPreviews
 (
     asset       int         references incomingAssets(id) on delete cascade,
-    path        text,
-    action      action      not null default 'add'
+    path        text        not null,
+    mimetype    text        not null,
+    type        text        not null,
+    subtype     text        not null
 );
 
 create table incomingAssetChangelogs

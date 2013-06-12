@@ -20,17 +20,6 @@ var errors = require('../errors.js');
 var createUtils = require('./createutils.js');
 var async = require('async');
 
-function sendResponse(db, req, res, assetInfo)
-{
-    var json = utils.standardJson(req, true);
-
-    json.asset = {
-        id : assetInfo.id,
-        name : assetInfo.name
-    };
-    res.send(json);
-}
-
 function sendResponse(err, db, req, res, partner, assets)
 {
     if (err) {
@@ -109,7 +98,7 @@ module.exports = function(db, req, res) {
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             if (err) {
-                errors.report('ListAssetsInvalidPartner', req, res, err);
+                errors.report('PartnerInvalid', req, res, err);
                 return;
             }
             /* Our starter function that just passes the things we need */

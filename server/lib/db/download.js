@@ -21,7 +21,7 @@ var errors = require('../errors.js');
 function launchDownload(db, req, res)
 {
     var assetInfoQuery =
-        "SELECT a.id, a.partner as partnerId, a.version, a.path, a.file, a.name \
+        "SELECT a.id, a.partner as partnerId, a.version, a.file, a.name \
          FROM assets a LEFT JOIN channelAssets ca ON (a.id = ca.asset)  \
          LEFT JOIN channels c ON (c.id = ca.channel) \
          WHERE a.id = $1 and c.store = $2";
@@ -29,6 +29,7 @@ function launchDownload(db, req, res)
     var q = db.query(
         assetInfoQuery, [req.params.assetId, req.session.user.store],
         function(err, result) {
+            var assetInfo;
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
@@ -38,7 +39,8 @@ function launchDownload(db, req, res)
                 errors.report('NoMatch', req, res);
                 return;
             }
-            app.assetStore.download(res, result.rows[0].path, result.rows[0].file, function(err) {
+            assetInfo = result.rows[0];
+            app.assetStore.download(res, assetInfo, function(err) {
                 if (err) {
                     errors.report('Download', req, res, err);
                     return;

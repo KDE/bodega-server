@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -78,7 +78,7 @@ var AssetStore = (function() {
     }
 
     function pathForAsset(assetInfo) {
-        var assetPath = assetInfo.path;
+        var assetPath = assetInfo.externpath;
         var parsedUrl;
 
         /* If it's a http url just return it as is */
@@ -286,26 +286,35 @@ var AssetStore = (function() {
 
     AssetStore.prototype.upload = function(fromFile, assetInfo, fn) {
         var assetPath;
+        var e;
         if (!fromFile || !assetInfo.id || !assetInfo.file) {
-            var err = errors.create('MissingParameters', '');
-            fn(err);
+            e = errors.create('MissingParameters', '');
+            fn(e);
             return;
         }
         assetPath = pathForAsset(assetInfo);
 
-        if (storageSystem === 's3') {
-            var client;
-
-            try {
-                client = knox.createClient(storageConfig);
-            } catch (err) {
-                fn(err);
+        fs.stat(fromFile, function(err, stat) {
+            if (err) {
+                e = errors.create('AssetFileMissing', err.message);
+                fn(e);
                 return;
             }
-            s3PutStream(fromFile, assetPath, client, fn);
-        } else {
-            localPutStream(fromFile, assetPath, fn);
-        }
+            assetInfo.size = stat.size;
+            if (storageSystem === 's3') {
+                var client;
+
+                try {
+                    client = knox.createClient(storageConfig);
+                } catch (err) {
+                    fn(err);
+                    return;
+                }
+                s3PutStream(fromFile, assetPath, client, fn);
+            } else {
+                localPutStream(fromFile, assetPath, fn);
+            }
+        });
     };
 
     // fn: a function used to process errors with
@@ -374,7 +383,7 @@ var AssetStore = (function() {
         }
 
         //Can't publish external assets
-        if (assetInfo.path) {
+        if (assetInfo.externpath) {
             return;
         }
 

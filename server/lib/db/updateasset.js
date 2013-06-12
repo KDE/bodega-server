@@ -62,6 +62,7 @@ function buildQueryString(assetInfo)
     addToStr(q, assetInfo, 'version');
     addToStr(q, assetInfo, 'file');
     addToStr(q, assetInfo, 'publish');
+    addToStr(q, assetInfo, 'size');
 
     q.insertStr += ")";
     q.valuesStr += ")";
@@ -136,15 +137,15 @@ function updatePublishedAsset(db, req, res, assetInfo)
     var incomingAssetQuery =
             "insert into incomingAssets (id, license, partner, baseprice, \
                                          name, description, version, versionts, \
-                                         path, file, image, publish)\
+                                         path, file, size, image, publish)\
                                          values ($1, $2, $3, $4, $5, $6, $7, \
-                                                 $8, $9, $10, $11, false)";
+                                                 $8, $9, $10, $11, $12, false)";
 
     db.query(
         incomingAssetQuery, [assetInfo.id, assetInfo.license, assetInfo.partner,
                              assetInfo.baseprice, assetInfo.name, assetInfo.description,
                              assetInfo.version, assetInfo.versionts, assetInfo.path,
-                             assetInfo.file, assetInfo.image],
+                             assetInfo.file, assetInfo.size, assetInfo.image],
         function (err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
@@ -175,14 +176,14 @@ function processInfo(assetInfo, db, req, res)
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             if (err) {
-                errors.report('UploadPartnerInvalid', req, res, err);
+                errors.report('PartnerInvalid', req, res, err);
                 return;
             }
             createUtils.findAsset(
                 db, req, res, assetInfo, false,
                 function(err, db, req, res, assetInfo) {
                     if (err) {
-                        errors.report('DeleteAssetMissing', req, res, err);
+                        errors.report('AssetMissing', req, res, err);
                         return;
                     }
                     if (assetInfo.incoming) {

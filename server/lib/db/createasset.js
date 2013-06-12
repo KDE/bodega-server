@@ -56,7 +56,7 @@ function setupTags(db, req, res, assetInfo)
     }
 }
 
-function setupPreviews(db, req, res, assetInfo, fn)
+function recordPreviews(db, req, res, assetInfo, fn)
 {
     var i;
     if (assetInfo.previews) {
@@ -76,34 +76,39 @@ function setupPreviews(db, req, res, assetInfo, fn)
 }
 
 
-function setupIcons(db, req, res, assetInfo)
+function setupPreviews(db, req, res, assetInfo)
 {
     var imageUrls = utils.findImagePaths(req);
 
-    // upload:
-    //   req.files.icons.tiny
-    //   req.files.icons.small
-    //   req.files.icons.medium
-    //   req.files.icons.large
-    //   req.files.icons.huge
-
-    setupPreviews(db, req, res, assetInfo);
+    
+    createUtils.bindPreviewsToFiles(assetInfo, req.files, function(err) {
+        if (err) {
+            errors.report(err.name, req, res, err);
+            return;
+        }
+        app.previewStore.upload(assetInfo, function(err) {
+            if (err) {
+                errors.report(err.name, req, res, err);
+                return;
+            }
+            recordPreviews(db, req, res, assetInfo);
+        });
+    });
 }
 
 
 function recordAsset(db, req, res, assetInfo)
 {
-    var file = req.files.asset;
-    var newAssetQuery = 'insert into incomingAssets (id, license, partner, baseprice, name, description, version, file) values ($1, $2, $3, $4, $5, $6, $7, $8)';
+    var newAssetQuery = 'insert into incomingAssets (id, license, partner, baseprice, name, description, version, file, size) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
     db.query(newAssetQuery,
-             [assetInfo.id, assetInfo.license, assetInfo.partner, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.file],
+             [assetInfo.id, assetInfo.license, assetInfo.partner, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.file, assetInfo.size],
              function(err, result) {
                  if (err) {
                      reportError(db, req, res, assetInfo,
                                  'Database', err);
                      return;
                  }
-                 setupIcons(db, req, res, assetInfo);
+                 setupPreviews(db, req, res, assetInfo);
              });
 }
 
@@ -116,6 +121,7 @@ function storeAsset(db, req, res, assetInfo)
                  assetInfo.id = result.rows[0].assetid;
                  //console.log(req.files.asset);
                  //console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + assetInfo.file);
+                 //console.log('file size = ' + req.files.asset.size);
                  app.assetStore.upload(
                      fromFile, assetInfo,
                      function(err) {
@@ -140,7 +146,7 @@ function checkPartner(db, req, res, assetInfo)
                  function(err, result) {
                      if (err || !result.rows || result.rows.length === 0) {
                          reportError(db, req, res, assetInfo,
-                                     'UploadPartnerInvalid', err);
+                                     'InvalidPartner', err);
                          return;
                      }
 
@@ -154,7 +160,7 @@ function checkPartner(db, req, res, assetInfo)
                  function(err, result) {
                      if (err || !result.rows || result.rows.length === 0) {
                          reportError(db, req, res, assetInfo,
-                                     'UploadPartnerInvalid', err);
+                                     'PartnerInvalid', err);
                          return;
                      }
 

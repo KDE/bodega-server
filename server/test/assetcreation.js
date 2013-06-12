@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -22,71 +22,36 @@ var mime = require('mime');
 var path = require('path');
 var fs = require('fs');
 var http = require('http');
+var async = require('async');
+var request = require('request');
+var Cookie = require('cookie-jar');
 
-
-function encodeFilePart(boundary, name, filename)
+function postFiles(server, dst, files, cookie, fn)
 {
-    var type = mime.lookup(filename);
-    var str = "--" + boundary + "\r\n";
-    str += "Content-Disposition: form-data; name=\"" +
-        name + "\"; filename=\"" + filename + "\"\r\n";
-    str += "Content-Type: " + type + "\r\n\r\n";
-
-    str += fs.readFileSync(filename);
-
-    str += '\r\n';
-
-    return str;
-}
-
-
-function postFiles(server, url, files, cookie, fn)
-{
-    var boundary = Math.random();
-
-    var data = "";
+    var url = 'http://' + server.address().address + ':' +
+            server.address().port + dst;
+    var obj = {
+        url : url,
+        cookie: cookie
+    };
+    var r = request.post(obj, function(err, res, body) {
+        res.body = JSON.parse(body);
+        fn(res);
+    });
+    var form = r.form();
+    var filePath;
 
     for (var i = 0; i < files.length; ++i) {
-        data += encodeFilePart(boundary, files[i].name,
-                               __dirname + '/' + files[i].filename);
+        filePath = path.join(__dirname, files[i].filename);
+        form.append(files[i].name,
+                    fs.createReadStream(filePath));
     }
-    data += "--" + boundary + "--\r\n";
-
-    var options = {
-        host: server.address().address,
-        port: server.address().port,
-        path: url,
-        method: 'POST',
-        headers : {
-            'Content-Type' : 'multipart/form-data; boundary=' + boundary,
-            'Content-Length' : Buffer.byteLength(data),
-            'Cookie': cookie
-        }
-    };
-
-    var postReq = http.request(options, function(response){
-        response.setEncoding('utf8');
-        var buf = '';
-        response.on('data', function(chunk){
-            //console.log(chunk);
-            buf += chunk;
-        });
-        response.on("end", function() {
-            response.body = JSON.parse(buf);
-            fn(response);
-        });
-    });
-
-    postReq.write(data);
-    postReq.end();
-
-    //console.log(data);
 }
-
 describe('Asset manipulation', function(){
     var cookie;
     var incompleteAssetId;
     var completeAssetId;
+    var cleanupAssets = [];
     describe('Authentication', function(){
         it('should succeed.', function(done){
             utils.getUrl(
@@ -99,11 +64,38 @@ describe('Asset manipulation', function(){
                         'application/json; charset=utf-8');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
+                    var j = request.jar();
+                    request = request.defaults({jar :j });
+                    j.add(new Cookie(cookie[0]));
                     res.body.should.have.property('authStatus', true);
                     done();
                 });
         });
     });
+
+
+    function deleteAsset(assets, i, cb)
+    {
+        var asset = assets[i];
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/asset/delete/' + asset,
+            function(res) {
+                ++i;
+                cb(null, assets, i);
+            },
+            cookie);
+    }
+
+    function deleteCompleteAsset(assets, i, cb)
+    {
+        var deleteQuery = 'DELETE FROM assets WHERE id=$1;';
+        app.db.dbQuery(function(db) {
+            db.query(deleteQuery, [assets[i]], function(err, result) {
+                cb(null, assets, i);
+            });
+        });
+    }
 
     describe('Creation', function(){
         it('allow incomplete assets', function(done){
@@ -122,6 +114,7 @@ describe('Asset manipulation', function(){
                           res.body.should.have.property('asset');
                           res.body.asset.should.have.property('id');
                           incompleteAssetId = res.body.asset.id;
+                          cleanupAssets.push(incompleteAssetId);
                           done();
                       });
         });
@@ -152,6 +145,7 @@ describe('Asset manipulation', function(){
                           res.body.asset.should.have.property('id');
                           res.body.asset.should.have.property('name');
                           completeAssetId = res.body.asset.id;
+                          cleanupAssets.push(completeAssetId);
                           done();
                       });
         });
@@ -277,7 +271,7 @@ describe('Asset manipulation', function(){
                         'application/json; charset=utf-8');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
-                        'type', 'DeleteAssetMissing');
+                        'type', 'AssetMissing');
                     done();
                 },
                 cookie);
@@ -298,25 +292,92 @@ describe('Asset manipulation', function(){
         });
     });
 
+    describe('Posting', function(){
+        before(function(done){
+            var finished = 0;
+            postFiles(server.server,
+                    '/bodega/v1/json/asset/create',
+                    [{
+                        "name" : "info",
+                        "filename" : "sampleasset/sample-info-incomplete.json"
+                    }, {
+                        "name" : "asset",
+                        "filename" : "sampleasset/sample.pdf"
+                    }], cookie,
+                      function(res) {
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          incompleteAssetId = res.body.asset.id;
+                          cleanupAssets.push(incompleteAssetId);
+                          ++finished;
+                          if (finished === 2) {
+                              done();
+                          }
+                      });
+            postFiles(server.server,
+                    '/bodega/v1/json/asset/create',
+                    [{
+                        "name" : "info",
+                        "filename" : "sampleasset/sample-info.json"
+                    }, {
+                        "name" : "asset",
+                        "filename" : "sampleasset/sample.pdf"
+                    },{
+                        "name" : "sample-0.png",
+                        "filename" : "sampleasset/sample-0.png"
+                    },{
+                        "name" : "sample-1.png",
+                        "filename" : "sampleasset/sample-1.png"
+                    },{
+                        "name" : "cover.jpg",
+                        "filename" : "sampleasset/cover.jpg"
+                    }], cookie,
+                      function(res) {
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          res.body.asset.should.have.property('name');
+                          completeAssetId = res.body.asset.id;
+                          cleanupAssets.push(completeAssetId);
+                          ++finished;
+                          if (finished === 2) {
+                              done();
+                          }
+                      });
+        });
+        it('should work with a complete asset', function(done){
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/asset/post/' + completeAssetId, null,
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    deleteCompleteAsset([completeAssetId], 0, function(){});
+                    done();
+                },
+                cookie);
+        });
+    });
+
     /* Make sure that even after an error we delete the assets
      *  that we created for the test */
     after(function(done) {
-        if (!server || (!completeAssetId && !incompleteAssetId)) {
+        var i;
+        var deleted = 0;
+        var numToDelete = cleanupAssets.length;
+        var funcs = [function(cb) {
+            cb(null, cleanupAssets, 0);
+        }];
+        if (!server || !numToDelete) {
             done();
             return;
         }
-        utils.getUrl(
-            server,
-            '/bodega/v1/json/delete/' + completeAssetId,
-            function(res) {
-            },
-            cookie);
-        utils.getUrl(
-            server,
-            '/bodega/v1/json/delete/' + incompleteAssetId,
-            function(res) {
-                done();
-            },
-            cookie);
+        for (i = 0; i < numToDelete; ++i) {
+            funcs.push(deleteAsset);
+        }
+        async.waterfall(funcs, function(){ done(); });
     });
 });

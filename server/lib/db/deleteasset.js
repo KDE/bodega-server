@@ -122,14 +122,14 @@ module.exports = function(db, req, res) {
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             if (err) {
-                errors.report('UploadPartnerInvalid', req, res, err);
+                errors.report('PartnerInvalid', req, res, err);
                 return;
             }
             createUtils.findAsset(
                 db, req, res, assetInfo, true,
                 function(err, db, req, res, assetInfo) {
                     if (err) {
-                        errors.report('DeleteAssetMissing', req, res);
+                        errors.report('AssetMissing', req, res);
                         return;
                     }
                     if (assetInfo.incoming) {

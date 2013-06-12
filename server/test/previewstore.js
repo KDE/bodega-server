@@ -35,7 +35,7 @@ describe('Preview Store, ', function(){
         id : 133,
         incoming : true,
         previews : [
-            {type : "cover", "subtype" : "front", file : tmpCoverFile }
+            {type : "cover", "subtype" : "front", mimetype : 'image/jpeg', file : tmpCoverFile }
         ],
         tags : [
             {"type" : "assetType", "title" : "book" }
@@ -45,10 +45,10 @@ describe('Preview Store, ', function(){
         id : 134,
         incoming : true,
         previews : [
-            {type : "icon", "subtype" : "medium", file : tmpIcon64 },
-            {type : "icon", "subtype" : "large", file : tmpIcon128 },
-            {type : "icon", "subtype" : "huge", file : tmpIcon512 },
-            {type : "screenshot", "subtype" : "screen1", file : tmpScreenshot }
+            {type : "icon", "subtype" : "medium", mimetype : 'image/png', file : tmpIcon64 },
+            {type : "icon", "subtype" : "large", mimetype : 'image/png', file : tmpIcon128 },
+            {type : "icon", "subtype" : "huge", mimetype : 'image/png', file : tmpIcon512 },
+            {type : "screenshot", "subtype" : "screen1", mimetype : 'image/png', file : tmpScreenshot }
         ],
         tags : [
             {"type" : "assetType", "title" : "application" }

@@ -6,10 +6,15 @@
     "partner" : "1002",
     "basePrice" : "0",
     "file" : "sample.pdf",
+    "size" : "137887",
     "languages" : ["en"],
     "previews" : [
-        { "type" : "cover", "subtype" : "front", "file" : "cover.jpg" },
-        { "type" : "cover", "subtype" : "back", "file" : "sample-1.png" }
+        { "type" : "cover", "subtype" : "front", "file" : "cover.jpg",
+          "mimetype" : "image/jpeg" },
+        { "type" : "cover", "subtype" : "back", "file" : "sample-1.png",
+          "mimetype" : "image/png" },
+        { "type" : "screenshot", "subtype" : "screen1", "file" : "sample-0.png",
+          "mimetype" : "image/png" }
     ],
     "tags" : [
         {"type" : "assetType", "title" : "book" },

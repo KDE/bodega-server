@@ -54,6 +54,24 @@ var PreviewStore = (function() {
         return Object.keys(obj).length === 0;
     }
 
+    function previewName(preview) {
+        var filename;
+
+        if (preview.name) {
+            filename = path.basename(preview.name);
+        }
+
+        if (!filename && preview.path) {
+            filename = path.basename(preview.path);
+        }
+
+        if (!filename && preview.file) {
+            filename = path.basename(preview.file);
+        }
+
+        return filename;
+    }
+
     function isValidImageFile(preview) {
         switch (preview.mimetype) {
         case 'image/jpeg':
@@ -132,23 +150,20 @@ var PreviewStore = (function() {
 
     function validateFile(previews, i, cb) {
         var e;
-        var mimetype;
         var fileStat;
         var preview = previews[i];
 
         if (!preview.file) {
-            e = errors.create('PreviewMissingFile');
+            e = errors.create('PreviewFileMissing');
             cb(e);
             return;
         }
         fs.stat(preview.file, function(err, stat) {
             if (err || !stat.isFile()) {
-                e = errors.create('PreviewMissingFile');
+                e = errors.create('PreviewFileMissing');
                 cb(e);
                 return;
             }
-            mimetype = mime.lookup(preview.file);
-            preview.mimetype = mimetype;
             if (preview.type === 'icon' ||
                 preview.type === 'screenshot' ||
                 preview.type === 'cover') {
@@ -368,7 +383,9 @@ var PreviewStore = (function() {
     function splitPreviews(rawPreviews) {
         var previews = {
             icons : [],
+            splitIcons : {},
             covers : [],
+            splitCovers : {},
             screenshots : [],
             others : []
         };
@@ -377,8 +394,10 @@ var PreviewStore = (function() {
         for (i = 0; i < rawPreviews.length; ++i) {
             if (rawPreviews[i].type === "icon") {
                 previews.icons.push(rawPreviews[i]);
+                previews.splitIcons[rawPreviews[i].subtype] = rawPreviews[i];
             } else if (rawPreviews[i].type === "cover") {
                 previews.covers.push(rawPreviews[i]);
+                previews.splitCovers[rawPreviews[i].subtype] = rawPreviews[i];
             } else if (rawPreviews[i].type === "screenshot") {
                 previews.screenshots.push(rawPreviews[i]);
             } else {
@@ -388,21 +407,81 @@ var PreviewStore = (function() {
         return previews;
     }
 
+    function iconRelativePath(assetInfo, icon) {
+        var extension;
+        var prefix = '';
+        
+        if (!assetInfo.id || !icon || (!icon.file && !icon.path)) {
+            return null;
+        }
+        extension = path.extname(icon.file);
+        if (!extension && icon.path) {
+            extension = path.extname(icon.path);
+        }
+
+        return path.join(assetInfo.id.toString(),
+                         'icon' + extension);
+    }
+
+    function previewRelativePath(assetInfo, preview) {
+        if (preview.type === 'icon') {
+            return iconRelativePath(assetInfo, preview);
+        } else {
+            var filename = previewName(preview);
+
+            return path.join(assetInfo.id.toString(),
+                             filename);
+        }
+    }
+
+    function previewFullPath(assetInfo, preview, isIncoming) {
+        var basePath;
+        var relPath;
+        var fullPath;
+        if (preview.type === 'icon') {
+            relPath = iconRelativePath(assetInfo, preview);
+            if (isIncoming) {
+                fullPath = path.join(fullPreviewPaths.incoming,
+                                     assetInfo.id.toString(),
+                                     iconSizes[preview.subtype].toString(),
+                                     path.basename(relPath));
+                                     
+            } else {
+                basePath = fullPreviewPaths.icons[preview.subtype];
+                fullPath = path.join(basePath, relPath);
+            }
+        } else {
+            relPath = previewRelativePath(assetInfo, preview);
+
+            if (isIncoming) {
+                fullPath = path.join(fullPreviewPaths.incoming,
+                                     relPath);
+            } else {
+                fullPath = path.join(fullPreviewPaths.previews,
+                                     relPath);
+            }
+        }
+
+        return fullPath;
+    }
+
     function handleIcon(assetInfo, assetPaths, icons, i, cb) {
         var icon = icons[i];
         var expectedSize = iconSizes[icon.subtype];
-        var extension = path.extname(icon.file);
-        var filename = "icon" + expectedSize + extension;
-        var relPath = path.join(assetInfo.id.toString(),
-                                filename);
-        var fullIncomingPath = path.join(
-            assetPaths.incoming, filename);
+        var relPath = iconRelativePath(assetInfo, icon);
+        var fullIncomingPath = previewFullPath(assetInfo, icon, true);
+        var dirname = path.dirname(fullIncomingPath);
 
-        localMove(icon.file, fullIncomingPath, function(err) {
-            if (!err) {
-                icon.path = relPath;
+        checkDirectory(dirname, "0700", function(err) {
+            if (err) {
+                cb(err, assetInfo, assetPaths, icons, ++i);
             }
-            cb(err, assetInfo, assetPaths, icons, ++i);
+            localMove(icon.file, fullIncomingPath, function(err) {
+                if (!err) {
+                    icon.path = relPath;
+                }
+                cb(err, assetInfo, assetPaths, icons, ++i);
+            });
         });
     }
 
@@ -429,7 +508,7 @@ var PreviewStore = (function() {
 
     function handleCover(assetInfo, assetPaths, covers, i, cb) {
         var cover = covers[i];
-        var filename = path.basename(cover.file);
+        var filename = previewName(cover);
         var relPath = path.join(assetInfo.id.toString(),
                                 filename);
         var fullIncomingPath = path.join(
@@ -467,7 +546,7 @@ var PreviewStore = (function() {
 
     function handleScreenshot(assetInfo, assetPaths, screenshots, i, cb) {
         var screenshot = screenshots[i];
-        var filename = path.basename(screenshot.file);
+        var filename = previewName(screenshot);
         var relPath = path.join(assetInfo.id.toString(),
                                 filename);
         var fullIncomingPath = path.join(
@@ -505,7 +584,7 @@ var PreviewStore = (function() {
 
     function handleOther(assetInfo, assetPaths, others, i, cb) {
         var other = others[i];
-        var filename = path.basename(other.file);
+        var filename = previewName(other);
         var relPath = path.join(assetInfo.id.toString(),
                                 filename);
         var fullIncomingPath = path.join(
@@ -549,7 +628,6 @@ var PreviewStore = (function() {
         if (!assetInfo || !assetInfo.tags) {
             return null;
         }
-
         for (i = 0; i < assetInfo.tags.length; ++i) {
             tag = assetInfo.tags[i];
             if (tag.type === 'assetType') {
@@ -677,10 +755,15 @@ var PreviewStore = (function() {
         var i;
         var assetPaths;
         var funcs = [];
-        if (!assetInfo.previews || !assetInfo.previews.length ||
-            !assetInfo.id) {
+
+        if (!assetInfo.id) {
             var err = errors.create('MissingParameters', '');
             fn(err);
+            return;
+        }
+
+        if (!assetInfo.previews || !assetInfo.previews.length) {
+            fn(null);
             return;
         }
 
@@ -711,11 +794,102 @@ var PreviewStore = (function() {
         });
     };
 
-    PreviewStore.prototype.previewPaths = function() {
-        return findPreviewPaths();
-    };
+    function generateIcon(assetInfo, assetPaths, preview, icons, i, cb) {
+        var icon = icons[i];
+        var w = iconSizes[icon.subtype];
+        var h = iconSizes[icon.subtype];
+        var w1, h1;
+        var xoffset = 0;
+        var yoffset = 0;
+        var fromPath = previewFullPath(assetInfo, preview, true);
+        var fullIncomingPath;
+        var dirname;
+
+        //console.log(preview);
+        icon.file = fromPath;
+        icon.path = iconRelativePath(assetInfo, icon);
+        //console.log("Cover file = " + icon.file);
+        //console.log("Icon path = " + icon.path);
+        assetInfo.image = icon.path;
+        icon.file = undefined;
+
+        fullIncomingPath = previewFullPath(assetInfo, icon, true);
+        //console.log('Full from path = ' + fromPath);
+        //console.log('Full incoming path = ' + fullIncomingPath);
+        dirname = path.dirname(fullIncomingPath);
+
+        checkDirectory(dirname, "0700", function(err) {
+            gm(fromPath)
+            .size(function(err, size) {
+                //console.log(size);
+                if (size.width > size.height) {
+                    w1 = w;
+                    h1 = Math.floor(size.height * (w/size.width));
+                    if (h1 > h) {
+                        w1 = Math.floor(w1 * (((h-h1)/h) + 1));
+                        h1 = h;
+                    }
+                } else if (size.width < size.height) {
+                    h1 = h;
+                    w1 = Math.floor(size.width * (h/size.height));
+                    if (w1 > w) {
+                        h1 = Math.floor(h1 * (((w-w1)/w) + 1));
+                        w1 = w;
+                    }
+                } else if (size.width === size.height) {
+                    var bigger = (w<h?w:h);
+                    w1 = bigger;
+                    h1 = bigger;
+                }
+                
+                if (w < w1) {
+                    xoffset = (w1 - w)/2;
+                }
+                if (h < h1) {
+                    yoffset = (h1-h)/2;
+                }
+                gm(fromPath)
+                    .quality(100)
+                    .in("-size", w1+"x"+h1)
+                    .scale(w1, h1)
+                    .noProfile()
+                    .write(fullIncomingPath, function(err) {
+                        cb(err, assetInfo, assetPaths, preview, icons, ++i);
+                    });
+                });
+        });
+    }
 
     PreviewStore.prototype.generateCoverIcons = function(assetInfo, fn) {
+        var previews = splitPreviews(assetInfo.previews);
+        var iconsToGenerate = [];
+        var iconType;
+        var assetPaths = fillPathsForAsset(assetInfo);
+        var cover = previews.splitCovers.front;
+        var funcs = [function(cb) {
+            cb(null, assetInfo, assetPaths, cover,
+               iconsToGenerate, 0);
+        }];
+
+        if (!cover) {
+            fn(null);
+            return;
+        }
+
+        for (iconType in iconSizes) {
+            if (!previews.splitIcons[iconType]) {
+                iconsToGenerate.push({
+                    asset: assetInfo.id,
+                    type : 'icon',
+                    subtype : iconType
+                });
+                funcs.push(generateIcon);
+            }
+        }
+        
+        async.waterfall(funcs, function(err, assetInfo, icons, i) {
+            fn(err);
+        });
     };
 
     PreviewStore.prototype.generateScaledIcons = function(assetInfo, fn) {
@@ -729,18 +903,13 @@ var PreviewStore = (function() {
             var incomingIconFile;
             var iconFile;
             var relPath;
-            var filename;
             if (err) {
                 cb(err, assetInfo, assetPaths, icons, i);
                 return;
             }
-            filename = "icon" + path.extname(icon.path);
-            incomingIconFile = path.join(assetPaths.incoming,
-                                        path.basename(icon.path));
-            relPath = path.join(assetInfo.id.toString(), filename);
-            iconFile = path.join(assetPaths.icons[icon.subtype],
-                                 filename);
-            //console.log("  filename = " + filename);
+            incomingIconFile = previewFullPath(assetInfo, icon, true);
+            relPath = iconRelativePath(assetInfo, icon);
+            iconFile = previewFullPath(assetInfo, icon, false);
             //console.log("      from = " + incomingIconFile);
             //console.log("        to = " + iconFile);
             localMove(incomingIconFile, iconFile, function(err) {
@@ -777,17 +946,13 @@ var PreviewStore = (function() {
             var incomingPreviewFile;
             var previewFile;
             var relPath;
-            var filename;
             if (err) {
                 cb(err, assetInfo, assetPaths, previews, i);
                 return;
             }
-            filename = path.basename(preview.path);
-            incomingPreviewFile = path.join(assetPaths.incoming,
-                                            filename);
-            relPath = path.join(assetInfo.id.toString(), filename);
-            previewFile = path.join(dirpath, filename);
-            //console.log("  filename = " + filename);
+            incomingPreviewFile = previewFullPath(assetInfo, preview, true);
+            relPath = previewRelativePath(assetInfo, preview);
+            previewFile = previewFullPath(assetInfo, preview, false);
             //console.log("      from = " + incomingPreviewFile);
             //console.log("        to = " + previewFile);
             localMove(incomingPreviewFile, previewFile, function(err) {
@@ -845,6 +1010,13 @@ var PreviewStore = (function() {
             fn(err);
         });
     };
+
+
+    PreviewStore.prototype.previewPaths = function() {
+        return findPreviewPaths();
+    };
+    PreviewStore.prototype.previewRelativePath = previewRelativePath;
+    PreviewStore.prototype.previewFullPath = previewFullPath;
 
     return PreviewStore;
 })();

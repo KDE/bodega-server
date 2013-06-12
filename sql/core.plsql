@@ -366,7 +366,6 @@ BEGIN
         PERFORM ct_updateAssetPrices(NEW.id, NEW.basePrice);
     END IF;
 
-    NEW.file = substring(NEW.path FROM '[^/]*$');
     IF OLD.version != NEW.version THEN
         SELECT INTO dummy asset FROM assetChangelogs a where a.asset = OLD.id and a.version = OLD.version;
         IF NOT FOUND THEN
@@ -385,7 +384,6 @@ CREATE OR REPLACE FUNCTION ct_processNewAsset() RETURNS TRIGGER AS $$
 DECLARE
 BEGIN
     PERFORM ct_updateAssetPrices(NEW.id, NEW.basePrice);
-    NEW.file = substring(NEW.path FROM '[^/]*$');
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';

@@ -290,6 +290,12 @@ app.post(serverPath('asset/update/:assetId'), isAuthorized,
             app.db.updateAsset(req, res);
         });
 
+app.post(serverPath('asset/post/:assetId'), isAuthorized,
+         function(req, res) {
+             //console.log(req.query);
+             app.db.postAsset(req, res);
+         });
+
 app.get(serverPath('asset/list/:type?*'), isAuthorized,
         function(req, res) {
             //console.log(req.query);

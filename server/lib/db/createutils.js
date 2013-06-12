@@ -19,7 +19,6 @@ var async = require('async');
 var errors = require('../errors.js');
 var path = require('path');
 
-
 function associateTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount, cb)
 {
     var tagQuery =
@@ -150,10 +149,12 @@ function recordPreview(db, req, res, assetInfo, previewPath,
                        previewIdx, previewCount, cb)
 {
     var atEnd = (previewIdx === (previewCount - 1));
-    var newPreviewQuery = 'insert into incomingAssetPreviews (asset, path) values ($1, $2)';
+    var previewInfo = assetInfo.previews[previewIdx];
+    var newPreviewQuery = 'insert into incomingAssetPreviews (asset, path, mimetype, type, subtype) values ($1, $2, $3, $4, $5)';
     var e;
+
     db.query(newPreviewQuery,
-             [assetInfo.id, previewPath],
+             [assetInfo.id, previewPath, previewInfo.mimetype, previewInfo.type, previewInfo.subtype],
              function(err, result) {
                  if (err) {
                      e = errors.create('Database', err.message);
@@ -177,21 +178,27 @@ function setupPreview(db, req, res, assetInfo, previewIdx, previewCount, cb)
 {
     var keys = Object.keys(assetInfo.previews);
     var previewInfo = assetInfo.previews[previewIdx];
-    var preview = req.files[previewInfo.file];
     var e;
+    var previewPath;
 
-    if (!preview || !previewInfo) {
-        preview = previewInfo ? previewInfo.file : previewIdx;
+    if (!previewInfo) {
         e = errors.create('UploadPreviewError',
-                          'Preview ' + preview + ' is missing.');
+                          'Preview ' + previewIdx + ' is missing.');
         //console.log("error due to bad rename?");
         cb(e, db, req, res, assetInfo, previewIdx, previewCount);
         return;
     }
 
-    var filename = path.basename(preview.name);
-    console.log("Upload preview " + filename);
-    recordPreview(db, req, res, assetInfo, filename,
+    if (previewInfo.type === 'icon') {
+        if (!assetInfo.image) {
+            assetInfo.image =
+                app.previewStore.previewRelativePath(assetInfo, previewInfo);
+        }
+    }
+
+    previewPath = app.previewStore.previewRelativePath(assetInfo,
+                                                       previewInfo);
+    recordPreview(db, req, res, assetInfo, previewPath,
                   previewIdx, previewCount, cb);
 }
 
@@ -215,6 +222,45 @@ module.exports.setupPreviews = function(db, req, res, assetInfo, fn)
         });
 };
 
+module.exports.bindPreviewsToFiles = function(assetInfo, files, fn)
+{
+    var i;
+    var preview;
+    var e;
+    var file;
+
+    if (!assetInfo.previews || !assetInfo.previews.length) {
+        fn(null);
+        return;
+    }
+    if (!files) {
+        e = errors.create('PreviewFileMissing',
+                          'All preview files are missing!');
+        fn(e);
+        return;
+    }
+
+    for (i = 0; i < assetInfo.previews.length; ++i) {
+        preview = assetInfo.previews[i];
+        file = files[preview.file];
+
+        if (!file) {
+            e = errors.create('PreviewFileMissing',
+                              'File ' + preview.file + ' is missing');
+            fn(e);
+            return;
+        }
+        //console.log("Binding " + preview.file + " to " + file.path);
+        //console.log("Name = " + file.name);
+        //console.log("Size = " + file.size);
+        preview.file = file.path;
+        preview.name = file.name;
+        if (!preview.mimetype) {
+            preview.mimetype = file.type;
+        }
+    }
+    fn(null);
+};
 
 module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
 {
@@ -226,7 +272,7 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
                  [req.session.user.id],
                  function(err, result) {
                      if (err || !result.rows || result.rows.length === 0) {
-                         e = errors.create('UploadPartnerInvalid',
+                         e = errors.create('PartnerInvalid',
                                            err ? err.message : '');
                          fn(e, db, req, res, assetInfo);
                          return;
@@ -241,7 +287,7 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
                  [partner, req.session.user.id],
                  function(err, result) {
                      if (err || !result.rows || result.rows.length === 0) {
-                         e = errors.create('UploadPartnerInvalid',
+                         e = errors.create('PartnerInvalid',
                                            err ? err.message : '');
                          fn(e, db, req, res, assetInfo);
                          return;
@@ -278,7 +324,7 @@ function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
             }
             if (!result.rows || result.rows.length !== 1) {
                 if (!assetInfo.published) {
-                    e = errors.create('UpdateAssetMissing',
+                    e = errors.create('AssetMissing',
                                       'Unable to find the update asset ' +
                                       assetInfo.id);
                     fn(e, db, req, res, assetInfo);
@@ -338,5 +384,5 @@ module.exports.findAsset = function(db, req, res, assetInfo, fillIn, fn)
 
     assetInfo.incoming  = false;
     assetInfo.published = false;
-    findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
+    findPublishedAsset(db, req, res, assetInfo, fillIn, fn);
 };

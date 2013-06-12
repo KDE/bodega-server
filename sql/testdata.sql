@@ -50,7 +50,7 @@ insert into stores (id, partner, name, description) values ('KDE-2', ct_partnerI
 insert into stores (id, partner, name, description) values ('DD-1', ct_partnerId('Diamond Devices'), 'Bling Media Center', 'Imaginary hifi for your home');
 insert into stores (id, partner, name, description) values ('DD-2', ct_partnerId('Diamond Devices'), 'Affordaphone', 'Finally a phone even you can afford');
 
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true, 'aquarium');
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true);
 insert into channels (image, store, active, name, description)
     values ('games.png', 'KDE-1', true, 'Games', 'Fun and amusements');
 insert into channels (image, store, active, name, description, parent)
@@ -71,31 +71,32 @@ insert into tags (partner, type, title) values (ct_partnerId('KDE'), 3, 'Card Ga
 insert into tags (partner, type, title) values (ct_partnerId('KDE'), 3, 'Util');
 insert into tags (partner, type, title) values (ct_partnerId('KDE'), 3, 'Misc');
 
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true, 'dice');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Diamond Juice', 'Best app from Diamond to date', '0.1', 'com.diamondevices.juice.plasmoid', 'juice.png', true, 'juice');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), '15 Puzzle', 'The classic puzzle game', '0.1', 'org.kde.15puzzle.plasmoid', '15puzzle.png', true, 'fifteenpuzzle');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Tetris', 'Stacking blocks', '0.1', 'org.kde.tetris.plasmoid', 'tetris.png', true, 'jstetris');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Jewels', 'Connect the jewels', '0.1', 'org.kde.jewels.plasmoid', 'jewels.png', true, 'jewels');
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Diamond Juice', 'Best app from Diamond to date', '0.1', 'com.diamondevices.juice.plasmoid', 'juice.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), '15 Puzzle', 'The classic puzzle game', '0.1', 'org.kde.15puzzle.plasmoid', '15puzzle.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Tetris', 'Stacking blocks', '0.1', 'org.kde.tetris.plasmoid', 'tetris.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Jewels', 'Connect the jewels', '0.1', 'org.kde.jewels.plasmoid', 'jewels.png', true);
 
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker1', 'Poker 1', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker2', 'Poker 2', '0.2', 'org.kde.poker1.plasmoid', 'poker2.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker3', 'Poker 3', '0.3', 'org.kde.poker1.plasmoid', 'poker3.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker4', 'Poker 4', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker5', 'Poker 5', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker6', 'Poker 6', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker7', 'Poker 7', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker8', 'Poker 8', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker9', 'Poker 9', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker10', 'Poker 10', '1.0', 'org.kde.poker1.plasmoid', 'poker1.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker11', 'Poker 11', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker12', 'Poker 12', '0.2', 'org.kde.poker1.plasmoid', 'poker2.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker13', 'Poker 13', '0.3', 'org.kde.poker1.plasmoid', 'poker3.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker14', 'Poker 14', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker15', 'Poker 15', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid) values (1, ct_partnerId('KDE'), 'Poker16', 'Poker 16', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true, 'poker1');
-insert into assets (license, partner, name, description, version, path, image, active, externid, baseprice) values (1, ct_partnerId('KDE'), 'Poker17', 'Poker 17', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true, 'poker1', 500);
-insert into assets (license, partner, name, description, version, path, image, active, externid, baseprice) values (1, ct_partnerId('KDE'), 'Poker18', 'Poker 18', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true, 'poker1', 1000);
-insert into assets (license, partner, name, description, version, path, image, active, externid, baseprice) values (1, ct_partnerId('KDE'), 'Poker19', 'Poker 19', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true, 'poker1', 20000);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker1', 'Poker 1', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker2', 'Poker 2', '0.2', 'org.kde.poker1.plasmoid', 'poker2.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker3', 'Poker 3', '0.3', 'org.kde.poker1.plasmoid', 'poker3.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker4', 'Poker 4', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker5', 'Poker 5', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker6', 'Poker 6', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker7', 'Poker 7', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker8', 'Poker 8', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker9', 'Poker 9', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker10', 'Poker 10', '1.0', 'org.kde.poker1.plasmoid', 'poker1.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker11', 'Poker 11', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker12', 'Poker 12', '0.2', 'org.kde.poker1.plasmoid', 'poker2.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker13', 'Poker 13', '0.3', 'org.kde.poker1.plasmoid', 'poker3.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker14', 'Poker 14', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker15', 'Poker 15', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true);
+insert into assets (license, partner, name, description, version, file, image, active) values (1, ct_partnerId('KDE'), 'Poker16', 'Poker 16', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true);
+insert into assets (license, partner, name, description, version, file, image, active, baseprice) values (1, ct_partnerId('KDE'), 'Poker17', 'Poker 17', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true, 500);
+insert into assets (license, partner, name, description, version, file, image, active, baseprice) values (1, ct_partnerId('KDE'), 'Poker18', 'Poker 18', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true, 1000);
+insert into assets (license, partner, name, description, version, file, image, active, baseprice) values (1, ct_partnerId('KDE'), 'Poker19', 'Poker 19', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true, 20000);
+
 
 insert into assetPreviews (asset, path, mimetype, type, subtype) values (2, 'fishswimming.png',
        'image/png', 'screenshot', '1');

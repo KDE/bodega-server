@@ -61,13 +61,13 @@ var ErrorType = {
     "CardDuplicateTransaction" : 38,//same transaction was just submitted
     "CardProcessingError"    : 39,//error occurred while processing the card
 
-    "UploadPartnerInvalid"   : 40,//the authorized user tried to upload without a valid partner id
+    "PartnerInvalid"         : 40,//the authorized user tried to change asset without a valid partner id
     "UploadFailed"           : 41, //the uploading of the file did not succeed
     "UploadInvalidJson"      : 42, //asset info data was malformed
     "UploadTagError"         : 43, //one of the required tags is missing
     "UploadPreviewError"     : 44, //the asset is missing a preview
     "UploadIconError"        : 45, //the asset is missing an icon
-    "DeleteAssetMissing"     : 46, //the delete asset does not exist
+    "AssetMissing"           : 46, //the given asset doesn't exist'
     "InvalidUrl"             : 47, //the requested url is invalid
 
     "PreviewFileMissing"     : 48, //one of the preview files is missing
@@ -77,6 +77,9 @@ var ErrorType = {
     "AssetMissingIcons"      : 52, //asset is missing the required icons
     "AssetMissingScreenshot" : 53, //asset is missing required screenshot
     "AssetMissingCover"      : 54, //asset is missing required screenshot
+    "AssetInfoMissing"       : 55, //asset info is missing
+    "AssetFileMissing"       : 56, //the specified asset file doesn't exist
+    "InvalidAssetListing"    : 57, //the specified asset listing is invalid
 
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
     "StorePartnerInvalid"    : 61,//the partner provided is incorrect

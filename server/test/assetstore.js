@@ -51,7 +51,7 @@ describe('Asset Store, ', function(){
     describe('Upload', function(){
         it('error on absent file.', function(done){
             app.assetStore.upload("/invalid/file", sampleAsset, function(err) {
-                err.should.have.property('code', 'ENOENT');
+                err.should.have.property('name', 'AssetFileMissing');
                 done();
             });
         });
