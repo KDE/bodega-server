@@ -21,7 +21,7 @@ var errors = require('../errors.js');
 module.exports.listAll = function(db, req, res) {
     /*jshint multistr:true */
     var queryString =
-        'SELECT b.id, b.name, b.public, b.wishlist \
+        'SELECT b.id, b.name, b.public, b.type \
          FROM collections b WHERE b.person = $1        \
          ORDER BY b.name LIMIT $2 OFFSET $3;';
     var defaultPageSize = 25;
@@ -51,14 +51,14 @@ module.exports.listAll = function(db, req, res) {
 module.exports.create = function(db, req, res) {
     /*jshint multistr:true */
     var insertQuery =
-        'INSERT INTO collections (person, name, public, wishlist) \
+        'INSERT INTO collections (person, name, public, type) \
          VALUES ($1, $2, $3, $4) RETURNING id;';
     var searchQuery =
         'SELECT * FROM collections WHERE person = $1 AND name = $2;';
     var defaultPageSize = 25;
     var name = req.body.name;
     var isPublic = utils.parseBool(req.body.public);
-    var isWishList = utils.parseBool(req.body.wishlist);
+    var type = req.body.type;
 
     if (!name) {
         // Name of the collection is missing.
@@ -80,7 +80,7 @@ module.exports.create = function(db, req, res) {
                 return;
             }
             db.query(
-                insertQuery, [req.session.user.id, name, isPublic, isWishList],
+                insertQuery, [req.session.user.id, name, isPublic, type],
                 function(err, result) {
                     if (err || !result.rows || result.rows.length !== 1) {
                         errors.report('Database', req, res, err);
@@ -91,7 +91,7 @@ module.exports.create = function(db, req, res) {
                             id : result.rows[0].id,
                             name : name,
                             public : isPublic,
-                            wishlist : isWishList
+                            type : type
                         }];
                     res.json(json);
                 });
@@ -142,7 +142,7 @@ module.exports.remove = function(db, req, res) {
 module.exports.listAssets = function(db, req, res) {
     /*jshint multistr:true */
     var collectionQuery =
-        'SELECT b.id, b.name, b.public, b.wishlist \
+        'SELECT b.id, b.name, b.public, b.type \
          FROM collections b WHERE b.person = $1 AND b.id = $2;';
     var assetsQuery =
         'SELECT DISTINCT a.id, a.license, partners.id as partnerId, \
@@ -180,7 +180,7 @@ module.exports.listAssets = function(db, req, res) {
                 id : result.rows[0].id,
                 name : result.rows[0].name,
                 public : result.rows[0].public,
-                wishlist : result.rows[0].wishlist,
+                type : result.rows[0].type,
                 assets : []
             };
 
@@ -206,7 +206,7 @@ module.exports.listAssets = function(db, req, res) {
 module.exports.addAsset = function(db, req, res) {
     /*jshint multistr:true */
     var collectionQuery =
-        'SELECT b.id, b.name, b.public, b.wishlist \
+        'SELECT b.id, b.name, b.public, b.type \
          FROM collections b WHERE b.person = $1 AND b.id = $2;';
     var assetsQuery =
         'SELECT bc.asset as assetId FROM collectionsContent bc \
@@ -246,7 +246,7 @@ module.exports.addAsset = function(db, req, res) {
                 id : result.rows[0].id,
                 name : result.rows[0].name,
                 public : result.rows[0].public,
-                wishlist : result.rows[0].wishlist
+                type : result.rows[0].type
             };
 
             db.query(
@@ -278,7 +278,7 @@ module.exports.addAsset = function(db, req, res) {
 module.exports.removeAsset = function(db, req, res) {
     /*jshint multistr:true */
     var collectionQuery =
-        'SELECT b.id, b.name, b.public, b.wishlist \
+        'SELECT b.id, b.name, b.public, b.type \
          FROM collections b WHERE b.person = $1 AND b.id = $2;';
     var assetsQuery =
         'SELECT bc.asset as assetId FROM collectionsContent bc \
@@ -318,7 +318,7 @@ module.exports.removeAsset = function(db, req, res) {
                 id : result.rows[0].id,
                 name : result.rows[0].name,
                 public : result.rows[0].public,
-                wishlist : result.rows[0].wishlist
+                type : result.rows[0].type
             };
 
             db.query(

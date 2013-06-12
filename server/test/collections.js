@@ -102,7 +102,11 @@ describe('Collections', function(){
 
     describe('After authentication', function(){
         it('should create', function(done){
-            var params = { name: collectionName };
+            var params = {
+                name: collectionName,
+                public: true,
+                type: 'wishlist'
+            };
             utils.postUrl(
                 server,
                 '/bodega/v1/json/collection/create',
@@ -116,6 +120,8 @@ describe('Collections', function(){
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(1);
                     res.body.collections[0].should.have.property('name', collectionName);
+                    res.body.collections[0].should.have.property('public', true);
+                    res.body.collections[0].should.have.property('type', 'wishlist');
                     done();
                 },
                 cookie);
@@ -138,8 +144,8 @@ describe('Collections', function(){
                         collections[i].should.have.property('id');
                         if (collections[i].name === collectionName) {
                             collections[i].should.have.property('name', collectionName);
-                            collections[i].should.have.property('public', false);
-                            collections[i].should.have.property('wishlist', false);
+                            collections[i].should.have.property('public', true);
+                            collections[i].should.have.property('type', 'wishlist');
                             collectionId = res.body.collections[i].id;
                         }
                     }
@@ -164,8 +170,8 @@ describe('Collections', function(){
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
                         res.body.collection.should.have.property('name', collectionName);
-                        res.body.collection.should.have.property('public', false);
-                        res.body.collection.should.have.property('wishlist', false);
+                        res.body.collection.should.have.property('public', true);
+                        res.body.collection.should.have.property('type', 'wishlist');
                         ++addedAssets;
                         if (addedAssets === assets.length) {
                             done();
@@ -211,8 +217,8 @@ describe('Collections', function(){
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
                         res.body.collection.should.have.property('name', collectionName);
-                        res.body.collection.should.have.property('public', false);
-                        res.body.collection.should.have.property('wishlist', false);
+                        res.body.collection.should.have.property('public', true);
+                        res.body.collection.should.have.property('type', 'wishlist');
                         ++removedAssets;
                         if (removedAssets === assetsToRemove.length) {
                             done();
@@ -258,8 +264,8 @@ describe('Collections', function(){
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
                         res.body.collection.should.have.property('name', collectionName);
-                        res.body.collection.should.have.property('public', false);
-                        res.body.collection.should.have.property('wishlist', false);
+                        res.body.collection.should.have.property('public', true);
+                        res.body.collection.should.have.property('type', 'wishlist');
                         ++addedAssets;
                         if (addedAssets === assetsToRemove.length) {
                             done();
@@ -331,7 +337,7 @@ describe('Collections', function(){
                                app.config.database.name;
 
         pg.connect(connectionString, function(err, client, finis) {
-                   client.query('delete from cllections where name = $1', [ collectionName ],
+                   client.query('delete from collections where name = $1', [ collectionName ],
                    function(err, result) {
                            done();
                    });

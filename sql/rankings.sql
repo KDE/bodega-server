@@ -5,7 +5,7 @@ create table collections
     person          int         not null references people(id) on delete cascade,
     name            text        not null,
     public          bool        default false,
-    wishlist        bool        default false -- means assets in it haven't been bought
+    type            text
 );
 
 -- drop table collectionsContent;
