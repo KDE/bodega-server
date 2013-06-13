@@ -30,9 +30,15 @@ All commands that follow are done relative to the server/ directory.
 
 ## Node setup and module Installation
 
+The npm application takes care of install all the required modules, which are listed in the
+package.json file. Simply run:
+
    $ npm install
 
-Move config.json.sample to config.json and update/edit it if necessary.
+If you are planning on extending bodega-server, then running the test suite will be a necessity and
+you will want to install the development dependencies as well:
+
+   $ npm --dev install
 
 ## Configuration
 
