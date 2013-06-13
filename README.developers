@@ -65,9 +65,13 @@ adapted for Javascript. In brief, that means:
 Consistency is of vital importance to future maintenance of the codebase
 and code that does not follow the coding style will not be accepted into master.
 
-The codebase should also pass the pedantic style checker which can be launched:
+## Checking if things are Good
+
+The codebase should also pass the pedantic style checker which can be launched
+thusly:
 
 
     $ cd server/
     $ make check
 
+We use JSHint, documentation for which can be found here: http://www.jshint.com
