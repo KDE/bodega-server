@@ -353,7 +353,7 @@ function updateChannel(partner, store, db, req, res)
 
 function deleteChannel(partner, store, db, req, res)
 {
-    var channelId = utils.parseNumber(req.params.channelId);
+    var channelId = utils.parseNumber(req.params.channel);
 
     if (channelId > 0) {
         db.query('delete from channels where id = $1 and store = $2;', [channelId, store],
