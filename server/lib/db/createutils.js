@@ -19,28 +19,25 @@ var async = require('async');
 var errors = require('../errors.js');
 var path = require('path');
 
-function associateTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount, cb)
+function associateTag(db, req, res, assetInfo, tagInfo, cb)
 {
     var tagQuery =
             'insert into incomingAssetTags (asset, tag) values ($1, $2);';
-    var atEnd = (tagIdx === (tagCount - 1));
     var e;
     db.query(
         tagQuery, [assetInfo.id, tagInfo.tagId],
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
-                cb(e, db, req, res, assetInfo);
+                cb(e, db, req, res, assetInfo, tagInfo);
                 return;
             }
             //process next tag
-            ++tagIdx;
-            cb(null, db, req, res, assetInfo,
-               tagIdx, tagCount);
+            cb(null, db, req, res, assetInfo, tagInfo);
         });
 }
 
-function recordTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount, cb)
+function recordTag(db, req, res, assetInfo, tagInfo, cb)
 {
     var insertTagQuery =
             'insert into tags (partner, type, title) values ($1, $2, $3) returning id;';
@@ -50,55 +47,49 @@ function recordTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount, cb)
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
-                cb(e, db, req, res, assetInfo, tagIdx, tagCount);
+                cb(e, db, req, res, assetInfo, tagInfo);
                 return;
             }
             if (result && result.rows.length > 0) {
                 tagInfo.tagId = result.rows[0].id;
                 associateTag(db, req, res, assetInfo,
-                             tagInfo, tagIdx, tagCount, cb);
+                             tagInfo, cb);
             } else {
                 e = errors.create(
                     'NoMatch',
                     "Tag '" + tagInfo.type + "'doesn't exist!");
-                cb(e, db, req, res, assetInfo, tagIdx, tagCount);
+                cb(e, db, req, res, assetInfo, tagInfo);
                 return;
             }
         });
 }
 
-
-function findTag(db, req, res, assetInfo, tagInfo, tagIdx, tagCount, cb)
+function findTag(db, req, res, assetInfo, tagInfo, cb)
 {
     var findTagQuery =
-            'select id from tags where type = $1 and title = $2;';
+            'select id from tags where partner = $1 and type = $2 and title = $3;';
     var e;
     db.query(
         findTagQuery, [assetInfo.partner, tagInfo.typeId, tagInfo.title],
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
-                cb(e, db, req, res, assetInfo, tagIdx, tagCount);
+                cb(e, db, req, res, assetInfo, tagInfo);
                 return;
             }
             if (result && result.rows.length > 0) {
                 tagInfo.tagId = result.rows[0].id;
                 associateTag(db, req, res, assetInfo,
-                             tagInfo, tagIdx, tagCount, cb);
+                             tagInfo, cb);
             } else {
-                e = errors.create(
-                    'NoMatch',
-                    "Tag '" + tagInfo.type + "'doesn't exist!");
-                cb(e, db, req, res, assetInfo, tagIdx, tagCount);
-                return;
+                recordTag(db, req, res, assetInfo,
+                          tagInfo, cb);
             }
         });
 }
 
-
-function setupTag(db, req, res, assetInfo, tagIdx, tagCount, cb)
+function setupTag(db, req, res, assetInfo, tagInfo, cb)
 {
-    var tagInfo = assetInfo.tags[tagIdx];
     var tagIdQuery =
             "select id from tagtypes t where t.type=$1;";
     var e;
@@ -107,18 +98,17 @@ function setupTag(db, req, res, assetInfo, tagIdx, tagCount, cb)
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
-                cb(e, db, req, res, assetInfo, tagIdx, tagCount);
+                cb(e, db, req, res, assetInfo, tagInfo);
                 return;
             }
             if (result && result.rows.length > 0) {
                 tagInfo.typeId = result.rows[0].id;
-                recordTag(db, req, res, assetInfo, tagInfo,
-                          tagIdx, tagCount, cb);
+                findTag(db, req, res, assetInfo, tagInfo, cb);
             } else {
                 e = errors.create(
                     'NoMatch',
                     "Tag '" + tagInfo.type + "'doesn't exist!");
-                cb(e, db, req, res, assetInfo, tagIdx, tagCount);
+                cb(e, db, req, res, assetInfo, tagInfo);
                 return;
             }
         }
@@ -127,22 +117,11 @@ function setupTag(db, req, res, assetInfo, tagIdx, tagCount, cb)
 
 module.exports.setupTags = function(db, req, res, assetInfo, fn)
 {
-    var keys = Object.keys(assetInfo.tags);
-    var tagIdx = 0;
-    var tagCount = keys.length;
-    var funcs = [function(cb) {
-        cb(null, db, req, res, assetInfo, 0, tagCount);
-    }];
-
-    for (tagIdx = 0; tagIdx < tagCount; ++tagIdx) {
-        funcs.push(setupTag);
-    }
-
-    async.waterfall(
-        funcs, function(err, db, req, res, assetInfo, tagIdx, tagCount) {
-            //console.log(err);
-            fn(err, db, req, res, assetInfo);
-        });
+    async.each(assetInfo.tags, function(tag, callback) {
+        setupTag(db, req, res, assetInfo, tag, callback);
+    }, function(err) {
+        fn(err, db, req, res, assetInfo);
+    });
 };
 
 function recordPreview(db, req, res, assetInfo, previewPath,
