@@ -20,6 +20,7 @@ INSERT INTO tagTypes (type) VALUES ('genre');
 INSERT INTO tagTypes (type) VALUES ('publisher');
 INSERT INTO tagTypes (type) VALUES ('url');
 INSERT INTO tagTypes (type) VALUES ('isbn');
+INSERT INTO tagTypes (type) VALUES ('platform');
 
 INSERT INTO tags (type, title) VALUES (7, 'application/x-plasma');
 
@@ -31,16 +32,16 @@ INSERT INTO tags (type, title) VALUES (8, 'Mature');
 INSERT INTO tags (type, title) VALUES (8, 'Adults Only');
 
 
-INSERT INTO tags (type, title) VALUES (9, 'article');
-INSERT INTO tags (type, title) VALUES (9, 'application');
-INSERT INTO tags (type, title) VALUES (9, 'audio');
-INSERT INTO tags (type, title) VALUES (9, 'audiobook');
-INSERT INTO tags (type, title) VALUES (9, 'book');
-INSERT INTO tags (type, title) VALUES (9, 'game');
-INSERT INTO tags (type, title) VALUES (9, 'magazine');
-INSERT INTO tags (type, title) VALUES (9, 'movie');
-INSERT INTO tags (type, title) VALUES (9, 'tvshow');
-INSERT INTO tags (type, title) VALUES (9, 'wallpaper');
+INSERT INTO tags (type, title) SELECT id, 'article' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'application' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'audio' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'audiobook' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'book' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'game' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'magazine' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'movie' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'tvshow' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECt id, 'wallpaper' FROM tagtypes WHERE type = 'assetType';
 
 INSERT INTO licenses (name, text) VALUES ('GPL', '');
 INSERT INTO licenses (name, text) VALUES ('LGPL', '');
