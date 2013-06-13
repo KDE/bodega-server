@@ -202,7 +202,7 @@ BEGIN
     select id into favoriteCollectionId from collections where person=personId and name='favorites';
     IF NOT FOUND THEN
        insert into collections (person, name, public, type)
-                        VALUES (personId, 'favorites', false, 'wishlist');
+                        VALUES (personId, 'favorites', false, null);
        select id into favoriteCollectionId from collections where person=personId and name='favorites';
     END IF;
 
