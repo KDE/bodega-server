@@ -319,7 +319,8 @@ function updateChannel(partner, store, db, req, res)
     }
 
     var channelId = utils.parseNumber(req.params.channel);
-
+console.log(req.body.channel)
+console.log(req.params.channel);
     if (channelId > 0) {
         var channelParent = utils.parseNumber(req.body.channel.parent);
         var channelName = req.body.channel.name;
