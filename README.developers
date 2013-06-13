@@ -1,0 +1,73 @@
+Thinking of extending Bodega with more features, fixing bugs in it or improving
+performance? Excellent!
+
+# Community
+
+Other Bodega developers can be found via the following means online:
+
+    active@kde.org: Mailing list for discussion of Plasma Active, including Bodega
+    #active on irc.freenode.net
+
+We use http://bugs.kde.org to track feature and bug reports under the Bodega product
+and http://reviewboard.kde.org to review patches.
+
+# Development Workflow
+
+The goal is simple: the master branch should always be usable to host a Bodega
+instance. To reach that goal, the following workflow has been adopted.
+
+## The almighty test suite
+
+All new code in Bodega must be accompanied by a unit test. You will find the test
+suite in server/test/ and it can be run by:
+
+    $ cd server/
+    $ make test
+
+Before code can be merged into master, the test suite must pass in its entirety.
+
+## Branches are the new black
+
+All new feature development and all but the most trivial of bug fixes must be done
+in a branch. The branch should be named descriptively so it is obvious what it
+contains. Creating a branch is easy:
+
+    $ git checkout -b aGreatNewFeature
+
+When ready, pushing that branch to the server is equally easy:
+
+    $ git push --set-upstream origin aGreatNewFeature
+
+When it is ready to be considered for merging into master, drop an email to
+active@kde.org noting this is the case. You can also post a review request at:
+
+    http://reviewboard.kde.org
+
+Typically, branches will first be merged into the *integration* branch by the
+repository maintainer for further testing before being merged into master.
+
+If you need a developer account to push to git.kde.org, visit
+http://identity.kde.org to set up an account and ask one of the other Bodega
+developers for a recommendation for an account upgrade to commiter status.
+
+Of course, we use git which is inherently decentralized, so you can also
+work in a clone hosted elsewhere if that's more your speed.
+
+# Coding Style
+
+We use the [KDE Library coding style](http://techbase.kde.org/Policies/Kdelibs_Coding_Style)
+adapted for Javascript. In brief, that means:
+
+    * Indentation: 4 spaces (no tabs)
+    * All blocks gets {}, even one liners
+    * CamelCase is in effect
+
+Consistency is of vital importance to future maintenance of the codebase
+and code that does not follow the coding style will not be accepted into master.
+
+The codebase should also pass the pedantic style checker which can be launched:
+
+
+    $ cd server/
+    $ make check
+

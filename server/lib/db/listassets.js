@@ -84,7 +84,6 @@ function findPostedAssets(db, req, res, assetInfo, assets, cb)
 
 function checkIfIsContentCreator(db, req, res, assetInfo, assets, cb)
 {
-    
     createUtils.isContentCreator(
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
@@ -100,7 +99,6 @@ function checkIfIsContentCreator(db, req, res, assetInfo, assets, cb)
 
 function checkIfIsValidator(db, req, res, assetInfo, assets, cb)
 {
-    
     createUtils.isValidator(
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
@@ -137,7 +135,7 @@ module.exports = function(db, req, res) {
     } else {
         funcs.push(checkIfIsContentCreator);
     }
-    
+
     switch (req.params.type) {
     case 'all':
         funcs.push(findPublishedAssets);

@@ -848,6 +848,8 @@ var PreviewStore = (function() {
                 if (h < h1) {
                     yoffset = (h1-h)/2;
                 }
+
+                //jshint -W024
                 gm(fromPath)
                     .quality(100)
                     .in("-size", w1+"x"+h1)
@@ -889,8 +891,8 @@ var PreviewStore = (function() {
 
         async.waterfall(funcs, function(err, assetInfo, icons, i) {
             fn(err);
-        });
-    };
+    });
+};
 
     PreviewStore.prototype.generateScaledIcons = function(assetInfo, fn) {
     };
