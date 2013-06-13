@@ -296,6 +296,12 @@ app.post(serverPath('asset/post/:assetId'), isAuthorized,
              app.db.postAsset(req, res);
          });
 
+app.post(serverPath('asset/publish/:assetId'), isAuthorized,
+         function(req, res) {
+             //console.log(req.query);
+             app.db.publishAsset(req, res);
+         });
+
 app.get(serverPath('asset/list/:type?*'), isAuthorized,
         function(req, res) {
             //console.log(req.query);

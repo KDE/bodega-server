@@ -408,6 +408,38 @@
           ]
         },
         {
+          "MethodName": "Post",
+          "read-only": "true",
+          "Synopsis": "Posts an assets, i.e. declares it ready for a review. Note that assets can't be edited for as long as the posted status is set.",
+          "HTTPMethod": "POST",
+          "URI": "/asset/post/:assetId",
+          "parameters": [
+            {
+              "Name": "assetId",
+              "Location": "URL",
+              "Description": "Post an asset owned by you",
+              "Required": "Y",
+              "Type": "number"
+            }
+          ]
+        },
+        {
+          "MethodName": "Publish",
+          "read-only": "true",
+          "Synopsis": "Publishes a posted asset to the store. Only store validators can publish assets.",
+          "HTTPMethod": "POST",
+          "URI": "/asset/publish/:assetId",
+          "parameters": [
+            {
+              "Name": "assetId",
+              "Location": "URL",
+              "Description": "Publishes an asset if you are a validator.",
+              "Required": "Y",
+              "Type": "number"
+            }
+          ]
+        },
+        {
           "MethodName": "Update",
           "read-only": "true",
           "Synopsis": "Updates an asset owned by you. Otherwise identical to create.",
