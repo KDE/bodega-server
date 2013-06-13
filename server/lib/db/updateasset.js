@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2013 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@ var errors = require('../errors.js');
 var createUtils = require('./createutils.js');
 var fs = require('fs');
 var path = require('path');
+var async = require('async');
 
 function sendResponse(db, req, res, assetInfo)
 {
@@ -30,6 +31,44 @@ function sendResponse(db, req, res, assetInfo)
         name : assetInfo.name
     };
     res.send(json);
+}
+
+function setupTags(db, req, res, assetInfo, cb)
+{
+    var e;
+    if (assetInfo.tags) {
+        createUtils.setupTags(
+            db, req, res, assetInfo,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    e = errors.create('UploadTagError', err.message);
+                    cb(e, db, req, res, assetInfo);
+                    return;
+                }
+                cb(null, db, req, res, assetInfo);
+            });
+    } else {
+        cb(null, db, req, res, assetInfo);
+    }
+}
+
+function setupPreviews(db, req, res, assetInfo, cb)
+{
+    var e;
+    if (assetInfo.previews) {
+        createUtils.setupPreviews(
+            db, req, res, assetInfo,
+            function(err) {
+                if (err) {
+                    e = errors.create('UploadPreviewError', err.message);
+                    cb(e, db, req, res, assetInfo);
+                    return;
+                }
+                cb(null, db, req, res, assetInfo);
+            });
+    } else {
+        cb(null, db, req, res, assetInfo);
+    }
 }
 
 function addToStr(q, hash, value)
@@ -54,14 +93,13 @@ function buildQueryString(assetInfo)
         inserted  : 0
     };
 
-    //id, license, baseprice, name, description, version, path, file
     addToStr(q, assetInfo, 'license');
     addToStr(q, assetInfo, 'baseprice');
     addToStr(q, assetInfo, 'name');
     addToStr(q, assetInfo, 'description');
     addToStr(q, assetInfo, 'version');
+    addToStr(q, assetInfo, 'externpath');
     addToStr(q, assetInfo, 'file');
-    addToStr(q, assetInfo, 'publish');
     addToStr(q, assetInfo, 'size');
 
     q.insertStr += ")";
@@ -79,80 +117,226 @@ function buildQueryString(assetInfo)
     return queryStr;
 }
 
-function updateIncomingAsset(db, req, res, assetInfo)
+function writeIncomingAsset(db, req, res, assetInfo, cb)
 {
     var queryStr = buildQueryString(assetInfo);
 
     if (!queryStr) {
-        sendResponse(db, req, res, assetInfo);
+        cb(null, db, req, res, assetInfo);
         return;
     }
 
     db.query(queryStr, [], function(err, result) {
+        var e;
         if (err) {
-            errors.report('Database', req, res, err);
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+function updateIncomingAsset(db, req, res, assetInfo)
+{
+    var funcs = [function(cb) {
+        cb(null, db, req, res, assetInfo);
+    }];
+
+    funcs.push(writeIncomingAsset);
+    funcs.push(setupTags);
+    funcs.push(setupPreviews);
+
+    async.waterfall(funcs, function(err, db, req, res, assetInfo) {
+        if (err) {
+            errors.report(err.name, req, res, err);
             return;
         }
         sendResponse(db, req, res, assetInfo);
     });
 }
 
-function setupTags(db, req, res, assetInfo)
+
+function endTransaction(db, req, res, assetInfo, cb)
 {
-    if (assetInfo.tags) {
-        createUtils.setupTags(
-            db, req, res, assetInfo,
-            function(err, db, req, res, assetInfo) {
-                if (err) {
-                    errors.report('UploadTagError',
-                                  req, res, err);
-                    return;
-                }
-                sendResponse(db, req, res, assetInfo);
-            });
-    } else {
-        sendResponse(db, req, res, assetInfo);
-    }
+    var query = "END;";
+    var e;
+
+    var q = db.query(query, [], function(err, result) {
+        var i;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
 }
 
-function setupPreviews(db, req, res, assetInfo)
+function duplicateTag(db, req, res, assetInfo, tag, callback)
 {
-    if (assetInfo.previews) {
-        createUtils.setupPreviews(
-            db, req, res, assetInfo,
-            function(err, db, req, res, assetInfo) {
-                if (err) {
-                    errors.report('UploadPreviewError', req, res, err);
-                    return;
-                }
-                setupTags(db, req, res, assetInfo);
-            });
-    } else {
-        setupTags(db, req, res, assetInfo);
-    }
+    var query = 'insert into assetTags (asset, tag) values ($1, $2);';
+    var args = [tag.asset, tag.tag];
+    var e;
+
+    db.query(query, args, function(err, result) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            callback(e);
+            return;
+        }
+        callback(null);
+    });
 }
 
-function updatePublishedAsset(db, req, res, assetInfo)
+function duplicateTags(db, req, res, assetInfo, cb)
+{
+    async.each(assetInfo.tags, function(tag, callback) {
+        duplicateTag(db, req, res, assetInfo, tag, callback);
+    }, function(err) {
+        cb(err, db, req, res, assetInfo);
+    });
+}
+
+function findTags(db, req, res, assetInfo, cb)
+{
+    var query =  "SELECT tagTypes.type, tags.title, a.asset, a.tag \
+    FROM assetTags a JOIN tags ON (a.tag = tags.id) \
+    LEFT JOIN tagTypes ON (tags.type = tagTypes.id) where a.asset = $1;";
+    var e;
+
+    db.query(query, [assetInfo.id], function (err, result) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        assetInfo.tags = result.rows;
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+function duplicatePreview(db, req, res, assetInfo, preview, callback)
+{
+    var query = 'insert into assetPreviews (asset, path, mimetype, \
+    type, subtype) values ($1, $2, $3, $4, $5);';
+    var args = [preview.asset, preview.path, preview.mimetype,
+                preview.type, preview.subtype];
+    var e;
+
+    db.query(query, args, function(err, result) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            callback(e);
+            return;
+        }
+        app.previewStore.copyPreview(assetInfo, preview, function(err) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            callback(null);
+        });
+    });
+}
+
+function duplicatePreviews(db, req, res, assetInfo, cb)
+{
+    async.each(assetInfo.previews, function(preview, callback) {
+        duplicatePreview(db, req, res, assetInfo, preview, callback);
+    }, function(err) {
+        cb(err, db, req, res, assetInfo);
+    });
+}
+
+function findPreviews(db, req, res, assetInfo, cb)
+{
+    var query = "select * from assetPreviews where asset=$1;";
+    var e;
+
+    db.query(query, [assetInfo.id], function (err, result) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        assetInfo.previews = result.rows;
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+function duplicatePublishedAsset(db, req, res, assetInfo, cb)
 {
     var incomingAssetQuery =
             "insert into incomingAssets (id, license, partner, baseprice, \
-                                         name, description, version, versionts, \
-                                         path, file, size, image, publish)\
+                                         name, description, version,  \
+                                         versionts, externpath, file, \
+                                         size, image, posted)\
                                          values ($1, $2, $3, $4, $5, $6, $7, \
                                                  $8, $9, $10, $11, $12, false)";
 
     db.query(
-        incomingAssetQuery, [assetInfo.id, assetInfo.license, assetInfo.partner,
-                             assetInfo.baseprice, assetInfo.name, assetInfo.description,
-                             assetInfo.version, assetInfo.versionts, assetInfo.path,
-                             assetInfo.file, assetInfo.size, assetInfo.image],
+        incomingAssetQuery, [assetInfo.id, assetInfo.license,
+                             assetInfo.partner, assetInfo.baseprice,
+                             assetInfo.name, assetInfo.description,
+                             assetInfo.version, assetInfo.versionts,
+                             assetInfo.externpath, assetInfo.file,
+                             assetInfo.size, assetInfo.image],
         function (err, result) {
+            var e;
             if (err) {
-                errors.report('Database', req, res, err);
+                e = errors.create('Database', err.message);
+                cb(e, db, req, res, assetInfo);
                 return;
             }
-            updateIncomingAsset(db, req, res, assetInfo);
+            app.assetStore.copyAsset(assetInfo, function(err) {
+                if (err) {
+                    cb(err, db, req, res, assetInfo);
+                    return;
+                }
+                cb(null, db, req, res, assetInfo);
+            });
         });
+}
+
+
+function beginTransaction(db, req, res, assetInfo, cb)
+{
+    var query = "BEGIN;";
+    var e;
+
+    var q = db.query(query, [], function(err, result) {
+        var i;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+function updatePublishedAsset(db, req, res, assetInfo)
+{
+    var funcs = [function(cb) {
+        cb(null, db, req, res, assetInfo.publishedAsset);
+    }];
+
+    funcs.push(beginTransaction);
+    funcs.push(duplicatePublishedAsset);
+    funcs.push(findPreviews);
+    funcs.push(duplicatePreviews);
+    funcs.push(findTags);
+    funcs.push(duplicateTags);
+    funcs.end(endTransaction);
+
+    async.waterfall(funcs, function(err) {
+        if (err) {
+            errors.report(err.name, req, res, err);
+            return;
+        }
+        updateIncomingAsset(db, req, res, assetInfo);
+    });
 }
 
 function processInfo(assetInfo, db, req, res)
@@ -191,7 +375,6 @@ function processInfo(assetInfo, db, req, res)
                         errors.report('AssetPosted', req, res, err);
                         return;
                     }
-                    
                     if (assetInfo.incoming) {
                         updateIncomingAsset(db, req, res, assetInfo);
                     } else {
@@ -228,4 +411,3 @@ module.exports = function(db, req, res) {
         return;
     }
 };
-

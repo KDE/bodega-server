@@ -407,6 +407,28 @@ var AssetStore = (function() {
         }
     };
 
+    AssetStore.prototype.copyAsset = function(assetInfo, preview, cb) {
+        var fromPath;
+        var toPath;
+        var incoming = assetInfo.incoming;
+
+        assetInfo.incoming = false;
+        fromPath = pathForAsset(assetInfo);
+        assetInfo.incoming = true;
+        toPath = pathForAsset(assetInfo);
+        assetInfo.incoming = incoming;
+
+        utils.copyFile(fromPath, toPath, function(err) {
+            var e;
+            if (err) {
+                e = errors.create('AssetFileMissing', err.message);
+                cb(e);
+                return;
+            }
+            cb(null);
+        });
+    };
+
     return AssetStore;
 })();
 

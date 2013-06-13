@@ -410,7 +410,7 @@ var PreviewStore = (function() {
     function iconRelativePath(assetInfo, icon) {
         var extension;
         var prefix = '';
-        
+
         if (!assetInfo.id || !icon || (!icon.file && !icon.path)) {
             return null;
         }
@@ -445,7 +445,7 @@ var PreviewStore = (function() {
                                      assetInfo.id.toString(),
                                      iconSizes[preview.subtype].toString(),
                                      path.basename(relPath));
-                                     
+
             } else {
                 basePath = fullPreviewPaths.icons[preview.subtype];
                 fullPath = path.join(basePath, relPath);
@@ -841,7 +841,7 @@ var PreviewStore = (function() {
                     w1 = bigger;
                     h1 = bigger;
                 }
-                
+
                 if (w < w1) {
                     xoffset = (w1 - w)/2;
                 }
@@ -886,7 +886,7 @@ var PreviewStore = (function() {
                 funcs.push(generateIcon);
             }
         }
-        
+
         async.waterfall(funcs, function(err, assetInfo, icons, i) {
             fn(err);
         });
@@ -1008,6 +1008,21 @@ var PreviewStore = (function() {
         funcs.push(publishPreviews);
         async.waterfall(funcs, function(err, assetInfo, assetPaths, prevs) {
             fn(err);
+        });
+    };
+
+    PreviewStore.prototype.copyPreview = function(assetInfo, preview, cb) {
+        var fromPath = previewFullPath(assetInfo, preview, false);
+        var toPath = previewFullPath(assetInfo, preview, true);
+
+        utils.copyFile(fromPath, toPath, function(err) {
+            var e;
+            if (err) {
+                e = errors.create('PreviewFileMissing', err.message);
+                cb(e);
+                return;
+            }
+            cb(null);
         });
     };
 

@@ -159,6 +159,12 @@ describe('Asset manipulation', function(){
                       [{
                           "name" : "info",
                           "filename" : "sampleasset/sample-info-update1.json"
+                      }, {
+                          "name" : "cover.jpg",
+                          "filename" : "sampleasset/cover.jpg"
+                      }, {
+                          "name" : "sample-1.png",
+                          "filename" : "sampleasset/sample-1.png"
                       }], cookie,
                       function(res) {
                           res.body.should.have.property('authStatus', true);

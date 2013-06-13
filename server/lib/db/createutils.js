@@ -146,10 +146,8 @@ module.exports.setupTags = function(db, req, res, assetInfo, fn)
 };
 
 function recordPreview(db, req, res, assetInfo, previewPath,
-                       previewIdx, previewCount, cb)
+                       previewInfo, cb)
 {
-    var atEnd = (previewIdx === (previewCount - 1));
-    var previewInfo = assetInfo.previews[previewIdx];
     var newPreviewQuery = 'insert into incomingAssetPreviews (asset, path, mimetype, type, subtype) values ($1, $2, $3, $4, $5)';
     var e;
 
@@ -158,34 +156,23 @@ function recordPreview(db, req, res, assetInfo, previewPath,
              function(err, result) {
                  if (err) {
                      e = errors.create('Database', err.message);
-                     cb(e, db, req, res, assetInfo, previewIdx, previewCount);
+                     cb(e, db, req, res, assetInfo, previewInfo);
                      return;
                  }
-                 ++previewIdx;
-                 cb(null, db, req, res, assetInfo,
-                    previewIdx, previewCount);
+                 cb(null, db, req, res, assetInfo, previewInfo);
              });
 }
 
-/**
- * setupPreview is recursive through recordPreview because we want
- * to make sure that the error stops the entire chain. with a for
- * loop that would be impossible because each iteration of the for 
- * loop would invoke an asynchronous function, essentially making
- * them all run in parallel.
- */
-function setupPreview(db, req, res, assetInfo, previewIdx, previewCount, cb)
+function setupPreview(db, req, res, assetInfo, previewInfo, cb)
 {
-    var keys = Object.keys(assetInfo.previews);
-    var previewInfo = assetInfo.previews[previewIdx];
     var e;
     var previewPath;
 
     if (!previewInfo) {
         e = errors.create('UploadPreviewError',
-                          'Preview ' + previewIdx + ' is missing.');
+                          'Preview is missing.');
         //console.log("error due to bad rename?");
-        cb(e, db, req, res, assetInfo, previewIdx, previewCount);
+        cb(e, db, req, res, assetInfo, previewInfo);
         return;
     }
 
@@ -199,30 +186,19 @@ function setupPreview(db, req, res, assetInfo, previewIdx, previewCount, cb)
     previewPath = app.previewStore.previewRelativePath(assetInfo,
                                                        previewInfo);
     recordPreview(db, req, res, assetInfo, previewPath,
-                  previewIdx, previewCount, cb);
+                  previewInfo, cb);
 }
 
-module.exports.setupPreviews = function(db, req, res, assetInfo, fn)
+function recordPreviews(db, req, res, assetInfo, fn)
 {
-    var keys = Object.keys(assetInfo.previews);
-    var previewIdx = 0;
-    var previewCount = keys.length;
-    var funcs = [function(cb) {
-        cb(null, db, req, res, assetInfo, 0, previewCount);
-    }];
+    async.each(assetInfo.previews, function(preview, callback) {
+        setupPreview(db, req, res, assetInfo, preview, callback);
+    }, function(err) {
+        fn(err, db, req, res, assetInfo);
+    });
+}
 
-    for (previewIdx = 0; previewIdx < previewCount; ++previewIdx) {
-        funcs.push(setupPreview);
-    }
-
-    async.waterfall(
-        funcs,
-        function(err, db, req, res, assetInfo, previewIdx, previewCount) {
-            fn(err, db, req, res, assetInfo);
-        });
-};
-
-module.exports.bindPreviewsToFiles = function(assetInfo, files, fn)
+function bindPreviewsToFiles(assetInfo, files, fn)
 {
     var i;
     var preview;
@@ -260,7 +236,9 @@ module.exports.bindPreviewsToFiles = function(assetInfo, files, fn)
         }
     }
     fn(null);
-};
+}
+
+module.exports.bindPreviewsToFiles = bindPreviewsToFiles;
 
 module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
 {
@@ -348,39 +326,6 @@ function mergeObjects(a, b)
     return a;
 }
 
-function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
-{
-    var q = "select * from incomingAssets where id = $1 and partner = $2;";
-    var e;
-    db.query(
-        q, [assetInfo.id, assetInfo.partner],
-        function(err, result) {
-            if (err) {
-                e = errors.create('Database', err.message);
-                fn(e, db, req, res, assetInfo);
-                return;
-            }
-            if (!result.rows || result.rows.length !== 1) {
-                if (!assetInfo.published) {
-                    e = errors.create('AssetMissing',
-                                      'Unable to find the update asset ' +
-                                      assetInfo.id);
-                    fn(e, db, req, res, assetInfo);
-                } else {
-                    fn(null, db, req, res, assetInfo);
-                }
-            } else {
-                if (fillIn) {
-                    assetInfo = mergeObjects(assetInfo, result.rows[0]);
-                }
-                assetInfo.incoming = true;
-                fn(null, db, req, res, assetInfo);
-            }
-        }
-    );
-}
-
-
 function findPublishedAsset(db, req, res, assetInfo, fillIn, fn)
 {
     var q = "select * from assets where id = $1 and partner = $2;";
@@ -394,14 +339,71 @@ function findPublishedAsset(db, req, res, assetInfo, fillIn, fn)
                 return;
             }
             if (!result.rows || result.rows.length !== 1) {
-                findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
+                e = errors.create('AssetMissing',
+                                  'Unable to find the update asset ' +
+                                  assetInfo.id);
+                fn(e, db, req, res, assetInfo);
                 return;
             } else {
                 if (fillIn) {
                     assetInfo = result.rows[0];
+                } else {
+                    assetInfo.publishedAsset = result.rows[0];
                 }
                 assetInfo.published = true;
-                findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
+                fn(null, db, req, res, assetInfo);
+            }
+        }
+    );
+}
+
+function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
+{
+    var q = "select * from incomingAssets where id = $1 and partner = $2;";
+    var e;
+    db.query(
+        q, [assetInfo.id, assetInfo.partner],
+        function(err, result) {
+            if (err) {
+                e = errors.create('Database', err.message);
+                fn(e, db, req, res, assetInfo);
+                return;
+            }
+            if (!result.rows || result.rows.length !== 1) {
+                findPublishedAsset(db, req, res, assetInfo, fillIn, fn);
+            } else {
+                if (fillIn) {
+                    assetInfo = result.rows[0];
+                }
+                assetInfo.incoming = true;
+                fn(null, db, req, res, assetInfo);
+            }
+        }
+    );
+}
+
+function findPostedAsset(db, req, res, assetInfo, fn)
+{
+    var q = "select * from incomingAssets where id = $1 and posted = true;";
+    var e;
+    db.query(
+        q, [assetInfo.id],
+        function(err, result) {
+            if (err) {
+                e = errors.create('Database', err.message);
+                fn(e, db, req, res, assetInfo);
+                return;
+            }
+            if (!result.rows || result.rows.length !== 1) {
+                e = errors.create('AssetMissing',
+                                  'Unable to find the update asset ' +
+                                  assetInfo.id);
+                fn(e, db, req, res, assetInfo);
+                return;
+            } else {
+                assetInfo = result.rows[0];
+                assetInfo.incoming = true;
+                fn(null, db, req, res, assetInfo);
             }
         }
     );
@@ -422,5 +424,43 @@ module.exports.findAsset = function(db, req, res, assetInfo, fillIn, fn)
 
     assetInfo.incoming  = false;
     assetInfo.published = false;
-    findPublishedAsset(db, req, res, assetInfo, fillIn, fn);
+    findIncomingAsset(db, req, res, assetInfo, fillIn, fn);
+};
+
+
+module.exports.findPostedAsset = function(db, req, res, assetInfo, fillIn, fn)
+{
+    //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
+    var partner = assetInfo.partner;
+    var e;
+
+    if (!assetInfo || !assetInfo.id || !assetInfo.partner) {
+        e = errors.create('MissingParameters',
+                          'Asset info missing asset or partner id.');
+        fn(e, db, req, res, assetInfo);
+        return;
+    }
+
+    assetInfo.incoming  = false;
+    assetInfo.published = false;
+    assetInfo.posted = false;
+    findPostedAsset(db, req, res, assetInfo, fn);
+};
+
+
+module.exports.setupPreviews = function(db, req, res, assetInfo, fn)
+{
+    bindPreviewsToFiles(assetInfo, req.files, function(err) {
+        if (err) {
+            fn(err);
+            return;
+        }
+        app.previewStore.upload(assetInfo, function(err) {
+            if (err) {
+                fn(err);
+                return;
+            }
+            recordPreviews(db, req, res, assetInfo, fn);
+        });
+    });
 };

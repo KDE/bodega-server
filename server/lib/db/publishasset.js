@@ -33,6 +33,7 @@ function sendResponse(db, req, res, assetInfo)
     res.send(json);
 }
 
+
 function assetHasTag(assetInfo, tagType)
 {
     var keys = Object.keys(assetInfo.tags);
@@ -73,7 +74,7 @@ function validateAssetInfo(db, req, res, assetInfo, cb)
 function fetchTags(db, req, res, assetInfo, cb)
 {
     var tagsQuery =
-            "SELECT tagTypes.type, tags.title, a.tag \
+            "SELECT tagTypes.type, tags.title, a.tag, a.action \
     FROM incomingAssetTags a \
     JOIN tags ON (a.tag = tags.id) LEFT JOIN tagTypes ON \
     (tags.type = tagTypes.id) where a.asset = $1;";
@@ -146,7 +147,7 @@ function validateTags(db, req, res, assetInfo, cb)
 function fetchPreviews(db, req, res, assetInfo, cb)
 {
     var previewsQuery =
-            "SELECT p.path, p.mimetype, p.type, p.subtype \
+            "SELECT p.path, p.mimetype, p.type, p.subtype, p.action \
     FROM incomingAssetPreviews p where p.asset = $1;";
     var e;
 
@@ -171,29 +172,95 @@ function validatePreviews(db, req, res, assetInfo, cb)
     });
 }
 
-function generateIcons(db, req, res, assetInfo, cb)
+function beginTransaction(db, req, res, assetInfo, cb)
 {
-    if (assetInfo.assetType === 'book' ||
-        assetInfo.assetType === 'album') {
-        app.previewStore.generateCoverIcons(assetInfo, function(err) {
-            cb(err, db, req, res, assetInfo);
-        });
-    } else {
-        app.previewStore.generateScaledIcons(assetInfo, function(err) {
-            cb(err, db, req, res, assetInfo);
-        });
-    }
+    var query = "BEGIN;";
+    var e;
+
+    var q = db.query(query, [], function(err, result) {
+        var i;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
 }
 
-function setPosted(db, req, res, assetInfo, cb)
+function writeAsset(db, req, res, assetInfo, cb)
 {
-    var query = 'UPDATE incomingAssets set posted=true;';
+    var query;
+    var fieldsStr = '(';
+    var valuesStr = '(';
+    var args  = [];
+    var fields = ['license', 'partner', 'basePrice',
+                  'name', 'description', 'version',
+                  'file', 'image'];
+    var field;
+    var i;
+    var idx = 1;
+
+
+    if (!assetInfo.published) {
+        args.push(assetInfo.id);
+        fieldsStr += 'id, ';
+        valuesStr += '$' + idx + ', ';
+        ++idx;
+    }
+
+    for (i = 0; i < fields.length; ++i) {
+        field = fields[i];
+        if (typeof assetInfo[field] !== 'undefined' &&
+            assetInfo[field] !== null) {
+            fieldsStr += field;
+            args.push(assetInfo[field]);
+            valuesStr += "$" + idx;
+
+            if (i !== (fields.length - 1)) {
+                fieldsStr += ', ';
+                valuesStr += ', ';
+            }
+            ++idx;
+        }
+    }
+
+    if (args.length) {
+        fieldsStr += ")";
+        valuesStr += ")";
+    } else {
+        cb(null, db, req, res, assetInfo);
+        return;
+    }
+
+    if (assetInfo.published) {
+        query = "UPDATE assets set " + fieldsStr +
+            " = " + valuesStr + " WHERE id = " + assetInfo.id;
+    } else {
+        query = "INSERT INTO assets " + fieldsStr +
+            " VALUES " + valuesStr;
+    }
 
     //console.log(args);
     //console.log("Query is : ");
     //console.log(query);
 
-    db.query(query, [], function(err, result) {
+    db.query(query, args, function(err, result) {
+        var e;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+
+}
+
+function deleteIncoming(db, req, res, assetInfo, cb)
+{
+    var query = 'delete from incomingAssets where id = $1;';
+    db.query(query, [assetInfo.id], function(err, result) {
         var e;
         if (err) {
             e = errors.create('Database', err.message);
@@ -204,30 +271,85 @@ function setPosted(db, req, res, assetInfo, cb)
     });
 }
 
+function writeTags(db, req, res, assetInfo, cb)
+{
+    cb(null, db, req, res, assetInfo);
+}
 
-function postAsset(db, req, res, assetInfo)
+function writePreviews(db, req, res, assetInfo, cb)
+{
+    cb(null, db, req, res, assetInfo);
+}
+
+function publishIcons(db, req, res, assetInfo, cb)
+{
+    cb(null, db, req, res, assetInfo);
+}
+
+function publishPreviews(db, req, res, assetInfo, cb)
+{
+    cb(null, db, req, res, assetInfo);
+}
+
+function publishAssetFile(db, req, res, assetInfo, cb)
+{
+    cb(null, db, req, res, assetInfo);
+}
+
+function endTransaction(db, req, res, assetInfo, cb)
+{
+    var query = "END;";
+    var e;
+
+    var q = db.query(query, [], function(err, result) {
+        var i;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+function publishAsset(db, req, res, assetInfo)
 {
     var funcs = [function(cb) {
         cb(null, db, req, res, assetInfo);
     }];
 
-    // fetch tags
+    //fetch tags
     funcs.push(fetchTags);
-    // validateTags
+    //if initial post
+    //   validateTags
     funcs.push(validateTags);
 
-    // fetch previews
+    //fetch previews
     funcs.push(fetchPreviews);
-    // generate icons from covers/larger icons
-    funcs.push(generateIcons);
-    // validatePreviews
+    //   validatePreviews
     funcs.push(validatePreviews);
 
-    // validate asset info
+    //   validate asset info
     funcs.push(validateAssetInfo);
 
-    // mark the asset as posted
-    funcs.push(setPosted);
+    //begin transaction
+    funcs.push(beginTransaction);
+    //  store asset in db
+    funcs.push(writeAsset);
+    //  store tags in db
+    funcs.push(writeTags);
+    //  store previews in db
+    funcs.push(writePreviews);
+    //  delete from the incoming
+    funcs.push(deleteIncoming);
+    //  publish icons
+    funcs.push(publishIcons);
+    //  publish previews
+    funcs.push(publishPreviews);
+    //  publish asset
+    funcs.push(publishAssetFile);
+    //end transaction
+    funcs.push(endTransaction);
 
     async.waterfall(funcs, function(err, assetInfo) {
         if (err) {
@@ -248,25 +370,25 @@ module.exports = function(db, req, res) {
     }
     assetInfo.partner = req.query.partner;
 
-    createUtils.isContentCreator(
+    createUtils.isValidator(
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             if (err) {
                 errors.report('InvalidPartner', req, res, err);
                 return;
             }
-            createUtils.findAsset(
+            createUtils.findPostedAsset(
                 db, req, res, assetInfo, true,
                 function(err, db, req, res, assetInfo) {
                     if (err) {
                         errors.report('AssetMissing', req, res);
                         return;
                     }
-                    if (!assetInfo.incoming || assetInfo.published) {
+                    if (!assetInfo.incoming) {
                         errors.report('AssetMissing', req, res);
                         return;
                     }
-                    postAsset(db, req, res, assetInfo);
+                    publishAsset(db, req, res, assetInfo);
                 }
             );
         });

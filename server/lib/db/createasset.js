@@ -56,16 +56,15 @@ function setupTags(db, req, res, assetInfo)
     }
 }
 
-function recordPreviews(db, req, res, assetInfo, fn)
+function setupPreviews(db, req, res, assetInfo)
 {
-    var i;
     if (assetInfo.previews) {
         createUtils.setupPreviews(
             db, req, res, assetInfo,
-            function(err, db, req, res, assetInfo) {
+            function(err) {
                 if (err) {
                     reportError(db, req, res, assetInfo,
-                               'UploadPreviewError', err);
+                                'UploadPreviewError', err);
                     return;
                 }
                 setupTags(db, req, res, assetInfo);
@@ -73,27 +72,6 @@ function recordPreviews(db, req, res, assetInfo, fn)
     } else {
         setupTags(db, req, res, assetInfo);
     }
-}
-
-
-function setupPreviews(db, req, res, assetInfo)
-{
-    var imageUrls = utils.findImagePaths(req);
-
-    
-    createUtils.bindPreviewsToFiles(assetInfo, req.files, function(err) {
-        if (err) {
-            errors.report(err.name, req, res, err);
-            return;
-        }
-        app.previewStore.upload(assetInfo, function(err) {
-            if (err) {
-                errors.report(err.name, req, res, err);
-                return;
-            }
-            recordPreviews(db, req, res, assetInfo);
-        });
-    });
 }
 
 

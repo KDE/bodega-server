@@ -17,6 +17,7 @@
 
 var nodemailer = require('nodemailer');
 var errors = require('./errors.js');
+var fs = require('fs');
 
 module.exports.parseBool = function(string)
 {
@@ -241,4 +242,27 @@ module.exports.partnerId = function(db, req, res, fn, role)
     }
 };
 
+module.exports.copyFile = function(source, target, cb) {
+    var cbCalled = false;
+    var rd, wr;
 
+    function done(err) {
+        if (!cbCalled) {
+            cbCalled = true;
+            cb(err);
+        }
+    }
+
+    rd = fs.createReadStream(source);
+    rd.on("error", function(err) {
+        done(err);
+    });
+    wr = fs.createWriteStream(target);
+    wr.on("error", function(err) {
+        done(err);
+    });
+    wr.on("close", function(ex) {
+        done();
+    });
+    rd.pipe(wr);
+};
