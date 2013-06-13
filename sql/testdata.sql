@@ -201,8 +201,8 @@ BEGIN
     select id into personId from people where people.email=$1;
     select id into favoriteCollectionId from collections where person=personId and name='favorites';
     IF NOT FOUND THEN
-       insert into collections (person, name, public, wishlist)
-                        VALUES (personId, 'favorites', false, false);
+       insert into collections (person, name, public, type)
+                        VALUES (personId, 'favorites', false, 'wishlist');
        select id into favoriteCollectionId from collections where person=personId and name='favorites';
     END IF;
 
