@@ -619,10 +619,9 @@
             {
               "Name": "wishlist",
               "Location": "body",
-              "Description": "Whether or not this collection is a wishlist",
+              "Description": "Type of this collection",
               "Required": "N",
-              "Default": false,
-              "Type": "boolean"
+              "Type": "string"
             }
           ]
         },
