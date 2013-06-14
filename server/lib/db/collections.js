@@ -98,6 +98,60 @@ module.exports.create = function(db, req, res) {
         });
 };
 
+module.exports.update = function(db, req, res) {
+    /*jshint multistr:true */
+    var updateQuery =
+        'update collections set \
+        name = $1, public = $2, type = $3 \
+        where id = $4 RETURNING id;';
+    var searchQuery =
+        'SELECT * FROM collections WHERE person = $1 AND name = $2 AND id != $3;';
+    var defaultPageSize = 25;
+    var name = req.body.name;
+    var isPublic = utils.parseBool(req.body.public);
+    var type = req.body.type;
+    var id = req.params.collectionId;
+
+    if (!name || !id) {
+        // Name of the collection is missing.
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    db.query(
+        searchQuery, [req.session.user.id, name, id],
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+
+            if (result.rows.length > 0) {
+                // "Collection with the name '" + name + "' already exists!",
+                errors.report('CollectionExists', req, res);
+                return;
+            }
+
+            db.query(
+                updateQuery, [name, isPublic, type, id],
+                function(err, result) {
+
+                    if (err || !result.rows || result.rows.length !== 1) {
+                        errors.report('Database', req, res, err);
+                        return;
+                    }
+                    var json = utils.standardJson(req);
+                    json.collections = [{
+                            id : result.rows[0].id,
+                            name : name,
+                            public : isPublic,
+                            type : type
+                        }];
+                    res.json(json);
+                });
+        });
+};
+
 module.exports.remove = function(db, req, res) {
     /*jshint multistr:true */
     var deleteQuery =

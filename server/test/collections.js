@@ -100,6 +100,7 @@ describe('Collections', function(){
         });
     });
 
+    var createdId;
     describe('After authentication', function(){
         it('should create', function(done){
             var params = {
@@ -110,6 +111,58 @@ describe('Collections', function(){
             utils.postUrl(
                 server,
                 '/bodega/v1/json/collection/create',
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('collections');
+                    res.body.collections.length.should.be.equal(1);
+                    res.body.collections[0].should.have.property('id');
+                    res.body.collections[0].should.have.property('name', collectionName);
+                    res.body.collections[0].should.have.property('public', true);
+                    res.body.collections[0].should.have.property('type', 'wishlist');
+                    createdId = res.body.collections[0].id;
+                    done();
+                },
+                cookie);
+        });
+        it('should update', function(done){
+            var params = {
+                name: collectionName + '_renamed',
+                public: false,
+                type: 'wishlist'
+            };
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/collection/update/' + createdId,
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('collections');
+                    res.body.collections.length.should.be.equal(1);
+                    res.body.collections[0].should.have.property('name', collectionName + '_renamed');
+                    res.body.collections[0].should.have.property('public', false);
+                    res.body.collections[0].should.have.property('type', 'wishlist');
+                    done();
+                },
+                cookie);
+        });
+        it('should update to the old values', function(done){
+            var params = {
+                name: collectionName,
+                public: true,
+                type: 'wishlist'
+            };
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/collection/update/' + createdId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);

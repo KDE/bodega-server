@@ -169,6 +169,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbCollections.create, req, res);
     };
 
+    BodegaDb.prototype.updateCollection = function(req, res) {
+        this.dbQuery(dbCollections.update, req, res);
+    };
+
     BodegaDb.prototype.deleteCollection = function(req, res) {
         this.dbQuery(dbCollections.remove, req, res);
     };

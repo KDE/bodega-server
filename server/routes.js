@@ -143,6 +143,12 @@ app.post(serverPath('collection/create'), isAuthorized,
             app.db.createCollection(req, res);
         });
 
+app.post(serverPath('collection/update/:collectionId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.updateCollection(req, res);
+        });
+
 app.get(serverPath('collection/delete/:collectionId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);

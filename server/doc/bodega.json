@@ -626,6 +626,36 @@
           ]
         },
         {
+          "MethodName": "Update",
+          "Synopsis": "Updates the data of an existing collection",
+          "HTTPMethod": "Post",
+          "URI": "/collection/update:collectionId",
+          "parameters": [
+            {
+              "Name": "name",
+              "Location": "body",
+              "Description": "The new name of the collection",
+              "Required": "N",
+              "Type": "number"
+            },
+            {
+              "Name": "public",
+              "Location": "body",
+              "Description": "Whether or not this collection should be viewable by others",
+              "Required": "N",
+              "Default": false,
+              "Type": "boolean"
+            },
+            {
+              "Name": "type",
+              "Location": "body",
+              "Description": "Type of this collection",
+              "Required": "N",
+              "Type": "string"
+            }
+          ]
+        },
+        {
           "MethodName": "Delete",
           "Synopsis": "Deletes a collection",
           "HTTPMethod": "Get",
