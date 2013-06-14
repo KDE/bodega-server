@@ -88,9 +88,9 @@ BEGIN
     PERFORM dblink_connect('dbname=discourse_development');
     IF (TG_OP = 'INSERT') THEN
         -- we will create forums only for the partners who have id >= 1000
-        --IF (NEW.partner < 1000) THEN
-        --    RETURN NEW;
-        -- END IF;
+        IF (NEW.partner < 1000) THEN
+            RETURN NEW;
+        END IF;
 
         categoryName := 'Forum for ' || NEW.name;
         categoryDescription := 'In this forum you can contact the author of' || NEW.name;
