@@ -476,7 +476,7 @@ describe('Store management', function(){
                                       "type": 9
                                     },
                                     {
-                                      "id": 56,
+                                      "id": 22,
                                       "title": "Card Game",
                                       "type": 3
                                     }

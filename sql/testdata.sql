@@ -18,6 +18,7 @@ select setval('seq_peopleids', 1);
 select setval('seq_partnerids', 1005);
 select setval('seq_channelids', 1);
 select setval('seq_purchaseids', 1);
+select setval('seq_tagids', 20);
 
 -- create some handy functions
 
@@ -101,6 +102,24 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION ct_testing_assetByName(text) RETURNS INT AS $$
+DECLARE
+    assetId int := -1;
+BEGIN
+    select into assetId id from assets where name = $1 limit 1;
+    return assetId;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION ct_testing_personByEmail(text) RETURNS INT AS $$
+DECLARE
+    personId int := -1;
+BEGIN
+    select into personId id from people where email = $1 limit 1;
+    return personId;
+END;
+$$ LANGUAGE 'plpgsql';
+
 -- now start setting up the data
 insert into people (lastname, firstname, email, points, password, active)
     values ('Rusin', 'Zack', 'zack@kde.org', 10000, '$2a$10$Iejk3uw6uGFCGR5OKaOOZO2tmnlIhPCsCvw7G1pLa81QH4fonDC.C', true);
@@ -157,7 +176,7 @@ insert into channelTags (channel, tag)
 
 
 insert into assets (license, partner, name, description, version, file, image, active) 
-    values (ct_testing_licenseByName('GPL'), ct_partnerId('KDE'), 'Aquariums', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true);
+    values (ct_testing_licenseByName('GPL'), ct_partnerId('KDE'), 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true);
 insert into assetTags (asset, tag) 
     values (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
 insert into assetTags (asset, tag) 
@@ -460,53 +479,76 @@ select ct_testing_downloadBooksByAuthor('aseigo@kde.org', 'Tolstoy, Leo');
 
 
 --purchases sample data for the statistics test
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (2, 'zack@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 20, '2013-05-26 00:00:00Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (3, 'aseigo@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 01:00:00Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (4, 'mart@kde.org', 3, 'VIVALDI-1', 'dice', 500, 475, 25, '2013-05-26 02:00:00Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (2, 'zack@kde.org', 4, 'VIVALDI-1', 'diamond', 100, 90, 10, '2013-05-25 13:26:00Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (3, 'aseigo@kde.org', 4, 'VIVALDI-1', 'diamond', 100, 90, 10, '2013-05-25 09:35:24Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (3, 'aseigo@kde.rog', 3, 'VIVALDI-1', 'dice', 300, 280, 15, '2013-06-02 01:02:03Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (4, 'mart@kde.org', 3, 'VIVALDI-1', 'dice', 300, 280, 15, '2013-07-02 01:02:03Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (4, 'mart@kde.org', 2, 'VIVALDI-1', 'aquarium', 200, 190, 5, '2013-06-10 09:10:11Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('zack@kde.org'), 'zack@kde.org', ct_testing_assetByName('Dice'), 'VIVALDI-1', 'Dice', 500, 475, 20, '2013-05-26 00:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('aseigo@kde.org'), 'aseigo@kde.org', ct_testing_assetByName('Dice'), 'VIVALDI-1', 'Dice', 500, 475, 25, '2013-05-26 01:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('mart@kde.org'), 'mart@kde.org', ct_testing_assetByName('Dice'), 'VIVALDI-1', 'Dice', 500, 475, 25, '2013-05-26 02:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('zack@kde.org'), 'zack@kde.org', ct_testing_assetByName('Diamond Juice'), 'VIVALDI-1', 'Diamond Juice', 100, 90, 10, '2013-05-25 13:26:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('aseigo@kde.org'), 'aseigo@kde.org', ct_testing_assetByName('Diamond Juice'), 'VIVALDI-1', 'Diamond Juice', 100, 90, 10, '2013-05-25 09:35:24Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('aseigo@kde.org'), 'aseigo@kde.org', ct_testing_assetByName('Dice'), 'VIVALDI-1', 'Dice', 300, 280, 15, '2013-06-02 01:02:03Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('mart@kde.org'), 'mart@kde.org', ct_testing_assetByName('Dice'), 'VIVALDI-1', 'Dice', 300, 280, 15, '2013-07-02 01:02:03Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('mart@kde.org'), 'mart@kde.org', ct_testing_assetByName('Aquarium'), 'VIVALDI-1', 'aquarium', 200, 190, 5, '2013-06-10 09:10:11Z');
 
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (2, 'zack@kde.org', 5, 'KDE-1', '15 Puzzle', 500, 475, 20, '2013-05-26 00:00:00Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (3, 'aseigo@kde.org', 5, 'KDE-1', '15 Puzzle', 500, 475, 25, '2013-05-26 01:00:00Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (4, 'mart@kde.org', 5, 'KDE-1', '15 Puzzle', 500, 475, 25, '2013-05-26 02:00:00Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (3, 'aseigo@kde.rog', 4, 'KDE-1', 'Diamond Juice', 300, 280, 15, '2013-06-02 01:02:03Z');
-INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (4, 'mart@kde.org', 10, 'KDE-1', 'Poker 3', 200, 190, 5, '2013-06-10 09:10:11Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('zack@kde.org'), 'zack@kde.org', ct_testing_assetByName('15 Puzzle'), 'KDE-1', '15 Puzzle', 500, 475, 20, '2013-05-26 00:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('aseigo@kde.org'), 'aseigo@kde.org', ct_testing_assetByName('15 Puzzle'), 'KDE-1', '15 Puzzle', 500, 475, 25, '2013-05-26 01:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('mart@kde.org'), 'mart@kde.org', ct_testing_assetByName('15 Puzzle'), 'KDE-1', '15 Puzzle', 500, 475, 25, '2013-05-26 02:00:00Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('aseigo@kde.org'), 'aseigo@kde.org', ct_testing_assetByName('Diamond Juice'), 'KDE-1', 'Diamond Juice', 300, 280, 15, '2013-06-02 01:02:03Z');
+INSERT INTO purchases (person, email, asset, store, name, points, toparticipant, tostore, purchasedon) VALUES (ct_testing_personByEmail('mart@kde.org'), 'mart@kde.org', ct_testing_assetByName('Poker3'), 'KDE-1', 'Poker 3', 200, 190, 5, '2013-06-10 09:10:11Z');
 
 
 
 --downloads sample data for the statistics test
-INSERT INTO downloads VALUES (3, 2, '2013-05-26 00:00:00Z', 'VIVALDI-1', '45.46.47.48', 'dice', 1);
-INSERT INTO downloads VALUES (3, 3, '2013-05-26 01:00:00Z', 'VIVALDI-1', '58.59.56.61', 'dice', 1);
-INSERT INTO downloads VALUES (3, 4, '2013-05-26 02:00:00Z', 'VIVALDI-1', '67.68.69.70', 'dice', 1);
-INSERT INTO downloads VALUES (4, 2, '2013-05-25 13:26:00Z', 'VIVALDI-1', '45.46.47.48', 'Diamond Juice', 1);
-INSERT INTO downloads VALUES (4, 3, '2013-05-25 09:35:24Z', 'VIVALDI-1', '58.59.56.61', 'Diamond Juice', 1);
-INSERT INTO downloads VALUES (3, 3, '2013-06-02 01:02:03Z', 'VIVALDI-1', '58.59.56.61', 'dice', 1);
-INSERT INTO downloads VALUES (3, 4, '2013-07-02 01:02:03Z', 'VIVALDI-1', '67.68.69.70', 'dice', 1);
-INSERT INTO downloads VALUES (2, 4, '2013-06-10 09:10:11Z', 'VIVALDI-1', '67.68.69.70', 'aquarium', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('zack@kde.org'), '2013-05-26 00:00:00Z', 'VIVALDI-1', '45.46.47.48', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('aseigo@kde.org'), '2013-05-26 01:00:00Z', 'VIVALDI-1', '58.59.56.61', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('mart@kde.org'), '2013-05-26 02:00:00Z', 'VIVALDI-1', '67.68.69.70', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Diamond Juice'), ct_testing_personByEmail('zack@kde.org'), '2013-05-25 13:26:00Z', 'VIVALDI-1', '45.46.47.48', 'Diamond Juice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Diamond Juice'), ct_testing_personByEmail('aseigo@kde.org'), '2013-05-25 09:35:24Z', 'VIVALDI-1', '58.59.56.61', 'Diamond Juice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('aseigo@kde.org'), '2013-06-02 01:02:03Z', 'VIVALDI-1', '58.59.56.61', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('mart@kde.org'), '2013-07-02 01:02:03Z', 'VIVALDI-1', '67.68.69.70', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (2, 4, '2013-06-10 09:10:11Z', 'VIVALDI-1', '67.68.69.70', 'aquarium', 1);
 
-INSERT INTO downloads VALUES (3, 2, '2013-05-26 02:00:00Z', 'VIVALDI-1', '45.46.47.48', 'dice', 1);
-INSERT INTO downloads VALUES (3, 3, '2013-05-27 03:00:00Z', 'VIVALDI-1', '58.59.56.61', 'dice', 1);
-INSERT INTO downloads VALUES (3, 4, '2013-05-29 12:00:00Z', 'VIVALDI-1', '67.68.69.70', 'dice', 1);
-INSERT INTO downloads VALUES (4, 3, '2013-06-12 19:35:24Z', 'VIVALDI-1', '58.59.56.61', 'Diamond Juice', 1);
-INSERT INTO downloads VALUES (3, 3, '2013-07-23 11:02:03Z', 'VIVALDI-1', '58.59.56.61', 'dice', 1);
-INSERT INTO downloads VALUES (3, 4, '2013-09-30 22:02:03Z', 'VIVALDI-1', '67.68.69.70', 'dice', 1);
-INSERT INTO downloads VALUES (2, 4, '2013-10-01 23:10:11Z', 'VIVALDI-1', '67.68.69.70', 'aquarium', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('zack@kde.org'), '2013-05-26 02:00:00Z', 'VIVALDI-1', '45.46.47.48', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('aseigo@kde.org'), '2013-05-27 03:00:00Z', 'VIVALDI-1', '58.59.56.61', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('mart@kde.org'), '2013-05-29 12:00:00Z', 'VIVALDI-1', '67.68.69.70', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Diamond Juice'), ct_testing_personByEmail('aseigo@kde.org'), '2013-06-12 19:35:24Z', 'VIVALDI-1', '58.59.56.61', 'Diamond Juice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('aseigo@kde.org'), '2013-07-23 11:02:03Z', 'VIVALDI-1', '58.59.56.61', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Dice'), ct_testing_personByEmail('mart@kde.org'), '2013-09-30 22:02:03Z', 'VIVALDI-1', '67.68.69.70', 'Dice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (2, 4, '2013-10-01 23:10:11Z', 'VIVALDI-1', '67.68.69.70', 'aquarium', 1);
 
-INSERT INTO downloads VALUES (5, 2, '2013-05-26 02:00:00Z', 'KDE-1', '45.46.47.48', '15 Puzzle', 1);
-INSERT INTO downloads VALUES (5, 3, '2013-05-27 03:00:00Z', 'KDE-1', '58.59.56.61', '15 Puzzle', 1);
-INSERT INTO downloads VALUES (10, 4, '2013-05-29 12:00:00Z', 'KDE-1', '67.68.69.70', 'Poker 3', 1);
-INSERT INTO downloads VALUES (4, 3, '2013-06-12 19:35:24Z', 'KDE-1', '58.59.56.61', 'Diamond Juice', 1);
-INSERT INTO downloads VALUES (17, 3, '2013-07-23 11:02:03Z', 'KDE-1', '58.59.56.61', 'Poker 10', 1);
-INSERT INTO downloads VALUES (17, 4, '2013-09-30 22:02:03Z', 'KDE-1', '67.68.69.70', 'Poker 10', 1);
-INSERT INTO downloads VALUES (7, 4, '2013-10-01 23:10:11Z', 'KDE-1', '67.68.69.70', 'Jewels', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('15 Puzzle'), ct_testing_personByEmail('zack@kde.org'), '2013-05-26 02:00:00Z', 'KDE-1', '45.46.47.48', '15 Puzzle', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('15 Puzzle'), ct_testing_personByEmail('aseigo@kde.org'), '2013-05-27 03:00:00Z', 'KDE-1', '58.59.56.61', '15 Puzzle', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Poker3'), ct_testing_personByEmail('mart@kde.org'), '2013-05-29 12:00:00Z', 'KDE-1', '67.68.69.70', 'Poker 3', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Diamond Juice'), ct_testing_personByEmail('aseigo@kde.org'), '2013-06-12 19:35:24Z', 'KDE-1', '58.59.56.61', 'Diamond Juice', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Poker10'), ct_testing_personByEmail('aseigo@kde.org'), '2013-07-23 11:02:03Z', 'KDE-1', '58.59.56.61', 'Poker 10', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Poker10'), ct_testing_personByEmail('mart@kde.org'), '2013-09-30 22:02:03Z', 'KDE-1', '67.68.69.70', 'Poker 10', 1);
+INSERT INTO downloads (asset, person, downloadedOn, store, address, title, version)
+     VALUES (ct_testing_assetByName('Jewels'), ct_testing_personByEmail('mart@kde.org'), '2013-10-01 23:10:11Z', 'KDE-1', '67.68.69.70', 'Jewels', 1);
 
 -- cleanup
 drop function ct_testing_favoriteBooksByAuthor(email text, author text);
 drop function ct_testing_downloadBooksByAuthor(email text, author text);
 drop function ct_testing_tagByName(text);
 drop function ct_testing_licenseByName(text);
-
+drop function ct_testing_assetByName(text);
+drop function ct_testing_personByEmail(text);
 commit;

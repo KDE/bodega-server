@@ -471,13 +471,13 @@ describe('getting account information', function() {
                 var expected = [
                     {
                         "category": "Download",
-                        "what": "15 Puzzle",
+                        "what": "Dice",
                         "date": "2013-05-26T02:00:00.000Z",
                         "comment": "Version: 1"
                     },
                     {
                         "category": "Download",
-                        "what": "dice",
+                        "what": "15 Puzzle",
                         "date": "2013-05-26T02:00:00.000Z",
                         "comment": "Version: 1"
                     },
@@ -489,14 +489,20 @@ describe('getting account information', function() {
                     },
                     {
                         "category": "Download",
-                        "what": "dice",
+                        "what": "Dice",
                         "date": "2013-05-26T00:00:00.000Z",
                         "comment": "Version: 1"
                     },
-                     {
+                    {
                         "category": "Purchase",
-                        "what": "dice",
+                        "what": "Dice",
                         "date": "2013-05-26T00:00:00.000Z",
+                        "comment": ""
+                    },
+                    {
+                        "category": "Purchase",
+                        "what": "Diamond Juice",
+                        "date": "2013-05-25T13:26:00.000Z",
                         "comment": ""
                     },
                     {
@@ -504,12 +510,6 @@ describe('getting account information', function() {
                         "what": "Diamond Juice",
                         "date": "2013-05-25T13:26:00.000Z",
                         "comment": "Version: 1"
-                    },
-                    {
-                        "category": "Purchase",
-                        "what": "diamond",
-                        "date": "2013-05-25T13:26:00.000Z",
-                        "comment": ""
                     }
                 ];
                 res.statusCode.should.equal(200);
