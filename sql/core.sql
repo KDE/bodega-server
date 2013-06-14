@@ -280,7 +280,7 @@ create table assetPrices
     points      int         not null constraint ct_apAssetPricePoint check (points > 0),
     toStore     int         not null default 0 constraint ct_apAssetToStorePoints check (toStore >=0 AND toStore < points),
     starting    timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
-    ending      timestamp   constraint ct_apEndAfterStart check (ending > starting)
+    ending      timestamp   constraint ct_apEndAfterStart check (ending >= starting)
 );
 
 create index idx_assetPrices_assetChannel on assetPrices (asset, store);
