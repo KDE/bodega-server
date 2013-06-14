@@ -376,14 +376,18 @@ var AssetStore = (function() {
 
     AssetStore.prototype.publish = function(assetInfo, fn) {
         var incomingAssetPath, assetPath;
+        var e;
 
-        if (!assetInfo.incoming) {
-            console.warn("Trying to publishing a non-incoming asset!");
+        if (!assetInfo.incoming || !assetInfo.posted) {
+            e = errors.create('PublishingFailed',
+                              "Trying to publishing a non-incoming asset.");
+            fn(e);
             return;
         }
 
         //Can't publish external assets
         if (assetInfo.externpath) {
+            fn(null);
             return;
         }
 

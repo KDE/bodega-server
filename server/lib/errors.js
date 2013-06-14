@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -89,7 +89,8 @@ var ErrorType = {
     "StoreNotDeleted"        : 63,//deleting a store failed
     "StoreIdInvalid"         : 64,//the provided store id is not valid for this user
     "StoreChannelIdInvalid"  : 65,//the requested channel id for editting is invalid
-    "StoreCreateChannelFailed": 65//could not create the requested channel
+    "StoreCreateChannelFailed": 66,//could not create the requested channel
+    "PublishingFailed"       : 67//wasn't able to publish an asset
 };
 
 module.exports.Type = ErrorType;

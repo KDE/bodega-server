@@ -25,7 +25,8 @@ describe('Asset Store, ', function(){
     var sampleAsset = {
         id : 133,
         file : 'assetstore.js',
-        incoming : true
+        incoming : true,
+        posted : true
     };
     var fileSize;
     var tempFile = "temp-file.json";

@@ -33,7 +33,6 @@ function sendResponse(db, req, res, assetInfo)
     res.send(json);
 }
 
-
 function assetHasTag(assetInfo, tagType)
 {
     var keys = Object.keys(assetInfo.tags);
@@ -271,29 +270,79 @@ function deleteIncoming(db, req, res, assetInfo, cb)
     });
 }
 
+function writeTag(db, req, res, assetInfo, tag, cb)
+{
+    var query = 'insert into assetTags (asset, tag) values ($1, $2);';
+    var args = [tag.asset, tag.tag];
+
+    db.query(query, args, function(err, result) {
+        cb(err, db, req, res, assetInfo, tag);
+    });
+}
+
 function writeTags(db, req, res, assetInfo, cb)
 {
-    cb(null, db, req, res, assetInfo);
+    async.each(assetInfo.tags, function(tag, callback) {
+        writeTag(db, req, res, assetInfo, tag, callback);
+    }, function(err) {
+        cb(err, db, req, res, assetInfo);
+    });
+}
+
+function deleteTags(db, req, res, assetInfo, cb)
+{
+    var query = 'delete from assetTags where asset=$1;';
+    var args = [assetInfo.id];
+
+    db.query(query, args, function(err, result) {
+        cb(err, db, req, res, assetInfo);
+    });
+}
+
+function writePreview(db, req, res, assetInfo, preview, cb)
+{
+    var query = 'insert into assetPreviews \
+    (asset, path, mimetype, type, subtype) \
+    values ($1, $2, $3, $4, $5);';
+    var args = [preview.asset, preview.path, preview.mimetype,
+                preview.type, preview.subtype];
+
+    db.query(query, args, function(err, result) {
+        cb(err, db, req, res, assetInfo);
+    });
 }
 
 function writePreviews(db, req, res, assetInfo, cb)
 {
-    cb(null, db, req, res, assetInfo);
+    async.each(assetInfo.previews, function(preview, callback) {
+        writePreview(db, req, res, assetInfo, preview, callback);
+    }, function(err) {
+        cb(err, db, req, res, assetInfo);
+    });
 }
 
-function publishIcons(db, req, res, assetInfo, cb)
+function deletePreviews(db, req, res, assetInfo, cb)
 {
-    cb(null, db, req, res, assetInfo);
+    var query = 'delete from assetPreviews where asset=$1;';
+    var args = [assetInfo.id];
+
+    db.query(query, args, function(err, result) {
+        cb(err, db, req, res, assetInfo);
+    });
 }
 
 function publishPreviews(db, req, res, assetInfo, cb)
 {
-    cb(null, db, req, res, assetInfo);
+    app.previewStore.publish(assetInfo, function(err) {
+        cb(null, db, req, res, assetInfo);
+    });
 }
 
 function publishAssetFile(db, req, res, assetInfo, cb)
 {
-    cb(null, db, req, res, assetInfo);
+    app.assetStore.publish(assetInfo, function(err) {
+        cb(null, db, req, res, assetInfo);
+    });
 }
 
 function endTransaction(db, req, res, assetInfo, cb)
@@ -318,36 +367,37 @@ function publishAsset(db, req, res, assetInfo)
         cb(null, db, req, res, assetInfo);
     }];
 
-    //fetch tags
+    // fetch tags
     funcs.push(fetchTags);
-    //if initial post
-    //   validateTags
+    // validateTags
     funcs.push(validateTags);
 
-    //fetch previews
+    // fetch previews
     funcs.push(fetchPreviews);
-    //   validatePreviews
+    // validatePreviews
     funcs.push(validatePreviews);
 
-    //   validate asset info
+    // validate asset info
     funcs.push(validateAssetInfo);
 
     //begin transaction
     funcs.push(beginTransaction);
     //  store asset in db
     funcs.push(writeAsset);
+    //  delete old tags from the db
+    funcs.push(deleteTags);
     //  store tags in db
     funcs.push(writeTags);
+    //  delete old previews from the db
+    funcs.push(deletePreviews);
     //  store previews in db
     funcs.push(writePreviews);
-    //  delete from the incoming
-    funcs.push(deleteIncoming);
-    //  publish icons
-    funcs.push(publishIcons);
     //  publish previews
     funcs.push(publishPreviews);
     //  publish asset
     funcs.push(publishAssetFile);
+    //  delete from the incoming
+    funcs.push(deleteIncoming);
     //end transaction
     funcs.push(endTransaction);
 
