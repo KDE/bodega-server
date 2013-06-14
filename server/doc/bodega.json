@@ -629,7 +629,7 @@
           "MethodName": "Update",
           "Synopsis": "Updates the data of an existing collection",
           "HTTPMethod": "Post",
-          "URI": "/collection/update:collectionId",
+          "URI": "/collection/update/:collectionId",
           "parameters": [
             {
               "Name": "name",
