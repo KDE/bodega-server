@@ -136,19 +136,9 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION ct_test() RETURNS bool AS $$
-DECLARE
-    go bool;
-BEGIN
-    select into go dowork from test where what = 'updateassetcount';
-    return go;
-END;
-$$ LANGUAGE 'plpgsql';
-
 DROP TRIGGER IF EXISTS trg_ct_associateAssetWithChannels ON assetTags;
 CREATE TRIGGER trg_ct_associateAssetWithChannels AFTER INSERT OR UPDATE OR DELETE ON assetTags
 FOR EACH ROW EXECUTE PROCEDURE ct_associateAssetWithChannels();
-
 
 CREATE OR REPLACE FUNCTION ct_associateChannelWithAssets() RETURNS TRIGGER AS $$
 DECLARE
