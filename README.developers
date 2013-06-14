@@ -26,6 +26,10 @@ suite in server/test/ and it can be run by:
 
 Before code can be merged into master, the test suite must pass in its entirety.
 
+The tests relies on the test data set which can be loaded with:
+
+    $ make test_sql
+
 ## Branches are the new black
 
 All new feature development and all but the most trivial of bug fixes must be done
