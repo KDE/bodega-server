@@ -178,7 +178,7 @@ describe('Listing', function(){
                         res.body.should.have.property('authStatus', true);
                     }
                     res.body.should.have.property('assets');
-                    Object.keys(res.body.assets).length.should.be.equal(21);
+                    Object.keys(res.body.assets).length.should.be.equal(19);
                     --runningTests;
                     if (runningTests === 0) {
                         done();
@@ -245,7 +245,7 @@ describe('Listing', function(){
                     }
                     res.body.should.have.property('assets');
                     var assets = res.body.assets;
-                    assets.length.should.be.equal(10);
+                    assets.length.should.be.equal(9);
                     cardsChannelResponse.assets[10].should.be.eql(assets[0]);
                     done();
                 },

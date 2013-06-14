@@ -452,9 +452,9 @@ describe('Store management', function(){
                               "title": "application/x-plasma",
                               "type": 7},
                             {
-                              "id": 2,
-                              "title": "Early Childhood",
-                              "type": 8
+                              "id": 13,
+                              "title": "game",
+                              "type": 9
                             }
                             ],
                             "channels": [
@@ -471,9 +471,14 @@ describe('Store management', function(){
                                       "type": 7
                                     },
                                     {
-                                      "id": 3,
-                                      "title": "Everyone",
-                                      "type": 8
+                                      "id": 13,
+                                      "title": "game",
+                                      "type": 9
+                                    },
+                                    {
+                                      "id": 56,
+                                      "title": "Card Game",
+                                      "type": 3
                                     }
                                 ],
                                 "channels": []
@@ -590,6 +595,8 @@ describe('Store management', function(){
 
     // always delete the two stores we made, even on error
     after(function(done) {
+        done();
+        return;
         var connectionString = app.config.database.protocol + "://" +
                                app.config.database.user + ":" + app.config.database.password +
                                "@" + app.config.database.host + "/" +
