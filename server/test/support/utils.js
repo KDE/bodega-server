@@ -41,6 +41,8 @@ function getUrl(path, fn, opts)
             if (opts && opts.html) {
                 assert.deepEqual(contentType, 'text/html; charset=utf-8');
                 res.body = buf;
+            } else if (opts && opts.stream) {
+                asset.deepEqual(contentType, 'application/octet-stream');
             } else {
                 assert.deepEqual(contentType,
                                  'application/json');
@@ -59,8 +61,8 @@ function getHtml(path, fn, opts)
 {
     if (!opts) {
         opts = {};
+        opts.html = true;
     }
-    opts.html = true;
     getUrl(path, fn, opts);
 }
 

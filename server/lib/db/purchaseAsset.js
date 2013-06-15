@@ -55,7 +55,7 @@ module.exports = function(db, req, res) {
                      return;
                  }
 
-                 db.query('SELECT points + owedPoints as points FROM people WHERE id = $1',
+                 db.query('SELECT points as points FROM people WHERE id = $1',
                           [req.session.user.id],
                           function(error, result)
                           {
