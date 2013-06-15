@@ -34,6 +34,9 @@ function getUrl(path, fn, opts)
             if (opts && opts.html) {
                 assert.deepEqual(contentType, 'text/html; charset=utf-8');
                 res.body = buf;
+            } else if (opts && opts.stream) {
+                assert.deepEqual(contentType,
+                                'application/octet-stream');
             } else {
                 assert.deepEqual(contentType,
                                  'application/json');
@@ -53,7 +56,18 @@ function getHtml(path, fn, opts)
     if (!opts) {
         opts = {};
     }
+
     opts.html = true;
+    getUrl(path, fn, opts);
+}
+
+function getStream(path, fn, opts)
+{
+    if (!opts) {
+        opts = {};
+    }
+
+    opts.stream = true;
     getUrl(path, fn, opts);
 }
 
@@ -212,6 +226,7 @@ module.exports.cookie = '';
 // public functions
 module.exports.getUrl = getUrl;
 module.exports.getHtml = getHtml;
+module.exports.getStream = getStream;
 module.exports.postUrl = postUrl;
 module.exports.auth = auth;
 module.exports.dbSnapshot = dbSnapshot;
