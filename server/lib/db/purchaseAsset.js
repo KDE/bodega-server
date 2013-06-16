@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -37,7 +37,20 @@ module.exports = function(db, req, res) {
                  }
 
                  var ret = result.rows[0].result;
-                 if (ret > 0) {
+                 switch (ret) {
+                 case 0:
+                     //our purchase looks fine
+                     break;
+                 case 1:
+                     errors.report('InvalidAsset', req, res);
+                     return;
+                 case 2:
+                     errors.report('Database', req, res);
+                     return;
+                 case 3:
+                     errors.report('PurchaseNotEnoughPoints', req, res);
+                     return;
+                 default:
                      errors.report('PurchaseFailed', req, res);
                      return;
                  }
