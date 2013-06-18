@@ -450,11 +450,11 @@ describe('Store management', function(){
                             {
                               "id": 1,
                               "title": "application/x-plasma",
-                              "type": 7},
+                              "type": 'mimetype'},
                             {
                               "id": 13,
                               "title": "game",
-                              "type": 9
+                              "type": 'assetType'
                             }
                             ],
                             "channels": [
@@ -468,17 +468,17 @@ describe('Store management', function(){
                                     {
                                       "id":1,
                                       "title": "application/x-plasma",
-                                      "type": 7
+                                      "type": 'mimetype'
                                     },
                                     {
                                       "id": 13,
                                       "title": "game",
-                                      "type": 9
+                                      "type": 'assetType'
                                     },
                                     {
                                       "id": 22,
                                       "title": "Card Game",
-                                      "type": 3
+                                      "type": 'market'
                                     }
                                 ],
                                 "channels": []
