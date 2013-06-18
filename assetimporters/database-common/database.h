@@ -23,7 +23,7 @@ protected:
 
     void writeAssetTags(int assetId, QVariant &tagId);
 
-    int showError(const QSqlQuery &query) const;
+    void showError(const QSqlQuery &query) const;
     int channelId(const QString &name,
                   const QString &description,
                   int parentId=0);
