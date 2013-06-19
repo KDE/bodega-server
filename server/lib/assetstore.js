@@ -426,10 +426,14 @@ var AssetStore = (function() {
             var e;
             if (err) {
                 e = errors.create('AssetFileMissing', err.message);
-                cb(e);
+                if (cb) {
+                    cb(e);
+                }
                 return;
             }
-            cb(null);
+            if (cb) {
+                cb(null);
+            }
         });
     };
 
