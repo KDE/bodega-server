@@ -328,7 +328,7 @@ function updatePublishedAsset(db, req, res, assetInfo)
     funcs.push(duplicatePreviews);
     funcs.push(findTags);
     funcs.push(duplicateTags);
-    funcs.end(endTransaction);
+    funcs.push(endTransaction);
 
     async.waterfall(funcs, function(err) {
         if (err) {
