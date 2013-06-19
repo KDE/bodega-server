@@ -14,7 +14,8 @@ sql:
 update_sql:
 	@cd ../sql && ../server/bodegaDbHelper ../server/config.json . update
 
-test_sql:
+test_data:
 	@cd ../sql && ../server/bodegaDbHelper ../server/config.json . testdata
+	@cp -auR ../sql/test_data/* ../server/content
 
 .PHONY: test check sql update_sql
