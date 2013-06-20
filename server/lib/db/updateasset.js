@@ -159,7 +159,7 @@ function updateIncomingAsset(db, req, res, assetInfo)
 
 function endTransaction(db, req, res, assetInfo, cb)
 {
-    var query = "END;";
+    var query = "COMMIT;";
     var e;
 
     var q = db.query(query, [], function(err, result) {
