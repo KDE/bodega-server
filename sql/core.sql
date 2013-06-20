@@ -22,7 +22,7 @@ create table partners
 (
     id           int         primary key default nextval('seq_partnerIds'),
     name         text        not null unique,
-    developer    bool        default false,
+    publisher    bool        default false,
     distributor  bool        default false,
     supportEmail text        default null,
     earnedPoints int         not null default 0 constraint ct_personEarnedPoints check (earnedPoints > -1),

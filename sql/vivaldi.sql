@@ -1,6 +1,6 @@
 --begin;
 
-insert into partners (id, name, developer, distributor, homepage, supportEmail)
+insert into partners (id, name, publisher, distributor, homepage, supportEmail)
        values (1, 'Make Play Live', true, true, 'http://makeplaylive.com', 'support@makeplaylive.com');
 
 insert into stores (id, partner, name, description)

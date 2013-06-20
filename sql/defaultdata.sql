@@ -56,7 +56,7 @@ INSERT INTO licenses (name, text) VALUES ('Proprietary', '');
 
 -- a "NULL" store for use with e.g. the bodegamarket log ins
 SELECT setval('seq_partnerIds', 1000);
-INSERT INTO partners (id, name, developer, distributor) VALUES (0, 'Management Group', true, true);
+INSERT INTO partners (id, name, publisher, distributor) VALUES (0, 'Management Group', true, true);
 INSERT INTO stores (partner, name, id) VALUES (0, 'No Store', 'null');
 INSERT INTO warehouses VALUES ('main', 15, 10000, false, 15);
 

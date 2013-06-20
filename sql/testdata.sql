@@ -130,16 +130,16 @@ insert into people (lastname, firstname, email, points, password, active)
 insert into people (lastname, firstname, email, points, password, active)
     values ('Martin', 'Marco', 'mart@kde.org', 10000, '$2a$10$VYBi6invWdeT..wQ5FFXqu67HQI5Y8WVAhN5orzUIsWAeMaAItYrS', true);
 
-insert into partners (id, name, developer, distributor) values (0, 'Management', true, true);
-insert into partners (id, name, developer, distributor, supportEmail) values (1000, 'Make Play Live', true, true, 'support@makeplaylive.com');
+insert into partners (id, name, publisher, distributor) values (0, 'Management', true, true);
+insert into partners (id, name, publisher, distributor, supportEmail) values (1000, 'Make Play Live', true, true, 'support@makeplaylive.com');
 insert into partnerContacts (partner, service, account, url) values (1000, 'website', null, 'http://makeplaylive.com');
 insert into partnerContacts (partner, service, account, url) values (1000, 'identi.ca', 'aseigo', null);
 insert into partnerContacts (partner, service, account, url) values (1000, 'blog', '', 'http://aseigo.blogspot.com');
-insert into partners (id, name, developer, distributor, supportEmail) values (1002, 'KDE', false, true, 'info@kde.org');
+insert into partners (id, name, publisher, distributor, supportEmail) values (1002, 'KDE', false, true, 'info@kde.org');
 insert into partnerContacts (partner, service, account, url) values (1002, 'blog', null, 'http://planet.kde.org');
 insert into partnerContacts (partner, service, account, url) values (1002, 'website', null, 'http://kde.org');
-insert into partners (id, name, developer, distributor) values (1003, 'Diamond Devices', false, true);
-insert into partners (id, name, developer, distributor) values (1004, 'Saphire Software', false, true);
+insert into partners (id, name, publisher, distributor) values (1003, 'Diamond Devices', false, true);
+insert into partners (id, name, publisher, distributor) values (1004, 'Saphire Software', false, true);
 
 select affiliatePerson('zack@kde.org', 'KDE', 'Content Creator');
 select affiliatePerson('zack@kde.org', 'KDE', 'Store Manager');

@@ -50,7 +50,7 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
     m_partnerId = partnerId();
     if (m_partnerId <= 0) {
         QSqlQuery query;
-        if (!query.exec("insert into partners (name, developer, distributor) "
+        if (!query.exec("insert into partners (name, publisher, distributor) "
                         "values ('Project Gutenberg', false, true);")) {
             showError(query);
             QSqlDatabase::database().rollback();
