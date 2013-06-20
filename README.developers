@@ -30,6 +30,14 @@ The tests relies on the test data set which can be loaded with:
 
     $ make test_sql
 
+## Changes to the database
+
+All changes affecting the database schema or default data set must appear both
+in the relevant files in the sql/ directory as well as in an update file in
+sql/updates. The update files are commands that will be run on the PostgreSQL
+server. This allows installed systems to update to new versions in an incremental
+fashion without database drama.
+
 ## Branches are the new black
 
 All new feature development and all but the most trivial of bug fixes must be done
