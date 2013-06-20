@@ -31,12 +31,15 @@ var AssetStore = (function() {
     var incomingDirPath;
     var contentDirPath;
 
-    function checkContentDirectory(dirpath) {
+    function checkContentDirectory(dirpath, fn) {
         var stats;
+        var e;
 
         if (!dirpath) {
-            console.error("Invalid content directory! Set storageConfig!");
-            process.exit(1);
+            e = errors.create('UploadFailed',
+                              "Invalid content directory!");
+            fn(e);
+            return;
         }
 
         stats = fs.statSync(dirpath);
@@ -46,18 +49,14 @@ var AssetStore = (function() {
                 fs.mkdirSync(dirpath, "0700");
             } catch (err) {
                 if (!fs.existsSync(dirpath)) {
-                    console.log(err);
-                    console.error("Unable to create content directory: " + dirpath);
-                    process.exit(1);
+                    fn(err);
+                    return;
                 }
             }
         }
 
         fs.chmod(dirpath, '0700', function (err) {
-            if (err) {
-                console.error(dirpath + " has invalid permissions and the server can't change them!");
-                process.exit(1);
-            }
+            fn(err);
         });
     }
 
@@ -72,8 +71,16 @@ var AssetStore = (function() {
                                         storageConfig.incomingBasePath);
             contentDirPath = path.join(process.cwd(),
                                        storageConfig.basePath);
-            checkContentDirectory(incomingDirPath);
-            checkContentDirectory(contentDirPath);
+            checkContentDirectory(incomingDirPath, function(err) {
+                console.log("Invalid content directory! Set storageConfig!");
+                console.error(err);
+                process.exit(1);
+            });
+            checkContentDirectory(contentDirPath, function(err) {
+                console.log("Invalid content directory! Set storageConfig!");
+                console.error(err);
+                process.exit(1);
+            });
         }
     }
 
@@ -415,6 +422,7 @@ var AssetStore = (function() {
         var fromPath;
         var toPath;
         var incoming = assetInfo.incoming;
+        var incomingDir;
 
         assetInfo.incoming = false;
         fromPath = pathForAsset(assetInfo);
@@ -422,14 +430,23 @@ var AssetStore = (function() {
         toPath = pathForAsset(assetInfo);
         assetInfo.incoming = incoming;
 
-        utils.copyFile(fromPath, toPath, function(err) {
+        incomingDir = path.dirname(toPath);
+
+        checkContentDirectory(incomingDir, function(err) {
             var e;
             if (err) {
                 e = errors.create('AssetFileMissing', err.message);
                 cb(e);
                 return;
             }
-            cb(null);
+            utils.copyFile(fromPath, toPath, function(err) {
+                if (err) {
+                    e = errors.create('AssetFileMissing', err.message);
+                    cb(e);
+                    return;
+                }
+                cb(null);
+            });
         });
     };
 
