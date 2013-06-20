@@ -43,12 +43,10 @@ if (argv.production) {
 //    so that our config file is available to all the resources
 var BodegaDb = require('./lib/bodegadb').BodegaDb;
 var AssetStore = require('./lib/assetstore').AssetStore;
-var ContentPartner = require('./lib/contentpartner').ContentPartner;
 var PreviewStore = require('./lib/previewstore').PreviewStore;
 
 app.db = new BodegaDb();
 app.assetStore = new AssetStore();
-app.contentPartner = new ContentPartner();
 app.previewStore = new PreviewStore();
 
 // Configuration

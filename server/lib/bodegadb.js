@@ -43,6 +43,7 @@ var dbStores = require('./db/stores.js');
 var dbContactInfo = require('./db/contactInfo.js');
 var dbPostAsset = require('./db/postasset.js');
 var dbPublishAsset = require('./db/publishasset.js');
+var dbParticipantInfo = require('./db/participantInfo.js');
 
 var BodegaDb = (function() {
     var connectionString;
@@ -235,6 +236,10 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.contactInfo = function(req, res) {
         this.dbQuery(dbContactInfo, req, res);
+    };
+
+    BodegaDb.prototype.participantInfo = function(req, res) {
+        this.dbQuery(dbParticipantInfo, req, res);
     };
 
     return BodegaDb;

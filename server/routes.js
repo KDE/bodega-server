@@ -172,7 +172,7 @@ app.get(serverPath('collection/:collectionId/remove/:assetId'), isAuthorized,
 // Account info and management
 app.get(serverPath('participant/info'), isAuthorized,
         function(req, res) {
-            app.contentPartner.participantInfo(req, res);
+            app.db.participantInfo(req, res);
         });
 
 app.get(serverPath('participant/history'), isAuthorized,
