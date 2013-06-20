@@ -744,6 +744,128 @@
         ]
     },
     {
+        "name": "Partners",
+        "methods": [
+        {
+            "MethodName": "List",
+            "Synopsis": "Lists all partners the authenticated account is associated with",
+            "HTTPMethod": "GET",
+            "URI": "/partner/update",
+            "parameters": [
+            ]
+        },
+        {
+            "MethodName": "Create",
+            "Synopsis": "Adds a new partner entity and associates the currently authenticated account with it",
+            "HTTPMethod": "POST",
+            "URI": "/partner/create",
+            "parameters": [
+            {
+                "Name": "name",
+                "Location": "body",
+                "Description": "The name of the partner",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "email",
+                "Location": "body",
+                "Description": "General contact email",
+                "Required": "N",
+                "Type": "string"
+            },
+            {
+                "Name": "homepage",
+                "Location": "body",
+                "Description": "URL of the partner's homepage",
+                "Required": "N",
+                "Type": "string"
+            }
+            ]
+        },
+        {
+            "MethodName": "Update",
+            "Synopsis": "Updates a partner entity with new information",
+            "HTTPMethod": "POST",
+            "URI": "/partner/update",
+            "parameters": [
+            {
+                "Name": "id",
+                "Location": "body",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            },
+            {
+                "Name": "name",
+                "Location": "body",
+                "Description": "The name of the partner",
+                "Required": "N",
+                "Type": "string"
+            },
+            {
+                "Name": "email",
+                "Location": "body",
+                "Description": "General contact email",
+                "Required": "N",
+                "Type": "string"
+            },
+            {
+                "Name": "homepage",
+                "Location": "body",
+                "Description": "URL of the partner's homepage",
+                "Required": "N",
+                "Type": "string"
+            }
+            ]
+        },
+        {
+            "MethodName": "Request publisher status",
+            "Synopsis": "Enters a request to have publisher status added to a partner the account is affiliated with. This allows creation and management of assets.",
+            "HTTPMethod": "POST",
+            "URI": "/partner/request/publisher",
+            "parameters": [
+            {
+                "Name": "id",
+                "Location": "body",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            },
+            {
+                "Name": "information",
+                "Location": "body",
+                "Description": "An explanation of the intended use of publisher status or other useful informaton that can help direct the approval process.",
+                "Required": "N",
+                "Type": "string"
+            }
+            ]
+        },
+        {
+            "MethodName": "Request distributor status",
+            "Synopsis": "Enters a request to have distributor status added to a partner the account is affiliated with. This allows creation and management of stores.",
+            "HTTPMethod": "POST",
+            "URI": "/partner/request/distributor",
+            "parameters": [
+            {
+                "Name": "id",
+                "Location": "body",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            },
+            {
+                "Name": "information",
+                "Location": "body",
+                "Description": "A description of the store target (e.g. a device, a given platform, etc.) that can help direct the approval process.",
+                "Required": "N",
+                "Type": "string"
+            }
+            ]
+        }
+        ]
+    },
+    {
         "name": "Points",
         "methods": [
         {

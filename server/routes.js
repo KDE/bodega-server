@@ -396,10 +396,51 @@ app.get(serverPath('store/collection/remove/:store/:collection'), isAuthorized,
     }
 );
 
+/******************************************************
+ * Partner management
+ */
+app.get(serverPath('partner/list'), isAuthorized,
+    function(req, res) {
+        app.db.listPartner(req, res);
+    }
+);
+
+app.post(serverPath('partner/create'), isAuthorized,
+    function(req, res) {
+        app.db.createPartner(req, res);
+    }
+);
+
+
+app.post(serverPath('partner/update/:partner'), isAuthorized,
+    function(req, res) {
+        app.db.updatePartner(req, res);
+    }
+);
+
+app.post(serverPath('partner/request/publisher/:partner'), isAuthorized,
+    function(req, res) {
+        app.db.requestPublisherStatus(req, res);
+    }
+);
+
+app.post(serverPath('partner/request/distributor/:partner'), isAuthorized,
+    function(req, res) {
+        app.db.requestDistributorStatus(req, res);
+    }
+);
+
+/******************************************************
+ * Store and warehouse contact listing
+ */
 app.get(serverPath('contact'), function(req, res) {
     app.db.contactInfo(req, res);
 });
 
+
+/******************************************************
+ * Easter egg hunting
+ */
 app.get(serverPath('hunt/:store/:code'),
     function(req, res) {
         app.db.hunt(req, res);

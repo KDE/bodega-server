@@ -43,6 +43,7 @@ var dbStores = require('./db/stores.js');
 var dbContactInfo = require('./db/contactInfo.js');
 var dbPostAsset = require('./db/postasset.js');
 var dbPublishAsset = require('./db/publishasset.js');
+var dbPartners = require('./db/partners.js');
 var dbParticipantInfo = require('./db/participantInfo.js');
 
 var BodegaDb = (function() {
@@ -236,6 +237,26 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.contactInfo = function(req, res) {
         this.dbQuery(dbContactInfo, req, res);
+    };
+
+    BodegaDb.prototype.listPartner = function(req, res) {
+        this.dbQuery(dbPartners.list, req, res);
+    };
+
+    BodegaDb.prototype.createPartner = function(req, res) {
+        this.dbQuery(dbPartners.create, req, res);
+    };
+
+    BodegaDb.prototype.updatePartner = function(req, res) {
+        this.dbQuery(dbPartners.update, req, res);
+    };
+
+    BodegaDb.prototype.requestPublisherStatus = function(req, res) {
+        this.dbQuery(dbPartners.requestPublisherStatus, req, res);
+    };
+
+    BodegaDb.prototype.requestDistributorStatus = function(req, res) {
+        this.dbQuery(dbPartners.requestDistributorStatus, req, res);
     };
 
     BodegaDb.prototype.participantInfo = function(req, res) {

@@ -66,6 +66,7 @@ INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('twitter', '
 INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('identi.ca', 'extern/identica.png', 'https://identi.ca/');
 INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('google+', 'extern/googleplus.png', 'https://plus.google.com/');
 INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('blog', 'extern/blog.png', null);
+INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('website', null, null);
 
 -- default roles for the accounts
 INSERT INTO personRoles (description) VALUES ('Store Manager');
