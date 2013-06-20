@@ -371,8 +371,7 @@ function processInfo(assetInfo, db, req, res)
                         return;
                     }
                     //Can't edit a posted asset
-                    //unfortunately posted can arrive as string 'false' as well
-                    if (assetInfo.posted !== false && assetInfo.posted !== 'false') {
+                    if (!assetInfo.posted) {
                         errors.report('AssetPosted', req, res, err);
                         return;
                     }
