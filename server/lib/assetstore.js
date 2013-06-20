@@ -411,7 +411,7 @@ var AssetStore = (function() {
         }
     };
 
-    AssetStore.prototype.copyAsset = function(assetInfo, preview, cb) {
+    AssetStore.prototype.copyAsset = function(assetInfo, cb) {
         var fromPath;
         var toPath;
         var incoming = assetInfo.incoming;
@@ -426,14 +426,10 @@ var AssetStore = (function() {
             var e;
             if (err) {
                 e = errors.create('AssetFileMissing', err.message);
-                if (cb) {
-                    cb(e);
-                }
+                cb(e);
                 return;
             }
-            if (cb) {
-                cb(null);
-            }
+            cb(null);
         });
     };
 
