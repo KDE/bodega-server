@@ -17,7 +17,6 @@
 
 var pg = require('pg');
 var queryString = require('qs');
-var request = require('pg');
 
 var server = require('../app.js');
 var utils = require('./support/http');
