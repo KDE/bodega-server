@@ -25,7 +25,6 @@ create table partners
     developer    bool        default false,
     distributor  bool        default false,
     supportEmail text        default null,
-    homepage     text        default null,
     earnedPoints int         not null default 0 constraint ct_personEarnedPoints check (earnedPoints > -1),
     owedPoints   int         not null default 0 constraint ct_personOwedPoints check (owedPoints> -1)
 );

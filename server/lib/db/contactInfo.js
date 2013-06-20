@@ -33,7 +33,7 @@ module.exports = function(db, req, res) {
         json.warehouse = warehouse;
 
         db.query(
-            "select s.name, s.description, p.name as owner, p.homepage as url, p.supportEmail as contact, s.partner as partner from stores s left join partners p on (s.partner = p.id) where s.id = $1", [req.session.user.store],
+            "select s.name, s.description, p.name as owner, p.supportEmail as contact, s.partner as partner from stores s left join partners p on (s.partner = p.id) where s.id = $1", [req.session.user.store],
             function(err, result) {
                 if (err) {
                     errors.report('Database', req, res, err);
@@ -54,13 +54,9 @@ module.exports = function(db, req, res) {
 
                 var partner = result.rows[0].partner;
 
-                json.store.links = [];
-                if (result.rows[0].url  && result.rows[0].url !== '') {
-                    json.store.links.push({ type: "Website", url: result.rows[0].url, icon: ''});
-                }
-
                 // now we look to see if there are any social media etc. links
-                db.query("select p.service, p.account, p.url, s.icon, s.baseurl from partnerContacts p left join partnerContactServices s on (p.service = s.service) where partner = $1",
+                json.store.links = [];
+                db.query("select p.service, p.account, p.url, CASE WHEN s.icon IS NULL THEN '' ELSE s.icon END, s.baseurl from partnerContacts p left join partnerContactServices s on (p.service = s.service) where partner = $1",
                          [partner],
                          function (err, result) {
                              if (err) {

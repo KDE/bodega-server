@@ -71,11 +71,6 @@ describe('Fetch contact information', function() {
                     contact: 'support@makeplaylive.com',
                     links: [
                          {
-                             "type": "Website",
-                             "url": "http://makeplaylive.com",
-                             "icon": ""
-                         },
-                         {
                              "type": "identi.ca",
                              "url": "https://identi.ca/aseigo",
                              "icon": "extern/identica.png"
@@ -83,7 +78,12 @@ describe('Fetch contact information', function() {
                          {
                              "type": "blog",
                              "url": "http://aseigo.blogspot.com",
-                         "icon": "extern/blog.png"
+                             "icon": "extern/blog.png"
+                         },
+                         {
+                             "type": "website",
+                             "url": "http://makeplaylive.com",
+                             "icon": ""
                          }
                   ]
                 };
