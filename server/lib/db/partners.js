@@ -97,10 +97,10 @@ module.exports.list = function(db, req, res)
             });
 };
 
-function insertPartner(db, req, res, name, email, cb)
+function insertPartner(db, req, res, data, cb)
 {
     db.query("insert into partners (name, supportEmail) values ($1, $2) returning id as id",
-             [name, email],
+             [data.name, data.email],
              function(err, result) {
                  if (err) {
                      if (errors.dbErrorType(err, 'UniqueKey')) {
@@ -153,6 +153,16 @@ module.exports.create = function(db, req, res)
         }
     }
 
+    wrapInTransaction(db, req, res, [insertPartner, addDefaultAffiliaton], { 'name': name, 'email': email });
+}
+
+function wrapInTransaction(db, req, res, functions, startData)
+{
+    if (functions.length  < 1) {
+        console.log("Can not transact without functions!");
+        return;
+    }
+
     var funcs = [
         function(cb) {
             db.query("BEGIN", [], function(err, result) {
@@ -162,12 +172,12 @@ module.exports.create = function(db, req, res)
                     return;
                 }
 
-                cb(null, db, req, res, name, email);
+                cb(null, db, req, res, startData);
             });
         }
     ];
-    funcs.push(insertPartner);
-    funcs.push(addDefaultAffiliaton);
+
+    funcs = funcs.concat(functions);
 
     async.waterfall(funcs, function(err, json) {
         if (err) {
