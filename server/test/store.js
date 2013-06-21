@@ -594,16 +594,17 @@ describe('Store management', function(){
 
     // always delete the two stores we made, even on error
     after(function(done) {
-        var connectionString = app.config.database.protocol + "://" +
-                               app.config.database.user + ":" + app.config.database.password +
-                               "@" + app.config.database.host + "/" +
-                               app.config.database.name;
+        var connectionString = server.config.database.protocol + "://" +
+                               server.config.database.user + ":" + server.config.database.password +
+                               "@" + server.config.database.host + "/" +
+                               server.config.database.name;
 
         pg.connect(connectionString, function(err, client, finis) {
                    client.query("delete from stores where id = '1002_FUN_TIMES_WITH_CLOWNS' or id = 'somethingcrazy'", [],
                    function(err, result) {
                        client.query("delete from channels where name = 'Test Channel';", [],
                        function(err, result) {
+                           finis();
                            done();
                        });
                    });
