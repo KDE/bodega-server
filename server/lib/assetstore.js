@@ -42,9 +42,12 @@ var AssetStore = (function() {
             return;
         }
 
-        stats = fs.statSync(dirpath);
+        if (fs.existsSync()) {
+            //statSync fails with inexistent paths
+            stats = fs.statSync(dirpath);
+        }
 
-        if (!stats.isDirectory()) {
+        if (!stats || !stats.isDirectory()) {
             try {
                 fs.mkdirSync(dirpath, "0700");
             } catch (err) {
@@ -72,14 +75,18 @@ var AssetStore = (function() {
             contentDirPath = path.join(process.cwd(),
                                        storageConfig.basePath);
             checkContentDirectory(incomingDirPath, function(err) {
-                console.log("Invalid content directory! Set storageConfig!");
-                console.error(err);
-                process.exit(1);
+                if (err) {
+                    console.log("Invalid content directory! Set storageConfig!");
+                    console.error(err);
+                    process.exit(1);
+                }
             });
             checkContentDirectory(contentDirPath, function(err) {
-                console.log("Invalid content directory! Set storageConfig!");
-                console.error(err);
-                process.exit(1);
+                if (err) {
+                    console.log("Invalid content directory! Set storageConfig!");
+                    console.error(err);
+                    process.exit(1);
+                }
             });
         }
     }
