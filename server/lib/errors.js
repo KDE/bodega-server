@@ -91,11 +91,23 @@ var ErrorType = {
     "StoreIdInvalid"         : 64,//the provided store id is not valid for this user
     "StoreChannelIdInvalid"  : 65,//the requested channel id for editting is invalid
     "StoreCreateChannelFailed": 66,//could not create the requested channel
-    "PublishingFailed"       : 67//wasn't able to publish an asset
+    "PublishingFailed"       : 67,//wasn't able to publish an asset
+
+    "PartnerNameExists"      : 80,//the partner already exists in the database
+};
+
+var DbErrorType = {
+    UniqueKey: 23505
 };
 
 module.exports.Type = ErrorType;
 
+module.exports.DbErrorType = DbErrorType;
+
+module.exports.dbErrorType = function(err, type)
+{
+    return err && err.code == DbErrorType[type];
+}
 
 module.exports.create = function(name, msg)
 {
