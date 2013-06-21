@@ -594,8 +594,6 @@ describe('Store management', function(){
 
     // always delete the two stores we made, even on error
     after(function(done) {
-        done();
-        return;
         var connectionString = app.config.database.protocol + "://" +
                                app.config.database.user + ":" + app.config.database.password +
                                "@" + app.config.database.host + "/" +
