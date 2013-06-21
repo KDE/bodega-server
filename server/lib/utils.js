@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var async = require('async');
 var nodemailer = require('nodemailer');
 var errors = require('./errors.js');
 var fs = require('fs');
@@ -266,3 +267,68 @@ module.exports.copyFile = function(source, target, cb) {
     });
     rd.pipe(wr);
 };
+
+/**
+ * Wraps any number of functions in a waterfalling transaction
+ * Each function passed in will be executed one after the other within
+ * a database transaction and are called with the db, req and res
+ * params. Functions are responsible for ensuring that
+ * errors.report(..) is called when an error takes place and the last
+ * function can also include an option json object to be sent back 
+ * to the client
+ *
+ * functions: an array of functions
+ * db: a database connection
+ * req: the client request object
+ * res: the client response object
+ *
+ * any number of parameters may be passed in after res and those will
+ * be sent as additional parameters to this first function.
+ */
+module.exports.wrapInTransaction = function(functions, db, req, res)
+{
+    if (functions.length  < 1) {
+        console.log("Can not transact without functions!");
+        return;
+    }
+
+    startArgs = Array.prototype.slice.call(arguments, 1);
+    startArgs.unshift(null);
+
+    var funcs = [
+        function(cb) {
+            db.query("BEGIN", [], function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    cb(errors.create('Database', err.message));
+                    return;
+                }
+
+                cb.apply(null, startArgs);
+            });
+        }
+    ];
+
+    funcs = funcs.concat(functions);
+
+    async.waterfall(funcs, function(err, json) {
+        if (err) {
+            db.query("abort", []);
+        } else {
+            db.query("commit", [],
+                     function(err, result) {
+                          if (json) {
+                              res.json(json);
+                          }
+                     });
+        }
+    }
+    );
+};
+
+module.exports.update = function(db, req, res)
+{
+
+};
+
+

@@ -97,10 +97,10 @@ module.exports.list = function(db, req, res)
             });
 };
 
-function insertPartner(db, req, res, data, cb)
+function insertPartner(db, req, res, name, email, cb)
 {
     db.query("insert into partners (name, supportEmail) values ($1, $2) returning id as id",
-             [data.name, data.email],
+             [name, email],
              function(err, result) {
                  if (err) {
                      if (errors.dbErrorType(err, 'UniqueKey')) {
@@ -117,7 +117,7 @@ function insertPartner(db, req, res, data, cb)
             });
 }
 
-function addDefaultAffiliaton(db, req, res, partnerId, cb)
+function addDefaultAffiliation(db, req, res, partnerId, cb)
 {
     db.query("insert into affiliations (person, partner, role) select $1, $2, id from personRoles where description = 'Partner Manager';",
              [req.session.user.id, partnerId],
@@ -153,49 +153,8 @@ module.exports.create = function(db, req, res)
         }
     }
 
-    wrapInTransaction(db, req, res, [insertPartner, addDefaultAffiliaton], { 'name': name, 'email': email });
+    utils.wrapInTransaction([insertPartner, addDefaultAffiliation], db, req, res, name, email);
 }
-
-function wrapInTransaction(db, req, res, functions, startData)
-{
-    if (functions.length  < 1) {
-        console.log("Can not transact without functions!");
-        return;
-    }
-
-    var funcs = [
-        function(cb) {
-            db.query("BEGIN", [], function(err, result) {
-                if (err) {
-                    errors.report('Database', req, res, err);
-                    cb(errors.create('Database', err.message));
-                    return;
-                }
-
-                cb(null, db, req, res, startData);
-            });
-        }
-    ];
-
-    funcs = funcs.concat(functions);
-
-    async.waterfall(funcs, function(err, json) {
-        if (err) {
-            db.query("abort", []);
-        } else {
-            db.query("commit", [],
-                     function(err, result) {
-                          res.json(json);
-                     });
-        }
-    }
-    );
-};
-
-module.exports.update = function(db, req, res)
-{
-
-};
 
 module.exports.requestDestributorStatus = function(db, req, res)
 {
