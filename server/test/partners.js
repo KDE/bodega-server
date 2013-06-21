@@ -163,4 +163,85 @@ describe('Partner management', function() {
                 cookie);
         });
     });
+
+    describe('creating and updating a new partner', function() {
+        var newPartnerId = 0;
+        it('creation should fail with an existing partner name', function(done) {
+            server.config.printErrors = false;
+            var params = { name: 'KDE', email: 'foo@somewhere.org' };
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/partner/create',
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'PartnerNameExists');
+                    done();
+                    server.config.printErrors = true;
+                },
+                cookie);
+        });
+
+        it('creation should fail with an invalid email', function(done) {
+            var params = { name: 'Somewhere', email: 'foo..somewhere.org' };
+            server.config.printErrors = false;
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/partner/create',
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'InvalidEmailAddress');
+                    server.config.printErrors = true;
+                    done();
+                },
+                cookie);
+        });
+
+        it('creation should succeed with good data', function(done) {
+            var params = { name: 'Somewhere', email: 'foo@somewhere.org' };
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/partner/create',
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('partnerId');
+                    newPartnerId = res.body.partnerId;
+                    done();
+                },
+                cookie);
+        });
+
+        after(function(done) {
+            if (newPartnerId < 1) {
+                return;
+            }
+
+            var connectionString = server.config.database.protocol + "://" +
+                                   server.config.database.user + ":" + server.config.database.password +
+                                   "@" + server.config.database.host + "/" +
+                                   server.config.database.name;
+
+            pg.connect(connectionString,
+                       function(err, client, finis) {
+                            client.query("delete from partners where id = $1", [newPartnerId],
+                                    function() {
+                                        finis();
+                                        done();
+                            });
+            });
+        });
+    });
 });

@@ -17,6 +17,7 @@
 
 var async = require('async');
 var check = require('validator').check;
+var sanitize = require('validator').sanitize;
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
@@ -96,9 +97,89 @@ module.exports.list = function(db, req, res)
             });
 };
 
+function insertPartner(db, req, res, name, email, cb)
+{
+    db.query("insert into partners (name, supportEmail) values ($1, $2) returning id as id",
+             [name, email],
+             function(err, result) {
+                 if (err) {
+                     if (errors.dbErrorType(err, 'UniqueKey')) {
+                        errors.report('PartnerNameExists', req, res);
+                     } else {
+                        errors.report('Database', req, res, err);
+                     }
+
+                     cb(errors.create('Database', err.message));
+                     return;
+                 }
+
+                 cb(null, db, req, res, result.rows[0].id);
+            });
+}
+
+function addDefaultAffiliaton(db, req, res, partnerId, cb)
+{
+    db.query("insert into affiliations (person, partner, role) select $1, $2, id from personRoles where description = 'Partner Manager';",
+             [req.session.user.id, partnerId],
+             function(err, result) {
+                  if (err) {
+                      errors.report('Database', req, res, err);
+                      cb(errors.create('Database', err.message));
+                      return;
+                  }
+
+                  var json = utils.standardJson(req);
+                  json.partnerId = partnerId;
+                  cb(null, json);
+             });
+}
+
+
 module.exports.create = function(db, req, res)
 {
+    var name = sanitize(req.body.name).trim();
+    if (name === '') {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
 
+    var email = sanitize(req.body.email).trim();
+    if (email !== '') {
+        try {
+            check(email).isEmail();
+        } catch (e) {
+            errors.report('InvalidEmailAddress', req, res, e);
+            return;
+        }
+    }
+
+    var funcs = [
+        function(cb) {
+            db.query("BEGIN", [], function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    cb(errors.create('Database', err.message));
+                    return;
+                }
+
+                cb(null, db, req, res, name, email);
+            });
+        }
+    ];
+    funcs.push(insertPartner);
+    funcs.push(addDefaultAffiliaton);
+
+    async.waterfall(funcs, function(err, json) {
+        if (err) {
+            db.query("abort", []);
+        } else {
+            db.query("commit", [],
+                     function(err, result) {
+                          res.json(json);
+                     });
+        }
+    }
+    );
 };
 
 module.exports.update = function(db, req, res)
