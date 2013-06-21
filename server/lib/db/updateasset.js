@@ -371,7 +371,7 @@ function processInfo(assetInfo, db, req, res)
                         return;
                     }
                     //Can't edit a posted asset
-                    if (!assetInfo.posted) {
+                    if (assetInfo.posted) {
                         errors.report('AssetPosted', req, res, err);
                         return;
                     }
