@@ -104,12 +104,12 @@ function insertPartner(db, req, res, name, email, cb)
              function(err, result) {
                  if (err) {
                      if (errors.dbErrorType(err, 'UniqueKey')) {
-                        errors.report('PartnerNameExists', req, res);
+                         cb(errors.create('PartnerNameExists',
+                                          'Partner ' + name + ' already exists in the database'));
                      } else {
-                        errors.report('Database', req, res, err);
+                         cb(errors.create('Database', err.message));
                      }
 
-                     cb(errors.create('Database', err.message));
                      return;
                  }
 
@@ -123,7 +123,6 @@ function addDefaultAffiliation(db, req, res, partnerId, cb)
              [req.session.user.id, partnerId],
              function(err, result) {
                   if (err) {
-                      errors.report('Database', req, res, err);
                       cb(errors.create('Database', err.message));
                       return;
                   }

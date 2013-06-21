@@ -272,10 +272,9 @@ module.exports.copyFile = function(source, target, cb) {
  * Wraps any number of functions in a waterfalling transaction
  * Each function passed in will be executed one after the other within
  * a database transaction and are called with the db, req and res
- * params. Functions are responsible for ensuring that
- * errors.report(..) is called when an error takes place and the last
- * function can also include an option json object to be sent back 
- * to the client
+ * params.
+ *
+ * The last may pass a json object to be sent back to the client
  *
  * functions: an array of functions
  * db: a database connection
@@ -313,7 +312,10 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
 
     async.waterfall(funcs, function(err, json) {
         if (err) {
-            db.query("abort", []);
+            db.query("rollback", [],
+                     function() {
+                        errors.report(err.name, req, res, err);
+                     });
         } else {
             db.query("commit", [],
                      function(err, result) {
