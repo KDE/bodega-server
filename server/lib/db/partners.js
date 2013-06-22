@@ -134,6 +134,15 @@ function requireAccountOrUrl(db, req, res, partner, cb)
         return;
     }
 
+    if (req.body.url) {
+        try {
+            check(req.body.url).isUrl();
+        } catch(e) {
+            cb(errors.create('InvalidUrl'));
+            return;
+        }
+    }
+
     cb(null, db, req, res, partner);
 }
 
