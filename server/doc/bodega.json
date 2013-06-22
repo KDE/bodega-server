@@ -773,13 +773,6 @@
                 "Description": "General contact email",
                 "Required": "N",
                 "Type": "string"
-            },
-            {
-                "Name": "homepage",
-                "Location": "body",
-                "Description": "URL of the partner's homepage",
-                "Required": "N",
-                "Type": "string"
             }
             ]
         },
@@ -787,11 +780,11 @@
             "MethodName": "Update",
             "Synopsis": "Updates a partner entity with new information",
             "HTTPMethod": "POST",
-            "URI": "/partner/update",
+            "URI": "/partner/update/:partner",
             "parameters": [
             {
-                "Name": "id",
-                "Location": "body",
+                "Name": "partner",
+                "Location": "URL",
                 "Description": "The id of the partner",
                 "Required": "Y",
                 "Type": "number"
@@ -809,11 +802,76 @@
                 "Description": "General contact email",
                 "Required": "N",
                 "Type": "string"
+            }
+            ]
+        },
+        {
+            "MethodName": "Create web link",
+            "Synopsis": "Creates a partner web link. If an account is provided then a service must be defined. A url or an account is required, and a url may also have a service defined for it. See the service types listing in the utils section",
+            "HTTPMethod": "POST",
+            "URI": "/partner/:partner/link/create/",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
             },
             {
-                "Name": "homepage",
+                "Name": "service",
                 "Location": "body",
-                "Description": "URL of the partner's homepage",
+                "Description": "The type of service",
+                "Required": "N",
+                "Type": "string"
+            },
+            {
+                "Name": "account",
+                "Location": "body",
+                "Description": "The account name for the service. This will automatically be interpolated into the service's template URL",
+                "Required": "N",
+                "Type": "string"
+            },
+            {
+                "Name": "url",
+                "Location": "body",
+                "Description": "The full URL to the link",
+                "Required": "N",
+                "Type": "string"
+            }
+            ]
+        },
+        {
+            "MethodName": "Delete web link",
+            "Synopsis": "Deletes a partner web link matching the parameters provided",
+            "HTTPMethod": "POST",
+            "URI": "/partner/:partner/link/delete/",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            },
+            {
+                "Name": "service",
+                "Location": "body",
+                "Description": "The type of service",
+                "Required": "N",
+                "Type": "string"
+            },
+            {
+                "Name": "account",
+                "Location": "body",
+                "Description": "The account name for the service",
+                "Required": "N",
+                "Type": "string"
+            },
+            {
+                "Name": "url",
+                "Location": "body",
+                "Description": "The full URL to the link",
                 "Required": "N",
                 "Type": "string"
             }

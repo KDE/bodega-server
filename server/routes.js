@@ -411,10 +411,21 @@ app.post(serverPath('partner/create'), isAuthorized,
     }
 );
 
-
 app.post(serverPath('partner/update/:partner'), isAuthorized,
     function(req, res) {
         app.db.updatePartner(req, res);
+    }
+);
+
+app.post(serverPath('partner/:partner/link/create'), isAuthorized,
+    function(req, res) {
+        app.db.createPartnerLink(req, res);
+    }
+);
+
+app.post(serverPath('partner/:partner/link/delete'), isAuthorized,
+    function(req, res) {
+        app.db.deletePartnerLink(req, res);
     }
 );
 

@@ -95,6 +95,7 @@ var ErrorType = {
     "PublishingFailed"       : 67,//wasn't able to publish an asset
 
     "PartnerNameExists"      : 80,//the partner already exists in the database
+    "InvalidLinkService"     : 81,//the service requested for use as a link does not exist
 };
 
 var DbErrorType = {

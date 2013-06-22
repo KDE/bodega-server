@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var async = require('async');
 var pg = require('pg');
 var queryString = require('qs');
 
@@ -33,12 +34,14 @@ describe('Partner management', function() {
                             points: 0,
                             links: [
                              {
-                                 "type": "blog",
+                                 "service": "blog",
+                                 "account": "",
                                  "url": "http://planet.kde.org",
                                  "icon": "extern/blog.png"
                              },
                              {
-                                 "type": "website",
+                                 "service": "website",
+                                 "account": "",
                                  "url": "http://kde.org",
                                  "icon": ""
                              }
@@ -242,6 +245,61 @@ describe('Partner management', function() {
                 cookie);
         });
 
+        it('adding contact links should succeed', function(done) {
+            var queue = async.queue(function(params, cb) {
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/partner/' + newPartnerId + '/link/create',
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    cb();
+                },
+                cookie);
+            });
+
+            var tasks = [
+                {
+                    service: 'blog',
+                    url: 'http://myblog.com'
+                },
+                {
+                    service: 'identi.ca',
+                    account: 'sometimes'
+                },
+                {
+                    service: 'facebook',
+                    account: 'meh'
+                },
+            ];
+            queue.push(tasks);
+            queue.drain = function() { done(); };
+        });
+
+        it('deleting a contact link should succeed', function(done) {
+            var params = {
+                service: 'facebook',
+                account: 'meh'
+            };
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/partner/' + newPartnerId + '/link/delete',
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    done();
+                },
+                cookie);
+        });
+
         it('listing should show new partner', function(done) {
             var expected = existingPartnerJson;
             expected.push(
@@ -252,7 +310,20 @@ describe('Partner management', function() {
                     "publisher": false,
                     "distributor": false,
                     "points": 0,
-                    "links": []
+                    "links": [
+                        {
+                            "service": "blog",
+                            "account": "",
+                            "url": "http://myblog.com",
+                            "icon": "extern/blog.png"
+                        },
+                        {
+                            "service": "identi.ca",
+                            "account": "sometimes",
+                            "url": "",
+                            "icon": "extern/identica.png"
+                        }
+                    ]
                 }
             );
 

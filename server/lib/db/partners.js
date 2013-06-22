@@ -24,7 +24,12 @@ var errors = require('../errors.js');
 
 function linkFetcher(task, cb)
 {
-    task.db.query("select p.service, p.account, p.url, CASE WHEN s.icon IS NULL THEN '' ELSE s.icon END, s.baseurl from partnerContacts p left join partnerContactServices s on (p.service = s.service) where partner = $1",
+    task.db.query("select case WHEN p.service IS NULL THEN '' ELSE p.service END,\
+                          case WHEN p.account IS NULL THEN '' ELSE p.account END,\
+                          CASE WHEN p.url IS NULL THEN '' ELSE p.url END, \
+                          CASE WHEN s.icon IS NULL THEN '' ELSE s.icon END \
+                  from partnerContacts p left join partnerContactServices s on (p.service = s.service)\
+                  where partner = $1 order by p.service",
              [task.partner],
              function (err, result) {
                  if (err) {
@@ -32,23 +37,9 @@ function linkFetcher(task, cb)
                      return;
                  }
 
-                 var links = [];
-                 var i;
-                 for (i = 0; i < result.rowCount; ++i) {
-                     var contact = result.rows[i];
-                     var url;
-                     if (contact.url && contact.url !== '') {
-                         url = contact.url;
-                     } else {
-                         url = contact.baseurl + contact.account;
-                     }
-
-                     links.push({ type: contact.service, url: url, icon: contact.icon});
-                 }
-
                  for (i = 0; i < task.json.partners.length; ++i) {
                      if (task.json.partners[i].id === task.partner) {
-                        task.json.partners[i].links = links;
+                        task.json.partners[i].links = result.rows;
                      }
                  }
                  cb();
@@ -112,6 +103,89 @@ function updatePartner(db, req, res, partner, data, cb)
             });
 }
 
+function confirmServiceExists(db, req, res, partner, data, cb)
+{
+    var service = req.body.service;
+    if (service !== '') {
+        db.query("select * from partnercontactservices where service = $1",
+                 [service],
+                 function(err, result) {
+                     if (err) {
+                         cb(errors.create('Database', err.message));
+                         return;
+                     }
+
+                     if (result.rowCount < 1) {
+                         cb(errors.create('InvalidLinkService', 'Service ' + service + ' is uknown'));
+                         return;
+                     }
+
+                     cb(null, db, req, res, partner);
+                 });
+    } else {
+        cb(null, db, req, res, partner);
+    }
+}
+
+function requireAccountOrUrl(db, req, res, partner, cb)
+{
+    if (!req.body.account && !req.body.url) {
+        cb(errors.create('MissingParameters', 'An account or a URL is required'));
+        return;
+    }
+
+    cb(null, db, req, res, partner);
+}
+
+function createPartnerLink(db, req, res, partner, cb)
+{
+    db.query("insert into partnerContacts (partner, service, account, url) values ($1, $2, $3, $4)",
+             [partner, req.body.service, req.body.account, req.body.url],
+             function(err, result) {
+                 if (err) {
+                     cb(errors.create('Database', err.message));
+                     return;
+                 }
+
+                 cb(null, utils.standardJson(req));
+             });
+}
+
+function deletePartnerLink(db, req, res, partner, cb)
+{
+    var params = [partner];
+    var whereClause = ['partner = $1'];
+
+    if (req.body.service) {
+        params.push(req.body.service);
+        whereClause.push('service = $' + params.length);
+    }
+
+    if (req.body.aclength) {
+        params.push(req.body.aclength);
+        whereClause.push('aclength = $' + params.length);
+    }
+
+    if (req.body.url) {
+        params.push(req.body.url);
+        whereClause.push('url = $' + params.length);
+    }
+
+    db.query("delete from partnerContacts where " + whereClause.join(' and '),
+             params,
+             function(err, result) {
+                 if (err) {
+                     cb(errors.create('Database', err.message));
+                     return;
+                 }
+
+                 if (result.rowCount < 1) {
+                     cb(errors.create('NoMatch', 'Could not find the requested partner link: ' + params.join(', ')));
+                     return;
+                }
+                 cb(null, utils.standardJson(req));
+             });
+}
 
 module.exports.list = function(db, req, res)
 {
@@ -135,7 +209,7 @@ module.exports.list = function(db, req, res)
                 var error = null;
                 queue.drain = function() {
                     if (error) {
-                        errors.report(error);
+                        errors.report(error.type, req, res, error);
                     } else {
                         res.json(json);
                     }
@@ -217,9 +291,40 @@ module.exports.update = function(db, req, res)
                             partner, 'Partner Manager', data);
 };
 
+module.exports.createLink = function(db, req, res)
+{
+    var partner = utils.parseNumber(req.params.partner);
+    if (partner < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    utils.wrapInTransaction([utils.requireRole, confirmServiceExists, requireAccountOrUrl, createPartnerLink],
+                            db, req, res, partner, 'Partner Manager', null);
+};
+
+module.exports.deleteLink = function(db, req, res)
+{
+    var partner = utils.parseNumber(req.params.partner);
+    if (partner < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    utils.wrapInTransaction([utils.requireRole, confirmServiceExists, requireAccountOrUrl, deletePartnerLink],
+                            db, req, res, partner, 'Partner Manager', null);
+};
+
 module.exports.requestDestributorStatus = function(db, req, res)
 {
+    var partner = utils.parseNumber(req.params.partner);
+    if (partner < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
 
+    utils.wrapInTransaction([utils.requireRole, deletePartnerLink], db, req, res,
+                            partner, 'Partner Manager');
 };
 
 module.exports.requestPublisherStatus = function(db, req, res)

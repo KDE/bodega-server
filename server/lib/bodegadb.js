@@ -251,6 +251,14 @@ var BodegaDb = (function() {
         this.dbQuery(dbPartners.update, req, res);
     };
 
+    BodegaDb.prototype.createPartnerLink = function(req, res) {
+        this.dbQuery(dbPartners.createLink, req, res);
+    };
+
+    BodegaDb.prototype.deletePartnerLink = function(req, res) {
+        this.dbQuery(dbPartners.deleteLink, req, res);
+    };
+
     BodegaDb.prototype.requestPublisherStatus = function(req, res) {
         this.dbQuery(dbPartners.requestPublisherStatus, req, res);
     };
