@@ -28,8 +28,7 @@ function linkFetcher(task, cb)
              [task.partner],
              function (err, result) {
                  if (err) {
-                     errors.report('Database', req, res, err);
-                     cb(err);
+                     cb(errors.create('Database', err.message));
                      return;
                  }
 
@@ -48,7 +47,7 @@ function linkFetcher(task, cb)
                  }
 
                  for (i = 0; i < task.json.partners.length; ++i) {
-                     if (task.json.partners[i].id == task.partner) {
+                     if (task.json.partners[i].id === task.partner) {
                         task.json.partners[i].links = links;
                      }
                  }
@@ -101,7 +100,7 @@ function updatePartner(db, req, res, partner, data, cb)
                  if (err) {
                      if (errors.dbErrorType(err, 'UniqueKey')) {
                          cb(errors.create('PartnerNameExists',
-                                          'Partner ' + name + ' already exists in the database'));
+                                          'Partner ' + data.params[0] + ' already exists in the database'));
                      } else {
                          cb(errors.create('Database', err.message));
                      }
@@ -133,8 +132,17 @@ module.exports.list = function(db, req, res)
                 }
 
                 var queue = async.queue(linkFetcher, 2);
+                var error = null;
                 queue.drain = function() {
-                    res.json(json);
+                    if (error) {
+                        errors.report(error);
+                    } else {
+                        res.json(json);
+                    }
+                };
+
+                function errorReporter(err) {
+                    error = err;
                 }
 
                 for (var i = 0; i < result.rowCount; ++i) {
@@ -150,7 +158,7 @@ module.exports.list = function(db, req, res)
                         'partner': store.id
                     };
 
-                    queue.push(task);
+                    queue.push(task, errorReporter);
                 }
             });
 };
@@ -174,7 +182,7 @@ module.exports.create = function(db, req, res)
     }
 
     utils.wrapInTransaction([insertPartner, addDefaultAffiliation], db, req, res, name, email);
-}
+};
 
 module.exports.update = function(db, req, res)
 {
@@ -207,7 +215,7 @@ module.exports.update = function(db, req, res)
 
     utils.wrapInTransaction([utils.requireRole, updatePartner], db, req, res,
                             partner, 'Partner Manager', data);
-}
+};
 
 module.exports.requestDestributorStatus = function(db, req, res)
 {

@@ -98,7 +98,7 @@ var ErrorType = {
 };
 
 var DbErrorType = {
-    UniqueKey: 23505
+    UniqueKey: '23505'
 };
 
 module.exports.Type = ErrorType;
@@ -107,8 +107,8 @@ module.exports.DbErrorType = DbErrorType;
 
 module.exports.dbErrorType = function(err, type)
 {
-    return err && err.code == DbErrorType[type];
-}
+    return err && err.code === DbErrorType[type];
+};
 
 module.exports.create = function(name, msg)
 {

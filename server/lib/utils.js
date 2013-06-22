@@ -224,7 +224,7 @@ module.exports.requireRole = function(db, req, res, partner, role, data, cb)
 
                 cb(null, db, req, res, partner, data);
             });
-}
+};
 
 module.exports.partnerId = function(db, req, res, cb, role)
 {
@@ -313,7 +313,7 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
         return;
     }
 
-    startArgs = Array.prototype.slice.call(arguments, 1);
+    var startArgs = Array.prototype.slice.call(arguments, 1);
     startArgs.unshift(null);
 
     var funcs = [
