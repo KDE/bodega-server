@@ -204,7 +204,29 @@ module.exports.authStore = function(req)
     return null;
 };
 
-module.exports.partnerId = function(db, req, res, fn, role)
+module.exports.requireRole = function(db, req, res, partner, role, data, cb)
+{
+    var roleQuery = 'select a.partner from affiliations a \
+                     left join personRoles r on (a.role = r.id and r.description = $1) \
+                     where a.partner = $2 and a.person = $3';
+
+    db.query(roleQuery, [ role, partner, req.session.user.id ],
+             function(err, result) {
+                if (err) {
+                    cb(errors.create('Database', err.message));
+                    return;
+                }
+
+                if (result.rowCount < 1) {
+                    cb(errors.create('InvalidRole', 'Request requires the ' + role + ' role'));
+                    return;
+                }
+
+                cb(null, db, req, res, partner, data);
+            });
+}
+
+module.exports.partnerId = function(db, req, res, cb, role)
 {
     var partner = module.exports.parseNumber(req.body.partner ? req.body.partner : req.query.partner);
     var params = [req.session.user.id];
@@ -225,7 +247,7 @@ module.exports.partnerId = function(db, req, res, fn, role)
                         return -1;
                     }
 
-                    fn(result.rows[0].partner, db, req, res);
+                    cb(result.rows[0].partner, db, req, res);
                 });
     } else {
         params.push(partner);
@@ -238,7 +260,7 @@ module.exports.partnerId = function(db, req, res, fn, role)
                         return;
                     }
 
-                    fn(partner, db, req, res);
+                    cb(partner, db, req, res);
                 });
     }
 };
@@ -298,7 +320,6 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
         function(cb) {
             db.query("BEGIN", [], function(err, result) {
                 if (err) {
-                    errors.report('Database', req, res, err);
                     cb(errors.create('Database', err.message));
                     return;
                 }

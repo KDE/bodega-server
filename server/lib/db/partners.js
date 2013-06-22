@@ -56,9 +56,67 @@ function linkFetcher(task, cb)
              });
 }
 
+function insertPartner(db, req, res, name, email, cb)
+{
+    db.query("insert into partners (name, supportEmail) values ($1, $2) returning id as id",
+             [name, email],
+             function(err, result) {
+                 if (err) {
+                     if (errors.dbErrorType(err, 'UniqueKey')) {
+                         cb(errors.create('PartnerNameExists',
+                                          'Partner ' + name + ' already exists in the database'));
+                     } else {
+                         cb(errors.create('Database', err.message));
+                     }
+
+                     return;
+                 }
+
+                 cb(null, db, req, res, result.rows[0].id);
+            });
+}
+
+function addDefaultAffiliation(db, req, res, partnerId, cb)
+{
+    db.query("insert into affiliations (person, partner, role) select $1, $2, id from personRoles where description = 'Partner Manager';",
+             [req.session.user.id, partnerId],
+             function(err, result) {
+                  if (err) {
+                      cb(errors.create('Database', err.message));
+                      return;
+                  }
+
+                  var json = utils.standardJson(req);
+                  json.partnerId = partnerId;
+                  cb(null, json);
+             });
+}
+
+function updatePartner(db, req, res, partner, data, cb)
+{
+    data.params.push(partner);
+    db.query("update partners set " + data.columns.join(', ') + " where id = $3",
+             data.params,
+             function(err, result) {
+                 if (err) {
+                     if (errors.dbErrorType(err, 'UniqueKey')) {
+                         cb(errors.create('PartnerNameExists',
+                                          'Partner ' + name + ' already exists in the database'));
+                     } else {
+                         cb(errors.create('Database', err.message));
+                     }
+
+                     return;
+                 }
+
+                 cb(null, utils.standardJson(req));
+            });
+}
+
+
 module.exports.list = function(db, req, res)
 {
-    db.query("select distinct p.id, p.name, p.supportEmail as email, p.publisher, p.distributor, p.owedPoints as points from partners p join affiliations a on (p.id = a.partner and a.person = $1)",
+    db.query("select distinct p.id, p.name, p.supportEmail as email, p.publisher, p.distributor, p.owedPoints as points from partners p join affiliations a on (p.id = a.partner and a.person = $1) order by id",
             [req.session.user.id],
             function (err, result) {
                 if (err) {
@@ -97,43 +155,6 @@ module.exports.list = function(db, req, res)
             });
 };
 
-function insertPartner(db, req, res, name, email, cb)
-{
-    db.query("insert into partners (name, supportEmail) values ($1, $2) returning id as id",
-             [name, email],
-             function(err, result) {
-                 if (err) {
-                     if (errors.dbErrorType(err, 'UniqueKey')) {
-                         cb(errors.create('PartnerNameExists',
-                                          'Partner ' + name + ' already exists in the database'));
-                     } else {
-                         cb(errors.create('Database', err.message));
-                     }
-
-                     return;
-                 }
-
-                 cb(null, db, req, res, result.rows[0].id);
-            });
-}
-
-function addDefaultAffiliation(db, req, res, partnerId, cb)
-{
-    db.query("insert into affiliations (person, partner, role) select $1, $2, id from personRoles where description = 'Partner Manager';",
-             [req.session.user.id, partnerId],
-             function(err, result) {
-                  if (err) {
-                      cb(errors.create('Database', err.message));
-                      return;
-                  }
-
-                  var json = utils.standardJson(req);
-                  json.partnerId = partnerId;
-                  cb(null, json);
-             });
-}
-
-
 module.exports.create = function(db, req, res)
 {
     var name = sanitize(req.body.name).trim();
@@ -153,6 +174,39 @@ module.exports.create = function(db, req, res)
     }
 
     utils.wrapInTransaction([insertPartner, addDefaultAffiliation], db, req, res, name, email);
+}
+
+module.exports.update = function(db, req, res)
+{
+    var partner = utils.parseNumber(req.params.partner);
+    if (partner < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    var data = {
+        columns: [],
+        params: []
+    };
+
+    var name = sanitize(req.body.name).trim();
+    if (name !== '') {
+        data.params.push(name);
+        data.columns.push('name = $' + data.params.length);
+    }
+
+    var email = sanitize(req.body.email).trim();
+    if (email !== '') {
+        try {
+            check(email).isEmail();
+            data.params.push(email);
+            data.columns.push('supportEmail = $' + data.params.length);
+        } catch (e) {
+        }
+    }
+
+    utils.wrapInTransaction([utils.requireRole, updatePartner], db, req, res,
+                            partner, 'Partner Manager', data);
 }
 
 module.exports.requestDestributorStatus = function(db, req, res)

@@ -36,6 +36,7 @@ var ErrorType = {
     "RedeemCodeFailure"      : 16,//could not redeem points code.
     "InvalidEmailAddress"    : 1000,//email address not valid
     "InvalidAsset"           : 1001,//The asset doesn't exist in this store
+    "InvalidRole"            : 1002,//The account lacks the necessary person role
 
     "PurchaseMethodCreation" : 17,//could not link credit card to customer
     "PurchaseMethodDeletion" : 18,//delete card details

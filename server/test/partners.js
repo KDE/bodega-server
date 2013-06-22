@@ -23,6 +23,28 @@ var utils = require('./support/http');
 
 describe('Partner management', function() {
     var cookie;
+    var existingPartnerJson = [
+                        {
+                            id: 1002,
+                            name: 'KDE',
+                            email: 'info@kde.org',
+                            publisher: false,
+                            distributor: true,
+                            points: 0,
+                            links: [
+                             {
+                                 "type": "blog",
+                                 "url": "http://planet.kde.org",
+                                 "icon": "extern/blog.png"
+                             },
+                             {
+                                 "type": "website",
+                                 "url": "http://kde.org",
+                                 "icon": ""
+                             }
+                          ]
+                       }
+                    ];
 
     describe('without authenticating', function(){
         it('Creating a partner should fail', function(done) {
@@ -130,28 +152,7 @@ describe('Partner management', function() {
                 server,
                 '/bodega/v1/json/partner/list',
                 function(res) {
-                    var expected = [
-                        {
-                            id: 1002,
-                            name: 'KDE',
-                            email: 'info@kde.org',
-                            publisher: false,
-                            distributor: true,
-                            points: 0,
-                            links: [
-                             {
-                                 "type": "blog",
-                                 "url": "http://planet.kde.org",
-                                 "icon": "extern/blog.png"
-                             },
-                             {
-                                 "type": "website",
-                                 "url": "http://kde.org",
-                                 "icon": ""
-                             }
-                          ]
-                       }
-                    ];
+                    var expected = existingPartnerJson;
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -222,6 +223,75 @@ describe('Partner management', function() {
                     done();
                 },
                 cookie);
+        });
+
+        it('update should succeed with good data', function(done) {
+            var params = { name: 'Sometime', email: 'foo@sometime.org' };
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/partner/update/' + newPartnerId,
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    done();
+                },
+                cookie);
+        });
+
+        it('listing should show new partner', function(done) {
+            var expected = existingPartnerJson;
+            expected.push(
+                {
+                    "id": newPartnerId,
+                    "name": "Sometime",
+                    "email": "foo@sometime.org",
+                    "publisher": false,
+                    "distributor": false,
+                    "points": 0,
+                    "links": []
+                }
+            );
+
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/partner/list',
+                function(res) {
+                    var expected = existingPartnerJson;
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('partners');
+                    res.body.partners.should.eql(expected);
+                    done();
+                },
+                cookie);
+        });
+
+        it('should not allow updating a partner we are not a manager for', function(done) {
+            var params = { name: 'Sometime', email: 'foo@sometime.org' };
+            server.config.printErrors = false;
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/partner/update/' + 1003,
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', false);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'InvalidRole');
+                    server.config.printErrors = true;
+                    done();
+                },
+                cookie);
+
         });
 
         after(function(done) {
