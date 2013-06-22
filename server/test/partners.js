@@ -245,7 +245,57 @@ describe('Partner management', function() {
                 cookie);
         });
 
-        it('adding contact links should succeed', function(done) {
+        it('adding invalid contact links should fail', function(done) {
+            var params = { service: 'Not Even Close', email: 'foo..somewhere.org' };
+            server.config.printErrors = false;
+            var queue = async.queue(function(task, cb) {
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/partner/' + task.partner + '/link/create',
+                task.params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', task.error);
+                    cb();
+                },
+                cookie);
+            });
+
+            var tasks = [
+                {
+                    params: { service: 'no such service', account: 'foo' },
+                    partner: newPartnerId,
+                    error: 'InvalidLinkService'
+                },
+                {
+                    params: { service: 'blog' },
+                    partner: newPartnerId,
+                    error: 'MissingParameters'
+                },
+                {
+                    params: { service: 'blog', url: 'malformedurl' },
+                    partner: newPartnerId,
+                    error: 'InvalidUrl'
+                },
+                {
+                    params: { service: 'blog', url: 'http://nowhere' },
+                    partner: 1003,
+                    error: 'InvalidRole'
+                }
+            ];
+
+            queue.push(tasks);
+            queue.drain = function() {
+                    server.config.printErrors = true;
+                    done();
+            }
+        });
+
+        it('adding contact links with proper data should succeed', function(done) {
             var queue = async.queue(function(params, cb) {
             utils.postUrl(
                 server,
