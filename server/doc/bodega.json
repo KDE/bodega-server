@@ -881,11 +881,11 @@
             "MethodName": "Request publisher status",
             "Synopsis": "Enters a request to have publisher status added to a partner the account is affiliated with. This allows creation and management of assets.",
             "HTTPMethod": "POST",
-            "URI": "/partner/request/publisher",
+            "URI": "/partner/request/publisher/:partner",
             "parameters": [
             {
-                "Name": "id",
-                "Location": "body",
+                "Name": "partner",
+                "Location": "URL",
                 "Description": "The id of the partner",
                 "Required": "Y",
                 "Type": "number"
@@ -903,11 +903,11 @@
             "MethodName": "Request distributor status",
             "Synopsis": "Enters a request to have distributor status added to a partner the account is affiliated with. This allows creation and management of stores.",
             "HTTPMethod": "POST",
-            "URI": "/partner/request/distributor",
+            "URI": "/partner/request/distributor/:partner",
             "parameters": [
             {
-                "Name": "id",
-                "Location": "body",
+                "Name": "partner",
+                "Location": "URL",
                 "Description": "The id of the partner",
                 "Required": "Y",
                 "Type": "number"
