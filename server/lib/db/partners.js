@@ -22,6 +22,51 @@ var sanitize = require('validator').sanitize;
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
+function affiliationFetcher(task, cb)
+{
+    task.db.query("select p.fullname, r.description from affiliations a join people p on (a.person = p.id) \
+                          join personRoles r on (a.role = r.id) where a.partner = $1 \
+                          order by p.fullname, r.description",
+             [task.partner],
+             function (err, result) {
+                 if (err) {
+                     cb(errors.create('Database', err.message));
+                     return;
+                 }
+
+                 var people = [];
+                 var i;
+                 for (i = 0; i < result.rowCount; ++i) {
+                     var row = result.rows[i];
+                     var person = {
+                         name: row.fullname,
+                         roles: [ row.description ]
+                     };
+
+                     ++i;
+                     while (i < result.rowCount) {
+                        row = result.rows[i];
+                        if (row.fullname == person.name) {
+                            person.roles.push(row.description);
+                            ++i;
+                        } else {
+                            --i;
+                            break;
+                        }
+                     }
+                     people.push(person);
+                 }
+
+                 for (i = 0; i < task.json.partners.length; ++i) {
+                     if (task.json.partners[i].id === task.partner) {
+                        task.json.partners[i].people = people;
+                     }
+                 }
+
+                 cb();
+             });
+}
+
 function linkFetcher(task, cb)
 {
     task.db.query("select case WHEN p.service IS NULL THEN '' ELSE p.service END,\
@@ -214,19 +259,28 @@ module.exports.list = function(db, req, res)
                     return;
                 }
 
+                function errorReporter(err) {
+                    error = err;
+                }
+
                 var queue = async.queue(linkFetcher, 2);
                 var error = null;
+                var tasks = [];
                 queue.drain = function() {
                     if (error) {
                         errors.report(error.type, req, res, error);
                     } else {
-                        res.json(json);
+                        var queue = async.queue(affiliationFetcher, 2);
+                        queue.drain = function() {
+                            if (error) {
+                                errors.report(error.type, req, res, error);
+                            } else {
+                                res.json(json);
+                            }
+                        };
+                        queue.push(tasks, errorReporter);
                     }
                 };
-
-                function errorReporter(err) {
-                    error = err;
-                }
 
                 for (var i = 0; i < result.rowCount; ++i) {
                     var store = result.rows[i];
@@ -241,8 +295,10 @@ module.exports.list = function(db, req, res)
                         'partner': store.id
                     };
 
-                    queue.push(task, errorReporter);
+                    tasks.push(task);
                 }
+
+                queue.push(tasks, errorReporter);
             });
 };
 

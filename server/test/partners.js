@@ -45,8 +45,25 @@ describe('Partner management', function() {
                                  "url": "http://kde.org",
                                  "icon": ""
                              }
-                          ]
-                       }
+                            ],
+                            people: [
+                                {
+                                    "name": "Aaron Seigo",
+                                    "roles": [
+                                        "Content Creator",
+                                        "Partner Manager"
+                                    ]
+                                },
+                                {
+                                    "name": "Zack Rusin",
+                                    "roles": [
+                                        "Content Creator",
+                                        "Store Manager",
+                                        "Validator"
+                                    ]
+                                }
+                            ]
+                        }
                     ];
 
     describe('without authenticating', function(){
@@ -372,6 +389,14 @@ describe('Partner management', function() {
                             "account": "sometimes",
                             "url": "",
                             "icon": "extern/identica.png"
+                        }
+                    ],
+                    people: [
+                        {
+                            "name": "Zack Rusin",
+                            "roles": [
+                                "Partner Manager"
+                            ]
                         }
                     ]
                 }
