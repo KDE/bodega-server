@@ -1,4 +1,5 @@
 
+var async = require('async');
 var pg = require('pg');
 var mailer = require('nodemailer');
 
@@ -16,29 +17,34 @@ var MessageQueue = (function() {
         }
 
         var processId = res.rows[0].process;
-        console.log('Going in with process id of ' + processId);
         var transport = mailer.createTransport("SMTP", app.config.service.smtp);
 
-        for (var i = 0; i < res.rowCount; ++i) {
-            var row = res.rows[i];
+        var queue = async.queue(function(task, cb) {
             try {
-                var template = require('./messengers/' + row.template);
-                template.sendEmail(transport, row);
+                var template = require('./messengers/' + task.template);
+                template.sendEmail(transport, task, cb);
             } catch (e) {
-                console.log('Failed to load messenger for template ' + row.template);
+                console.log('Failed to load messenger for template ' + task.template);
                 console.warn(e);
+                cb(e);
             }
-        }
+        });
 
-        dbClient.query("select ct_markEmailQueueProcessed('" + processId + "')", [],
-                function() {
-                        setTimeout(processEmails, processDelay);
-                    });
+        queue.drain = function() {
+            dbClient.query("select ct_markEmailQueueProcessed('" + processId + "')", [],
+                           function() {
+                               setTimeout(processEmails, processDelay);
+                           });
+            transport.close();
+        };
+
+
+        queue.push(res.rows);
     }
 
     function processEmails()
     {
-        console.log('processing emails');
+        //console.log('processing emails');
         emailsPending = false;
 
         dbClient.query("select ct_reserveEmailQueue(" + processChunkSize + ") as processid", [],
