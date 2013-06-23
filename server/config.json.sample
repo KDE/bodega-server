@@ -25,6 +25,10 @@
         "redis": {
             "host": "localhost"
         },
+        "stripe": {
+            "testSecretKey": "",
+            "liveSecretKey": ""
+        },
         "smtp": {
             "host": "mail.example.org",
             "port": "465",
@@ -39,18 +43,16 @@
     "addresses": {
         "partnerRequests": "partnerrequests@example.org"
     },
-    "storageSystem": "localStorage",
-    "s3": {
-        "key": "",
-        "secret": "",
-        "bucket": ""
-    },
-    "localStorage": {
-        "basePath": "/content/",
-        "incomingBasePath": "/incoming/"
-    },
-    "stripe": {
-        "testSecretKey": "",
-        "liveSecretKey": ""
+    "storage": {
+        "system": "localStorage",
+        "s3": {
+            "key": "",
+            "secret": "",
+            "bucket": ""
+        },
+        "localStorage": {
+            "basePath": "/content/",
+            "incomingBasePath": "/incoming/"
+        }
     }
 }
