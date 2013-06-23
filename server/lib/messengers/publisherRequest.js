@@ -32,4 +32,4 @@ module.exports.sendEmail = function(transport, data, cb)
                     }
                 }
             });
-}
+};

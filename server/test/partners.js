@@ -292,7 +292,7 @@ describe('Partner management', function() {
             queue.drain = function() {
                     server.config.printErrors = true;
                     done();
-            }
+            };
         });
 
         it('adding contact links with proper data should succeed', function(done) {

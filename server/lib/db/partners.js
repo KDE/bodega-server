@@ -37,7 +37,7 @@ function linkFetcher(task, cb)
                      return;
                  }
 
-                 for (i = 0; i < task.json.partners.length; ++i) {
+                 for (var i = 0; i < task.json.partners.length; ++i) {
                      if (task.json.partners[i].id === task.partner) {
                         task.json.partners[i].links = result.rows;
                      }
