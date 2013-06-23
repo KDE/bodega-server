@@ -5,8 +5,8 @@ var mailer = require('nodemailer');
 
 var MessageQueue = (function() {
     var dbClient;
-    var processDelay = 1000;
-    var processChunkSize = 2;
+    var processDelay = 5000;
+    var processChunkSize = 10;
     var emailsPending = false;
     var emailQueueQuery = 'select q.process, q.recipient, p.email, p.fullname, q.template from emailQueue q join people p on (q.recipient = p.id) where process = $1';
 
