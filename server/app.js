@@ -44,8 +44,10 @@ if (argv.production) {
 var BodegaDb = require('./lib/bodegadb').BodegaDb;
 var AssetStore = require('./lib/assetstore').AssetStore;
 var PreviewStore = require('./lib/previewstore').PreviewStore;
+var MessageQueue = require('./lib/messagequeue.js').MessageQueue;
 
 app.db = new BodegaDb();
+app.messageQueue = new MessageQueue();
 app.assetStore = new AssetStore();
 app.previewStore = new PreviewStore();
 
