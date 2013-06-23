@@ -25,7 +25,7 @@ function sendResponse(db, req, res, assetInfo)
 {
     var json = utils.standardJson(req);
     json.asset = {
-        id : assetInfo.id,
+        id : utils.parseNumber(assetInfo.id),
         name : assetInfo.name
     };
     res.send(json);
