@@ -24,8 +24,8 @@ describe('Point operations', function(){
 
     /* Only run the payments tests if the secret key
      * is in the config.json file */
-    if (!app.config.stripe.secretKey ||
-        app.config.stripe.secretKey.length < 10) {
+    if (!app.config.service.stripe.secretKey ||
+        app.config.service.stripe.secretKey.length < 10) {
         it('skips - .', function(done){
             console.log("Stripe tests disabled");
             done();

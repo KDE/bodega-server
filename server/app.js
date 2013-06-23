@@ -31,11 +31,11 @@ app.config = JSON.parse(fs.readFileSync(argv.config ? argv.config : './config.js
 app.config.printErrors = true;
 
 if (argv.production) {
-    app.config.stripe.secretKey = app.config.stripe.liveSecretKey;
+    app.config.service.stripe.secretKey = app.config.service.stripe.liveSecretKey;
     app.production = true;
     app.settings.env = 'production';
 } else {
-    app.config.stripe.secretKey = app.config.stripe.testSecretKey;
+    app.config.service.stripe.secretKey = app.config.service.stripe.testSecretKey;
     app.production = false;
 }
 
@@ -71,7 +71,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.session({ secret: app.config.cookieSecret ? app.config.cookieSecret : "love cookies",
-                          store: new RedisStore(app.config.redis) }));
+                          store: new RedisStore(app.config.service.redis) }));
 app.use(app.router);
 app.set('views', __dirname + '/views');
 
