@@ -2,7 +2,7 @@
 var mailer = require('nodemailer');
 var path = require('path');
 var template = require('email-template');
-var fs = require('fs');
+var wrap = require('wordwrap')(40, 80);
 
 module.exports.sendEmail = function(transport, data, cb)
 {
@@ -12,6 +12,9 @@ module.exports.sendEmail = function(transport, data, cb)
         to: app.config.addresses.partnerRequests,
         subject: "Publisher account upgrade request"
     };
+
+    // break the message up into nice short lines for the email
+    data.message = wrap(data.message);
 
     template.createBodies(
             {

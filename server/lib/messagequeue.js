@@ -8,7 +8,7 @@ var MessageQueue = (function() {
     var processDelay = 5000;
     var processChunkSize = 10;
     var emailsPending = false;
-    var emailQueueQuery = 'select q.process, q.recipient, p.email, p.fullname, q.template from emailQueue q join people p on (q.recipient = p.id) where process = $1';
+    var emailQueueQuery = 'select q.process, q.recipient, p.email, p.fullname, q.message, q.template from emailQueue q join people p on (q.recipient = p.id) where process = $1';
 
     function processEmailRequests(err, res)
     {

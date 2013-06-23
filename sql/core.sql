@@ -365,6 +365,7 @@ CREATE TABLE emailQueue
     id          int         primary key default(nextval('seq_queueIds')),
     recipient   int         references people(id) on delete cascade,
     queued      timestamp   default(current_timestamp),
+    message     text,
     process     text,
     completed   timestamp,
     template    text        not null
