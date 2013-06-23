@@ -20,6 +20,7 @@ module.exports.sendEmail = function(transport, data, cb)
             data,
             function(err, output) {
                 if (app.production) {
+                    mailOptions.text = output.text;
                     mailer.sendEmail(mailOptions, cb);
                 } else {
                     console.log(output);
