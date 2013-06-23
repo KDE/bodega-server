@@ -4,14 +4,6 @@
     "pointConversionRate": 100,
     "cookieSecret": "love cookies",
     "prefix": "/bodega/v1/json/",
-    "database": {
-        "protocol": "pg",
-        "user":     "bodega",
-        "password": "bodega",
-        "host":     "localhost",
-        "name":     "bodega",
-        "adminuser": "postgres"
-    },
     "storeInfo": {
         "name": "Make Play Live",
         "description": "foo",
@@ -22,12 +14,16 @@
         "browsing": false
     },
     "service": {
+        "database": {
+            "protocol": "pg",
+            "user":     "bodega",
+            "password": "bodega",
+            "host":     "localhost",
+            "name":     "bodega",
+            "adminuser": "postgres"
+        },
         "redis": {
             "host": "localhost"
-        },
-        "stripe": {
-            "testSecretKey": "",
-            "liveSecretKey": ""
         },
         "smtp": {
             "host": "mail.example.org",
@@ -53,6 +49,12 @@
         "localStorage": {
             "basePath": "/content/",
             "incomingBasePath": "/incoming/"
+        }
+    },
+    "payment": {
+        "stripe": {
+            "testSecretKey": "",
+            "liveSecretKey": ""
         }
     }
 }

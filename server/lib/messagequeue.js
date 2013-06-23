@@ -76,10 +76,10 @@ var MessageQueue = (function() {
     function MessageQueue()
     {
         var connectionString =
-            app.config.database.protocol + "://" +
-            app.config.database.user + ":" + app.config.database.password +
-            "@" + app.config.database.host + "/" +
-            app.config.database.name;
+            app.config.service.database.protocol + "://" +
+            app.config.service.database.user + ":" + app.config.service.database.password +
+            "@" + app.config.service.database.host + "/" +
+            app.config.service.database.name;
 
         dbClient = new pg.Client(connectionString);
         dbClient.connect();

@@ -420,10 +420,10 @@ describe('Partner management', function() {
                 return;
             }
 
-            var connectionString = server.config.database.protocol + "://" +
-                                   server.config.database.user + ":" + server.config.database.password +
-                                   "@" + server.config.database.host + "/" +
-                                   server.config.database.name;
+            var connectionString = server.config.service.database.protocol + "://" +
+                                   server.config.service.database.user + ":" + server.config.service.database.password +
+                                   "@" + server.config.service.database.host + "/" +
+                                   server.config.service.database.name;
 
             pg.connect(connectionString,
                        function(err, client, finis) {

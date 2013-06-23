@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var stripe = require('stripe')(app.config.service.stripe.secretKey);
+var stripe = require('stripe')(app.config.payment.stripe.secretKey);
 
 // In cents. Minimum is 500 points
 var MIN_AMOUNT_ALLOWED = 5 * app.config.pointConversionRate;

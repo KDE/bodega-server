@@ -594,10 +594,10 @@ describe('Store management', function(){
 
     // always delete the two stores we made, even on error
     after(function(done) {
-        var connectionString = server.config.database.protocol + "://" +
-                               server.config.database.user + ":" + server.config.database.password +
-                               "@" + server.config.database.host + "/" +
-                               server.config.database.name;
+        var connectionString = server.config.service.database.protocol + "://" +
+                               server.config.service.database.user + ":" + server.config.service.database.password +
+                               "@" + server.config.service.database.host + "/" +
+                               server.config.service.database.name;
 
         pg.connect(connectionString, function(err, client, finis) {
                    client.query("delete from stores where id = '1002_FUN_TIMES_WITH_CLOWNS' or id = 'somethingcrazy'", [],

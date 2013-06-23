@@ -24,10 +24,10 @@ var cookie;
 describe('Statistic query preconditions', function(){
     describe('database environment', function() {
         it('timezone set to UTC in postgresql.conf or db session', function(done) {
-            var connectionString = app.config.database.protocol + "://" +
-                                   app.config.database.user + ":" + app.config.database.password +
-                                   "@" + app.config.database.host + "/" +
-                                   app.config.database.name;
+            var connectionString = app.config.service.database.protocol + "://" +
+                                   app.config.service.database.user + ":" + app.config.service.database.password +
+                                   "@" + app.config.service.database.host + "/" +
+                                   app.config.service.database.name;
 
              pg.connect(connectionString, function(err, client, finis) {
                  client.query("SHOW time zone;", [],

@@ -28,8 +28,8 @@ function series(list, fn)
     //this is out command for the sql files
     var command_list = list;
     var sql_command = function(fileName) {
-        var command = "PGOPTIONS='--client-min-messages=warning' psql -q -d " + config.database.name +
-                      ' -U ' + config.database.user + ' -f ';
+        var command = "PGOPTIONS='--client-min-messages=warning' psql -q -d " + config.service.database.name +
+                      ' -U ' + config.service.database.user + ' -f ';
         if (fileName.indexOf(sql_dir) === -1) {
             command += sql_dir
         }
@@ -94,7 +94,7 @@ function listUpdateFiles()
 
 function confirm(task, fn)
 {
-    console.log("Bodega Database Helper, operating on database " + config.database.host + ":" + config.database.name);
+    console.log("Bodega Database Helper, operating on database " + config.service.database.host + ":" + config.service.database.name);
     prompt.start();
     var schema = {
         properties: {
@@ -138,7 +138,7 @@ var config = JSON.parse(fs.readFileSync((config_json), 'utf8'));
 
 function adminUser()
 {
-    return config.database.adminuser ? config.database.adminuser : config.database.user;
+    return config.service.database.adminuser ? config.service.database.adminuser : config.service.database.user;
 }
 
 if (sql_argument == 'update') {
@@ -171,8 +171,8 @@ if (sql_argument == 'update') {
         } catch (e) {
         }
 
-        sql_commands.unshift('createdb -U ' + adminUser() + ' -O ' + config.database.user + ' ' + config.database.name);
-        sql_commands.unshift('dropdb -U ' + adminUser() + ' ' + config.database.name);
+        sql_commands.unshift('createdb -U ' + adminUser() + ' -O ' + config.service.database.user + ' ' + config.service.database.name);
+        sql_commands.unshift('dropdb -U ' + adminUser() + ' ' + config.service.database.name);
         //console.log(sql_commands);
         series(sql_commands, function() {
             try {

@@ -31,11 +31,11 @@ app.config = JSON.parse(fs.readFileSync(argv.config ? argv.config : './config.js
 app.config.printErrors = true;
 
 if (argv.production) {
-    app.config.service.stripe.secretKey = app.config.service.stripe.liveSecretKey;
+    app.config.payment.stripe.secretKey = app.config.payment.stripe.liveSecretKey;
     app.production = true;
     app.settings.env = 'production';
 } else {
-    app.config.service.stripe.secretKey = app.config.service.stripe.testSecretKey;
+    app.config.payment.stripe.secretKey = app.config.payment.stripe.testSecretKey;
     app.production = false;
 }
 
