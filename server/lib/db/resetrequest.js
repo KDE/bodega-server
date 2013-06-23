@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -22,7 +22,6 @@ var nodemailer = require('nodemailer');
 
 function sendResetEmail(db, req, res, args)
 {
-    var service = app.config.service;
     //XXX: replace with jade and html emails
     var template =
 'Password reset for Make·Play·Live, \n\
@@ -35,19 +34,11 @@ function sendResetEmail(db, req, res, args)
  \n\
  Thank You,\n \
  Make·Play·Live Team\n';
-    var transport = nodemailer.createTransport("SMTP",{
-        host:             service.smtp.host,
-        secureConnection: service.smtp.useSSL,
-        port:             service.smtp.port,
-        auth: {
-            user: service.smtp.user,
-            pass: service.smtp.pass
-        }
-    });
+    var transport = nodemailer.createTransport("SMTP", app.config.service.smtp);
 
     var mailOptions = {
         transport: transport, // transport method to use
-        from: service.email,
+        from: app.config.service.email,
         to: args.email, // list of receivers
         subject: "Reset your password" // Subject line
     };

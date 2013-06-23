@@ -1,51 +1,56 @@
 {
-    "database" : {
-        "protocol" : "pg",
-        "user" :     "bodega",
-        "password" : "bodega",
-        "host" :     "localhost",
-        "name" :     "bodega",
-        "adminuser" : "postgres"
+    "host": "localhost",
+    "port": 3000,
+    "pointConversionRate": 100,
+    "cookieSecret": "love cookies",
+    "prefix": "/bodega/v1/json/",
+    "database": {
+        "protocol": "pg",
+        "user":     "bodega",
+        "password": "bodega",
+        "host":     "localhost",
+        "name":     "bodega",
+        "adminuser": "postgres"
     },
-    "storeInfo" : {
-        "name" : "Make Play Live",
+    "storeInfo": {
+        "name": "Make Play Live",
         "description": "foo",
-        "url" : "http://makeplaylive.com",
+        "url": "http://makeplaylive.com",
         "contact": "foo@example.gr"
     },
-    "anonAccess" : {
+    "anonAccess": {
         "browsing": false
     },
-    "redis" : {
-        "host" : "localhost"
-    },
-    "prefix" : "/bodega/v1/json/",
-    "service" : {
-        "smtp" : {
-            "host" : "mail.example.org",
-            "port" : "465",
-            "useSSL" : "true",
-            "user" : "user@example.org",
-            "pass" : "sample"
+    "service": {
+        "redis": {
+            "host": "localhost"
         },
-        "email" : "Name <returnaddress@example.org>"
+        "smtp": {
+            "host": "mail.example.org",
+            "port": "465",
+            "secureConnection": true,
+            "auth": {
+                "user": "user@example.org",
+                "pass": "sample"
+            }
+        },
+        "email": "Name <returnaddress@example.org>"
     },
-    "storageSystem" : "localStorage",
-    "s3" : {
-        "key" : "",
-        "secret" : "",
-        "bucket" : ""
+    "addresses": {
+        "partnerRequests": "partnerrequests@example.org"
     },
-    "localStorage" : {
-        "basePath" : "/content/",
-        "incomingBasePath" : "/incoming/"
+    "storageSystem": "localStorage",
+    "s3": {
+        "key": "",
+        "secret": "",
+        "bucket": ""
     },
-    "stripe" : {
-        "testSecretKey" : "",
-        "liveSecretKey" : ""
+    "localStorage": {
+        "basePath": "/content/",
+        "incomingBasePath": "/incoming/"
     },
-    "pointConversionRate" : 110,
-    "host" : "localhost",
-    "port" : 3000,
-    "cookieSecret": "love cookies"
+    "stripe": {
+        "testSecretKey": "",
+        "liveSecretKey": ""
+    }
 }

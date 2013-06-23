@@ -111,7 +111,6 @@ module.exports.deleteUser = deleteUser;
 
 module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
 {
-    var service = app.config.service;
     //XXX: replace with jade and html emails
     var template =
 'Welcome to Make·Play·Live, \n\
@@ -123,19 +122,11 @@ module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
  \n\
  Thank You,\n \
  Make·Play·Live Team\n';
-    var transport = nodemailer.createTransport("SMTP",{
-        host:             service.smtp.host,
-        secureConnection: service.smtp.useSSL,
-        port:             service.smtp.port,
-        auth: {
-            user: service.smtp.user,
-            pass: service.smtp.pass
-        }
-    });
+    var transport = nodemailer.createTransport("SMTP", app.config.service.smtp);
 
     var mailOptions = {
         transport: transport, // transport method to use
-        from: service.email,
+        from: app.config.service.email,
         to: userEmail, // list of receivers
         subject: "Activate your new account"
     };
