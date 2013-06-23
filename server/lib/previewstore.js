@@ -272,8 +272,8 @@ var PreviewStore = (function() {
     function PreviewStore() {
         var i;
 
-        storageSystem = app.config.storageSystem;
-        storageConfig = app.config[storageSystem];
+        storageSystem = app.config.storage.system;
+        storageConfig = app.config.storage[storageSystem];
 
         previewPaths = findPreviewPaths();
 

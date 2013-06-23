@@ -41,7 +41,7 @@ describe('Asset Store, ', function(){
 
     // you have to pay for the s3 get/put requests
     //  so lets disable them by default
-    if (app.config.storageSystem === 's3') {
+    if (app.config.storage.system === 's3') {
         it('skips - .', function(done){
             console.log("s3 tests disabled");
             done();
