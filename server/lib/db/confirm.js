@@ -34,7 +34,7 @@ module.exports = function(db, req, res) {
           title: 'Account activation failed!',
           message: 'Activation parameters missing',
           success: false,
-          storeName: app.config.storeInfo.name
+          storeName: app.config.warehouseInfo.name
         });
         return;
     }
@@ -85,7 +85,7 @@ module.exports = function(db, req, res) {
                   title: 'Success!',
                   message: 'A new Make·Play·Live account for ' + result.rows[0].email + ' has been created. You may now log in.',
                   success: true,
-                  storeName: app.config.storeInfo.name
+                  storeName: app.config.warehouseInfo.name
                 });
             });
         });

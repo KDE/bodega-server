@@ -194,7 +194,7 @@ app.get(serverPath('participant/resetPassword'), function(req, res) {
                  resetCode: req.query.code,
                  userId: req.query.id,
                  userEmail: req.query.email,
-                 storeName: app.config.storeInfo.name
+                 storeName: app.config.warehouseInfo.name
                });
 });
 
@@ -497,8 +497,8 @@ app.get('/api(/?*)', function(req, res) {
     fs.readFile(filePath, 'utf8', function(err, data) {
         if (err) {
             res.render('404.jade', {
-                storeName: app.config.storeInfo.name,
-                storeUrl: app.config.storeInfo.url
+                storeName: app.config.warehouseInfo.name,
+                storeUrl: app.config.warehouseInfo.url
             });
         } else if (filePath.substr(filePath.length - suffix.length) === suffix) {
             res.send(markdown(data));
@@ -511,8 +511,8 @@ app.get('/api(/?*)', function(req, res) {
 //NOTE: Always has to be the last route
 app.get('/', function(req, res) {
     res.render('index.jade', {
-        storeName: app.config.storeInfo.name,
-        storeUrl: app.config.storeInfo.url
+        storeName: app.config.warehouseInfo.name,
+        storeUrl: app.config.warehouseInfo.url
     });
 });
 

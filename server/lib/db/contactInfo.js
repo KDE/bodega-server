@@ -21,10 +21,10 @@ var errors = require('../errors.js');
 module.exports = function(db, req, res) {
     var json = {};
     var warehouse = {
-        name: app.config.storeInfo.name,
-        description: app.config.storeInfo.description,
-        url: app.config.storeInfo.url,
-        contact: app.config.storeInfo.contact
+        name: app.config.warehouseInfo.name,
+        description: app.config.warehouseInfo.description,
+        url: app.config.warehouseInfo.url,
+        contact: app.config.warehouseInfo.contact
     };
 
     // if we are authenticated against a store, fetch store info

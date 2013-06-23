@@ -37,7 +37,7 @@ module.exports = function(db, req, res) {
               title: 'Password reset failed!',
               message: 'Arguments missing!',
               success: false,
-              storeName: app.config.storeInfo.name
+              storeName: app.config.warehouseInfo.name
             });
         return;
     }
@@ -50,7 +50,7 @@ module.exports = function(db, req, res) {
                   title: 'Password reset failed!',
                   message: 'Couldn\'t encrypt the password! Please try again.',
                   success: false,
-                  storeName: app.config.storeInfo.name
+                  storeName: app.config.warehouseInfo.name
                 });
             return;
         }
@@ -63,7 +63,7 @@ module.exports = function(db, req, res) {
                       title: 'Password reset failed!',
                       message: 'Couldn\'t encrypt the password! Please try again.',
                       success: false,
-                      storeName: app.config.storeInfo.name
+                      storeName: app.config.warehouseInfo.name
                     });
                 return;
             }
@@ -79,7 +79,7 @@ module.exports = function(db, req, res) {
                               title: 'Password reset failed!',
                               message: 'Database communication problem! Please try again.',
                               success: false,
-                              storeName: app.config.storeInfo.name
+                              storeName: app.config.warehouseInfo.name
                             });
                         return;
                     }
@@ -92,7 +92,7 @@ module.exports = function(db, req, res) {
                               title: 'Password reset failed!',
                               message: 'Specified password reset code was invalid.',
                               success: false,
-                              storeName: app.config.storeInfo.name
+                              storeName: app.config.warehouseInfo.name
                             });
                         return;
                     }
@@ -106,7 +106,7 @@ module.exports = function(db, req, res) {
                               'title': title,
                               'message': message,
                               success: true,
-                              storeName: app.config.storeInfo.name
+                              storeName: app.config.warehouseInfo.name
                             });
                 }
             );

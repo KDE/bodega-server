@@ -27,10 +27,10 @@ describe('Fetch contact information', function() {
             '/bodega/v1/json/contact',
             function(res) {
                 var expected = {
-                    name: app.config.storeInfo.name,
-                    description: app.config.storeInfo.description,
-                    url: app.config.storeInfo.url,
-                    contact: app.config.storeInfo.contact
+                    name: app.config.warehouseInfo.name,
+                    description: app.config.warehouseInfo.description,
+                    url: app.config.warehouseInfo.url,
+                    contact: app.config.warehouseInfo.contact
                 };
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property( 'content-type', 'application/json; charset=utf-8');
@@ -59,10 +59,10 @@ describe('Fetch contact information', function() {
              '/bodega/v1/json/contact',
              function(res) {
                 var warehouse = {
-                    name: app.config.storeInfo.name,
-                    description: app.config.storeInfo.description,
-                    url: app.config.storeInfo.url,
-                    contact: app.config.storeInfo.contact
+                    name: app.config.warehouseInfo.name,
+                    description: app.config.warehouseInfo.description,
+                    url: app.config.warehouseInfo.url,
+                    contact: app.config.warehouseInfo.contact
                 };
                 var store = {
                     name: 'Vivaldi',
