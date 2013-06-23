@@ -417,18 +417,15 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE function ct_partnerId(text) RETURNS INT
-AS
-$$
+CREATE OR REPLACE FUNCTION ct_notifyOfEmailQueuing() RETURNS TRIGGER AS $$
 DECLARE
-    partnerId   int;
 BEGIN
-    SELECT INTO partnerId id FROM partners WHERE name = $1;
-    IF NOT FOUND THEN
-        RETURN null;
-    END IF;
-
-    RETURN partnerId;
+    NOTIFY messageQueued, 'email';
+    RETURN NEW;
 END
 $$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_ct_notifyOfEmailQueuing ON emailQueue;
+CREATE TRIGGER trg_ct_notifyOfEmailQueuing AFTER INSERT ON emailQueue
+FOR EACH ROW EXECUTE PROCEDURE ct_notifyOfEmailQueuing();
 

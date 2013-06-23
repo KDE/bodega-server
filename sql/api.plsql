@@ -108,3 +108,25 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ct_reserveEmailQueue(int) RETURNS TEXT AS $$
+DECLARE
+    rv text := random_string(20);
+BEGIN
+    --rv := random_string(20);
+    UPDATE emailqueue SET process = rv
+        WHERE id in (SELECT id FROM emailqueue WHERE process IS NULL LIMIT $1 FOR UPDATE);
+    IF NOT FOUND THEN
+        RETURN null;
+    END IF;
+    return rv;
+END
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION ct_markEmailQueueProcessed(text) RETURNS VOID AS $$
+DECLARE
+BEGIN
+    UPDATE emailqueue SET completed = current_timestamp WHERE process = $1;
+END
+$$ LANGUAGE 'plpgsql';
+
