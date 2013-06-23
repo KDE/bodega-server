@@ -6,7 +6,7 @@
         "async": "latest",
         "bcrypt": ">= 0.5.0",
         "connect-redis": "latest",
-        "email-template": "latest:,
+        "email-template": "latest",
         "express": "> 2.4.6",
         "handlebars": "latest",
         "gm": "latest",
