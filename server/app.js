@@ -74,6 +74,7 @@ app.use(express.session({ secret: app.config.cookieSecret ? app.config.cookieSec
                           store: new RedisStore(app.config.service.redis) }));
 app.use(app.router);
 app.set('views', __dirname + '/views');
+app.set('trust proxy', app.config.behindProxy);
 
 app.use(function(req, res, next) {
     res.render('404.jade', {
