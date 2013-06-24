@@ -127,7 +127,7 @@ function summationQuery(req, dateParts, partner, assetStats)
         for (i = 0; i < array.length; ++i) {
             id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
             name = '"' + id + '"';
-            query += ", CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END AS " + name;
+            query += ", (CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END)::int AS " + name;
             params.push(id);
         }
 
@@ -136,7 +136,7 @@ function summationQuery(req, dateParts, partner, assetStats)
         for (i = 0; i < array.length; ++i) {
             id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
             name = '"' + id + '"';
-            query += "sum(CASE WHEN " + sumColumn + " = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END) AS " + name;
+            query += "sum(CASE WHEN " + sumColumn + " = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END)::int AS " + name;
             if (i < array.length - 1) {
                 query += ", ";
             }
@@ -148,7 +148,7 @@ function summationQuery(req, dateParts, partner, assetStats)
         }
         query += ") " + dateParts.limit + " group by assetdate order by assetdate)";
     } else {
-        query += "select dateof, CASE WHEN total IS NULL THEN 0 ELSE total END AS total from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn +
+        query += "select dateof, (CASE WHEN total IS NULL THEN 0 ELSE total END)::int AS total from (select date_trunc('" + dateParts.granularity + "', m." + assetDateColumn +
                  ") AS assetdate, " + totalSum + " AS total from  " +  joinTable +
                  " m join " + partnerJoin +
                  dateParts.limit + " group by assetdate order by assetdate)";
@@ -178,6 +178,14 @@ function assetStats(partner, db, req, res)
                 return;
             }
             json.stats = result.rows;
+            /*
+            json.stats = [];
+            for (var i = 0; i < result.rowCount; ++i) {
+                json.stats.push({
+                    dateof: result.rows[i].dateof,
+                    total: result.rows[i].total
+                });
+            }*/
             res.json(json);
         });
 }

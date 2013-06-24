@@ -579,6 +579,8 @@ describe('Store management', function(){
                         }
                         ];
 
+                        console.log(JSON.stringify(expected, null, 2));
+                        console.log("replacer is ... " + app.get('json replacer'));
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property(
                             'content-type',
