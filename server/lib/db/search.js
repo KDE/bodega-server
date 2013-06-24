@@ -30,7 +30,7 @@ function searchAssets(db, req, res, args, json)
         (sum(temp.namerank) + sum(temp.tagrank)) / (1 + sum(CASE WHEN temp.tagrank > 0 THEN 1 ELSE 0 END)) as rank, \
         max(a.license) as license, max(partners.id) as partnerid, \
         max(partners.name) AS partnername, max(a.version) as version, max(a.image) as image, max(a.name) as name, \
-        CASE WHEN max(temp.points) IS NULL THEN 0 ELSE max(temp.points) END AS points \
+        (CASE WHEN max(temp.points) IS NULL THEN 0 ELSE max(temp.points) END)::int AS points \
     FROM \
     ( \
         SELECT a.id as id, p.points as points, \

@@ -201,7 +201,7 @@ module.exports.listAssets = function(db, req, res) {
     var assetsQuery =
         'SELECT DISTINCT a.id, a.license, partners.id as partnerId, \
          partners.name AS partnername, a.version, a.file, a.image, a.name, \
-         CASE WHEN p.points IS NULL THEN 0 ELSE p.points END AS points \
+         (CASE WHEN p.points IS NULL THEN 0 ELSE p.points END)::int AS points \
          FROM collectionsContent bc \
          INNER JOIN assets a ON (bc.asset = a.id) \
          LEFT JOIN partners ON (a.partner = partners.id) \
