@@ -130,7 +130,7 @@ function addDefaultAffiliation(db, req, res, partnerId, cb)
 function updatePartner(db, req, res, partner, data, cb)
 {
     data.params.push(partner);
-    db.query("update partners set " + data.columns.join(', ') + " where id = $6",
+    db.query("update partners set " + data.columns.join(', ') + " where id = $3",
              data.params,
              function(err, result) {
                  if (err) {
@@ -351,12 +351,6 @@ module.exports.update = function(db, req, res)
         } catch (e) {
         }
     }
-
-    data.params.push(sanitize(req.body.publisher).trim());
-    data.columns.push('publisher = $' + data.params.length);
-
-    data.params.push(sanitize(req.body.distributor).trim());
-    data.columns.push('distributor = $' + data.params.length);
 
     utils.wrapInTransaction([utils.requireRole, updatePartner], db, req, res,
                             partner, 'Partner Manager', data);
