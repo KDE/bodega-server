@@ -405,6 +405,12 @@ app.get(serverPath('tag/types'), isAuthorized,
     }
 );
 
+app.get(serverPath('tag/list/asset/:asset'), isAuthorized,
+    function(req, res) {
+        app.db.listAssetTags(req, res);
+    }
+);
+
 
 /******************************************************
  * Partner management

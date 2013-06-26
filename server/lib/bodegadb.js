@@ -228,6 +228,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbTags.listTypes, req, res);
     };
 
+    BodegaDb.prototype.listAssetTags = function(req, res) {
+        this.dbQuery(dbTags.listAssetTags, req, res);
+    };
+
     BodegaDb.prototype.hunt = function(req, res) {
         this.dbQuery(dbHunt, req, res);
     };

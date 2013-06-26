@@ -19,8 +19,7 @@ var utils = require('../utils.js');
 var errors = require('../errors.js');
 
 
-module.exports.listTypes = function(db, req, res)
-{
+module.exports.listTypes = function(db, req, res) {
     var json = utils.standardJson(req);
 
     var q = db.query(
@@ -32,6 +31,33 @@ module.exports.listTypes = function(db, req, res)
                 return;
             }
             json.types = result.rows;
+            res.json(json);
+        });
+};
+
+module.exports.listAssetTags = function(db, req, res) {
+
+    if (!req.params.asset) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    var asset = req.params.asset;
+    var json = utils.standardJson(req);
+
+    var q = db.query(
+         "select tagtypes.id as type, tagtypes.type as typename, title\
+          from assettags join tags on assettags.tag = tags.id\
+          join tagtypes on tagtypes.id = tags.type\
+          where asset = $1",
+        [asset],
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+            json.asset = asset;
+            json.tags = result.rows;
             res.json(json);
         });
 };
