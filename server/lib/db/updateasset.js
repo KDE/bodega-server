@@ -356,6 +356,10 @@ function processInfo(assetInfo, db, req, res)
         return;
     }
 
+    if (assetInfo.posted !== undefined && typeof assetInfo.posted !== 'boolean') {
+        assetInfo.posted = utils.parseBool(assetInfo.posted)
+    }
+
     createUtils.isContentCreator(
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
