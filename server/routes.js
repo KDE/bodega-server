@@ -429,6 +429,24 @@ app.get(serverPath('tag/list/type/:type'), isAuthorized,
     }
 );
 
+app.get(serverPath('tag/create'), isAuthorized,
+    function(req, res) {
+        app.db.createTag(req, res);
+    }
+);
+
+app.get(serverPath('tag/update'), isAuthorized,
+    function(req, res) {
+        app.db.updateTag(req, res);
+    }
+);
+
+app.get(serverPath('tag/remove'), isAuthorized,
+    function(req, res) {
+        app.db.removeTag(req, res);
+    }
+);
+
 /******************************************************
  * Partner management
  */

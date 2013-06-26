@@ -158,7 +158,7 @@ function remove(partner, db, req, res) {
 
     var id = req.params.tag;
     if (!id || id === '') {
-        errors.report('StoreIdInvalid', req, res, errors.create("Invalid Tag Id", "Invalid tag passed into tag deletion: " + id));
+        errors.report('TagIdInvalid', req, res, errors.create("Invalid Tag Id", "Invalid tag passed into tag deletion: " + id));
         return;
     }
 
@@ -181,3 +181,31 @@ function remove(partner, db, req, res) {
 module.exports.remove = function(db, req, res) {
     utils.partnerId(db, req, res, remove);
 };
+
+
+function update(partner, db, req, res) {
+
+    var id = req.params.tag;
+    if (!id || id === '') {
+        errors.report('TagIdInvalid', req, res, errors.create("Invalid Tag Id", "Invalid tag passed into tag deletion: " + id));
+        return;
+    }
+
+    db.query(
+        "update tags set type = $1 and title = $2 where id = $3 and partner = $4",
+        [type, title, id, partner],
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+
+
+            cb(null, utils.standardJson(req));
+        });
+}
+
+module.exports.update = function(db, req, res) {
+    utils.partnerId(db, req, res, update);
+};
+

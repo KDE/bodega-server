@@ -240,6 +240,18 @@ var BodegaDb = (function() {
         this.dbQuery(dbTags.listTags, req, res);
     };
 
+    BodegaDb.prototype.createTag = function(req, res) {
+        this.dbQuery(dbTags.create, req, res);
+    };
+
+    BodegaDb.prototype.removeTag = function(req, res) {
+        this.dbQuery(dbTags.remove, req, res);
+    };
+
+    BodegaDb.prototype.updateTag = function(req, res) {
+        this.dbQuery(dbTags.update, req, res);
+    };
+
     BodegaDb.prototype.hunt = function(req, res) {
         this.dbQuery(dbHunt, req, res);
     };
