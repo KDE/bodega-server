@@ -40,6 +40,7 @@ var dbUpdateAsset = require('./db/updateasset.js');
 var dbListAssets = require('./db/listassets.js');
 var dbStats = require('./db/stats.js');
 var dbStores = require('./db/stores.js');
+var dbTags = require('./db/tags.js');
 var dbContactInfo = require('./db/contactInfo.js');
 var dbPostAsset = require('./db/postasset.js');
 var dbPublishAsset = require('./db/publishasset.js');
@@ -221,6 +222,10 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.deleteStoreChannel = function(req, res) {
         this.dbQuery(dbStores.deleteChannel, req, res);
+    };
+
+    BodegaDb.prototype.listTagTypes = function(req, res) {
+        this.dbQuery(dbTags.listTypes, req, res);
     };
 
     BodegaDb.prototype.hunt = function(req, res) {

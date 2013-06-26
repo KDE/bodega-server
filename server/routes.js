@@ -397,6 +397,16 @@ app.get(serverPath('store/collection/remove/:store/:collection'), isAuthorized,
 );
 
 /******************************************************
+ * Tags management
+ */
+app.get(serverPath('tag/types'), isAuthorized,
+    function(req, res) {
+        app.db.listTagTypes(req, res);
+    }
+);
+
+
+/******************************************************
  * Partner management
  */
 app.get(serverPath('partner/list'), isAuthorized,
