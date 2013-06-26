@@ -429,19 +429,19 @@ app.get(serverPath('tag/list/type/:type'), isAuthorized,
     }
 );
 
-app.get(serverPath('tag/create'), isAuthorized,
+app.post(serverPath('tag/create'), isAuthorized,
     function(req, res) {
         app.db.createTag(req, res);
     }
 );
 
-app.get(serverPath('tag/update'), isAuthorized,
+app.post(serverPath('tag/update'), isAuthorized,
     function(req, res) {
         app.db.updateTag(req, res);
     }
 );
 
-app.get(serverPath('tag/remove'), isAuthorized,
+app.get(serverPath('tag/remove/:tag'), isAuthorized,
     function(req, res) {
         app.db.removeTag(req, res);
     }

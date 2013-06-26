@@ -47,7 +47,7 @@ module.exports.listAssetTags = function(db, req, res) {
     var json = utils.standardJson(req);
 
     var q = db.query(
-         "select tagtypes.id as type, tagtypes.type as typename, title\
+         "select tags.id, tagtypes.id as type, tagtypes.type as typename, title\
           from assettags join tags on assettags.tag = tags.id\
           join tagtypes on tagtypes.id = tags.type\
           where asset = $1",
@@ -74,7 +74,7 @@ module.exports.listChannelTags = function(db, req, res) {
     var json = utils.standardJson(req);
 
     var q = db.query(
-         "select tagtypes.id as type, tagtypes.type as typename, title\
+         "select tags.id, tagtypes.id as type, tagtypes.type as typename, title\
           from channeltags join tags on channeltags.tag = tags.id\
           join tagtypes on tagtypes.id = tags.type\
           where channel = $1",
@@ -138,14 +138,16 @@ function create(partner, db, req, res) {
     }
 
     db.query("insert into tags (partner, type, title) values ($1, $2, $3) returning id as id",
-             [partner, title, type],
+             [partner, type, title],
              function(err, result) {
                  if (err) {
-                     cb(errors.create('Database', err.message));
+                     errors.report('Database', req, res, err);
                      return;
                  }
 
-                 cb(null, db, req, res, result.rows[0].id);
+                 var json = utils.standardJson(req);
+                 json.id = result.rows[0].id;
+                 res.json(json);
             });
 }
 

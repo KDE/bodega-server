@@ -23,6 +23,8 @@ var querystring = require('querystring');
 
 describe('Tags manipulation', function(){
     var cookie;
+    var createdTagId;
+
     describe('initialization', function() {
         it('authorize correctly.', function(done) {
             utils.getUrl(
@@ -41,10 +43,39 @@ describe('Tags manipulation', function(){
         });
     });
 
-    function listTags(asset, store, type, cb) {
+    function listTags(asset, channel, type, cb) {
+        var query = '';
+        if (asset) {
+            query += '/asset/' + asset;
+        } else if (channel) {
+            query += '/channel/' + channel;
+        } else if (type) {
+            query += '/type/' + type;
+        }
+
         utils.getUrl(
             server,
-            '/bodega/v1/json/tag/list',
+            '/bodega/v1/json/tag/list' + query,
+            function(res) {
+                cb(res);
+            },
+            cookie);
+    }
+
+    function createTag(title, type, cb) {
+        utils.postUrl(
+            server,
+            '/bodega/v1/json/tag/create', {'title': title, 'type': type},
+            function(res) {
+                cb(res);
+            },
+            cookie);
+    }
+
+    function removeTag(tag, cb) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/tag/remove/' + tag,
             function(res) {
                 cb(res);
             },
@@ -69,6 +100,100 @@ describe('Tags manipulation', function(){
                 done();
             }
             listTags(null, null, null, cb);
+        });
+
+        it('List all tags of asset 2', function(done) {
+            var cb = function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('tags');
+
+                res.body.tags.length.should.equal(2);
+                res.body.tags[0].id.should.be.eql(1);
+                res.body.tags[0].type.should.be.eql(7);
+                res.body.tags[0].typename.should.be.eql('mimetype');
+                res.body.tags[0].title.should.be.eql('application/x-plasma');
+                done();
+            }
+            listTags(2, null, null, cb);
+        });
+
+        it('List all tags of channel 2', function(done) {
+            var cb = function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('tags');
+
+                res.body.tags.length.should.equal(2);
+                res.body.tags[0].id.should.be.eql(1);
+                res.body.tags[0].type.should.be.eql(7);
+                res.body.tags[0].typename.should.be.eql('mimetype');
+                res.body.tags[0].title.should.be.eql('application/x-plasma');
+                done();
+            }
+            listTags(null, 2, null, cb);
+        });
+
+        it('List all tags of type 8', function(done) {
+            var cb = function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('tags');
+
+                res.body.tags.length.should.equal(6);
+                res.body.tags[0].id.should.be.eql(2);
+                res.body.tags[0].type.should.be.eql(8);
+                res.body.tags[0].typename.should.be.eql('contentrating');
+                res.body.tags[0].title.should.be.eql('Early Childhood');
+                done();
+            }
+            listTags(null, null, 8, cb);
+        });
+
+        it('create a tag', function(done) {
+            createTag('test', 8, function(res) {
+                createdTagId = res.body.id;
+
+                listTags(null, null, 8, function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('tags');
+
+                    res.body.tags.length.should.equal(7);
+                    res.body.tags[6].type.should.be.eql(8);
+                    res.body.tags[6].typename.should.be.eql('contentrating');
+                    res.body.tags[6].title.should.be.eql('test');
+                    done();
+                });
+            });
+        });
+
+        it('remove a tag', function(done) {
+            removeTag(createdTagId, function(res) {
+                listTags(null, null, 8, function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('tags');
+
+                    res.body.tags.length.should.equal(6);
+                    done();
+                });
+            });
         });
     });
 });
