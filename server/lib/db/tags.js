@@ -17,6 +17,7 @@
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
+var sanitize = require('validator').sanitize;
 
 
 module.exports.listTypes = function(db, req, res) {
@@ -121,3 +122,62 @@ module.exports.listTags = function(db, req, res) {
         });
 };
 
+
+function create(partner, db, req, res) {
+
+    var title = sanitize(req.body.title).trim();
+    if (title === '') {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    var type = utils.parseNumber(req.body.type);
+    if (type <= 0) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    db.query("insert into tags (partner, type, title) values ($1, $2, $3) returning id as id",
+             [partner, title, type],
+             function(err, result) {
+                 if (err) {
+                     cb(errors.create('Database', err.message));
+                     return;
+                 }
+
+                 cb(null, db, req, res, result.rows[0].id);
+            });
+}
+
+module.exports.create = function(db, req, res) {
+    utils.partnerId(db, req, res, create);
+};
+
+
+function remove(partner, db, req, res) {
+
+    var id = req.params.tag;
+    if (!id || id === '') {
+        errors.report('StoreIdInvalid', req, res, errors.create("Invalid Tag Id", "Invalid tag passed into tag deletion: " + id));
+        return;
+    }
+
+    db.query("delete from tags where id = $1 and partner = $2", [id, partner],
+             function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    return;
+                }
+
+                if (result.rowCount < 1) {
+                    errors.report('TagNotDeleted', req, res);
+                    return;
+                }
+
+                res.json(utils.standardJson(req));
+             });
+}
+
+module.exports.remove = function(db, req, res) {
+    utils.partnerId(db, req, res, remove);
+};
