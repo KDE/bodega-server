@@ -878,6 +878,71 @@
             ]
         },
         {
+            "MethodName": "Add role",
+            "Synopsis": "Adds a person with a given role to a partner. The account must have the Partner Manager role to be able to do this",
+            "HTTPMethod": "POST",
+            "URI": "/partner/roles/add/:partner",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            },
+            {
+                "Name": "person",
+                "Location": "Body",
+                "Description": "The email of the person to add to this partner",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "roles",
+                "Location": "Body",
+                "Description": "The roles the person should have; they must be existing roles known the Bodega warehouse. See the 'List roles' function",
+                "Required": "Yes",
+                "Type": "Array[string]"
+            }
+            ]
+        },
+        {
+            "MethodName": "Remove role",
+            "Synopsis": "Removes one or more roles that a person has with this partner. Removing all roles a person has will dissociate them with the partner",
+            "HTTPMethod": "POST",
+            "URI": "/partner/roles/remove/:partner",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            },
+            {
+                "Name": "person",
+                "Location": "Body",
+                "Description": "The email of the person to remove roles from",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "roles",
+                "Location": "Body",
+                "Description": "The roles to remove from this person; if not provided all roles will be removed",
+                "Required": "No",
+                "Type": "Array[string]"
+            }
+            ]
+        },
+        {
+            "MethodName": "List roles",
+            "Synopsis": "Returns the list of all define roles people can have with a partner",
+            "HTTPMethod": "GET",
+            "URI": "/partner/roles/list",
+            "parameters": []
+        },
+        {
             "MethodName": "Request publisher status",
             "Synopsis": "Enters a request to have publisher status added to a partner the account is affiliated with. This allows creation and management of assets.",
             "HTTPMethod": "POST",

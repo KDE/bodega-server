@@ -380,7 +380,26 @@ module.exports.deleteLink = function(db, req, res)
                             db, req, res, partner, 'Partner Manager', null);
 };
 
-module.exports.requestDestributorStatus = function(db, req, res)
+module.exports.listPersonRoles = function(db, req, res)
+{
+    db.query("select description from personroles order by description", [],
+             function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res);
+                    return;
+                }
+
+                var json = utils.standardJson(req);
+                json.roles = [];
+                for (var i = 0; i < result.rowCount; ++i) {
+                    json.roles.push(result.rows[i].description);
+                }
+
+                res.json(json);
+             });
+}
+
+module.exports.addPersonRole = function(db, req, res)
 {
     var partner = utils.parseNumber(req.params.partner);
     if (partner < 1) {
@@ -388,13 +407,48 @@ module.exports.requestDestributorStatus = function(db, req, res)
         return;
     }
 
-    utils.wrapInTransaction([utils.requireRole, deletePartnerLink], db, req, res,
+    //TODO: implement
+    utils.wrapInTransaction([utils.requireRole, addPersonRole], db, req, res,
+                            partner, 'Partner Manager');
+}
+
+module.exports.removePersonRole = function(db, req, res)
+{
+    var partner = utils.parseNumber(req.params.partner);
+    if (partner < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    //TODO: implement
+    utils.wrapInTransaction([utils.requireRole, removePersonRole], db, req, res,
+                            partner, 'Partner Manager');
+}
+
+module.exports.requestDistributorStatus = function(db, req, res)
+{
+    var partner = utils.parseNumber(req.params.partner);
+    if (partner < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    //TODO: implement
+    utils.wrapInTransaction([utils.requireRole, requestDistributorStatus], db, req, res,
                             partner, 'Partner Manager');
 };
 
 module.exports.requestPublisherStatus = function(db, req, res)
 {
+    var partner = utils.parseNumber(req.params.partner);
+    if (partner < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
 
+    //TODO: implement
+    utils.wrapInTransaction([utils.requireRole, requestPublisherStatus], db, req, res,
+                            partner, 'Partner Manager');
 };
 
 

@@ -440,6 +440,26 @@ describe('Partner management', function() {
 
         });
 
+        describe('role management', function(done) {
+            it('should allow listing known roles', function(done) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/partner/roles/list',
+                function(res) {
+                    expected = ['Accounts', 'Content Creator', 'Partner Manager', 'Store Manager', 'Validator'];
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('roles');
+                    res.body.roles.should.eql(expected);
+                    done();
+                },
+                cookie);
+            });
+        });
+
         after(function(done) {
             if (newPartnerId < 1) {
                 return;

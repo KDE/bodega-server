@@ -259,6 +259,18 @@ var BodegaDb = (function() {
         this.dbQuery(dbPartners.deleteLink, req, res);
     };
 
+    BodegaDb.prototype.listPersonRoles = function(req, res) {
+        this.dbQuery(dbPartners.listPersonRoles, req, res);
+    };
+
+    BodegaDb.prototype.addPersonRole = function(req, res) {
+        this.dbQuery(dbPartners.addPersonRole, req, res);
+    };
+
+    BodegaDb.prototype.removePersonRole = function(req, res) {
+        this.dbQuery(dbPartners.removePersonRole, req, res);
+    };
+
     BodegaDb.prototype.requestPublisherStatus = function(req, res) {
         this.dbQuery(dbPartners.requestPublisherStatus, req, res);
     };

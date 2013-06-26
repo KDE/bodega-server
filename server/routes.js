@@ -429,6 +429,24 @@ app.post(serverPath('partner/:partner/link/delete'), isAuthorized,
     }
 );
 
+app.get(serverPath('partner/roles/list'), isAuthorized,
+    function(req, res) {
+        app.db.listPersonRoles(req, res);
+    }
+);
+
+app.post(serverPath('partner/roles/add/:partner'), isAuthorized,
+    function(req, res) {
+        app.db.addPersonRole(req, res);
+    }
+);
+
+app.post(serverPath('partner/roles/remove/:partner'), isAuthorized,
+    function(req, res) {
+        app.db.removePersonRole(req, res);
+    }
+);
+
 app.post(serverPath('partner/request/publisher/:partner'), isAuthorized,
     function(req, res) {
         app.db.requestPublisherStatus(req, res);
