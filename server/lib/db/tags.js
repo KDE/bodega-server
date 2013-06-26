@@ -62,4 +62,31 @@ module.exports.listAssetTags = function(db, req, res) {
         });
 };
 
+module.exports.listChannelTags = function(db, req, res) {
+
+    if (!req.params.channel) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    var channel = req.params.channel;
+    var json = utils.standardJson(req);
+
+    var q = db.query(
+         "select tagtypes.id as type, tagtypes.type as typename, title\
+          from channeltags join tags on channeltags.tag = tags.id\
+          join tagtypes on tagtypes.id = tags.type\
+          where channel = $1",
+        [channel],
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+            json.channel = channel;
+            json.tags = result.rows;
+            res.json(json);
+        });
+};
+
 

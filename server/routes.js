@@ -411,6 +411,11 @@ app.get(serverPath('tag/list/asset/:asset'), isAuthorized,
     }
 );
 
+app.get(serverPath('tag/list/channel/:channel'), isAuthorized,
+    function(req, res) {
+        app.db.listChannelTags(req, res);
+    }
+);
 
 /******************************************************
  * Partner management
