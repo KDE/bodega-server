@@ -89,4 +89,35 @@ module.exports.listChannelTags = function(db, req, res) {
         });
 };
 
+module.exports.listTags = function(db, req, res) {
+
+    var query = "select tags.id, tags.type, tagtypes.type as typename, title \
+                 from tags \
+                 join tagtypes on tagtypes.id = tags.type ";
+
+    var params = new Array();
+    
+    if (req.params.type) {
+        query += "where tags.type = $1;";
+        params.push(req.params.type)
+    }
+
+    var json = utils.standardJson(req);
+
+    var q = db.query(
+        query, params,
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+
+            if (req.params.type) {
+                json.type = req.params.type;
+            }
+
+            json.tags = result.rows;
+            res.json(json);
+        });
+};
 

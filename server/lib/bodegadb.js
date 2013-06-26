@@ -236,6 +236,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbTags.listChannelTags, req, res);
     };
 
+    BodegaDb.prototype.listTags = function(req, res) {
+        this.dbQuery(dbTags.listTags, req, res);
+    };
+
     BodegaDb.prototype.hunt = function(req, res) {
         this.dbQuery(dbHunt, req, res);
     };

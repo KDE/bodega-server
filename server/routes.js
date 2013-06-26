@@ -417,6 +417,18 @@ app.get(serverPath('tag/list/channel/:channel'), isAuthorized,
     }
 );
 
+app.get(serverPath('tag/list'), isAuthorized,
+    function(req, res) {
+        app.db.listTags(req, res);
+    }
+);
+
+app.get(serverPath('tag/list/type/:type'), isAuthorized,
+    function(req, res) {
+        app.db.listTags(req, res);
+    }
+);
+
 /******************************************************
  * Partner management
  */
