@@ -189,12 +189,24 @@ function update(partner, db, req, res) {
 
     var id = req.params.tag;
     if (!id || id === '') {
-        errors.report('TagIdInvalid', req, res, errors.create("Invalid Tag Id", "Invalid tag passed into tag deletion: " + id));
+        errors.report('TagIdInvalid', req, res, errors.create("Invalid Tag Id", "Invalid tag passed into tag update: " + id));
+        return;
+    }
+
+    var title = sanitize(req.body.title).trim();
+    if (title === '') {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    var type = utils.parseNumber(req.body.type);
+    if (type <= 0) {
+        errors.report('MissingParameters', req, res);
         return;
     }
 
     db.query(
-        "update tags set type = $1 and title = $2 where id = $3 and partner = $4",
+        "update tags set type = $1, title = $2 where id = $3 and partner = $4",
         [type, title, id, partner],
         function(err, result) {
             if (err) {
@@ -202,8 +214,7 @@ function update(partner, db, req, res) {
                 return;
             }
 
-
-            cb(null, utils.standardJson(req));
+            res.json(utils.standardJson(req));
         });
 }
 

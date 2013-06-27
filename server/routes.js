@@ -435,8 +435,9 @@ app.post(serverPath('tag/create'), isAuthorized,
     }
 );
 
-app.post(serverPath('tag/update'), isAuthorized,
+app.post(serverPath('tag/update/:tag'), isAuthorized,
     function(req, res) {
+        //console.log(req.body)
         app.db.updateTag(req, res);
     }
 );

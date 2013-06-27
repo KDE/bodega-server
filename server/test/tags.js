@@ -72,6 +72,16 @@ describe('Tags manipulation', function(){
             cookie);
     }
 
+    function updateTag(id, title, type, cb) {
+        utils.postUrl(
+            server,
+            '/bodega/v1/json/tag/update/' + id, {'title': title, 'type': type},
+            function(res) {
+                cb(res);
+            },
+            cookie);
+    }
+
     function removeTag(tag, cb) {
         utils.getUrl(
             server,
@@ -180,7 +190,27 @@ describe('Tags manipulation', function(){
             });
         });
 
-        it('remove a tag', function(done) {
+        it('edit the created tag', function(done) {
+            updateTag(createdTagId, 'new title', 9, function(res) {
+
+                listTags(null, null, 9, function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('tags');
+
+                    res.body.tags.length.should.equal(12);
+                    res.body.tags[11].type.should.be.eql(9);
+                    res.body.tags[11].typename.should.be.eql('assetType');
+                    res.body.tags[11].title.should.be.eql('new title');
+                    done();
+                });
+            });
+        });
+
+        it('remove the created tag', function(done) {
             removeTag(createdTagId, function(res) {
                 listTags(null, null, 8, function(res) {
                     res.statusCode.should.equal(200);
