@@ -5,10 +5,10 @@ var mailer = require('nodemailer');
 
 var MessageQueue = (function() {
     var dbClient;
-    var processDelay = 5000;
+    var processDelay = app.production ? 5000 : 100;
     var processChunkSize = 10;
     var emailsPending = false;
-    var emailQueueQuery = 'select q.process, q.recipient, p.email, p.fullname, q.message, q.template from emailQueue q join people p on (q.recipient = p.id) where process = $1';
+    var emailQueueQuery = 'select q.process, q.recipient, p.email, p.fullname, hstore_to_matrix(q.data) as data, q.template from emailQueue q join people p on (q.recipient = p.id) where process = $1';
 
     function processEmailRequests(err, res)
     {
@@ -22,7 +22,18 @@ var MessageQueue = (function() {
         var queue = async.queue(function(task, cb) {
             try {
                 var template = require('./messengers/' + task.template);
-                template.sendEmail(transport, task, cb);
+                try {
+                    var assoc = {};
+                    for (var i in task.data) {
+                        assoc[task.data[i][0]] = task.data[i][1];
+                    }
+
+                    task.data = assoc;
+                    template.sendEmail(transport, dbClient, task, cb);
+                } catch (e) {
+                    console.log('Error in messenger ' + task.template  + ': ');
+                    console.warn(e);
+                }
             } catch (e) {
                 console.log('Failed to load messenger for template ' + task.template);
                 console.warn(e);
