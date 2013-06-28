@@ -449,7 +449,7 @@
             {
               "Name": "assetId",
               "Location": "URL",
-              "Description": "The id of the asset to delete. Must be owned by a partner you are affiliated with",
+              "Description": "The id of the asset to update. Must be owned by a partner you are affiliated with",
               "Required": "Y",
               "Type": "number"
             },
