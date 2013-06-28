@@ -87,7 +87,7 @@ describe('Tags manipulation', function(){
     function removeTag(tag, cb) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/tag/remove/' + tag,
+            '/bodega/v1/json/tag/delete/' + tag,
             function(res) {
                 cb(res);
             },
@@ -225,6 +225,46 @@ describe('Tags manipulation', function(){
                     res.body.tags.length.should.equal(6);
                     done();
                 });
+            });
+        });
+
+        it('edit a non existing tag', function(done) {
+            var expected = {
+                authStatus: true,
+                device: 'null',
+                store: 'null',
+                points: 10000,
+                success: false,
+                error: { type: 'TagIdInvalid' }
+            };
+
+            updateTag(createdTagId, 'new title', 9, function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.eql(expected);
+                done();
+            });
+        });
+
+        it('delete a non existing tag', function(done) {
+            var expected = {
+                authStatus: true,
+                device: 'null',
+                store: 'null',
+                points: 10000,
+                success: false,
+                error: { type: 'TagNotDeleted' }
+            };
+
+            removeTag(createdTagId, function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json; charset=utf-8');
+                res.body.should.eql(expected);
+                done();
             });
         });
     });

@@ -227,8 +227,10 @@ function update(partner, db, req, res) {
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
+            } else if (result.rowCount === 0) {
+                errors.report('TagIdInvalid', req, res, err);
+                return;
             }
-
             res.json(utils.standardJson(req));
         });
 }
