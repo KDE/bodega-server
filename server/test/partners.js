@@ -219,6 +219,7 @@ describe('Partner management', function() {
                             "name": "Zack Rusin",
                             "email": "zack@kde.org",
                             "roles": [
+                                "Accounts",
                                 "Partner Manager"
                             ]
                         }
@@ -482,6 +483,7 @@ describe('Partner management', function() {
                             "name": "Zack Rusin",
                             "email": "zack@kde.org",
                             "roles": [
+                                "Accounts",
                                 "Partner Manager"
                             ]
                         }
@@ -522,6 +524,7 @@ describe('Partner management', function() {
                             "name": "Zack Rusin",
                             "email": "zack@kde.org",
                             "roles": [
+                                "Accounts",
                                 "Partner Manager"
                             ]
                         }
@@ -554,6 +557,7 @@ describe('Partner management', function() {
                             "name": "Zack Rusin",
                             "email": "zack@kde.org",
                             "roles": [
+                                "Accounts",
                                 "Partner Manager"
                             ]
                         }

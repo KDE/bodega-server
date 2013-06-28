@@ -114,7 +114,7 @@ function insertPartner(db, req, res, name, email, cb)
 
 function addDefaultAffiliation(db, req, res, partnerId, cb)
 {
-    db.query("insert into affiliations (person, partner, role) select $1, $2, id from personRoles where description = 'Partner Manager';",
+    db.query("insert into affiliations (person, partner, role) select $1, $2, id from personRoles where description in ('Partner Manager', 'Accounts');",
              [req.session.user.id, partnerId],
              function(err, result) {
                   if (err) {
