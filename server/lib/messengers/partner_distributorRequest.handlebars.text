@@ -1,0 +1,5 @@
+A new distributor request has been made by {{fullname}} <{{email}}> (Account ID: {{recipient}}) on behalf of partner {{partnerName}} (Partner ID: {{data.partner}}) with the following information provided:
+
+{{data.message}}
+
+Please attend to this request at your earliest convenience.

@@ -12,7 +12,7 @@ module.exports.sendEmail = function(transport, db, record, cb)
         transport: transport,
         from: app.config.service.email,
         to: app.config.addresses.partnerRequests,
-        subject: "Publisher account upgrade request"
+        subject: "Distributor account upgrade request"
     };
 
     // break the message up into nice short lines for the email
@@ -29,7 +29,7 @@ module.exports.sendEmail = function(transport, db, record, cb)
 
                 template.createBodies(
                     {
-                        text: path.join(__dirname, '/partner_publisherRequest.handlebars.text')
+                        text: path.join(__dirname, '/partner_distributorRequest.handlebars.text')
                     },
                     record,
                     function(err, output) {
