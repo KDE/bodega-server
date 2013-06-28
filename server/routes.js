@@ -442,9 +442,9 @@ app.post(serverPath('tag/update/:tag'), isAuthorized,
     }
 );
 
-app.get(serverPath('tag/remove/:tag'), isAuthorized,
+app.get(serverPath('tag/delete/:tag'), isAuthorized,
     function(req, res) {
-        app.db.removeTag(req, res);
+        app.db.deleteTag(req, res);
     }
 );
 
