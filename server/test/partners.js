@@ -538,36 +538,77 @@ describe('Partner management', function() {
 
             it('should be able to delete all roles for a person with a partner we are a manager for', function(done) {
                 params = {
-                            person: 'aseigo@kde.org'
-                         };
+                    person: 'aseigo@kde.org'
+                };
+
                 utils.postUrl(
                     server,
                     '/bodega/v1/json/partner/roles/update/' + newPartnerId,
                     params,
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('success', true);
-                    var expected = existingPartnerJson.slice();
-                    expected.push(newPartnerJson);
-                    expected[1].people = [
-                        {
-                            "name": "Zack Rusin",
-                            "email": "zack@kde.org",
-                            "roles": [
-                                "Accounts",
-                                "Partner Manager"
-                            ]
-                        }
-                    ]
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json; charset=utf-8');
+                        res.body.should.have.property('success', true);
+                        var expected = existingPartnerJson.slice();
+                        expected.push(newPartnerJson);
+                        expected[1].people = [
+                            {
+                                "name": "Zack Rusin",
+                                "email": "zack@kde.org",
+                                "roles": [
+                                    "Accounts",
+                                    "Partner Manager"
+                                ]
+                            }
+                        ];
 
-                    checkPartnerList(expected, done);
+                        checkPartnerList(expected, done);
                 },
                 cookie);
 
                });
+
+            it('request publisher status', function(done) {
+                params = {
+                    reason: 'So we can upload content.'
+                };
+
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/request/publisher/' + newPartnerId,
+                    params,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json; charset=utf-8');
+                        res.body.should.have.property('success', true);
+                        done();
+                    },
+                    cookie);
+            });
+
+            it('request distributor status', function(done) {
+                params = {
+                    reason: 'So we can make stores.'
+                };
+
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/request/publisher/' + newPartnerId,
+                    params,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json; charset=utf-8');
+                        res.body.should.have.property('success', true);
+                        done();
+                    },
+                    cookie);
+            });
         });
 
         after(function(done) {

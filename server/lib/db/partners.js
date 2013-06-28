@@ -242,6 +242,12 @@ function deletePartnerLink(db, req, res, partner, cb)
              });
 }
 
+function sendStandardJson(req, res, cb)
+{
+    res.json(utils.standardJson(req));
+    cb();
+}
+
 function setPersonRole(db, req, res, partner, data, cb)
 {
     db.query("delete from affiliations where person = $1 and partner = $2",
@@ -259,24 +265,53 @@ function setPersonRole(db, req, res, partner, data, cb)
                     for (var i = 0; i < req.body.roles.length; i++) {
                           inStatement.push('$' + (i + 3));
                     }
+
                     db.query("insert into affiliations (person, partner, role) \
                              select $1, $2, id from personRoles where description in (" +
                              inStatement.join(', ') + ")",
                              params,
                              function(err, result) {
                                  if (err) {
-                                     console.log("Wtf ... insert into affiliations (person, partner, role) select $1, $2, id from personRoles where description in (" + inStatement.join(', ') + ")");
-                                     console.log(params);
                                      cb(errors.createError('Database', err.message));
                                      return;
                                  }
 
-                                 cb();
+                                 cb(null, req, res);
                              });
                 } else {
-                    cb();
+                    cb(null, req, res);
                 }
             });
+}
+
+function requestDistributorStatus(db, req, res, partner, data, cb)
+{
+    db.query("insert into partnerRequests (partner, person, type, reason) \
+              values ($1, $2, $3, $4)",
+              [partner, req.session.user.id, 'distributorRequest', req.body.reason],
+              function(err, result) {
+                  if (err) {
+                      cb(errors.create('Database', err.message));
+                      return;
+                  }
+
+                  cb(null, req, res);
+              });
+}
+
+function requestPublisherStatus(db, req, res, partner, data, cb)
+{
+    db.query("insert into partnerRequests (partner, person, type, reason) \
+              values ($1, $2, $3, $4)",
+              [partner, req.session.user.id, 'distributorRequest', req.body.reason],
+              function(err, result) {
+                  if (err) {
+                      cb(errors.create('Database', err.message));
+                      return;
+                  }
+
+                  cb(null, req, res);
+              });
 }
 
 module.exports.list = function(db, req, res)
@@ -462,8 +497,7 @@ module.exports.setPersonRole = function(db, req, res)
             return;
         }
 
-        utils.wrapInTransaction([utils.requireRole, setPersonRole,
-                                 function(cb) { res.json(utils.standardJson(req)); cb(); } ],
+        utils.wrapInTransaction([ utils.requireRole, setPersonRole, sendStandardJson ],
                                 db, req, res,
                                 partner, 'Partner Manager', { 'person': result.rows[0].id } );
     });
@@ -477,8 +511,8 @@ module.exports.requestDistributorStatus = function(db, req, res)
         return;
     }
 
-    //TODO: implement
-    utils.wrapInTransaction([utils.requireRole, requestDistributorStatus], db, req, res,
+    utils.wrapInTransaction([ utils.requireRole, requestDistributorStatus, sendStandardJson ],
+                            db, req, res,
                             partner, 'Partner Manager', null);
 };
 
@@ -490,8 +524,8 @@ module.exports.requestPublisherStatus = function(db, req, res)
         return;
     }
 
-    //TODO: implement
-    utils.wrapInTransaction([utils.requireRole, requestPublisherStatus], db, req, res,
+    utils.wrapInTransaction([ utils.requireRole, requestPublisherStatus, sendStandardJson ],
+                            db, req, res,
                             partner, 'Partner Manager', null);
 };
 
