@@ -37,13 +37,13 @@ module.exports.listTypes = function(db, req, res) {
 };
 
 module.exports.listAssetTags = function(db, req, res) {
+    var asset = utils.parseNumber(req.params.assetId);
 
-    if (!req.params.asset) {
+    if (asset < 1) {
         errors.report('MissingParameters', req, res);
         return;
     }
 
-    var asset = req.params.asset;
     var json = utils.standardJson(req);
 
     var q = db.query(
@@ -64,13 +64,13 @@ module.exports.listAssetTags = function(db, req, res) {
 };
 
 module.exports.listChannelTags = function(db, req, res) {
+    var channel = utils.parseNumber(req.params.channel);
 
-    if (!req.params.channel) {
+    if (channel < 1) {
         errors.report('MissingParameters', req, res);
         return;
     }
 
-    var channel = req.params.channel;
     var json = utils.standardJson(req);
 
     var q = db.query(
@@ -93,16 +93,17 @@ module.exports.listChannelTags = function(db, req, res) {
 module.exports.listTags = function(db, req, res) {
 
     var query = "select tags.id, tags.type, tagtypes.type as typename, title \
-                 from tags \
-                 join tagtypes on tagtypes.id = tags.type ";
+                 from tags join tagtypes on (tagtypes.id = tags.type)"
 
     var params = new Array();
-    
-    if (req.params.type) {
-        query += "where tags.type = $1;";
+
+    var type = utils.parseNumber(req.params.type);
+    if (type > 0) {
+        query += " where tags.type = $1";
         params.push(req.params.type)
     }
 
+    query += " order by title";
     var json = utils.standardJson(req);
 
     var q = db.query(
@@ -137,7 +138,7 @@ function create(partner, db, req, res) {
         return;
     }
 
-    db.query("insert into tags (partner, type, title) values ($1, $2, $3) returning id as id",
+    db.query("select * from tags where partner = $1 and type = $2 and title = $3",
              [partner, type, title],
              function(err, result) {
                  if (err) {
@@ -145,10 +146,24 @@ function create(partner, db, req, res) {
                      return;
                  }
 
-                 var json = utils.standardJson(req);
-                 json.id = result.rows[0].id;
-                 res.json(json);
-            });
+                 if (result.rowCount > 0) {
+                     errors.report('TagExists', req, res, err);
+                     return;
+                 }
+
+                db.query("insert into tags (partner, type, title) values ($1, $2, $3) returning id as id",
+                         [partner, type, title],
+                         function(err, result) {
+                             if (err) {
+                                 errors.report('Database', req, res, err);
+                                 return;
+                             }
+
+                             var json = utils.standardJson(req);
+                             json.id = result.rows[0].id;
+                             res.json(json);
+                    });
+             });
 }
 
 module.exports.create = function(db, req, res) {

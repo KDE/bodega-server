@@ -44,18 +44,20 @@ describe('Tags manipulation', function(){
     });
 
     function listTags(asset, channel, type, cb) {
-        var query = '';
+        var query = '/bodega/v1/json';
         if (asset) {
-            query += '/asset/' + asset;
+            query += '/asset/tags/' + asset;
         } else if (channel) {
-            query += '/channel/' + channel;
+            query += '/store/channel/tags/' + channel;
         } else if (type) {
-            query += '/type/' + type;
+            query += '/tag/list/' + type;
+        } else {
+            query += '/tag/list';
         }
 
         utils.getUrl(
             server,
-            '/bodega/v1/json/tag/list' + query,
+            query,
             function(res) {
                 cb(res);
             },
@@ -102,11 +104,11 @@ describe('Tags manipulation', function(){
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
-                res.body.tags.length.should.equal(27);
-                res.body.tags[0].id.should.be.eql(1);
-                res.body.tags[0].type.should.be.eql(7);
-                res.body.tags[0].typename.should.be.eql('mimetype');
-                res.body.tags[0].title.should.be.eql('application/x-plasma');
+                res.body.tags.length.should.equal(21);
+                res.body.tags[0].id.should.be.eql(7);
+                res.body.tags[0].type.should.be.eql(8);
+                res.body.tags[0].typename.should.be.eql('contentrating');
+                res.body.tags[0].title.should.be.eql('Adults Only');
                 done();
             }
             listTags(null, null, null, cb);
@@ -160,10 +162,10 @@ describe('Tags manipulation', function(){
                 res.body.should.have.property('tags');
 
                 res.body.tags.length.should.equal(6);
-                res.body.tags[0].id.should.be.eql(2);
+                res.body.tags[0].id.should.be.eql(7);
                 res.body.tags[0].type.should.be.eql(8);
                 res.body.tags[0].typename.should.be.eql('contentrating');
-                res.body.tags[0].title.should.be.eql('Early Childhood');
+                res.body.tags[0].title.should.be.eql('Adults Only');
                 done();
             }
             listTags(null, null, 8, cb);
@@ -201,10 +203,10 @@ describe('Tags manipulation', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('tags');
 
-                    res.body.tags.length.should.equal(12);
-                    res.body.tags[11].type.should.be.eql(9);
-                    res.body.tags[11].typename.should.be.eql('assetType');
-                    res.body.tags[11].title.should.be.eql('new title');
+                    res.body.tags.length.should.equal(11);
+                    res.body.tags[8].type.should.be.eql(9);
+                    res.body.tags[8].typename.should.be.eql('assetType');
+                    res.body.tags[8].title.should.be.eql('new title');
                     done();
                 });
             });
