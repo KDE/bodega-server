@@ -34,7 +34,7 @@ function sendResponse(err, db, req, res, assetInfo, assets)
 
 function tagFetcher(asset, cb)
 {
-    asset.db.query('select tags.id, tagtypes.id as type, tagtypes.type as typename, title \
+    asset.db.query('select tags.id, tagtypes.id as typeid, tagtypes.type as type, title \
           from assettags join tags on assettags.tag = tags.id \
           join tagtypes on tagtypes.id = tags.type \
           where asset = $1',

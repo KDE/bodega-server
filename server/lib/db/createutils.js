@@ -93,6 +93,7 @@ function setupTag(db, req, res, assetInfo, tagInfo, cb)
     var tagIdQuery =
             "select id from tagtypes t where t.type=$1;";
     var e;
+
     db.query(
         tagIdQuery, [tagInfo.type],
         function(err, result) {
