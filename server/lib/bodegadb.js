@@ -244,7 +244,7 @@ var BodegaDb = (function() {
         this.dbQuery(dbTags.create, req, res);
     };
 
-    BodegaDb.prototype.removeTag = function(req, res) {
+    BodegaDb.prototype.deleteTag = function(req, res) {
         this.dbQuery(dbTags.remove, req, res);
     };
 
