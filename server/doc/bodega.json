@@ -465,7 +465,7 @@
         {
           "MethodName": "List",
           "read-only": "true",
-          "Synopsis": "Lists the assets that either belong to you or have been posted and you are a content validator.",
+          "Synopsis": "Lists the assets that either belong to you or, if you are a content validator,  have been posted.",
           "HTTPMethod": "GET",
           "URI": "/asset/list/",
           "parameters": [
@@ -881,7 +881,7 @@
             "MethodName": "Set roles",
             "Synopsis": "Sets roles for one or more person for a given partner. The account must have the Partner Manager role to be able to do this",
             "HTTPMethod": "POST",
-            "URI": "/partner/roles/add/:partner",
+            "URI": "/partner/roles/update/:partner",
             "parameters": [
             {
                 "Name": "partner",
