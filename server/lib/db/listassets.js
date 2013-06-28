@@ -31,6 +31,64 @@ function sendResponse(err, db, req, res, assetInfo, assets)
     }
 }
 
+
+function tagFetcher(asset, cb)
+{
+    asset.db.query('select tags.id, tagtypes.id as type, tagtypes.type as typename, title \
+          from assettags join tags on assettags.tag = tags.id \
+          join tagtypes on tagtypes.id = tags.type \
+          where asset = $1',
+        [asset.asset],
+        function (err, result) {
+            if (err) {
+                cb(errors.create('Database', err.message));
+                return;
+            }
+
+            for (var i = 0; i < asset.allAssets.length; ++i) {
+                if (asset.allAssets[i].id === asset.asset) {
+                    asset.allAssets[i].tags = result.rows;
+                }
+            }
+            cb();
+        });
+}
+
+function addTagsToAssets(db, req, res, assetInfo, results, assets, cb) {
+
+    function errorReporter(err) {
+        error = err;
+    }
+
+    var queue = async.queue(tagFetcher, 2);
+    var tasks = [];
+    queue.drain = function() {
+        if (error) {
+            errors.report(error.type, req, res, error);
+        } else {
+            cb(null, db, req, res, assetInfo, assets);
+        }
+    };
+
+    for (var i = 0; i < results.rowCount; ++i) {
+        var asset = results.rows[i];
+        asset.tags = [];
+        assets.push(asset);
+
+        var task = {
+            'db': db,
+            'req': req,
+            'res': res,
+            'asset': asset.id,
+            'allAssets': assets
+        };
+
+        tasks.push(task);
+    }
+
+    queue.push(tasks, errorReporter);
+}
+
 function findPublishedAssets(db, req, res, assetInfo, assets, cb)
 {
     var query = 'select * from assets where partner=$1 and active=true';
@@ -42,8 +100,9 @@ function findPublishedAssets(db, req, res, assetInfo, assets, cb)
             cb(e, db, req, res, assetInfo, assets);
             return;
         }
-        assets = assets.concat(results.rows);
-        cb(null, db, req, res, assetInfo, assets);
+
+
+        addTagsToAssets(db, req, res, assetInfo, results, assets, cb);
     });
 }
 
@@ -59,8 +118,7 @@ function findIncomingAssets(db, req, res, assetInfo, assets, cb)
             return;
         }
 
-        assets = assets.concat(results.rows);
-        cb(null, db, req, res, assetInfo, assets);
+        addTagsToAssets(db, req, res, assetInfo, results, assets, cb);
     });
 }
 
@@ -76,8 +134,7 @@ function findPostedAssets(db, req, res, assetInfo, assets, cb)
             return;
         }
 
-        assets = assets.concat(results.rows);
-        cb(null, db, req, res, assetInfo, assets);
+        addTagsToAssets(db, req, res, assetInfo, results, assets, cb);
     });
 }
 
