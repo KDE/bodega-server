@@ -417,15 +417,4 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION ct_notifyOfEmailQueuing() RETURNS TRIGGER AS $$
-DECLARE
-BEGIN
-    NOTIFY messageQueued, 'email';
-    RETURN NEW;
-END
-$$ LANGUAGE 'plpgsql';
-
-DROP TRIGGER IF EXISTS trg_ct_notifyOfEmailQueuing ON emailQueue;
-CREATE TRIGGER trg_ct_notifyOfEmailQueuing AFTER INSERT ON emailQueue
-FOR EACH ROW EXECUTE PROCEDURE ct_notifyOfEmailQueuing();
 

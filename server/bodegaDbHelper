@@ -5,8 +5,9 @@ var prompt = require('prompt');
 var exec = require('child_process').exec;
 
 
+var psqlExec = "PGOPTIONS='--client-min-messages=warning' psql -q";
 //those are the files that we use for the setup of the database
-var sql_commands = ['core.sql', 'util.plsql', 'core.plsql', 'api.plsql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql', 'upload.sql'];
+var sql_commands = ['core.sql', 'messaging.sql', 'util.plsql', 'core.plsql', 'api.plsql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql', 'upload.sql'];
 var test_sql_commands = ['testdata.sql'];
 
 var run = function(command, fn) {
@@ -28,7 +29,7 @@ function series(list, fn)
     //this is out command for the sql files
     var command_list = list;
     var sql_command = function(fileName) {
-        var command = "PGOPTIONS='--client-min-messages=warning' psql -q -d " + config.service.database.name +
+        var command = psqlExec + " -d " + config.service.database.name +
                       ' -U ' + config.service.database.user + ' -f ';
         if (fileName.indexOf(sql_dir) === -1) {
             command += sql_dir
@@ -171,6 +172,7 @@ if (sql_argument == 'update') {
         } catch (e) {
         }
 
+        sql_commands.unshift(psqlExec + ' -U ' + adminUser() + ' -f superuserCommands.sql ' + config.service.database.name + ' 1>/dev/null');
         sql_commands.unshift('createdb -U ' + adminUser() + ' -O ' + config.service.database.user + ' ' + config.service.database.name);
         sql_commands.unshift('dropdb -U ' + adminUser() + ' ' + config.service.database.name);
         //console.log(sql_commands);
