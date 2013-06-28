@@ -1545,6 +1545,98 @@
             ]
         }
         ]
+    },
+    {
+        "name": "Tags management",
+        "methods": [
+        {
+            "MethodName": "Types",
+            "Synopsis": "list all types for the tags",
+            "HTTPMethod": "GET",
+            "URI": "/tag/types"
+        },
+        {
+            "MethodName": "List",
+            "Synopsis": "list all tags, matching the given type if specified, otherwise list all tags",
+            "HTTPMethod": "GET",
+            "URI": "/tag/list/?:type?",
+            "parameters": [
+                {
+                    "Name": "type",
+                    "Location": "URL",
+                    "Description": "The id of the type we want to list tags of",
+                    "Required": "N",
+                    "Type": "number"
+                }
+            ]
+        },
+        {
+            "MethodName": "Create",
+            "Synopsis": "Create a new tag",
+            "HTTPMethod": "POST",
+            "URI": "/tag/create",
+            "parameters": [
+                {
+                    "Name": "type",
+                    "Location": "body",
+                    "Description": "The id of the type of the new tag",
+                    "Required": "Y",
+                    "Type": "number"
+                },
+                {
+                    "Name": "title",
+                    "Location": "body",
+                    "Description": "The readable name for the new tag",
+                    "Required": "Y",
+                    "Type": "string"
+                }
+            ]
+        },
+        {
+            "MethodName": "Update",
+            "Synopsis": "Update an existing tag",
+            "HTTPMethod": "POST",
+            "URI": "/tag/update/:tag",
+            "parameters": [
+                {
+                    "Name": "tag",
+                    "Location": "URL",
+                    "Description": "The id of the tag we want to modify",
+                    "Required": "Y",
+                    "Type": "number"
+                },
+                {
+                    "Name": "type",
+                    "Location": "body",
+                    "Description": "The id of the type of the new tag",
+                    "Required": "Y",
+                    "Type": "number"
+                },
+                {
+                    "Name": "title",
+                    "Location": "body",
+                    "Description": "The readable name for the new tag",
+                    "Required": "Y",
+                    "Type": "string"
+                }
+            ]
+        },
+        {
+            "MethodName": "Delete",
+            "Synopsis": "Delete an existing tag",
+            "HTTPMethod": "GET",
+            "URI": "/tag/delete/:tag",
+            "parameters": [
+                {
+                    "Name": "tag",
+                    "Location": "URL",
+                    "Description": "The id of the tag we want to delete",
+                    "Required": "Y",
+                    "Type": "number"
+                }
+            ]
+        }
+        ]
     }
 ]
 }

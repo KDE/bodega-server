@@ -40,6 +40,7 @@ var dbUpdateAsset = require('./db/updateasset.js');
 var dbListAssets = require('./db/listassets.js');
 var dbStats = require('./db/stats.js');
 var dbStores = require('./db/stores.js');
+var dbTags = require('./db/tags.js');
 var dbContactInfo = require('./db/contactInfo.js');
 var dbPostAsset = require('./db/postasset.js');
 var dbPublishAsset = require('./db/publishasset.js');
@@ -221,6 +222,34 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.deleteStoreChannel = function(req, res) {
         this.dbQuery(dbStores.deleteChannel, req, res);
+    };
+
+    BodegaDb.prototype.listTagTypes = function(req, res) {
+        this.dbQuery(dbTags.listTypes, req, res);
+    };
+
+    BodegaDb.prototype.listAssetTags = function(req, res) {
+        this.dbQuery(dbTags.listAssetTags, req, res);
+    };
+
+    BodegaDb.prototype.listChannelTags = function(req, res) {
+        this.dbQuery(dbTags.listChannelTags, req, res);
+    };
+
+    BodegaDb.prototype.listTags = function(req, res) {
+        this.dbQuery(dbTags.listTags, req, res);
+    };
+
+    BodegaDb.prototype.createTag = function(req, res) {
+        this.dbQuery(dbTags.create, req, res);
+    };
+
+    BodegaDb.prototype.deleteTag = function(req, res) {
+        this.dbQuery(dbTags.remove, req, res);
+    };
+
+    BodegaDb.prototype.updateTag = function(req, res) {
+        this.dbQuery(dbTags.update, req, res);
     };
 
     BodegaDb.prototype.hunt = function(req, res) {

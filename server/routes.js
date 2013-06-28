@@ -308,6 +308,12 @@ app.post(serverPath('asset/publish/:assetId'), isAuthorized,
              app.db.publishAsset(req, res);
          });
 
+app.get(serverPath('asset/tags/:assetId'), isAuthorized,
+    function(req, res) {
+        app.db.listAssetTags(req, res);
+    }
+);
+
 app.get(serverPath('asset/list/:type?*'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
@@ -378,6 +384,12 @@ app.post(serverPath('store/channel/update/:store/:channel'), isAuthorized,
     }
 );
 
+app.get(serverPath('store/channel/tags/:channel'), isAuthorized,
+    function(req, res) {
+        app.db.listChannelTags(req, res);
+    }
+);
+
 app.get(serverPath('store/channel/delete/:store/:channel'), isAuthorized,
     function(req, res) {
         app.db.deleteStoreChannel(req, res);
@@ -393,6 +405,40 @@ app.get(serverPath('store/collection/add/:store/:collection'), isAuthorized,
 app.get(serverPath('store/collection/remove/:store/:collection'), isAuthorized,
     function(req, res) {
 //        app.db.removeFeaturedCollection(req, res);
+    }
+);
+
+/******************************************************
+ * Tags management
+ */
+app.get(serverPath('tag/types'), isAuthorized,
+    function(req, res) {
+        app.db.listTagTypes(req, res);
+    }
+);
+
+app.get(serverPath('tag/list/?:type?'), isAuthorized,
+    function(req, res) {
+        app.db.listTags(req, res);
+    }
+);
+
+app.post(serverPath('tag/create'), isAuthorized,
+    function(req, res) {
+        app.db.createTag(req, res);
+    }
+);
+
+app.post(serverPath('tag/update/:tag'), isAuthorized,
+    function(req, res) {
+        //console.log(req.body)
+        app.db.updateTag(req, res);
+    }
+);
+
+app.get(serverPath('tag/delete/:tag'), isAuthorized,
+    function(req, res) {
+        app.db.deleteTag(req, res);
     }
 );
 
