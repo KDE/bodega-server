@@ -1498,7 +1498,7 @@
             "MethodName": "Update",
             "Synopsis": "Updates and existing channel in a store",
             "HTTPMethod": "POST",
-            "URI": "/store/channel/create/:store",
+            "URI": "/store/channel/update/:store",
             "parameters": [
                 {
                     "Name": "store",
