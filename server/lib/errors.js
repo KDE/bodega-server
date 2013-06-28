@@ -97,7 +97,7 @@ var ErrorType = {
     "PartnerNameExists"      : 80,//the partner already exists in the database
     "InvalidLinkService"     : 81,//the service requested for use as a link does not exist
 
-    "TagIdInvelid"           : 90,//The tag that has been requested doesn't exist
+    "TagIdInvalid"           : 90,//The tag that has been requested doesn't exist
     "TagNotDeleted"          : 91,//The tag that has been requested to be deleted is still there
 };
 
