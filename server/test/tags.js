@@ -84,7 +84,7 @@ describe('Tags manipulation', function(){
             cookie);
     }
 
-    function removeTag(tag, cb) {
+    function deleteTag(tag, cb) {
         utils.getUrl(
             server,
             '/bodega/v1/json/tag/delete/' + tag,
@@ -212,8 +212,8 @@ describe('Tags manipulation', function(){
             });
         });
 
-        it('remove the created tag', function(done) {
-            removeTag(createdTagId, function(res) {
+        it('delete the created tag', function(done) {
+            deleteTag(createdTagId, function(res) {
                 listTags(null, null, 8, function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -258,7 +258,7 @@ describe('Tags manipulation', function(){
                 error: { type: 'TagNotDeleted' }
             };
 
-            removeTag(createdTagId, function(res) {
+            deleteTag(createdTagId, function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
