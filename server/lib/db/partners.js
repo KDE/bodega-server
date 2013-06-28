@@ -24,7 +24,7 @@ var errors = require('../errors.js');
 
 function affiliationFetcher(task, cb)
 {
-    task.db.query("select p.fullname, r.description from affiliations a join people p on (a.person = p.id) \
+    task.db.query("select p.fullname, p.email, r.description from affiliations a join people p on (a.person = p.id) \
                           join personRoles r on (a.role = r.id) where a.partner = $1 \
                           order by p.fullname, r.description",
              [task.partner],
@@ -40,6 +40,7 @@ function affiliationFetcher(task, cb)
                      var row = result.rows[i];
                      var person = {
                          name: row.fullname,
+                         email: row.email,
                          roles: [ row.description ]
                      };
 
@@ -241,6 +242,43 @@ function deletePartnerLink(db, req, res, partner, cb)
              });
 }
 
+function setPersonRole(db, req, res, partner, data, cb)
+{
+    db.query("delete from affiliations where person = $1 and partner = $2",
+            [ data.person, partner ],
+            function(err, result) {
+                if (err) {
+                    cb(errors.create('Database', err.message));
+                    return;
+                };
+
+                if (Array.isArray(req.body.roles) && req.body.roles.length > 0) {
+                    var params = [ data.person, partner ];
+                    params = params.concat(req.body.roles);
+                    var inStatement = [];
+                    for (var i = 0; i < req.body.roles.length; i++) {
+                          inStatement.push('$' + (i + 3));
+                    }
+                    db.query("insert into affiliations (person, partner, role) \
+                             select $1, $2, id from personRoles where description in (" +
+                             inStatement.join(', ') + ")",
+                             params,
+                             function(err, result) {
+                                 if (err) {
+                                     console.log("Wtf ... insert into affiliations (person, partner, role) select $1, $2, id from personRoles where description in (" + inStatement.join(', ') + ")");
+                                     console.log(params);
+                                     cb(errors.createError('Database', err.message));
+                                     return;
+                                 }
+
+                                 cb();
+                             });
+                } else {
+                    cb();
+                }
+            });
+}
+
 module.exports.list = function(db, req, res)
 {
     db.query("select distinct p.id, p.name, p.supportEmail as email, p.publisher, p.distributor, p.owedPoints as points from partners p join affiliations a on (p.id = a.partner and a.person = $1) order by id",
@@ -259,12 +297,12 @@ module.exports.list = function(db, req, res)
                     return;
                 }
 
+                var error = null;
                 function errorReporter(err) {
                     error = err;
                 }
 
                 var queue = async.queue(linkFetcher, 2);
-                var error = null;
                 var tasks = [];
                 queue.drain = function() {
                     if (error) {
@@ -399,7 +437,7 @@ module.exports.listPersonRoles = function(db, req, res)
              });
 }
 
-module.exports.addPersonRole = function(db, req, res)
+module.exports.setPersonRole = function(db, req, res)
 {
     var partner = utils.parseNumber(req.params.partner);
     if (partner < 1) {
@@ -407,9 +445,28 @@ module.exports.addPersonRole = function(db, req, res)
         return;
     }
 
-    //TODO: implement
-    utils.wrapInTransaction([utils.requireRole, addPersonRole], db, req, res,
-                            partner, 'Partner Manager');
+    var email = req.body.person;
+    if (!email) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    db.query("select id from people where email = $1", [ email ], function(err, result) {
+        if (err) {
+            errors.report('Database', req, res, err);
+            return;
+        }
+
+        if (result.rowCount < 1) {
+            errors.report('InvalidAccount', req, res);
+            return;
+        }
+
+        utils.wrapInTransaction([utils.requireRole, setPersonRole,
+                                 function() { res.json(utils.standardJson(req)); } ],
+                                db, req, res,
+                                partner, 'Partner Manager', { 'person': result.rows[0].id } );
+    });
 }
 
 module.exports.removePersonRole = function(db, req, res)
@@ -422,7 +479,7 @@ module.exports.removePersonRole = function(db, req, res)
 
     //TODO: implement
     utils.wrapInTransaction([utils.requireRole, removePersonRole], db, req, res,
-                            partner, 'Partner Manager');
+                            partner, 'Partner Manager', null);
 }
 
 module.exports.requestDistributorStatus = function(db, req, res)
@@ -435,7 +492,7 @@ module.exports.requestDistributorStatus = function(db, req, res)
 
     //TODO: implement
     utils.wrapInTransaction([utils.requireRole, requestDistributorStatus], db, req, res,
-                            partner, 'Partner Manager');
+                            partner, 'Partner Manager', null);
 };
 
 module.exports.requestPublisherStatus = function(db, req, res)
@@ -448,7 +505,7 @@ module.exports.requestPublisherStatus = function(db, req, res)
 
     //TODO: implement
     utils.wrapInTransaction([utils.requireRole, requestPublisherStatus], db, req, res,
-                            partner, 'Partner Manager');
+                            partner, 'Partner Manager', null);
 };
 
 

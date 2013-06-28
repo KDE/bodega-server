@@ -49,6 +49,7 @@ describe('Partner management', function() {
                             people: [
                                 {
                                     "name": "Aaron Seigo",
+                                    "email": "aseigo@kde.org",
                                     "roles": [
                                         "Content Creator",
                                         "Partner Manager"
@@ -56,6 +57,7 @@ describe('Partner management', function() {
                                 },
                                 {
                                     "name": "Zack Rusin",
+                                    "email": "zack@kde.org",
                                     "roles": [
                                         "Content Creator",
                                         "Store Manager",
@@ -166,13 +168,11 @@ describe('Partner management', function() {
         });
     });
 
-    describe('listing pre-creation', function() {
-        it('should list just KDE', function(done) {
-            utils.getUrl(
+    function checkPartnerList(expected, done) {
+        utils.getUrl(
                 server,
                 '/bodega/v1/json/partner/list',
                 function(res) {
-                    var expected = existingPartnerJson;
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -182,11 +182,48 @@ describe('Partner management', function() {
                     done();
                 },
                 cookie);
+    }
+
+    describe('listing pre-creation', function() {
+        it('should list just KDE', function(done) {
+            checkPartnerList(existingPartnerJson, done);
         });
     });
 
     describe('creating and updating a new partner', function() {
         var newPartnerId = 0;
+        var newPartnerJson =
+                {
+                    "id": newPartnerId,
+                    "name": "Sometime",
+                    "email": "foo@sometime.org",
+                    "publisher": false,
+                    "distributor": false,
+                    "points": 0,
+                    "links": [
+                        {
+                            "service": "blog",
+                            "account": "",
+                            "url": "http://myblog.com",
+                            "icon": "extern/blog.png"
+                        },
+                        {
+                            "service": "identi.ca",
+                            "account": "sometimes",
+                            "url": "",
+                            "icon": "extern/identica.png"
+                        }
+                    ],
+                    people: [
+                        {
+                            "name": "Zack Rusin",
+                            "email": "zack@kde.org",
+                            "roles": [
+                                "Partner Manager"
+                            ]
+                        }
+                    ]
+                };
         it('creation should fail with an existing partner name', function(done) {
             server.config.printErrors = false;
             var params = { name: 'KDE', email: 'foo@somewhere.org' };
@@ -240,6 +277,7 @@ describe('Partner management', function() {
                         'application/json; charset=utf-8');
                     res.body.should.have.property('partnerId');
                     newPartnerId = res.body.partnerId;
+                    newPartnerJson.id = newPartnerId;
                     done();
                 },
                 cookie);
@@ -368,54 +406,9 @@ describe('Partner management', function() {
         });
 
         it('listing should show new partner', function(done) {
-            var expected = existingPartnerJson;
-            expected.push(
-                {
-                    "id": newPartnerId,
-                    "name": "Sometime",
-                    "email": "foo@sometime.org",
-                    "publisher": false,
-                    "distributor": false,
-                    "points": 0,
-                    "links": [
-                        {
-                            "service": "blog",
-                            "account": "",
-                            "url": "http://myblog.com",
-                            "icon": "extern/blog.png"
-                        },
-                        {
-                            "service": "identi.ca",
-                            "account": "sometimes",
-                            "url": "",
-                            "icon": "extern/identica.png"
-                        }
-                    ],
-                    people: [
-                        {
-                            "name": "Zack Rusin",
-                            "roles": [
-                                "Partner Manager"
-                            ]
-                        }
-                    ]
-                }
-            );
-
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/partner/list',
-                function(res) {
-                    var expected = existingPartnerJson;
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json; charset=utf-8');
-                    res.body.should.have.property('partners');
-                    res.body.partners.should.eql(expected);
-                    done();
-                },
-                cookie);
+            var expected = existingPartnerJson.slice();
+            expected.push(newPartnerJson);
+            checkPartnerList(expected, done);
         });
 
         it('should not allow updating a partner we are not a manager for', function(done) {
@@ -446,7 +439,7 @@ describe('Partner management', function() {
                     server,
                     '/bodega/v1/json/partner/roles/list',
                 function(res) {
-                    expected = ['Accounts', 'Content Creator', 'Partner Manager', 'Store Manager', 'Validator'];
+                    var expected = ['Accounts', 'Content Creator', 'Partner Manager', 'Store Manager', 'Validator'];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -458,6 +451,119 @@ describe('Partner management', function() {
                 },
                 cookie);
             });
+
+            it('should be able to set roles for a partner we are a manager for', function(done) {
+                params = {
+                            person: 'aseigo@kde.org',
+                            roles: [ 'Validator', 'Accounts' ],
+                         };
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/roles/update/' + newPartnerId,
+                    params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    var expected = existingPartnerJson.slice();
+                    expected.push(newPartnerJson);
+                    expected[1].people = [
+                        {
+                            "name": "Aaron Seigo",
+                            "email": "aseigo@kde.org",
+                            "roles": [
+                                "Accounts",
+                                "Validator"
+                            ]
+                        },
+                        {
+                            "name": "Zack Rusin",
+                            "email": "zack@kde.org",
+                            "roles": [
+                                "Partner Manager"
+                            ]
+                        }
+                    ]
+
+                    checkPartnerList(expected, done);
+                },
+                cookie);
+
+               });
+
+            it('should be able to delete a role for a partner we are a manager for', function(done) {
+                params = {
+                            person: 'aseigo@kde.org',
+                            roles: [ 'Accounts' ],
+                         };
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/roles/update/' + newPartnerId,
+                    params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    var expected = existingPartnerJson.slice();
+                    expected.push(newPartnerJson);
+                    expected[1].people = [
+                        {
+                            "name": "Aaron Seigo",
+                            "email": "aseigo@kde.org",
+                            "roles": [
+                                "Accounts"
+                            ]
+                        },
+                        {
+                            "name": "Zack Rusin",
+                            "email": "zack@kde.org",
+                            "roles": [
+                                "Partner Manager"
+                            ]
+                        }
+                    ]
+
+                    checkPartnerList(expected, done);
+                },
+                cookie);
+
+               });
+
+            it('should be able to delete all roles for a person with a partner we are a manager for', function(done) {
+                params = {
+                            person: 'aseigo@kde.org'
+                         };
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/roles/update/' + newPartnerId,
+                    params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json; charset=utf-8');
+                    res.body.should.have.property('success', true);
+                    var expected = existingPartnerJson.slice();
+                    expected.push(newPartnerJson);
+                    expected[1].people = [
+                        {
+                            "name": "Zack Rusin",
+                            "email": "zack@kde.org",
+                            "roles": [
+                                "Partner Manager"
+                            ]
+                        }
+                    ]
+
+                    checkPartnerList(expected, done);
+                },
+                cookie);
+
+               });
         });
 
         after(function(done) {

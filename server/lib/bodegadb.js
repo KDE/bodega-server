@@ -263,12 +263,8 @@ var BodegaDb = (function() {
         this.dbQuery(dbPartners.listPersonRoles, req, res);
     };
 
-    BodegaDb.prototype.addPersonRole = function(req, res) {
-        this.dbQuery(dbPartners.addPersonRole, req, res);
-    };
-
-    BodegaDb.prototype.removePersonRole = function(req, res) {
-        this.dbQuery(dbPartners.removePersonRole, req, res);
+    BodegaDb.prototype.setPersonRole = function(req, res) {
+        this.dbQuery(dbPartners.setPersonRole, req, res);
     };
 
     BodegaDb.prototype.requestPublisherStatus = function(req, res) {

@@ -435,15 +435,9 @@ app.get(serverPath('partner/roles/list'), isAuthorized,
     }
 );
 
-app.post(serverPath('partner/roles/add/:partner'), isAuthorized,
+app.post(serverPath('partner/roles/update/:partner'), isAuthorized,
     function(req, res) {
-        app.db.addPersonRole(req, res);
-    }
-);
-
-app.post(serverPath('partner/roles/remove/:partner'), isAuthorized,
-    function(req, res) {
-        app.db.removePersonRole(req, res);
+        app.db.setPersonRole(req, res);
     }
 );
 
