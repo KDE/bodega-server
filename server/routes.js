@@ -423,7 +423,7 @@ app.get(serverPath('tag/list'), isAuthorized,
     }
 );
 
-app.get(serverPath('tag/list/type/:type'), isAuthorized,
+app.get(serverPath('tag/list/:type'), isAuthorized,
     function(req, res) {
         app.db.listTags(req, res);
     }
