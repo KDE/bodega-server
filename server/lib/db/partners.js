@@ -463,7 +463,7 @@ module.exports.setPersonRole = function(db, req, res)
         }
 
         utils.wrapInTransaction([utils.requireRole, setPersonRole,
-                                 function() { res.json(utils.standardJson(req)); } ],
+                                 function(cb) { res.json(utils.standardJson(req)); cb(); } ],
                                 db, req, res,
                                 partner, 'Partner Manager', { 'person': result.rows[0].id } );
     });
