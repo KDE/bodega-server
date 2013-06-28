@@ -469,19 +469,6 @@ module.exports.setPersonRole = function(db, req, res)
     });
 }
 
-module.exports.removePersonRole = function(db, req, res)
-{
-    var partner = utils.parseNumber(req.params.partner);
-    if (partner < 1) {
-        errors.report('MissingParameters', req, res);
-        return;
-    }
-
-    //TODO: implement
-    utils.wrapInTransaction([utils.requireRole, removePersonRole], db, req, res,
-                            partner, 'Partner Manager', null);
-}
-
 module.exports.requestDistributorStatus = function(db, req, res)
 {
     var partner = utils.parseNumber(req.params.partner);
