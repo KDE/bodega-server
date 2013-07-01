@@ -46,96 +46,6 @@ module.exports.listAll = function(db, req, res) {
         });
 };
 
-module.exports.create = function(db, req, res) {
-    /*jshint multistr:true */
-    var insertQuery =
-        'INSERT INTO ratings (description, value, channelId) \
-         VALUES ($1, $2, $3) RETURNING id;';
-    var searchQuery =
-        'SELECT * FROM ratings WHERE value = $1 AND channelId = $2;';
-    var defaultPageSize = 25;
-    var description = req.query.description.replace(/["']/g, "");// remove the quotes(singe or double) from the string
-    var value = req.query.value;
-    var channelId = req.query.channelId;
-
-    if (!description || !value || !channelId) {
-        // Name of the collection is missing.
-        errors.report('MissingParameters', req, res);
-        return;
-    }
-
-    db.query(
-        searchQuery, [value, channelId],
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-
-            if (result.rows.length > 0) {
-                errors.report('RatingExists', req, res);
-                return;
-            }
-            db.query(
-                insertQuery, [description, value, channelId],
-                function(err, result) {
-                    if (err || !result.rows || result.rows.length !== 1) {
-                        errors.report('Database', req, res, err);
-                        return;
-                    }
-                    var json = utils.standardJson(req);
-                    json.ratings = [{
-                            id : result.rows[0].id,
-                            description : description,
-                            value : value,
-                            channelId : channelId
-                        }];
-
-                    res.json(json);
-                });
-        });
-};
-
-module.exports.remove = function(db, req, res) {
-    /*jshint multistr:true */
-    var deleteQuery =
-        'DELETE FROM ratings WHERE id = $1;';
-    var searchQuery =
-        'SELECT * FROM ratings WHERE id = $1;';
-    var ratingId = req.query.ratingId;
-
-    if (!ratingId) {
-        //"Id of the collection is missing.",
-        errors.report('MissingParameters', req, res);
-        return;
-    }
-
-    db.query(
-        searchQuery, [ratingId],
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-
-            if (!result.rows || result.rows.length <= 0) {
-                errors.report('NoMatch', req, res);
-                return;
-            }
-            db.query(
-                deleteQuery, [ratingId],
-                function(err, result) {
-                    if (err) {
-                        errors.report('Database', req, res, err);
-                        return;
-                    }
-
-                    var json = utils.standardJson(req);
-                    res.json(json);
-                });
-        });
-};
-
 module.exports.asset = function(db, req, res) {
     /*jshint multistr:true */
     var assetQuery = 'SELECT DISTINCT a.id, a.license, partners.id as partnerId, \
@@ -193,7 +103,7 @@ module.exports.asset = function(db, req, res) {
     });
 };
 
-module.exports.person = function(db, req, res) {
+module.exports.participant = function(db, req, res) {
     /*jshint multistr:true */
     var personQuery = 'SELECT firstname, lastname, \
                       CASE WHEN people.middlenames IS NULL THEN \'\' \

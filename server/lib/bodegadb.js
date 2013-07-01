@@ -241,8 +241,8 @@ var BodegaDb = (function() {
         this.dbQuery(dbRatings.asset, req, res);
     };
 
-    BodegaDb.prototype.ratingPerson = function(req, res) {
-        this.dbQuery(dbRatings.person, req, res);
+    BodegaDb.prototype.participantRatings = function(req, res) {
+        this.dbQuery(dbRatings.participant, req, res);
     };
 
     BodegaDb.prototype.ratingAddAsset = function(req, res) {
