@@ -7,7 +7,10 @@ var exec = require('child_process').exec;
 
 var psqlExec = "PGOPTIONS='--client-min-messages=warning' psql -q";
 //those are the files that we use for the setup of the database
-var sql_commands = ['core.sql', 'messaging.sql', 'util.plsql', 'core.plsql', 'api.plsql', 'search_en.plsql', 'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql', 'payments_stripe.sql', 'upload.sql'];
+var sql_commands = ['core.sql', 'ratings.sql', 'messaging.sql', 'util.plsql', 'core.plsql', 'api.plsql', 'search_en.plsql',
+                    'defaultdata.sql', 'actionconf.plsql', 'rankings.sql', 'purchasing.plsql',
+                    'payments_stripe.sql', 'upload.sql'];
+
 var test_sql_commands = ['testdata.sql'];
 
 var run = function(command, fn) {
