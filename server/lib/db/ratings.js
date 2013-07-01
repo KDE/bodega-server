@@ -26,11 +26,7 @@ module.exports.listAll = function(db, req, res) {
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
     var offset = parseInt(req.query.offset, 10) || 0;
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        ratings : []
-    };
+    var json = utils.standardJson(req);
 
     db.query(
         queryString, [pageSize + 1, offset],
@@ -87,16 +83,14 @@ module.exports.create = function(db, req, res) {
                         errors.report('Database', req, res, err);
                         return;
                     }
-                    var json = {
-                        device : req.session.user.device,
-                        authStatus : req.session.authorized,
-                        ratings : [{
+                    var json = utils.standardJson(req);
+                    json.ratings = [{
                             id : result.rows[0].id,
                             description : description,
                             value : value,
                             channelId : channelId
-                        }]
-                    };
+                        }];
+
                     res.json(json);
                 });
         });
@@ -135,10 +129,8 @@ module.exports.remove = function(db, req, res) {
                         errors.report('Database', req, res, err);
                         return;
                     }
-                    var json = {
-                        device : req.session.user.device,
-                        authStatus : req.session.authorized,
-                    };
+
+                    var json = utils.standardJson(req);
                     res.json(json);
                 });
         });
@@ -165,10 +157,7 @@ module.exports.asset = function(db, req, res) {
     var offset = parseInt(req.query.offset, 10) || 0;
     var assetId = req.query.assetId;
 
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized
-    };
+    var json = utils.standardJson(req);
 
     if (!assetId) {
         //Id of the collection is missing.
@@ -224,10 +213,7 @@ module.exports.person = function(db, req, res) {
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
     var offset = parseInt(req.query.offset, 10) || 0;
 
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized
-    };
+    var json = utils.standardJson(req);
 
     db.query(
         personQuery, [req.session.user.id],
@@ -270,11 +256,8 @@ module.exports.addAsset = function(db, req, res) {
     var ratingId = req.query.ratingId;
     var assetId = req.query.assetId;
 
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        rating : []
-    };
+    var json = utils.standardJson(req);
+
     if (!ratingId) {
         errors.report('MissingParameters', req, res);
         return;
@@ -339,11 +322,8 @@ module.exports.removeAsset = function(db, req, res) {
     var ratingId = req.query.ratingId;
     var assetId = req.query.assetId;
 
-    var json = {
-        device : req.session.user.device,
-        authStatus : req.session.authorized,
-        collection : []
-    };
+    var json = utils.standardJson(req);
+
     if (!ratingId) {
         errors.report('MissingParameters', req, res);
         return;
@@ -394,3 +374,4 @@ module.exports.removeAsset = function(db, req, res) {
                 });
         });
 };
+
