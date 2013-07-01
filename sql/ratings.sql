@@ -1,20 +1,26 @@
---drop table ratings;
-
 create sequence seq_ratingsIds;
+
+create table ratingAttributes
+(
+    id               int            primary key default nextval('seq_ratingsIds'),
+    name             text           not null, -- e.g. 'Usability'
+    lowDesc          text           not null, -- e.g. 'Very hard to use'
+    highDesc         text           not null, -- e.g. 'Wonderfully designed'
+    assetType        int            not null references tags(id) on delete cascade
+);
 
 create table ratings
 (
-    id               int            primary key default nextval('seq_ratingsIds'),
-    description      varchar(80)    not null, -- like awesome book, good book, bad book
-    value            int            not null, -- a numeric value from 1-5.
-    tag              int            not null references tags(id) on delete cascade -- the id of the tag with which this rating is accosiated with
+    asset     int        not null references assets(id) on delete cascade,
+    attribute int        not null references ratingAttributes(id) on delete cascade,
+    person    int        not null references people(id) on delete cascade,
+    rating    int        check (rating > 0 AND rating < 6)
 );
 
---drop table ratingsContent;
-create table ratingsContent
+create table assetRatingAverages
 (
     asset     int        not null references assets(id) on delete cascade,
-    rating    int        not null references ratings(id) on delete cascade,
-    person    int        not null references people(id) on delete cascade
+    attribute int        not null references ratingAttributes(id) on delete cascade,
+    rating    float      not null check (rating > 0 AND rating < 6)
 );
 
