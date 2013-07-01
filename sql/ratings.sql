@@ -43,3 +43,18 @@ DROP TRIGGER IF EXISTS trg_ct_checkTagForRating ON ratingAttributes;
 CREATE TRIGGER trg_ct_checkTagForRating BEFORE INSERT OR UPDATE ON ratingAttributes
 FOR EACH ROW EXECUTE PROCEDURE ct_checkTagForRating();
 
+CREATE OR REPLACE FUNCTION ct_sumForAssetRatings() RETURNS TRIGGER AS $$
+DECLARE
+    tagId int;
+BEGIN
+    DELETE FROM assetRatingAverages WHERE asset = NEW.asset;
+    INSERT INTO assetRatingAverages (asset, attribute, rating) SELECT asset, attribute, round(avg(rating), 1) from ratings WHERE asset = NEW.asset GROUP BY asset, attribute;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_ct_checkTagForRating ON ratings;
+CREATE TRIGGER trg_ct_sumForAssetRatings AFTER INSERT OR UPDATE ON ratings
+FOR EACH ROW EXECUTE PROCEDURE ct_sumForAssetRatings();
+
