@@ -1,5 +1,6 @@
-drop table ratingsContent;
-drop table ratings;
+--drop table ratings;
+
+create sequence seq_ratingsIds;
 
 create table ratings
 (
@@ -9,6 +10,7 @@ create table ratings
     channelId        int            not null  -- the id of the channeId, like Wallpapers, Books etc
 );
 
+--drop table ratingsContent;
 create table ratingsContent
 (
     asset     int        not null references assets(id) on delete cascade,
