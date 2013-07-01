@@ -100,7 +100,8 @@ var ErrorType = {
 
     "TagIdInvalid"           : 90,//The tag that has been requested doesn't exist
     "TagNotDeleted"          : 91,//The tag that has been requested to be deleted is still there
-    "TagExists"              : 92,//The tag that has been requested to be created already exists
+    "TagExists"              : 92,//The tag that has been requested to be created already exists,
+    "RatingExists"           : 93//rating already exists
 };
 
 var DbErrorType = {

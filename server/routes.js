@@ -167,6 +167,49 @@ app.get(serverPath('collection/:collectionId/remove/:assetId'), isAuthorized,
             app.db.collectionRemoveAsset(req, res);
         });
 
+//*******************************
+// ratings
+app.get(serverPath('ratings/list'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.listRatings(req, res);
+        });
+
+app.get(serverPath('ratings/create'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.createRating(req, res);
+        });
+
+app.get(serverPath('ratings/delete'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.deleteRating(req, res);
+        });
+
+app.get(serverPath('ratings/asset'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.ratingAsset(req, res);
+        });
+
+app.get(serverPath('ratings/person'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.ratingPerson(req, res);
+        });
+
+app.get(serverPath('ratings/addAsset'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.ratingAddAsset(req, res);
+        });
+
+app.get(serverPath('ratings/removeAsset'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.ratingRemoveAsset(req, res);
+        });
 
 //********************************
 // Account info and management

@@ -46,6 +46,7 @@ var dbPostAsset = require('./db/postasset.js');
 var dbPublishAsset = require('./db/publishasset.js');
 var dbPartners = require('./db/partners.js');
 var dbParticipantInfo = require('./db/participantInfo.js');
+var dbRatings = require('./db/ratings.js');
 
 var BodegaDb = (function() {
     var connectionString;
@@ -222,6 +223,34 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.deleteStoreChannel = function(req, res) {
         this.dbQuery(dbStores.deleteChannel, req, res);
+    };
+
+    BodegaDb.prototype.listRatings = function(req, res) {
+        this.dbQuery(dbRatings.listAll, req, res);
+    };
+
+    BodegaDb.prototype.createRating = function(req, res) {
+        this.dbQuery(dbRatings.create, req, res);
+    };
+
+    BodegaDb.prototype.deleteRating = function(req, res) {
+        this.dbQuery(dbRatings.remove, req, res);
+    };
+
+    BodegaDb.prototype.ratingAsset = function(req, res) {
+        this.dbQuery(dbRatings.asset, req, res);
+    };
+
+    BodegaDb.prototype.ratingPerson = function(req, res) {
+        this.dbQuery(dbRatings.person, req, res);
+    };
+
+    BodegaDb.prototype.ratingAddAsset = function(req, res) {
+        this.dbQuery(dbRatings.addAsset, req, res);
+    };
+
+    BodegaDb.prototype.ratingRemoveAsset = function(req, res) {
+        this.dbQuery(dbRatings.removeAsset, req, res);
     };
 
     BodegaDb.prototype.listTagTypes = function(req, res) {
