@@ -12,7 +12,7 @@
             {
               "Name": "auth_user",
               "Location": "query",
-              "Description": "The person's login (the email address used with the account)",
+              "Description": "The person's login (the email addr    ess used with the account)",
               "Default": "zack@kde.org",
               "Required": "Y",
               "Type": "string"
@@ -248,8 +248,7 @@
           "Synopsis": "Fetches the current payment method (limited to last digits of card)",
           "HTTPMethod": "GET",
           "URI": "participant/paymentMethod",
-          "parameters": [
-           ]
+          "parameters": []
         },
         {
           "MethodName": "Update payment method",
@@ -285,8 +284,7 @@
           "Synopsis": "Delete the registered payment method from the account",
           "HTTPMethod": "GET",
           "URI": "participant/paymentMethod/delete",
-          "parameters": [
-          ]
+          "parameters": []
         },
         {
           "MethodName": "Get personal information",
@@ -751,8 +749,7 @@
             "Synopsis": "Lists all partners the authenticated account is associated with",
             "HTTPMethod": "GET",
             "URI": "/partner/update",
-            "parameters": [
-            ]
+            "parameters": []
         },
         {
             "MethodName": "Create",
@@ -1553,7 +1550,8 @@
             "MethodName": "Types",
             "Synopsis": "list all types for the tags",
             "HTTPMethod": "GET",
-            "URI": "/tag/types"
+            "URI": "/tag/types",
+            "parameters": []
         },
         {
             "MethodName": "List",
