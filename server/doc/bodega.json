@@ -1544,7 +1544,7 @@
         ]
     },
     {
-        "name": "Tags management",
+        "name": "Tags",
         "methods": [
         {
             "MethodName": "Types",
