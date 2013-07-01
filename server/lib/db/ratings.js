@@ -226,7 +226,7 @@ module.exports.removeAsset = function(db, req, res) {
     var assetDeleteQuery =
         'DELETE FROM ratings WHERE asset = $1 AND person = $2;';
     var userId = req.session.user.id;
-    var assetId = req.query.assetId;
+    var assetId = req.params.assetId;
 
     var json = utils.standardJson(req);
 
