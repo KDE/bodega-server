@@ -17,6 +17,8 @@ create table ratings
     rating    int        check (rating > 0 AND rating < 6)
 );
 
+create index ratings_asset on ratings(asset);
+
 create table assetRatingAverages
 (
     asset     int        not null references assets(id) on delete cascade,
