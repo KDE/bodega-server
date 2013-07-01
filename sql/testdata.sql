@@ -135,12 +135,12 @@ BEGIN
 END
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION ct_testing_ratingByDescription(text) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION ct_testing_ratingAttributeByName(text) RETURNS INT AS $$
 DECLARE
-    ratingsId int := -1;
+    ratingAttributeId int := -1;
 BEGIN
-    select into ratingsId id from ratings where description = $1 limit 1;
-    return ratingsId;
+    select into ratingAttributeId id from ratingAttributes where name = $1 limit 1;
+    return ratingAttributeId;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -572,18 +572,17 @@ INSERT INTO downloads (asset, person, downloadedOn, store, address, title, versi
      VALUES (ct_testing_assetByName('Jewels'), ct_testing_personByEmail('mart@kde.org'), '2013-10-01 23:10:11Z', 'KDE-1', '67.68.69.70', 'Jewels', 1);
 
 --ratings
-INSERT INTO ratings (description, value, tag) VALUES ('good Poker1', '1', ct_testing_tagByName('game'));
-INSERT INTO ratings (description, value, tag) VALUES ('good Poker2', '2', ct_testing_tagByName('game'));
-INSERT INTO ratings (description, value, tag) VALUES ('good Poker3', '3', ct_testing_tagByName('game'));
-INSERT INTO ratings (description, value, tag) VALUES ('good Poker4', '4', ct_testing_tagByName('game'));
-INSERT INTO ratings (description, value, tag) VALUES ('good Poker5', '5', ct_testing_tagByName('game'));
+INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('Usability', 'completely unusable', 'Wonderfully', ct_testing_tagByName('game'));
+INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('game'));
 
-INSERT INTO ratingsContent (asset, rating, person)
-    VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingByDescription('good Poker1'), ct_testing_personByEmail('aseigo@kde.org'));
-INSERT INTO ratingsContent (asset, rating, person)
-    VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingByDescription('good Poker2'), ct_testing_personByEmail('mart@kde.org'));
-INSERT INTO ratingsContent (asset, rating, person)
-    VALUES (ct_testing_assetByName('Poker3'), ct_testing_ratingByDescription('good Poker3'), ct_testing_personByEmail('zack@kde.org'));
+INSERT INTO ratings (asset, attribute, person, rating)
+    VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('aseigo@kde.org'), 1);
+INSERT INTO ratings (asset, attribute, person, rating)
+    VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('zack@kde.org'), 5);
+INSERT INTO ratings (asset, attribute, person, rating)
+    VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('funny'), ct_testing_personByEmail('aseigo@kde.org'), 2);
+INSERT INTO ratings (asset, attribute, person, rating)
+    VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('funny'), ct_testing_personByEmail('zack@kde.org'), 3);
 
 -- cleanup
 drop function ct_testing_favoriteBooksByAuthor(email text, author text);
@@ -593,5 +592,5 @@ drop function ct_testing_licenseByName(text);
 drop function ct_testing_assetByName(text);
 drop function ct_testing_personByEmail(text);
 drop function ct_testing_partnerId(text);
-drop function ct_testing_ratingByDescription(text);
+drop function ct_testing_ratingAttributeByName(text);
 commit;
