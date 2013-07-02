@@ -74,7 +74,6 @@ function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb
     for (var i = 0; i < results.rowCount; ++i) {
         var asset = results.rows[i];
         asset.tags = [];
-        assets.push(asset);
 
         var task = {
             'db': db,
