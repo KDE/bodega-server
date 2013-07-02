@@ -65,7 +65,7 @@ function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb
     var tasks = [];
     queue.drain = function() {
         if (error) {
-            errors.report(error.type, req, res, error);
+            cb(error);
         } else {
             cb(null, db, req, res, assetInfo, assets);
         }
@@ -87,7 +87,11 @@ function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb
         tasks.push(task);
     }
 
-    queue.push(tasks, errorReporter);
+    if (tasks.length > 0) {
+        queue.push(tasks, errorReporter);
+    } else {
+        cb(null, db, req, res, assetInfo, assets);
+    }
 }
 
 function findPublishedAssets(db, req, res, assetInfo, assets, cb)
