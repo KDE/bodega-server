@@ -118,6 +118,17 @@ function setupTag(db, req, res, assetInfo, tagInfo, cb)
 
 module.exports.setupTags = function(db, req, res, assetInfo, fn)
 {
+    db.query(
+        "delete from incomingAssetTags where asset = $1;",
+        [assetInfo.id],
+        function(err, result) {
+            if (err) {
+                e = errors.create('Database', err.message);
+                cb(e, db, req, res, assetInfo, tagInfo);
+                return;
+            }
+        });
+
     async.each(assetInfo.tags, function(tag, callback) {
         setupTag(db, req, res, assetInfo, tag, callback);
     }, function(err) {
