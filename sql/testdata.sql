@@ -37,7 +37,7 @@ BEGIN
     select id into favoriteCollectionId from collections where person=personId and name = 'Authors' and type = 'favorites';
     IF NOT FOUND THEN
        insert into collections (person, name, public, type)
-                        VALUES (personId, 'Authors', false, 'favorites');
+            VALUES (personId, 'Authors', false, 'favorites');
        select id into favoriteCollectionId from collections where person=personId and name = 'Authors' and type = 'favorites';
     END IF;
 
@@ -574,11 +574,17 @@ INSERT INTO downloads (asset, person, downloadedOn, store, address, title, versi
 --ratings
 INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('Usability', 'completely unusable', 'Wonderfully', ct_testing_tagByName('game'));
 INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('game'));
+INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('book'));
+INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('perfomance', 'laggy', 'super smooth', ct_testing_tagByName('application'));
 
 INSERT INTO ratings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('aseigo@kde.org'), 1);
 INSERT INTO ratings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('zack@kde.org'), 5);
+INSERT INTO ratings (asset, attribute, person, rating)
+    VALUES (ct_testing_assetByName('Aquarium'), ct_testing_ratingAttributeByName('perfomance'), ct_testing_personByEmail('aseigo@kde.org'), 1);
+INSERT INTO ratings (asset, attribute, person, rating)
+    VALUES (ct_testing_assetByName('Aquarium'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('zack@kde.org'), 1);
 INSERT INTO ratings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('funny'), ct_testing_personByEmail('aseigo@kde.org'), 2);
 INSERT INTO ratings (asset, attribute, person, rating)
