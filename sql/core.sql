@@ -157,7 +157,7 @@ create table assets
 (
     id          int         primary key default nextval('seq_assetsIds'),
     license     int         references licenses(id),
-    partner     int         references partners(id),
+    partner     int         not null references partners(id),
     basePrice   int         not null default 0 CHECK(basePrice >= 0),
     name        text        not null,
     description text,
@@ -176,8 +176,8 @@ create index idx_asset_partners on assets (partner);
 
 create table assetTags
 (
-    asset       int         references assets(id) on delete cascade,
-    tag         int         references tags(id) on delete cascade
+    asset       int         not null references assets(id) on delete cascade,
+    tag         int         not null references tags(id) on delete cascade
 );
 
 create index idx_assetTags_byAsset on assettags(asset);
@@ -185,7 +185,7 @@ create index idx_assetTags_byTag on assettags(tag);
 
 create table assetText
 (
-    asset       int         references assets(id) on delete cascade,
+    asset       int         not null references assets(id) on delete cascade,
     language    char(5)     not null,
     name        text        not null,
     description text
@@ -196,7 +196,7 @@ create index idx_assetText_assetLang on assetText (asset, language);
 
 create table assetPreviews
 (
-    asset       int         references assets(id) on delete cascade,
+    asset       int         not null references assets(id) on delete cascade,
     path        text        not null,
     mimetype    text        not null,
     type        text        not null,
@@ -205,7 +205,7 @@ create table assetPreviews
 
 create table assetChangelogs
 (
-    asset       int         references assets(id) on delete cascade,
+    asset       int         not null references assets(id) on delete cascade,
     version     text        not null,
     versionTs   timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
     changes     text
@@ -232,14 +232,14 @@ create index idx_channelParents on channels(parent);
 
 create table channelTags
 (
-    channel     int         references channels(id) on delete cascade,
-    tag         int         references tags(id) on delete cascade
+    channel     int         not null references channels(id) on delete cascade,
+    tag         int         not null references tags(id) on delete cascade
 );
 
 create table channelAssets
 (
-    channel     int         references channels(id) on delete cascade,
-    asset       int         references assets(id) on delete cascade
+    channel     int         not null references channels(id) on delete cascade,
+    asset       int         not null references assets(id) on delete cascade
 );
 
 create index idx_channelAssetsByAsset on channelAssets (asset);
@@ -247,9 +247,9 @@ create index idx_channelAssetsByChannel on channelAssets (channel);
 
 create table subChannelAssets
 (
-    channel     int         references channels(id) on delete cascade,
-    leafChannel int         references channels(id) on delete cascade,
-    asset       int         references assets(id) on delete cascade
+    channel     int         not null references channels(id) on delete cascade,
+    leafChannel int         not null references channels(id) on delete cascade,
+    asset       int         not null references assets(id) on delete cascade
 );
 
 create index idx_subChannelAssetsByAsset on subChannelAssets (asset);
@@ -258,7 +258,7 @@ create index idx_subChannelAssetsByLeaf on subChannelAssets (leafChannel);
 
 create table channelText
 (
-    channel     int         references channels(id) on delete cascade,
+    channel     int         not null references channels(id) on delete cascade,
     language    char(5),
     name        text        not null,
     description text
@@ -274,8 +274,8 @@ create table channelText
 
 create table assetPrices
 (
-    asset       int         references assets(id) on delete cascade,
-    store       text        references stores(id) on delete cascade,
+    asset       int         not null references assets(id) on delete cascade,
+    store       text        not null references stores(id) on delete cascade,
     points      int         not null constraint ct_apAssetPricePoint check (points > 0),
     toStore     int         not null default 0 constraint ct_apAssetToStorePoints check (toStore >=0 AND toStore < points),
     starting    timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
@@ -307,7 +307,7 @@ create index idx_purchasesStores on purchases(store);
 -- drop table downloads;
 create table downloads
 (
-    asset           int         not null references assets(id) on delete set null,
+    asset           int         references assets(id) on delete set null,
     person          int         references people(id) on delete set null,
     downloadedOn    timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
     store           text        REFERENCES stores(id) on delete set null,
