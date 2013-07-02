@@ -106,8 +106,8 @@ describe('Tags manipulation', function(){
 
                 res.body.tags.length.should.equal(21);
                 res.body.tags[0].id.should.be.eql(7);
-                res.body.tags[0].type.should.be.eql(8);
-                res.body.tags[0].typename.should.be.eql('contentrating');
+                res.body.tags[0].typeid.should.be.eql(8);
+                res.body.tags[0].type.should.be.eql('contentrating');
                 res.body.tags[0].title.should.be.eql('Adults Only');
                 done();
             }
@@ -125,8 +125,8 @@ describe('Tags manipulation', function(){
 
                 res.body.tags.length.should.equal(2);
                 res.body.tags[0].id.should.be.eql(1);
-                res.body.tags[0].type.should.be.eql(7);
-                res.body.tags[0].typename.should.be.eql('mimetype');
+                res.body.tags[0].typeid.should.be.eql(7);
+                res.body.tags[0].type.should.be.eql('mimetype');
                 res.body.tags[0].title.should.be.eql('application/x-plasma');
                 done();
             }
@@ -144,8 +144,8 @@ describe('Tags manipulation', function(){
 
                 res.body.tags.length.should.equal(2);
                 res.body.tags[0].id.should.be.eql(1);
-                res.body.tags[0].type.should.be.eql(7);
-                res.body.tags[0].typename.should.be.eql('mimetype');
+                res.body.tags[0].typeid.should.be.eql(7);
+                res.body.tags[0].type.should.be.eql('mimetype');
                 res.body.tags[0].title.should.be.eql('application/x-plasma');
                 done();
             }
@@ -163,8 +163,8 @@ describe('Tags manipulation', function(){
 
                 res.body.tags.length.should.equal(6);
                 res.body.tags[0].id.should.be.eql(7);
-                res.body.tags[0].type.should.be.eql(8);
-                res.body.tags[0].typename.should.be.eql('contentrating');
+                res.body.tags[0].typeid.should.be.eql(8);
+                res.body.tags[0].type.should.be.eql('contentrating');
                 res.body.tags[0].title.should.be.eql('Adults Only');
                 done();
             }
@@ -184,8 +184,8 @@ describe('Tags manipulation', function(){
                     res.body.should.have.property('tags');
 
                     res.body.tags.length.should.equal(7);
-                    res.body.tags[6].type.should.be.eql(8);
-                    res.body.tags[6].typename.should.be.eql('contentrating');
+                    res.body.tags[6].typeid.should.be.eql(8);
+                    res.body.tags[6].type.should.be.eql('contentrating');
                     res.body.tags[6].title.should.be.eql('test');
                     done();
                 });
@@ -204,8 +204,8 @@ describe('Tags manipulation', function(){
                     res.body.should.have.property('tags');
 
                     res.body.tags.length.should.equal(11);
-                    res.body.tags[8].type.should.be.eql(9);
-                    res.body.tags[8].typename.should.be.eql('assetType');
+                    res.body.tags[8].typeid.should.be.eql(9);
+                    res.body.tags[8].type.should.be.eql('assetType');
                     res.body.tags[8].title.should.be.eql('new title');
                     done();
                 });
