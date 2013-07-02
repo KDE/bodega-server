@@ -468,7 +468,7 @@ insert into channels (image, store, active, name, description)
 insert into channelTags (channel, tag) 
     values (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma'));
 insert into channelTags (channel, tag) 
-    values (currval('seq_channelids'), ct_testing_tagByName('Card Games'));
+    values (currval('seq_channelids'), ct_testing_tagByName('Card Game'));
 
 insert into channels (image, store, active, name, description)
     values ('utilities.png', 'DD-1', true, 'Utilities', 'Useful tools');
