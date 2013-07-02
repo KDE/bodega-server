@@ -77,7 +77,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -93,7 +93,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -109,7 +109,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -125,7 +125,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -141,7 +141,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -159,7 +159,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     res.body.should.have.property('authStatus', true);
@@ -176,7 +176,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('partners');
                     res.body.partners.should.eql(expected);
                     done();
@@ -236,7 +236,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'PartnerNameExists');
                     done();
@@ -256,7 +256,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'InvalidEmailAddress');
                     server.config.printErrors = true;
@@ -275,7 +275,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('partnerId');
                     newPartnerId = res.body.partnerId;
                     newPartnerJson.id = newPartnerId;
@@ -294,7 +294,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', true);
                     done();
                 },
@@ -313,7 +313,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', task.error);
                     cb();
@@ -361,7 +361,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', true);
                     cb();
                 },
@@ -399,7 +399,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', true);
                     done();
                 },
@@ -423,7 +423,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', false);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'InvalidRole');
@@ -444,7 +444,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('roles');
                     res.body.roles.should.eql(expected);
@@ -466,7 +466,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', true);
                     var expected = existingPartnerJson.slice();
                     expected.push(newPartnerJson);
@@ -508,7 +508,7 @@ describe('Partner management', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', true);
                     var expected = existingPartnerJson.slice();
                     expected.push(newPartnerJson);
@@ -549,7 +549,7 @@ describe('Partner management', function() {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property(
                             'content-type',
-                            'application/json; charset=utf-8');
+                            'application/json');
                         res.body.should.have.property('success', true);
                         var expected = existingPartnerJson.slice();
                         expected.push(newPartnerJson);
@@ -583,7 +583,7 @@ describe('Partner management', function() {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property(
                             'content-type',
-                            'application/json; charset=utf-8');
+                            'application/json');
                         res.body.should.have.property('success', true);
                         done();
                     },
@@ -603,7 +603,7 @@ describe('Partner management', function() {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property(
                             'content-type',
-                            'application/json; charset=utf-8');
+                            'application/json');
                         res.body.should.have.property('success', true);
                         done();
                     },

@@ -36,7 +36,7 @@ describe('Collections', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -55,7 +55,7 @@ describe('Collections', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -72,7 +72,7 @@ describe('Collections', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -91,7 +91,7 @@ describe('Collections', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     res.body.should.have.property('authStatus', true);
@@ -116,7 +116,7 @@ describe('Collections', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(1);
@@ -143,7 +143,7 @@ describe('Collections', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(1);
@@ -168,7 +168,7 @@ describe('Collections', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(1);
@@ -187,7 +187,7 @@ describe('Collections', function(){
                     res.should.have.status(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.above(0);
@@ -218,7 +218,7 @@ describe('Collections', function(){
                         res.should.have.status(200);
                         res.headers.should.have.property(
                             'content-type',
-                            'application/json; charset=utf-8');
+                            'application/json');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
@@ -242,7 +242,7 @@ describe('Collections', function(){
                     res.should.have.status(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collection');
                     res.body.collection.should.have.property('id', collectionId);
@@ -265,7 +265,7 @@ describe('Collections', function(){
                         res.should.have.status(200);
                         res.headers.should.have.property(
                             'content-type',
-                            'application/json; charset=utf-8');
+                            'application/json');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
@@ -289,7 +289,7 @@ describe('Collections', function(){
                     res.should.have.status(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collection');
                     res.body.collection.should.have.property('id', collectionId);
@@ -312,7 +312,7 @@ describe('Collections', function(){
                         res.should.have.status(200);
                         res.headers.should.have.property(
                             'content-type',
-                            'application/json; charset=utf-8');
+                            'application/json');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
@@ -336,7 +336,7 @@ describe('Collections', function(){
                     res.should.have.status(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collection');
                     res.body.collection.should.have.property('id', collectionId);
@@ -356,7 +356,7 @@ describe('Collections', function(){
                     res.should.have.status(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
                     done();
@@ -372,7 +372,7 @@ describe('Collections', function(){
                     res.should.have.status(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(numCollections - 1);

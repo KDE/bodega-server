@@ -61,7 +61,7 @@ describe('Asset manipulation', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     var j = request.jar();
@@ -240,7 +240,7 @@ describe('Asset manipulation', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('id',
@@ -257,7 +257,7 @@ describe('Asset manipulation', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('id',
@@ -274,7 +274,7 @@ describe('Asset manipulation', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
                         'type', 'AssetMissing');

@@ -49,7 +49,7 @@ describe('Statistic query preconditions', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     res.body.should.have.property('authStatus', true);
@@ -74,7 +74,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -109,7 +109,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -144,7 +144,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -185,7 +185,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -217,7 +217,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -250,7 +250,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -287,7 +287,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -319,7 +319,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -358,7 +358,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -394,7 +394,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -433,7 +433,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -469,7 +469,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -508,7 +508,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -544,7 +544,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -584,7 +584,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -620,7 +620,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -659,7 +659,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -695,7 +695,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -734,7 +734,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -770,7 +770,7 @@ describe('Asset statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -811,7 +811,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -847,7 +847,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -882,7 +882,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -917,7 +917,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -954,7 +954,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -986,7 +986,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1019,7 +1019,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1052,7 +1052,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1084,7 +1084,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1119,7 +1119,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1155,7 +1155,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1190,7 +1190,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1226,7 +1226,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1261,7 +1261,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1297,7 +1297,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1333,7 +1333,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1369,7 +1369,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1404,7 +1404,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1440,7 +1440,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1475,7 +1475,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1511,7 +1511,7 @@ describe('Store statistics', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {

@@ -32,7 +32,7 @@ describe('Create user', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('userId');
                 res.body.should.have.property('confirmationCode');
                 userInfo = {
@@ -68,7 +68,7 @@ describe('Deactivate user', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.headers.should.have.property('set-cookie');
                 cookie = res.headers['set-cookie'];
                 res.body.should.have.property('authStatus', true);
@@ -91,7 +91,7 @@ describe('Deactivate user', function() {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('device', 'VIVALDI-1');
                     res.body.should.have.property('store', 'VIVALDI-1');
@@ -129,7 +129,7 @@ function checkPersonInfo(cookie, key, value, done)
             res.statusCode.should.equal(200);
             res.headers.should.have.property(
                 'content-type',
-                'application/json; charset=utf-8');
+                'application/json');
             res.body.should.have.property('success', true);
             res.body.should.have.property(key, value);
             done();
@@ -147,7 +147,7 @@ describe('Changing account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.headers.should.have.property('set-cookie');
                 cookie = res.headers['set-cookie'];
                 res.body.should.have.property('authStatus', true);
@@ -166,7 +166,7 @@ describe('Changing account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', true);
                 checkPersonInfo(cookie, 'firstName', 'Bunny', done);
             },
@@ -184,7 +184,7 @@ describe('Changing account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', true);
                 checkPersonInfo(cookie, 'middleNames', 'Rabbit', done);
             },
@@ -202,7 +202,7 @@ describe('Changing account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', true);
                 checkPersonInfo(cookie, 'lastName', 'Foofoo', done);
             },
@@ -220,7 +220,7 @@ describe('Changing account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', true);
                 checkPersonInfo(cookie, 'email', 'bunny_rabbit@foofoo.com', done);
             },
@@ -240,7 +240,7 @@ describe('Changing account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', false);
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'InvalidEmailAddress');
@@ -261,7 +261,7 @@ describe('Changing account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', false);
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'AccountExists');
@@ -297,7 +297,7 @@ describe('Changing passwords', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.headers.should.have.property('set-cookie');
                 cookie = res.headers['set-cookie'];
                 res.body.should.have.property('authStatus', true);
@@ -316,7 +316,7 @@ describe('Changing passwords', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', true);
                 done();
             },
@@ -331,7 +331,7 @@ describe('Changing passwords', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.headers.should.have.property('set-cookie');
                 cookie = res.headers['set-cookie'];
                 res.body.should.have.property('authStatus', true);
@@ -350,7 +350,7 @@ describe('Changing passwords', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', false);
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'PasswordTooShort');
@@ -367,7 +367,7 @@ describe('Changing passwords', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', false);
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'MissingParameters');
@@ -401,7 +401,7 @@ describe('getting account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'Unauthorized');
                 done();
@@ -416,7 +416,7 @@ describe('getting account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'Unauthorized');
                 done();
@@ -431,7 +431,7 @@ describe('getting account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.headers.should.have.property('set-cookie');
                 cookie = res.headers['set-cookie'];
                 res.body.should.have.property('authStatus', true);
@@ -447,7 +447,7 @@ describe('getting account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('success', true);
                 res.body.should.have.property('storeCount');
                 res.body.should.have.property('pointsEarned');
@@ -515,7 +515,7 @@ describe('getting account information', function() {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                 res.body.should.have.property('success', true);
                 res.body.should.have.property('history');
                 res.body.history.should.eql(expected);

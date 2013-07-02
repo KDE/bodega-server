@@ -26,7 +26,7 @@ function getUrl(app, url, fn, cookie, expectsHtml)
                 res.body = buf;
             } else {
                 assert.deepEqual(contentType,
-                                 'application/json; charset=utf-8');
+                                 'application/json');
                 try {
                     res.body = JSON.parse(buf);
                 } catch (e) {
@@ -78,7 +78,7 @@ function auth(app, fn)
                res.statusCode.should.equal(200);
                res.headers.should.have.property(
                    'content-type',
-                   'application/json; charset=utf-8');
+                   'application/json');
                res.headers.should.have.property('set-cookie');
                res.body.should.have.property('authStatus', true);
                fn(res, done);

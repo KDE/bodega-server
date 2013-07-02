@@ -96,7 +96,7 @@ describe('Redeeming points code', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.eql(expected);
                     done();
                 },
@@ -118,7 +118,7 @@ describe('Redeeming points code', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.eql(expected);
                     done();
                 },

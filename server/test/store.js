@@ -33,7 +33,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -54,7 +54,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     res.body.should.have.property('authStatus', true);
@@ -69,7 +69,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
@@ -89,7 +89,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     res.body.should.have.property('authStatus', true);
@@ -108,7 +108,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StorePartnerInvalid');
@@ -126,7 +126,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StoreNameInvalid');
@@ -158,7 +158,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('storeInfo');
                     res.body.storeInfo.should.eql(expected);
@@ -189,7 +189,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('storeInfo');
                     res.body.storeInfo.should.eql(expected);
@@ -212,7 +212,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StoreIdExists');
@@ -268,7 +268,7 @@ describe('Store management', function(){
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property(
                             'content-type',
-                            'application/json; charset=utf-8');
+                            'application/json');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('success', true);
                         res.body.storeInfo.should.eql(expected);
@@ -294,7 +294,7 @@ describe('Store management', function(){
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
-                                                     'application/json; charset=utf-8');
+                                                     'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', false);
                     res.body.error.should.have.property('type', 'StoreIdInvalid');
@@ -318,7 +318,7 @@ describe('Store management', function(){
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
-                                                     'application/json; charset=utf-8');
+                                                     'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', false);
                     res.body.error.should.have.property('type', 'StoreIdInvalid');
@@ -353,7 +353,7 @@ describe('Store management', function(){
                     ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
-                                                     'application/json; charset=utf-8');
+                                                     'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.storeInfo.should.eql(expected);
@@ -385,7 +385,7 @@ describe('Store management', function(){
                     ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
-                                                     'application/json; charset=utf-8');
+                                                     'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.storeInfo.should.eql(expected);
@@ -415,7 +415,7 @@ describe('Store management', function(){
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
-                                                     'application/json; charset=utf-8');
+                                                     'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
@@ -497,7 +497,7 @@ describe('Store management', function(){
                     var expected = [ channel2 ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
-                                                     'application/json; charset=utf-8');
+                                                     'application/json');
                     res.body.should.have.property('success', true);
                     res.body.channels.should.eql(expected);
                     done();
@@ -512,7 +512,7 @@ describe('Store management', function(){
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
-                                                     'application/json; charset=utf-8');
+                                                     'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
@@ -530,7 +530,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
@@ -546,7 +546,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
@@ -582,7 +582,7 @@ describe('Store management', function(){
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property(
                             'content-type',
-                            'application/json; charset=utf-8');
+                            'application/json');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('success', true);
                         res.body.storeInfo.should.eql(expected);

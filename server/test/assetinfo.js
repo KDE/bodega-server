@@ -42,7 +42,7 @@ describe('Asset info', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     res.body.should.have.property('authStatus', true);
@@ -60,7 +60,7 @@ describe('Asset info', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('id', 6);
@@ -83,7 +83,7 @@ describe('Asset info', function(){
                     res.should.have.status(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('tags');
@@ -105,7 +105,7 @@ describe('Asset info', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('changelog');
@@ -121,7 +121,7 @@ describe('Asset info', function(){
                     res.should.have.status(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('previews');

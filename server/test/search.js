@@ -44,7 +44,7 @@ describe('Searching', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     res.body.should.have.property('authStatus', true);
@@ -60,7 +60,7 @@ describe('Searching', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('channels');
                     var channels = res.body.channels;
@@ -85,7 +85,7 @@ describe('Searching', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('channels');
                     var channels = res.body.channels;
@@ -112,7 +112,7 @@ describe('Searching', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
@@ -131,7 +131,7 @@ describe('Searching', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
@@ -151,7 +151,7 @@ describe('Searching', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('assets');
                     var assets = res.body.assets;
@@ -173,7 +173,7 @@ describe('Searching', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('assets');
                     var assets = res.body.assets;

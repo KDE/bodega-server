@@ -37,7 +37,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     if (authedBrowsing) {
@@ -57,7 +57,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -84,7 +84,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -111,7 +111,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -135,7 +135,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -154,7 +154,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -173,7 +173,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -198,7 +198,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -218,7 +218,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -239,7 +239,7 @@ describe('Listing', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }

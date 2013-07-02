@@ -34,7 +34,7 @@ describe('Tags manipulation', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.headers.should.have.property('set-cookie');
                     cookie = res.headers['set-cookie'];
                     res.body.should.have.property('authStatus', true);
@@ -100,7 +100,7 @@ describe('Tags manipulation', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
@@ -119,7 +119,7 @@ describe('Tags manipulation', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
@@ -138,7 +138,7 @@ describe('Tags manipulation', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
@@ -157,7 +157,7 @@ describe('Tags manipulation', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
@@ -179,7 +179,7 @@ describe('Tags manipulation', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('tags');
 
@@ -199,7 +199,7 @@ describe('Tags manipulation', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('tags');
 
@@ -218,7 +218,7 @@ describe('Tags manipulation', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
-                        'application/json; charset=utf-8');
+                        'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('tags');
 
@@ -242,7 +242,7 @@ describe('Tags manipulation', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.eql(expected);
                 done();
             });
@@ -262,7 +262,7 @@ describe('Tags manipulation', function(){
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
-                    'application/json; charset=utf-8');
+                    'application/json');
                 res.body.should.eql(expected);
                 done();
             });

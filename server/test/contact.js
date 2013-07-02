@@ -33,7 +33,7 @@ describe('Fetch contact information', function() {
                     contact: app.config.warehouseInfo.contact
                 };
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property( 'content-type', 'application/json; charset=utf-8');
+                res.headers.should.have.property( 'content-type', 'application/json');
                 res.body.should.eql(expected);
                 done();
             });
@@ -45,7 +45,7 @@ describe('Fetch contact information', function() {
              '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
              function(res) {
                  res.statusCode.should.equal(200);
-                 res.headers.should.have.property( 'content-type', 'application/json; charset=utf-8');
+                 res.headers.should.have.property( 'content-type', 'application/json');
                  res.headers.should.have.property('set-cookie');
                  cookie = res.headers['set-cookie'];
                  res.body.should.have.property('authStatus', true);
@@ -88,7 +88,7 @@ describe('Fetch contact information', function() {
                   ]
                 };
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property( 'content-type', 'application/json; charset=utf-8');
+                res.headers.should.have.property( 'content-type', 'application/json');
                 res.body.warehouse.should.eql(warehouse);
                 res.body.store.should.eql(store);
                 done();
