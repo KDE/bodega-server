@@ -103,7 +103,7 @@ function findPublishedAssets(db, req, res, assetInfo, assets, cb)
             return;
         }
 
-
+        assets = assets.concat(results.rows);
         addTagsToAssets(db, req, res, assetInfo, results, assets, true, cb);
     });
 }
@@ -119,7 +119,7 @@ function findIncomingAssets(db, req, res, assetInfo, assets, cb)
             cb(e, db, req, res, assetInfo, assets);
             return;
         }
-
+        assets = assets.concat(results.rows);
         addTagsToAssets(db, req, res, assetInfo, results, assets, false, cb);
     });
 }
@@ -135,7 +135,7 @@ function findPostedAssets(db, req, res, assetInfo, assets, cb)
             cb(e, db, req, res, assetInfo, assets);
             return;
         }
-
+        assets = assets.concat(results.rows);
         addTagsToAssets(db, req, res, assetInfo, results, assets, false, cb);
     });
 }
