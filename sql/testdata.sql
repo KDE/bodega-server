@@ -208,6 +208,8 @@ insert into assetTags (asset, tag)
     values (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
 insert into assetTags (asset, tag)
     values (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
+insert into assetTags (asset, tag)
+    values (currval('seq_assetsids'), ct_testing_tagByName('application'));
 update assets set version = '0.2' where id = currval('seq_assetsids');
 update assetChangelogs set changes = 'Bug fixes' where asset = currval('seq_assetsids') and version = '0.1';
 
