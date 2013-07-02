@@ -22,7 +22,8 @@ var path = require('path');
 function associateTag(db, req, res, assetInfo, tagInfo, cb)
 {
     var tagQuery =
-            'insert into incomingAssetTags (asset, tag) values ($1, $2);';
+            'insert into incomingAssetTags (asset, tag) select $1 as asset, $2 as tag where $2 not in (select asset from incomingAssetTags where asset = $1);';
+
     var e;
     db.query(
         tagQuery, [assetInfo.id, tagInfo.tagId],
@@ -118,13 +119,29 @@ function setupTag(db, req, res, assetInfo, tagInfo, cb)
 
 module.exports.setupTags = function(db, req, res, assetInfo, fn)
 {
+    var params = new Array();
+    params.push(assetInfo.id);
+
+    var query = "delete from incomingAssetTags where asset = $1 ";
+
+    if (assetInfo.tags.length > 0) {
+        var placeHolders = new Array();
+        for (var i = 0; i < assetInfo.tags.length; ++i) {
+            placeHolders.push('$'+ (i + 2));
+            params.push(assetInfo.tags[i].id);
+        }
+
+        query += " and tag not in (" + placeHolders.join(',') + ")";
+    }
+
+
     db.query(
-        "delete from incomingAssetTags where asset = $1;",
-        [assetInfo.id],
+        query,
+        params,
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
-                cb(e, db, req, res, assetInfo, tagInfo);
+                fn(err, db, req, res, assetInfo);
                 return;
             }
         });
