@@ -225,8 +225,8 @@ var BodegaDb = (function() {
         this.dbQuery(dbStores.deleteChannel, req, res);
     };
 
-    BodegaDb.prototype.listRatings = function(req, res) {
-        this.dbQuery(dbRatings.listAll, req, res);
+    BodegaDb.prototype.listRatingAttributtes = function(req, res) {
+        this.dbQuery(dbRatings.listAttributes, req, res);
     };
 
     BodegaDb.prototype.createRating = function(req, res) {

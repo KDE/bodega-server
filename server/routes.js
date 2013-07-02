@@ -169,12 +169,6 @@ app.get(serverPath('collection/:collectionId/remove/:assetId'), isAuthorized,
 
 //*******************************
 // ratings
-app.get(serverPath('ratings/list'), isAuthorized,
-        function(req, res) {
-            //console.log(req.query);
-            app.db.listRatings(req, res);
-        }
-);
 
 app.get(serverPath('ratings/asset'), isAuthorized,
         function(req, res) {
@@ -360,6 +354,11 @@ app.get(serverPath('asset/rate/delete/:assetId'), isAuthorized,
             app.db.ratingRemoveAsset(req, res);
         });
 
+app.get(serverPath('asset/ratingAttributes/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.listRatingAttributtes(req, res);
+        });
 //*******************************
 // Stats
 app.get(serverPath('stats/assets/?:metric?'), isAuthorized,

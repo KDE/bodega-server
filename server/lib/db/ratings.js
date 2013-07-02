@@ -18,18 +18,27 @@
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
-module.exports.listAll = function(db, req, res) {
+module.exports.listAttributes = function(db, req, res) {
     /*jshint multistr:true */
     var queryString =
-        'SELECT b.id, b.description, b.value, b.channelId \
-         FROM ratings b ORDER BY b.id LIMIT $1 OFFSET $2;';
+    'SELECT name, lowdesc, highdesc, assettype FROM ratingattributes ra \
+    INNER JOIN assettags at ON (ra.assettype = at.tag) \
+    WHERE at.asset = $1 LIMIT $2 OFFSET $3;';
+
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
     var offset = parseInt(req.query.offset, 10) || 0;
+    var assetId = req.params.assetId;
     var json = utils.standardJson(req);
 
+    if (!assetId) {
+        //Id of the asset is missing.
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
     db.query(
-        queryString, [pageSize + 1, offset],
+        queryString, [assetId, pageSize + 1, offset],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
@@ -37,11 +46,11 @@ module.exports.listAll = function(db, req, res) {
             }
 
             if (result.rows.length > pageSize) {
-                json.hasMoreRatings = true;
+                json.hasMoreRatingAttributes = true;
                 result.rows.pop();
             }
 
-            json.ratings = result.rows;
+            json.ratingAttributes = result.rows;
             res.json(json);
         });
 };
@@ -155,20 +164,17 @@ module.exports.participant = function(db, req, res) {
 
 module.exports.addAsset = function(db, req, res) {
     /*jshint multistr:true */
-    var ratingQuery =
-        'SELECT b.id, b.description, b.value, b.channelId \
-         FROM ratings b WHERE b.id = $1';
-    var assetsQuery =
-        'SELECT bc.asset FROM ratingsContent bc \
-         WHERE bc.rating = $1 AND bc.asset = $2;';
     var assetInsertQuery =
-        'INSERT INTO ratingsContent (asset, rating, person) VALUES ($1, $2, $3);';
-    var ratingId = req.query.ratingId;
-    var assetId = req.query.assetId;
+        'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3);';
+
+    var userId = req.query.user.id;
+    var assetId = req.params.assetId;
+    var attributeId = req.query.attributeId;
+    var rating = req.query.rating;
 
     var json = utils.standardJson(req);
 
-    if (!ratingId) {
+    if (!userId) {
         errors.report('MissingParameters', req, res);
         return;
     }
@@ -177,46 +183,28 @@ module.exports.addAsset = function(db, req, res) {
         return;
     }
 
+    if (!rating) {
+        errors.report('NoMatch', req, res);
+        return;
+    }
+    if (!attributeId) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
     db.query(
-        ratingQuery, [ratingId],
+        assetInsertQuery, [assetId, attributeId, req.session.user.id, rating],
         function(err, result) {
-            if (err || !result.rows) {
+            if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
-            if (!result.rows.length) {
-                errors.report('NoMatch', req, res);
-                return;
-            }
-            json.rating = {
-                id : result.rows[0].id,
-                description : result.rows[0].description,
-                value : result.rows[0].value
-            };
+//            json.rating = {
+  //              attribute
+    //        };
 
-            db.query(
-                assetsQuery, [json.rating.id, assetId],
-                function(err, result) {
-                    if (err) {
-                        errors.report('Database', req, res, err);
-                        return;
-                    }
-                    if (result.rows && result.rows.length > 0) {
-                        errors.report('AssetExists', req, res);
-                        return;
-                    }
-
-                    db.query(
-                        assetInsertQuery, [assetId, json.rating.id, req.session.user.id],
-                        function(err, result) {
-                            if (err) {
-                                errors.report('Database', req, res, err);
-                                return;
-                            }
-                            res.json(json);
-                        });
-                });
-        });
+            res.json(json);
+    });
 };
 
 module.exports.removeAsset = function(db, req, res) {
