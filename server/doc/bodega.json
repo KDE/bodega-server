@@ -1670,6 +1670,21 @@
                         "Type": "Number"
                     }
                 ]
+            },
+            {
+                "MethodName": "Asset Rate",
+                "Synopsis": "The rating of the asset",
+                "HTTPMethod": "GET",
+                "URI": "/ratings/asset/:assetId",
+                "parameters": [
+                    {
+                        "Name": "assetId",
+                        "Location": "URL",
+                        "Description": "The id of asset",
+                        "Required": "Y",
+                        "Type": "Number"
+                    }
+                ]
             }
         ]
     }
