@@ -49,6 +49,8 @@ module.exports.listAttributes = function(db, req, res) {
                 json.hasMoreRatingAttributes = true;
                 result.rows.pop();
             }
+            var ok = result.rows.length > 0 ? true : false;
+            var json = utils.standardJson(req, ok);
 
             json.ratingAttributes = result.rows;
             res.json(json);
