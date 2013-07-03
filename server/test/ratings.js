@@ -89,5 +89,40 @@ describe('Ratings', function() {
                 cookie);
         });
     });
+
+    describe('Remove asset', function() {
+        it('it should failed due to invalid asset', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/asset/rate/delete/1000',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', false);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'NoMatch');
+                    done();
+                },
+                cookie);
+        });
+        it('it should succeed', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/asset/rate/delete/2',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    done();
+                },
+                cookie);
+        });
+    });
 });
 
