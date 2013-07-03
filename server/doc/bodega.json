@@ -465,11 +465,12 @@
           "read-only": "true",
           "Synopsis": "Lists the assets that either belong to you or, if you are a content validator,  have been posted.",
           "HTTPMethod": "GET",
-          "URI": "/asset/list/",
+          "URI": "/asset/list/:type",
           "parameters": [
             {
               "Name": "type",
               "Description": "Which kind of listing to use",
+              "Location": "URL"
               "Required": "N",
               "Default": "published",
               "Type": "enumerated",
