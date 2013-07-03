@@ -59,24 +59,14 @@ module.exports.listAttributes = function(db, req, res) {
 
 module.exports.asset = function(db, req, res) {
     /*jshint multistr:true */
-    var assetQuery = 'SELECT DISTINCT a.id, a.license, partners.id as partnerId, \
-                     partners.name AS partnername, a.version, a.path, a.image, a.name,\
-                     CASE WHEN p.points IS NULL THEN 0 ELSE p.points END AS points \
-                     FROM ratingsContent rc \
-                     INNER JOIN assets a ON (rc.asset = $1 AND rc.asset = a.id)\
-                     LEFT JOIN partners ON (a.author = partners.id) \
-                     LEFT JOIN assetPrices p ON (p.asset = a.id AND p.device = $2) \
-                     ORDER BY a.name LIMIT $3 OFFSET $4;';
-
-    var ratingsQuery = 'SELECT id, description, value \
-                        FROM ratings \
-                        INNER JOIN  ratingscontent rc ON(rc.asset = $1 AND ratings.id = rc.rating) \
-                        ORDER BY ratings.id LIMIT $2 OFFSET $3;';
+    var ratingsQuery = 'SELECT attribute, person, rating \
+                        FROM ratings WHERE asset = $1 \
+                        ORDER BY ratings.person LIMIT $2 OFFSET $3;';
 
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
     var offset = parseInt(req.query.offset, 10) || 0;
-    var assetId = req.query.assetId;
+    var assetId = req.params.assetId;
 
     var json = utils.standardJson(req);
 
@@ -86,32 +76,24 @@ module.exports.asset = function(db, req, res) {
         return;
     }
 
+    json.hasMoreRatings = false;
+    json.ratings = [];
     db.query(
-        assetQuery, [assetId, json.device, pageSize + 1, offset],
+        ratingsQuery, [assetId, pageSize + 1, offset],
         function(err, result) {
-            if (err || !result.rows || !result.rows.length) {
+            if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
 
-            json.asset = result.rows[0];
-
-            json.ratings = [];
-            db.query(
-                ratingsQuery, [assetId, pageSize + 1, offset],
-                function(err, result) {
-                    if (err) {
-                        errors.report('Database', req, res, err);
-                        return;
-                    }
-                    if (result.rows.length > pageSize) {
-                        json.hasMoreRatings = true;
-                        result.rows.pop();
-                    }
-                    json.ratings = result.rows;
-                    res.json(json);
-            });
-    });
+            if (result.rows.length > pageSize) {
+                json.hasMoreRatings = true;
+                result.rows.pop();
+            }
+            //TODO do we want to export the assetRatingsAverage data?????
+            json.ratings = result.rows;
+            res.json(json);
+        });
 };
 
 module.exports.participant = function(db, req, res) {
