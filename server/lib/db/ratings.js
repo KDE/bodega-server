@@ -59,6 +59,8 @@ module.exports.listAttributes = function(db, req, res) {
 
 module.exports.asset = function(db, req, res) {
     /*jshint multistr:true */
+    var assetQuery = 'SELECT id FROM assets WHERE id = $1';
+
     var ratingsQuery = 'SELECT attribute, person, rating \
                         FROM ratings WHERE asset = $1 \
                         ORDER BY ratings.person LIMIT $2 OFFSET $3;';
@@ -79,21 +81,35 @@ module.exports.asset = function(db, req, res) {
     json.hasMoreRatings = false;
     json.ratings = [];
     db.query(
-        ratingsQuery, [assetId, pageSize + 1, offset],
+        assetQuery, [assetId],
         function(err, result) {
-            if (err) {
+            if (err)  {
                 errors.report('Database', req, res, err);
                 return;
             }
 
-            if (result.rows.length > pageSize) {
-                json.hasMoreRatings = true;
-                result.rows.pop();
+            if (result.rows.length < 1) {
+                errors.report('NoMatch', req, res);
+                return;
             }
-            //TODO do we want to export the assetRatingsAverage data?????
-            json.ratings = result.rows;
-            res.json(json);
-        });
+
+        db.query(
+            ratingsQuery, [assetId, pageSize + 1, offset],
+            function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res);
+                    return;
+                }
+
+                if (result.rows.length > pageSize) {
+                    json.hasMoreRatings = true;
+                    result.rows.pop();
+                }
+                //TODO do we want to export the assetRatingsAverage data?????
+                json.ratings = result.rows;
+                res.json(json);
+            });
+    });
 };
 
 module.exports.participant = function(db, req, res) {
