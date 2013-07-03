@@ -170,7 +170,7 @@ app.get(serverPath('collection/:collectionId/remove/:assetId'), isAuthorized,
 //*******************************
 // ratings
 
-app.get(serverPath('ratings/asset'), isAuthorized,
+app.get(serverPath('ratings/asset/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.ratingAsset(req, res);
