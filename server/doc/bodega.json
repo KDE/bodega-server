@@ -1637,6 +1637,41 @@
             ]
         }
         ]
+    },
+    {
+        "name": "Ratings",
+        "methods": [
+            {
+                "MethodName": "Remove rating",
+                "Synopsis": "Remove the rating for the specific asset",
+                "HTTPMethod": "GET",
+                "URI": "asset/rate/delete/:assetId",
+                "parameters": [
+                    {
+                        "Name": "assetId",
+                        "Location": "URL",
+                        "Description": "The id of asset from which we want to remove its rating",
+                        "Required": "Y",
+                        "Type": "Number"
+                    }
+                ]
+            },
+            {
+                "MethodName": "Attributes",
+                "Synopsis": "The possible rating attributes for the specific asset",
+                "HTTPMethod": "GET",
+                "URI": "/asset/ratingAttributes/:assetId",
+                "parameters": [
+                    {
+                        "Name": "assetId",
+                        "Location": "URL",
+                        "Description": "The id of asset",
+                        "Required": "Y",
+                        "Type": "Number"
+                    }
+                ]
+            }
+        ]
     }
 ]
 }
