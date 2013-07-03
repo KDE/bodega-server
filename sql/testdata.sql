@@ -584,7 +584,7 @@ INSERT INTO ratings (asset, attribute, person, rating)
 INSERT INTO ratings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('zack@kde.org'), 5);
 INSERT INTO ratings (asset, attribute, person, rating)
-    VALUES (ct_testing_assetByName('Aquarium'), ct_testing_ratingAttributeByName('perfomance'), ct_testing_personByEmail('aseigo@kde.org'), 1);
+    VALUES (ct_testing_assetByName('Aquarium'), ct_testing_ratingAttributeByName('perfomance'), ct_testing_personByEmail('zack@kde.org'), 1);
 INSERT INTO ratings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Aquarium'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('zack@kde.org'), 1);
 INSERT INTO ratings (asset, attribute, person, rating)
