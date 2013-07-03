@@ -52,7 +52,7 @@ describe('Ratings', function() {
     });
 
     describe('List Attributes', function() {
-        it('it should failed due to invalid asset', function(done) {
+        it('it should faile because the asset is invalid', function(done) {
             utils.getUrl(
                 server,
                 '/bodega/v1/json/asset/ratingattributes/1000',
@@ -91,7 +91,7 @@ describe('Ratings', function() {
     });
 
     describe('Remove asset', function() {
-        it('it should failed due to invalid asset', function(done) {
+        it('it should fail because the asset is invalid', function(done) {
             utils.getUrl(
                 server,
                 '/bodega/v1/json/asset/rate/delete/1000',
@@ -119,6 +119,61 @@ describe('Ratings', function() {
                         'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
+                    done();
+                },
+                cookie);
+        });
+    });
+    describe('Rate asset', function() {
+        it('it should fail because the asset is invalid', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/ratings/asset/1000',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', false);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'NoMatch');
+                    done();
+                },
+                cookie);
+        });
+        it('it should succeed', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/ratings/asset/8',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    var ratings = res.body.ratings;
+                    ratings.should.be.an.instanceOf(Array);
+                    ratings.should.have.length(2);
+                    done();
+                },
+                cookie);
+        });
+        it('it should be empty because there are no ratings for the asset', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/ratings/asset/10',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    var ratings = res.body.ratings;
+                    ratings.should.be.an.instanceOf(Array);
+                    ratings.should.have.length(0);
                     done();
                 },
                 cookie);
