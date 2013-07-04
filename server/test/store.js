@@ -45,22 +45,18 @@ describe('Store management', function(){
         });
     });
 
+    utils.auth(server,
+               function(res, done) {
+                   cookie = res.headers['set-cookie'];
+                   done();
+               },
+               {
+                   user: 'aseigo@kde.org',
+                   password: 'aseigo',
+                   store: 'null'
+               });
+
     describe('Create a store with someone who is not authorized to do so', function(){
-        it('Authorize with a person who is NOT a Store Manager', function(done){
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/auth?auth_user=aseigo@kde.org&auth_password=aseigo&auth_store=null',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.headers.should.have.property('set-cookie');
-                    cookie = res.headers['set-cookie'];
-                    res.body.should.have.property('authStatus', true);
-                    done();
-                });
-        });
         it('Creation request should fail', function(done) {
             utils.postUrl(
                 server,
@@ -80,23 +76,14 @@ describe('Store management', function(){
         });
     });
 
-    describe('Authorize as a person who is a Store Manager', function(){
-        it('authorize correctly.', function(done){
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=null',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.headers.should.have.property('set-cookie');
-                    cookie = res.headers['set-cookie'];
-                    res.body.should.have.property('authStatus', true);
-                    done();
-                });
-        });
-    });
+    utils.auth(server,
+               function(res, done) {
+                   cookie = res.headers['set-cookie'];
+                   done();
+               },
+               {
+                   store: 'null'
+               });
 
     describe('Store creation', function(){
         it('should fail with an invalid partner', function(done){
