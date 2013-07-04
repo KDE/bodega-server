@@ -25,23 +25,14 @@ describe('Tags manipulation', function(){
     var cookie;
     var createdTagId;
 
-    describe('initialization', function() {
-        it('authorize correctly.', function(done) {
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=null',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.headers.should.have.property('set-cookie');
-                    cookie = res.headers['set-cookie'];
-                    res.body.should.have.property('authStatus', true);
-                    done();
-                });
-        });
-    });
+    utils.auth(server,
+               function(res, done) {
+                   cookie = res.headers['set-cookie'];
+                   done();
+               },
+               {
+                   store: 'null'
+               });
 
     function listTags(asset, channel, type, cb) {
         var query = '/bodega/v1/json';
