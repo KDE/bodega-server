@@ -20,39 +20,13 @@ var utils = require('./support/http');
 
 describe('Ratings', function() {
     var cookie;
-    describe('needs to authorize first', function(){
-        it('authorize correctly.', function(done){
-            var expected = {
-                "store":"VIVALDI-1",
-                "authStatus":true,
-                "points" : 10000,
-                "imageUrls": {
-                    "tiny":"http://0.0.0.0:3000/icons/22",
-                    "small":"http://0.0.0.0:3000/icons/32",
-                    "medium":"http://0.0.0.0:3000/icons/64",
-                    "large":"http://0.0.0.0:3000/icons/128",
-                    "huge":"http://0.0.0.0:3000/icons/512",
-                    "previews":"http://0.0.0.0:3000/previews"
-                }
-            };
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.headers.should.have.property('set-cookie');
-                    cookie = res.headers['set-cookie'];
-                    res.body.should.have.property('authStatus', true);
-                    done();
-                });
-        });
+     utils.auth(server, function(res, done) {
+        cookie = res.headers['set-cookie'];
+        done();
     });
 
     describe('List Attributes', function() {
-        it('it should faile because the asset is invalid', function(done) {
+        it('it should fail because the asset is invalid', function(done) {
             utils.getUrl(
                 server,
                 '/bodega/v1/json/asset/ratingattributes/1000',
