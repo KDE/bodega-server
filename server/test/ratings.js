@@ -90,7 +90,7 @@ describe('Ratings', function() {
         });
     });
 
-    describe('Remove asset', function() {
+    describe('Remove asset rate', function() {
         it('it should fail because the asset is invalid', function(done) {
             utils.getUrl(
                 server,
@@ -124,7 +124,7 @@ describe('Ratings', function() {
                 cookie);
         });
     });
-    describe('Rate asset', function() {
+    describe('Asset Ratings', function() {
         it('it should fail because the asset is invalid', function(done) {
             utils.getUrl(
                 server,
@@ -230,6 +230,5 @@ describe('Ratings', function() {
                 cookie);
         });
     });
-
 });
 
