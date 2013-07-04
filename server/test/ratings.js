@@ -179,5 +179,57 @@ describe('Ratings', function() {
                 cookie);
         });
     });
+    describe('Participant', function() {
+        it('it should succeed', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/ratings/asset/8',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    var ratings = res.body.ratings;
+                    ratings.should.be.an.instanceOf(Array);
+                    ratings.should.have.length(2);
+                    done();
+                },
+                cookie);
+        });
+        it('it should have no ratings', function(done) {
+            //remove the ratings from Zack
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/asset/rate/delete/8',
+                function(res) {
+                    utils.getUrl(
+                    server,
+                    '/bodega/v1/json/asset/rate/delete/9',
+                    function(res) {
+                        utils.getUrl(
+                        server,
+                        '/bodega/v1/json/participant/ratings',
+                        function(res) {
+                            res.statusCode.should.equal(200);
+                            res.headers.should.have.property(
+                            'content-type',
+                            'application/json');
+                            res.body.should.have.property('authStatus', true);
+                            res.body.should.have.property('success', true);
+                            var ratings = res.body.ratings;
+                            ratings.should.be.an.instanceOf(Array);
+                            ratings.should.have.length(0);
+                            done();
+                        },
+                        cookie);
+                    },
+                    cookie);
+                },
+                cookie);
+        });
+    });
+
 });
 
