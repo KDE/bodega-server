@@ -73,9 +73,9 @@ function auth(app, fn, params)
     describe('needs to authorize first', function(){
         it('authorize correctly.', function(done){
          getUrl(app,
-           '/bodega/v1/json/auth?auth_user=' + (params.user ? params.user : 'zack@kde.org') +
-           '&auth_password=' + (params.password ? params.password : 'zack') +
-           '&auth_store=' + (params.store ? params.store : 'KDE-1'),
+           '/bodega/v1/json/auth?auth_user=' + (params && params.user ? params.user : 'zack@kde.org') +
+           '&auth_password=' + (params && params.password ? params.password : 'zack') +
+           '&auth_store=' + (params && params.store ? params.store : 'KDE-1'),
            function(res) {
                res.statusCode.should.equal(200);
                res.headers.should.have.property('content-type', 'application/json');
