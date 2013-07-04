@@ -165,46 +165,56 @@ module.exports.participant = function(db, req, res) {
 
 module.exports.addAsset = function(db, req, res) {
     /*jshint multistr:true */
+    var assetQuery = 'SELECT id FROM assets WHERE id = $1;';
     var assetInsertQuery =
-        'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3);';
+        'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);';
 
-    var userId = req.query.user.id;
+    var userId = req.session.user.id;
     var assetId = req.params.assetId;
-    var attributeId = req.query.attributeId;
-    var rating = req.query.rating;
+    var ratings = req.body.ratings;
 
     var json = utils.standardJson(req);
 
-    if (!userId) {
-        errors.report('MissingParameters', req, res);
-        return;
-    }
-    if (!assetId) {
-        errors.report('MissingParameters', req, res);
-        return;
-    }
-
-    if (!rating) {
-        errors.report('NoMatch', req, res);
-        return;
-    }
-    if (!attributeId) {
+    if (!assetId || !ratings) {
         errors.report('MissingParameters', req, res);
         return;
     }
 
     db.query(
-        assetInsertQuery, [assetId, attributeId, req.session.user.id, rating],
+        assetQuery, [assetId],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
-//            json.rating = {
-  //              attribute
-    //        };
 
-            res.json(json);
+            if (result.rows.length < 1) {
+                errors.report('NoMatch', req, res);
+                return;
+            }
+
+            json.ratings = [];
+            function next() {
+                var rate = ratings.shift();
+
+                if (!rate || !rate.attribute || !rate.rating) {
+                    res.json(json);
+                    return;
+                }
+
+                db.query(
+                assetInsertQuery, [assetId, rate.attribute, req.session.user.id, rate.rating],
+                function(err, result) {
+                    if (err) {
+                        errors.report('Database', req, res, err);
+                        return;
+                    }
+
+                    json.ratings.push(rate);
+                    next();
+                });
+            }
+            next();
     });
 };
 
