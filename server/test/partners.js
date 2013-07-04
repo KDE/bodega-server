@@ -49,6 +49,7 @@ describe('Partner management', function() {
                             "assets": 25,
                             "downloads": 22,
                             "purchases": 13,
+                            "stores": 2,
                             people: [
                                 {
                                     "name": "Aaron Seigo",
@@ -220,6 +221,7 @@ describe('Partner management', function() {
                     "assets": 0,
                     "downloads": 0,
                     "purchases": 0,
+                    "stores": 0,
                     people: [
                         {
                             "name": "Zack Rusin",
