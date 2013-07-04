@@ -70,8 +70,8 @@ function postUrl(app, path, formData, fn, cookie)
 
 function auth(app, fn, params)
 {
-    describe('needs to authorize first', function(){
-        it('authorize correctly.', function(done){
+    describe('needs to authorize first', function() {
+        it('authorize correctly.', function(done) {
          getUrl(app,
            '/bodega/v1/json/auth?auth_user=' + (params && params.user ? params.user : 'zack@kde.org') +
            '&auth_password=' + (params && params.password ? params.password : 'zack') +
