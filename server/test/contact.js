@@ -21,39 +21,34 @@ var assert = require('assert');
 var cookie;
 
 describe('Fetch contact information', function() {
-     it('should return only warehouse info when not authenticated', function(done) {
-        utils.getUrl(
-            server,
-            '/bodega/v1/json/contact',
-            function(res) {
-                var expected = {
-                    name: app.config.warehouseInfo.name,
-                    description: app.config.warehouseInfo.description,
-                    url: app.config.warehouseInfo.url,
-                    contact: app.config.warehouseInfo.contact
-                };
-                res.statusCode.should.equal(200);
-                res.headers.should.have.property( 'content-type', 'application/json');
-                res.body.should.eql(expected);
-                done();
-            });
-     });
+    describe('when not authenticated', function() {
+        it('should return only warehouse info', function(done) {
+            utils.getUrl(
+                server,
+                '/bodega/v1/json/contact',
+                function(res) {
+                    var expected = {
+                        name: app.config.warehouseInfo.name,
+                description: app.config.warehouseInfo.description,
+                url: app.config.warehouseInfo.url,
+                contact: app.config.warehouseInfo.contact
+                    };
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property( 'content-type', 'application/json');
+                    res.body.should.eql(expected);
+                    done();
+                });
+        });
+    });
 
-     it('should authenticate successfully', function(done){
-         utils.getUrl(
-             server,
-             '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
-             function(res) {
-                 res.statusCode.should.equal(200);
-                 res.headers.should.have.property( 'content-type', 'application/json');
-                 res.headers.should.have.property('set-cookie');
-                 cookie = res.headers['set-cookie'];
-                 res.body.should.have.property('authStatus', true);
-                 done();
-            });
-     });
+     utils.auth(server, function(res, done) {
+         cookie = res.headers['set-cookie'];
+         done();
+     },
+     { store: 'VIVALDI-1' });
 
-     it('should return both warehouse and store information when authenticated', function(done) {
+     describe('when authenticated', function() {
+        it('should return both warehouse and store information when authenticated', function(done) {
          utils.getUrl(
              server,
              '/bodega/v1/json/contact',
@@ -94,5 +89,6 @@ describe('Fetch contact information', function() {
                 done();
              },
              cookie);
+        });
      });
 });
