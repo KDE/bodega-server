@@ -248,6 +248,7 @@ describe('Ratings', function() {
                         'application/json');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
+                    res.body.ratings.should.be.eql(query.ratings);
                     done();
                 },
                 cookie);
