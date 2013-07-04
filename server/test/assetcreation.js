@@ -52,27 +52,14 @@ describe('Asset manipulation', function(){
     var incompleteAssetId;
     var completeAssetId;
     var cleanupAssets = [];
-    describe('Authentication', function(){
-        it('should succeed.', function(done){
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=null',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.headers.should.have.property('set-cookie');
-                    cookie = res.headers['set-cookie'];
-                    var j = request.jar();
-                    request = request.defaults({jar :j });
-                    j.add(new Cookie(cookie[0]));
-                    res.body.should.have.property('authStatus', true);
-                    done();
-                });
-        });
-    });
 
+    utils.auth(server, function(res, done) {
+        cookie = res.headers['set-cookie'];
+        var j = request.jar();
+        request = request.defaults({jar :j });
+        j.add(new Cookie(cookie[0]));
+        done();
+    });
 
     function deleteAsset(assets, i, cb)
     {

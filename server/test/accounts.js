@@ -60,26 +60,9 @@ describe('Create user', function() {
 
 describe('Deactivate user', function() {
     var cookie;
-    describe('needs to authorize first', function() {
-        it('authotize correctly', function(done) {
-            utils.getUrl(server,
-            '/bodega/v1/json/auth?auth_user=kok3rs@gmail.com&auth_password=123456789&auth_device=VIVALDI-1',
-            function(res) {
-                res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
-                res.headers.should.have.property('set-cookie');
-                cookie = res.headers['set-cookie'];
-                res.body.should.have.property('authStatus', true);
-                res.body.should.have.property('device', 'VIVALDI-1');
-                res.body.should.have.property('store', 'VIVALDI-1');
-                res.body.should.have.property('points');
-                res.body.should.have.property('success', true);
-                res.body.should.have.property('active', true);
-                done();
-            });
-        });
+    utils.auth(server, function(res, done) {
+        cookie = res.headers['set-cookie'];
+        done();
     });
 
     describe('disable account', function() {
