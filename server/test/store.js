@@ -22,8 +22,6 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Store management', function(){
-    var cookie;
-
     describe('Creating a store without authenticating', function(){
         it('should fail', function(done) {
             utils.postUrl(
@@ -40,16 +38,11 @@ describe('Store management', function(){
                     res.body.error.should.have.property('type',
                                                         'Unauthorized');
                     done();
-                },
-                cookie);
+                });
         });
     });
 
     utils.auth(server,
-               function(res, done) {
-                   cookie = res.headers['set-cookie'];
-                   done();
-               },
                {
                    user: 'aseigo@kde.org',
                    password: 'aseigo',
@@ -72,15 +65,11 @@ describe('Store management', function(){
                                                         'StorePartnerInvalid');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
     utils.auth(server,
-               function(res, done) {
-                   cookie = res.headers['set-cookie'];
-                   done();
-               },
                {
                    store: 'null'
                });
@@ -101,7 +90,7 @@ describe('Store management', function(){
                     res.body.error.should.have.property('type', 'StorePartnerInvalid');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should fail without a name', function(done){
@@ -119,7 +108,7 @@ describe('Store management', function(){
                     res.body.error.should.have.property('type', 'StoreNameInvalid');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should succeed with a valid partner and name', function(done){
@@ -151,7 +140,7 @@ describe('Store management', function(){
                     res.body.storeInfo.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should succeed with a name and no partner explicitly specified', function(done){
@@ -182,7 +171,7 @@ describe('Store management', function(){
                     res.body.storeInfo.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should fail with an id that exists', function(done){
@@ -205,7 +194,7 @@ describe('Store management', function(){
                     res.body.error.should.have.property('type', 'StoreIdExists');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
     });
@@ -261,7 +250,7 @@ describe('Store management', function(){
                         res.body.storeInfo.should.eql(expected);
                         done();
                     },
-                    cookie);
+                    utils.cookie);
            });
     });
 
@@ -287,7 +276,7 @@ describe('Store management', function(){
                     res.body.error.should.have.property('type', 'StoreIdInvalid');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should fail on a store that exists, but we are not authorized to manage', function(done) {
@@ -311,7 +300,7 @@ describe('Store management', function(){
                     res.body.error.should.have.property('type', 'StoreIdInvalid');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should succeed on an existing store', function(done) {
@@ -346,7 +335,7 @@ describe('Store management', function(){
                     res.body.storeInfo.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('partial updates work as well', function(done) {
@@ -378,7 +367,7 @@ describe('Store management', function(){
                     res.body.storeInfo.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
@@ -418,7 +407,7 @@ describe('Store management', function(){
 
                     done();
                 },
-                cookie);
+                utils.cookie);
             });
 
         it('fetch the structure of the store', function(done) {
@@ -489,7 +478,7 @@ describe('Store management', function(){
                     res.body.channels.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should be possible to delete that channel', function(done) {
@@ -504,7 +493,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
@@ -522,7 +511,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should succeed with another valid store', function(done){
@@ -538,7 +527,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('listing should reflect deletions',
@@ -575,7 +564,7 @@ describe('Store management', function(){
                         res.body.storeInfo.should.eql(expected);
                         done();
                     },
-                    cookie);
+                    utils.cookie);
            });
     });
 

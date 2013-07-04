@@ -19,7 +19,6 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Redeeming points code', function(){
-    var cookie;
     var testCode = 'NtTMi4EMBJugZu1hxTmv';
     var testPoints = 1000;
     var startPoints = -1;
@@ -74,8 +73,7 @@ describe('Redeeming points code', function(){
         });
     });
 
-    utils.auth(server, function(res, done) {
-        cookie = res.headers['set-cookie'];
+    utils.auth(server, { store: 'VIVALDI-1' }, function(res, done) {
         startPoints = res.body.points;
         done();
     });
@@ -100,7 +98,7 @@ describe('Redeeming points code', function(){
                     res.body.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('A working code', function(done){
             var expected = {
@@ -122,7 +120,7 @@ describe('Redeeming points code', function(){
                     res.body.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 });

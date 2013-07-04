@@ -21,7 +21,6 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Collections', function(){
-    var cookie;
     var collectionId;
     var collectionName = 'favorites1';
     var assets = [3, 4, 5, 6];
@@ -83,11 +82,7 @@ describe('Collections', function(){
         });
     });
 
-    utils.auth(server, function(res, done) {
-        cookie = res.headers['set-cookie'];
-        done();
-    });
-
+    utils.auth(server);
 
     var createdId;
     describe('After authentication', function(){
@@ -116,7 +111,7 @@ describe('Collections', function(){
                     createdId = res.body.collections[0].id;
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should update', function(done){
             var params = {
@@ -141,7 +136,7 @@ describe('Collections', function(){
                     res.body.collections[0].should.have.property('type', 'wishlist');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should update to the old values', function(done){
             var params = {
@@ -166,7 +161,7 @@ describe('Collections', function(){
                     res.body.collections[0].should.have.property('type', 'wishlist');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should list', function(done){
             utils.getUrl(
@@ -193,7 +188,7 @@ describe('Collections', function(){
                     }
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should allow adding assets', function(done){
@@ -219,7 +214,7 @@ describe('Collections', function(){
                             done();
                         }
                     },
-                    cookie);
+                    utils.cookie);
             }
         });
 
@@ -240,7 +235,7 @@ describe('Collections', function(){
                     res.body.collection.assets.length.should.be.equal(4);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should allow removing 2 assets', function(done){
@@ -266,7 +261,7 @@ describe('Collections', function(){
                             done();
                         }
                     },
-                    cookie);
+                    utils.cookie);
             }
         });
 
@@ -287,7 +282,7 @@ describe('Collections', function(){
                     res.body.collection.assets.length.should.be.equal(2);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should allow readding assets', function(done){
@@ -313,7 +308,7 @@ describe('Collections', function(){
                             done();
                         }
                     },
-                    cookie);
+                    utils.cookie);
             }
         });
 
@@ -334,7 +329,7 @@ describe('Collections', function(){
                     res.body.collection.assets.length.should.be.equal(4);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should allow deletion of a collection', function(done){
@@ -350,7 +345,7 @@ describe('Collections', function(){
                     res.body.should.not.have.property('error');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should not list collection after deletion', function(done){
@@ -367,7 +362,7 @@ describe('Collections', function(){
                     res.body.collections.length.should.be.equal(numCollections - 1);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 

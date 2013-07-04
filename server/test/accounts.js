@@ -58,32 +58,25 @@ describe('Create user', function() {
     });
 });
 
-describe('Deactivate user', function() {
-    var cookie;
-    utils.auth(server, function(res, done) {
-        cookie = res.headers['set-cookie'];
-        done();
-    });
+utils.auth(server);
 
-    describe('disable account', function() {
-        it('disable successfuly', function(done) {
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/participant/changeAccountDetails&active=false',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('device', 'VIVALDI-1');
-                    res.body.should.have.property('store', 'VIVALDI-1');
-                    res.body.should.have.property('points');
-                    res.body.should.have.property('success');
-                    done();
-                },
-                cookie);
-         });
+describe('Deactivate user', function() {
+    it('succeeds', function(done) {
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/changeAccountDetails&active=false',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('store', 'KDE-1');
+                res.body.should.have.property('points');
+                res.body.should.have.property('success');
+                done();
+            },
+            utils.cookie);
     });
 
     after(function(done) {
@@ -117,27 +110,10 @@ function checkPersonInfo(cookie, key, value, done)
             res.body.should.have.property(key, value);
             done();
         },
-        cookie);
+        utils.cookie);
 }
 
 describe('Changing account information', function() {
-    var cookie;
-    it('must authorize first', function(done) {
-        utils.getUrl(
-            server,
-            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
-            function(res) {
-                res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
-                res.headers.should.have.property('set-cookie');
-                cookie = res.headers['set-cookie'];
-                res.body.should.have.property('authStatus', true);
-                done();
-            });
-    });
-
     it('change first name to "Bunny"', function(done) {
         var query = {
             firstName: 'Bunny'
@@ -151,9 +127,9 @@ describe('Changing account information', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('success', true);
-                checkPersonInfo(cookie, 'firstName', 'Bunny', done);
+                checkPersonInfo(utils.cookie, 'firstName', 'Bunny', done);
             },
-            cookie);
+            utils.cookie);
     });
 
     it('change middle name to "Rabbit"', function(done) {
@@ -169,9 +145,9 @@ describe('Changing account information', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('success', true);
-                checkPersonInfo(cookie, 'middleNames', 'Rabbit', done);
+                checkPersonInfo(utils.cookie, 'middleNames', 'Rabbit', done);
             },
-            cookie);
+            utils.cookie);
     });
 
     it('change last name to "Foofoo"', function(done) {
@@ -187,9 +163,9 @@ describe('Changing account information', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('success', true);
-                checkPersonInfo(cookie, 'lastName', 'Foofoo', done);
+                checkPersonInfo(utils.cookie, 'lastName', 'Foofoo', done);
             },
-            cookie);
+            utils.cookie);
     });
 
     it('change email to "bunny_rabbit@foofoo.com"', function(done) {
@@ -205,9 +181,9 @@ describe('Changing account information', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('success', true);
-                checkPersonInfo(cookie, 'email', 'bunny_rabbit@foofoo.com', done);
+                checkPersonInfo(utils.cookie, 'email', 'bunny_rabbit@foofoo.com', done);
             },
-            cookie);
+            utils.cookie);
     });
 
     it('invalid email should fail', function(done) {
@@ -230,7 +206,7 @@ describe('Changing account information', function() {
                 done();
                 server.config.printErrors = true;
             },
-            cookie);
+            utils.cookie);
     });
 
     it('duplicate email should fail', function(done) {
@@ -250,7 +226,7 @@ describe('Changing account information', function() {
                 res.body.error.should.have.property('type', 'AccountExists');
                 done();
             },
-            cookie);
+            utils.cookie);
     });
 
     after(function(done) {
@@ -271,57 +247,6 @@ describe('Changing account information', function() {
 });
 
 describe('Changing passwords', function() {
-    var cookie;
-    it('authorizes correctly with password "zack"', function(done) {
-        utils.getUrl(
-            server,
-            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
-            function(res) {
-                res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
-                res.headers.should.have.property('set-cookie');
-                cookie = res.headers['set-cookie'];
-                res.body.should.have.property('authStatus', true);
-                done();
-            });
-    });
-
-    it('change the password to "alphabetical"', function(done) {
-        var query = {
-            newPassword: 'alphabetical'
-        };
-        utils.getUrl(
-            server,
-            '/bodega/v1/json/participant/changePassword?' + queryString.stringify(query),
-            function(res) {
-                res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
-                res.body.should.have.property('success', true);
-                done();
-            },
-            cookie);
-    });
-
-    it('authorizes correctly with password "alphabetical"', function(done) {
-        utils.getUrl(
-            server,
-            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=alphabetical&auth_store=KDE-1',
-            function(res) {
-                res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
-                res.headers.should.have.property('set-cookie');
-                cookie = res.headers['set-cookie'];
-                res.body.should.have.property('authStatus', true);
-                done();
-            });
-    });
-
     it('rejects short passwords', function(done) {
         var query = {
             newPassword: 'zack'
@@ -339,7 +264,7 @@ describe('Changing passwords', function() {
                 res.body.error.should.have.property('type', 'PasswordTooShort');
                 done();
             },
-            cookie);
+            utils.cookie);
     });
 
     it('rejects changing to no password', function(done) {
@@ -356,8 +281,28 @@ describe('Changing passwords', function() {
                 res.body.error.should.have.property('type', 'MissingParameters');
                 done();
             },
-            cookie);
+            utils.cookie);
     });
+
+    it('change the password to "alphabetical"', function(done) {
+        var query = {
+            newPassword: 'alphabetical'
+        };
+        utils.getUrl(
+            server,
+            '/bodega/v1/json/participant/changePassword?' + queryString.stringify(query),
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property(
+                    'content-type',
+                    'application/json');
+                res.body.should.have.property('success', true);
+                done();
+            },
+            utils.cookie);
+    });
+
+    utils.auth(server, { password: 'alphabetical' });
 
     after(function(done) {
         var connectionString = app.config.service.database.protocol + "://" +
@@ -375,7 +320,6 @@ describe('Changing passwords', function() {
 });
 
 describe('getting account information', function() {
-    var cookie;
     it('should fail to get personal information before authorization', function(done) {
         utils.getUrl(
             server,
@@ -416,7 +360,7 @@ describe('getting account information', function() {
                     'content-type',
                     'application/json');
                 res.headers.should.have.property('set-cookie');
-                cookie = res.headers['set-cookie'];
+                utils.cookie = res.headers['set-cookie'];
                 res.body.should.have.property('authStatus', true);
                 done();
             });
@@ -443,7 +387,7 @@ describe('getting account information', function() {
                 res.body.should.have.property('active', true);
                 done();
             },
-            cookie);
+            utils.cookie);
     });
 
     it('fetch history', function(done) {
@@ -504,6 +448,6 @@ describe('getting account information', function() {
                 res.body.history.should.eql(expected);
                 done();
             },
-            cookie);
+            utils.cookie);
     });
 });

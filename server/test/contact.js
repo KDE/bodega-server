@@ -18,7 +18,6 @@
 var server = require('../app.js');
 var utils = require('./support/http');
 var assert = require('assert');
-var cookie;
 
 describe('Fetch contact information', function() {
     describe('when not authenticated', function() {
@@ -41,11 +40,7 @@ describe('Fetch contact information', function() {
         });
     });
 
-     utils.auth(server, function(res, done) {
-         cookie = res.headers['set-cookie'];
-         done();
-     },
-     { store: 'VIVALDI-1' });
+     utils.auth(server, { store: 'VIVALDI-1' });
 
      describe('when authenticated', function() {
         it('should return both warehouse and store information when authenticated', function(done) {
@@ -88,7 +83,7 @@ describe('Fetch contact information', function() {
                 res.body.store.should.eql(store);
                 done();
              },
-             cookie);
+             utils.cookie);
         });
      });
 });

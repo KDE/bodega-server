@@ -68,21 +68,58 @@ function postUrl(app, path, formData, fn, cookie)
         });
 }
 
-function auth(app, fn, params)
+var defaultAuth = {
+    user: 'zack@kde.org',
+    password: 'zack',
+    store: 'KDE-1'
+};
+
+var currentlyAuthed = {
+    user: '',
+    password: '',
+    store: ''
+};
+
+function auth(app, params, cb)
 {
-    describe('needs to authorize first', function() {
-        it('authorize correctly.', function(done) {
-         getUrl(app,
-           '/bodega/v1/json/auth?auth_user=' + (params && params.user ? params.user : 'zack@kde.org') +
-           '&auth_password=' + (params && params.password ? params.password : 'zack') +
-           '&auth_store=' + (params && params.store ? params.store : 'KDE-1'),
-           function(res) {
-               res.statusCode.should.equal(200);
-               res.headers.should.have.property('content-type', 'application/json');
-               res.headers.should.have.property('set-cookie');
-               res.body.should.have.property('authStatus', true);
-               fn(res, done);
-           });
+    describe('authorization', function() {
+        it('succeeds', function(done) {
+            if (!params) {
+                params = defaultAuth;
+            }
+
+            if (!cb &&
+                module.exports.cookie !== '' &&
+                (((!params.user && currentlyAuthed.user == defaultAuth.user) ||
+                   params.user == currentlyAuthed.user) &&
+                 ((!params.password && currentlyAuthed.user == defaultAuth.user) ||
+                   params.password == currentlyAuthed.password) &&
+                 ((!params.store && currentlyAuthed.store == defaultAuth.store) ||
+                   params.store == currentlyAuthed.store))) {
+                // we are already authed as requested
+                done();
+                return;
+            }
+
+            currentlyAuthed.user = params.user ? params.user : defaultAuth.user;
+            currentlyAuthed.password = params.password ? params.password : defaultAuth.password;
+            currentlyAuthed.store = params.store ? params.store : defaultAuth.store;
+            getUrl(app,
+                   '/bodega/v1/json/auth?auth_user=' + currentlyAuthed.user +
+                   '&auth_password=' + currentlyAuthed.password +
+                   '&auth_store=' + currentlyAuthed.store,
+                   function(res) {
+                       res.statusCode.should.equal(200);
+                       res.headers.should.have.property('content-type', 'application/json');
+                       res.headers.should.have.property('set-cookie');
+                       res.body.should.have.property('authStatus', true);
+                       module.exports.cookie = res.headers['set-cookie'];
+                       if (cb) {
+                           cb(res, done);
+                       } else {
+                           done();
+                       }
+                   });
         });
     });
 }
@@ -91,3 +128,4 @@ module.exports.getUrl = getUrl;
 module.exports.getHtml = getHtml;
 module.exports.postUrl = postUrl;
 module.exports.auth = auth;
+module.exports.cookie = '';

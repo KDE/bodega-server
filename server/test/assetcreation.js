@@ -47,19 +47,18 @@ function postFiles(server, dst, files, cookie, fn)
                     fs.createReadStream(filePath));
     }
 }
+
+utils.auth(server, {}, function(res, done) {
+    var j = request.jar();
+    request = request.defaults({jar :j });
+    j.add(new Cookie(utils.cookie[0]));
+    done();
+});
+
 describe('Asset manipulation', function(){
-    var cookie;
     var incompleteAssetId;
     var completeAssetId;
     var cleanupAssets = [];
-
-    utils.auth(server, function(res, done) {
-        cookie = res.headers['set-cookie'];
-        var j = request.jar();
-        request = request.defaults({jar :j });
-        j.add(new Cookie(cookie[0]));
-        done();
-    });
 
     function deleteAsset(assets, i, cb)
     {
@@ -71,7 +70,7 @@ describe('Asset manipulation', function(){
                 ++i;
                 cb(null, assets, i);
             },
-            cookie);
+            utils.cookie);
     }
 
     function deleteCompleteAsset(assets, i, cb)
@@ -94,7 +93,7 @@ describe('Asset manipulation', function(){
                     }, {
                         "name" : "asset",
                         "filename" : "sampleasset/sample.pdf"
-                    }], cookie,
+                    }], utils.cookie,
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -124,7 +123,7 @@ describe('Asset manipulation', function(){
                     },{
                         "name" : "cover.jpg",
                         "filename" : "sampleasset/cover.jpg"
-                    }], cookie,
+                    }], utils.cookie,
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -152,7 +151,7 @@ describe('Asset manipulation', function(){
                       }, {
                           "name" : "sample-1.png",
                           "filename" : "sampleasset/sample-1.png"
-                      }], cookie,
+                      }], utils.cookie,
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -175,7 +174,7 @@ describe('Asset manipulation', function(){
                     res.body.assets.length.should.be.equal(25);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('lists published when asked', function(done){
             utils.getUrl(
@@ -188,7 +187,7 @@ describe('Asset manipulation', function(){
                     res.body.assets.length.should.be.equal(25);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('lists incoming when asked', function(done){
             utils.getUrl(
@@ -201,7 +200,7 @@ describe('Asset manipulation', function(){
                     res.body.assets.length.should.be.equal(2);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('lists all when asked', function(done){
             utils.getUrl(
@@ -214,7 +213,7 @@ describe('Asset manipulation', function(){
                     res.body.assets.length.should.be.equal(27);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
@@ -234,7 +233,7 @@ describe('Asset manipulation', function(){
                                                         completeAssetId);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should work with incomplete assets', function(done){
             utils.getUrl(
@@ -251,7 +250,7 @@ describe('Asset manipulation', function(){
                                                         incompleteAssetId);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should not work with already delete assets', function(done){
             utils.getUrl(
@@ -267,7 +266,7 @@ describe('Asset manipulation', function(){
                         'type', 'AssetMissing');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('listing incoming after deletion shouldnt return any', function(done){
@@ -281,7 +280,7 @@ describe('Asset manipulation', function(){
                     res.body.assets.length.should.be.equal(0);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
@@ -296,7 +295,7 @@ describe('Asset manipulation', function(){
                     }, {
                         "name" : "asset",
                         "filename" : "sampleasset/sample.pdf"
-                    }], cookie,
+                    }], utils.cookie,
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -326,7 +325,7 @@ describe('Asset manipulation', function(){
                     },{
                         "name" : "cover.jpg",
                         "filename" : "sampleasset/cover.jpg"
-                    }], cookie,
+                    }], utils.cookie,
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -351,7 +350,7 @@ describe('Asset manipulation', function(){
                     deleteCompleteAsset([completeAssetId], 0, function(){});
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 

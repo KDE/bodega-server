@@ -22,14 +22,9 @@ var querystring = require('querystring');
 
 
 describe('Tags manipulation', function(){
-    var cookie;
     var createdTagId;
 
     utils.auth(server,
-               function(res, done) {
-                   cookie = res.headers['set-cookie'];
-                   done();
-               },
                {
                    store: 'null'
                });
@@ -52,7 +47,7 @@ describe('Tags manipulation', function(){
             function(res) {
                 cb(res);
             },
-            cookie);
+            utils.cookie);
     }
 
     function createTag(title, type, cb) {
@@ -62,7 +57,7 @@ describe('Tags manipulation', function(){
             function(res) {
                 cb(res);
             },
-            cookie);
+            utils.cookie);
     }
 
     function updateTag(id, title, type, cb) {
@@ -72,7 +67,7 @@ describe('Tags manipulation', function(){
             function(res) {
                 cb(res);
             },
-            cookie);
+            utils.cookie);
     }
 
     function deleteTag(tag, cb) {
@@ -82,7 +77,7 @@ describe('Tags manipulation', function(){
             function(res) {
                 cb(res);
             },
-            cookie);
+            utils.cookie);
     }
 
     describe('Tags', function() {

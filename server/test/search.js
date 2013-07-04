@@ -19,15 +19,10 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Searching', function(){
-    var cookie;
     var gamesChannelId;
     var cardGamesChannelId;
 
-    utils.auth(server,
-               function(res, done) {
-                    cookie = res.headers['set-cookie'];
-                    done();
-                });
+    utils.auth(server);
 
     describe('initialization', function(){
         it('find the games channel', function(done){
@@ -52,7 +47,7 @@ describe('Searching', function(){
                     gamesChannelId.should.be.above(0);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('find the card games channel', function(done){
@@ -77,7 +72,7 @@ describe('Searching', function(){
                     cardGamesChannelId.should.be.above(0);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
@@ -97,7 +92,7 @@ describe('Searching', function(){
                                                         'MissingParameters');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should error an missing channel', function(done){
@@ -116,7 +111,7 @@ describe('Searching', function(){
                                                         'MissingParameters');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
 
@@ -139,7 +134,7 @@ describe('Searching', function(){
                         'Diamond Juice');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('work with plaintext query', function(done){
@@ -161,7 +156,7 @@ describe('Searching', function(){
                         'Diamond Juice');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
     });

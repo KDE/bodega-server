@@ -23,7 +23,6 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Partner management', function() {
-    var cookie;
     var existingPartnerJson = [
                         {
                             id: 1002,
@@ -154,12 +153,7 @@ describe('Partner management', function() {
         });
     });
 
-    utils.auth(server,
-            function(res, done) {
-                cookie = res.headers['set-cookie'];
-                done();
-            },
-            { store: 'null' });
+    utils.auth(server, { store: 'null' });
 
     function checkPartnerList(expected, done) {
         utils.getUrl(
@@ -174,7 +168,7 @@ describe('Partner management', function() {
                     res.body.partners.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
     }
 
     describe('listing pre-creation', function() {
@@ -239,7 +233,7 @@ describe('Partner management', function() {
                     done();
                     server.config.printErrors = true;
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('creation should fail with an invalid email', function(done) {
@@ -259,7 +253,7 @@ describe('Partner management', function() {
                     server.config.printErrors = true;
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('creation should succeed with good data', function(done) {
@@ -278,7 +272,7 @@ describe('Partner management', function() {
                     newPartnerJson.id = newPartnerId;
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('update should succeed with good data', function(done) {
@@ -295,7 +289,7 @@ describe('Partner management', function() {
                     res.body.should.have.property('success', true);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('adding invalid contact links should fail', function(done) {
@@ -315,7 +309,7 @@ describe('Partner management', function() {
                     res.body.error.should.have.property('type', task.error);
                     cb();
                 },
-                cookie);
+                utils.cookie);
             });
 
             var tasks = [
@@ -362,7 +356,7 @@ describe('Partner management', function() {
                     res.body.should.have.property('success', true);
                     cb();
                 },
-                cookie);
+                utils.cookie);
             });
 
             var tasks = [
@@ -400,7 +394,7 @@ describe('Partner management', function() {
                     res.body.should.have.property('success', true);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('listing should show new partner', function(done) {
@@ -427,7 +421,7 @@ describe('Partner management', function() {
                     server.config.printErrors = true;
                     done();
                 },
-                cookie);
+                utils.cookie);
 
         });
 
@@ -447,7 +441,7 @@ describe('Partner management', function() {
                     res.body.roles.should.eql(expected);
                     done();
                 },
-                cookie);
+                utils.cookie);
             });
 
             it('should be able to set roles for a partner we are a manager for', function(done) {
@@ -488,7 +482,7 @@ describe('Partner management', function() {
 
                     checkPartnerList(expected, done);
                 },
-                cookie);
+                utils.cookie);
 
                });
 
@@ -529,7 +523,7 @@ describe('Partner management', function() {
 
                     checkPartnerList(expected, done);
                 },
-                cookie);
+                utils.cookie);
 
                });
 
@@ -563,7 +557,7 @@ describe('Partner management', function() {
 
                         checkPartnerList(expected, done);
                 },
-                cookie);
+                utils.cookie);
 
                });
 
@@ -584,7 +578,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('success', true);
                         done();
                     },
-                    cookie);
+                    utils.cookie);
             });
 
             it('request distributor status', function(done) {
@@ -604,7 +598,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('success', true);
                         done();
                     },
-                    cookie);
+                    utils.cookie);
             });
         });
 

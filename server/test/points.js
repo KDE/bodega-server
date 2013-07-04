@@ -19,7 +19,6 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Point operations', function(){
-    var cookie;
     var startPoints;
 
     /* Only run the payments tests if the secret key
@@ -57,8 +56,7 @@ describe('Point operations', function(){
         }, cookie);
     });
 
-    utils.auth(server, function(res, done) {
-        cookie = res.headers['set-cookie'];
+    utils.auth(server, {}, function(res, done) {
         startPoints = res.body.points;
         done();
     });

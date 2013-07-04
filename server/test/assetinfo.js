@@ -19,12 +19,7 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Asset info', function(){
-    var cookie;
-    utils.auth(server, function(res, done) {
-        cookie = res.headers['set-cookie'];
-        done();
-    }, { store: 'KDE-1' });
-
+    utils.auth(server);
 
     describe('Basic fetch', function(){
         it('should show info for an asset', function(done){
@@ -48,7 +43,7 @@ describe('Asset info', function(){
                     res.body.asset.should.have.property('description');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should fetch tags', function(done){
             utils.getUrl(
@@ -67,7 +62,7 @@ describe('Asset info', function(){
                     tags.length.should.be.above(0);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
@@ -86,7 +81,7 @@ describe('Asset info', function(){
                     res.body.asset.should.have.property('changelog');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should show previews', function(done){
             utils.getUrl(
@@ -102,7 +97,7 @@ describe('Asset info', function(){
                     res.body.asset.should.have.property('previews');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 });
