@@ -97,7 +97,7 @@ module.exports.asset = function(db, req, res) {
             ratingsQuery, [assetId, pageSize + 1, offset],
             function(err, result) {
                 if (err) {
-                    errors.report('Database', req, res);
+                    errors.report('Database', req, res, err);
                     return;
                 }
 
@@ -115,18 +115,13 @@ module.exports.asset = function(db, req, res) {
 module.exports.participant = function(db, req, res) {
     /*jshint multistr:true */
     var personQuery = 'SELECT firstname, lastname, \
-                      CASE WHEN people.middlenames IS NULL THEN \'\' \
-                      ELSE people.middlenames END AS middlenames, \
-                      fullname,\
-                      email, points, earnedpoints, owedpoints, active \
+                      fullname, email, points, active \
                       FROM people \
                       WHERE people.id = $1;';
 
-    var ratingsQuery = 'SELECT r.id, r.description, r.value \
-                        FROM ratings r \
-                        INNER JOIN  ratingscontent rc ON(rc.rating = r.id) \
-                        INNER JOIN people ON(people.id = $1 AND rc.person = people.id) \
-                        ORDER BY r.id LIMIT $2 OFFSET $3;';
+    var ratingsQuery = 'SELECT r.asset, r.attribute, r.rating \
+                        FROM ratings r WHERE r.person = $1 \
+                        ORDER BY r.asset LIMIT $2 OFFSET $3;';
 
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
@@ -134,15 +129,21 @@ module.exports.participant = function(db, req, res) {
 
     var json = utils.standardJson(req);
 
+    // TODO do we need this query?
+    // It provides as with data that we already have.
     db.query(
         personQuery, [req.session.user.id],
         function(err, result) {
-            if (err || !result.rows || !result.rows.length) {
+            if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
 
-            json.person = result.rows[0];
+            if (result.rows.length < 1) {
+                errors.report('NoMatch', req, res);
+            }
+
+            json.participant = result.rows[0];
 
             json.ratings = [];
             db.query(
