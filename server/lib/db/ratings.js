@@ -202,6 +202,9 @@ module.exports.addAsset = function(db, req, res) {
                     return;
                 }
 
+                rate.attribute = utils.parseNumber(rate.attribute);
+                rate.rating = utils.parseNumber(rate.rating);
+
                 db.query(
                 assetInsertQuery, [assetId, rate.attribute, req.session.user.id, rate.rating],
                 function(err, result) {
