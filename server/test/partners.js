@@ -46,6 +46,9 @@ describe('Partner management', function() {
                                  "icon": ""
                              }
                             ],
+                            "assets": 25,
+                            "downloads": 22,
+                            "purchases": 13,
                             people: [
                                 {
                                     "name": "Aaron Seigo",
@@ -214,6 +217,9 @@ describe('Partner management', function() {
                             "icon": "extern/identica.png"
                         }
                     ],
+                    "assets": 0,
+                    "downloads": 0,
+                    "purchases": 0,
                     people: [
                         {
                             "name": "Zack Rusin",

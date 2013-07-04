@@ -76,19 +76,43 @@ function linkFetcher(task, cb)
                           CASE WHEN s.icon IS NULL THEN '' ELSE s.icon END \
                   from partnerContacts p left join partnerContactServices s on (p.service = s.service)\
                   where partner = $1 order by p.service",
-             [task.partner],
-             function (err, result) {
+             [ task.partner ],
+             function(err, result) {
                  if (err) {
                      cb(errors.create('Database', err.message));
                      return;
                  }
 
-                 for (var i = 0; i < task.json.partners.length; ++i) {
-                     if (task.json.partners[i].id === task.partner) {
-                        task.json.partners[i].links = result.rows;
+                 var partnerIndex = 0;
+                 for (; partnerIndex < task.json.partners.length; ++partnerIndex) {
+                     if (task.json.partners[partnerIndex].id === task.partner) {
+                        task.json.partners[partnerIndex].links = result.rows;
+                        break;
                      }
                  }
-                 cb();
+
+                 task.db.query("select 'assets' as type, count(id)::int as count from assets where partner = $1 \
+                                union \
+                                select 'downloads' as type, count(d.asset)::int as count \
+                                    from downloads d join assets a on (d.asset = a.id and a.partner = $1) \
+                                union \
+                                select 'purchases' as type, count(p.asset)::int as count \
+                                    from purchases p join assets a on (p.asset = a.id and a.partner = $1) \
+                                order by type;",
+                                [ task.partner ],
+                                function(err, result) {
+                                    if (err) {
+                                        cb(errors.create('Database', err.message));
+                                        return;
+                                    }
+
+                                    for (var i = 0; i < result.rowCount; ++i) {
+                                        var row = result.rows[i];
+                                        task.json.partners[partnerIndex][row.type] = row.count;
+                                    }
+
+                                    cb();
+                                });
              });
 }
 
