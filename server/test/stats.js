@@ -40,23 +40,11 @@ describe('Statistic query preconditions', function(){
         });
     });
 
-    describe('initialization', function() {
-        it('authorize correctly.', function(done){
-            utils.getUrl(
-                server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=null',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.headers.should.have.property('set-cookie');
+    utils.auth(server,
+               function(res, done) {
                     cookie = res.headers['set-cookie'];
-                    res.body.should.have.property('authStatus', true);
                     done();
                 });
-        });
-    });
 });
 
 describe('Asset statistics', function(){
