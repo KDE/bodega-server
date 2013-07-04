@@ -124,6 +124,7 @@ describe('Ratings', function() {
                 cookie);
         });
     });
+
     describe('Asset Ratings', function() {
         it('it should fail because the asset is invalid', function(done) {
             utils.getUrl(
@@ -179,6 +180,7 @@ describe('Ratings', function() {
                 cookie);
         });
     });
+
     describe('Participant', function() {
         it('it should succeed', function(done) {
             utils.getUrl(
@@ -230,5 +232,53 @@ describe('Ratings', function() {
                 cookie);
         });
     });
+
+    describe('Add asset rate', function() {
+        it('it should fail because the asset is invalid', function(done) {
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/asset/rate/1000', {},
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', false);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'MissingParameters');
+                    done();
+                },
+                cookie);
+        });
+        it('it should succeed', function(done) {
+            var query = {
+                ratings: [
+                    {
+                        'attribute': 1,
+                        'rating': 1
+                    },
+                    {
+                        'attribute': 2,
+                        'rating': 2
+                    }
+                ]
+            };
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/asset/rate/10', query,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    done();
+                },
+                cookie);
+        });
+    });
+
 });
 
