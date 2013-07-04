@@ -1685,6 +1685,13 @@
                         "Type": "Number"
                     }
                 ]
+            },
+            {
+                "MethodName": "Participant Ratings",
+                "Synopsis": "The ratings of the participant",
+                "HTTPMethod": "GET",
+                "URI": "/participant/ratings",
+                "parameters": []
             }
         ]
     }
