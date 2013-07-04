@@ -21,7 +21,6 @@ var should = require('should');
 var fs = require('fs');
 
 describe('Asset Store, ', function(){
-    var cookie;
     var sampleAsset = {
         id : 133,
         file : 'assetstore.js',
