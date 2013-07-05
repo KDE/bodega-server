@@ -243,7 +243,6 @@ function sendChannelInfo(channelId, db, req, res)
 
 function setChannelTags(tags, store, channelId, db, req, res)
 {
-    var immediateResponse = true;
     if (Array.isArray(tags)) {
         var addTags = [];
         tags.forEach(function(val) {
@@ -253,21 +252,16 @@ function setChannelTags(tags, store, channelId, db, req, res)
             }
         });
 
-        if (addTags.length > 0) {
-            immediateResponse = false;
-            db.query("select ct_setChannelTags($1, '{" + addTags.join(', ') + "}'::INT[]);", [channelId],
-                     function(err) {
-                         if (err) {
-                             errors.report('Database', req, res, err);
-                             return;
-                         }
+        db.query("select ct_setChannelTags($1, '{" + addTags.join(', ') + "}'::INT[]);", [channelId],
+                 function(err) {
+                     if (err) {
+                         errors.report('Database', req, res, err);
+                         return;
+                     }
 
-                         sendChannelInfo(channelId, db, req, res);
-                     });
-        }
-    }
-
-    if (immediateResponse) {
+                     sendChannelInfo(channelId, db, req, res);
+                 });
+    } else {
         sendChannelInfo(channelId, db, req, res);
     }
 }
