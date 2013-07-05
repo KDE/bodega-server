@@ -1491,16 +1491,9 @@
                     "Type": "string"
                 },
                 {
-                    "Name": "addTags",
+                    "Name": "tags",
                     "Location": "body",
-                    "Description": "Tags (by id) to associate with the channel",
-                    "Required": "N",
-                    "Type": "Array[number]"
-                },
-                {
-                    "Name": "rmTags",
-                    "Location": "body",
-                    "Description": "Tags (by id) to disassociate with the channel",
+                    "Description": "Tags (by id) to associate with the channel; if not an array the tags associated with the channel are not altered",
                     "Required": "N",
                     "Type": "Array[number]"
                 }
