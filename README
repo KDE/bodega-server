@@ -38,7 +38,7 @@ package.json file. Simply run:
 If you are planning on extending bodega-server, then running the test suite will be a necessity and
 you will want to install the development dependencies as well:
 
-   $ npm --dev install
+   $ npm install
 
 ## Configuration
 
