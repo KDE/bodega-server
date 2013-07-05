@@ -29,7 +29,6 @@ module.exports.listAttributes = function(db, req, res) {
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
     var offset = parseInt(req.query.offset, 10) || 0;
     var assetId = req.params.assetId;
-    var json = utils.standardJson(req);
 
     if (!assetId) {
         //Id of the asset is missing.
