@@ -81,7 +81,7 @@ function dateQueryParts(req)
 /**
  * Creates the main crostab query
  */
-function summationQuery(req, dateParts, partner, assetStats)
+function summationQuery(req, dateParts, assetNames, partner, assetStats)
 {
     var i;
     var query = '';
@@ -126,7 +126,11 @@ function summationQuery(req, dateParts, partner, assetStats)
 
         for (i = 0; i < array.length; ++i) {
             id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
-            name = '"' + id + '"';
+            if (typeof assetNames === 'object' && assetNames[id]) {
+                name = '"' + assetNames[id] + '"';
+            } else {
+                name = '"' + id + '"';
+            }
             query += ", (CASE WHEN " + name + " IS NULL THEN 0 ELSE " + name + " END)::int AS " + name;
             params.push(id);
         }
@@ -135,7 +139,11 @@ function summationQuery(req, dateParts, partner, assetStats)
 
         for (i = 0; i < array.length; ++i) {
             id = (assetStats === true) ? utils.parseNumber(array[i]) : array[i];
-            name = '"' + id + '"';
+            if (typeof assetNames === 'object' && assetNames[id]) {
+                name = '"' + assetNames[id] + '"';
+            } else {
+                name = '"' + id + '"';
+            }
             query += "sum(CASE WHEN " + sumColumn + " = $" + (i + 2) + " THEN " + crossTabSum + " ELSE 0 END)::int AS " + name;
             if (i < array.length - 1) {
                 query += ", ";
@@ -161,40 +169,63 @@ function summationQuery(req, dateParts, partner, assetStats)
 
 function assetStats(partner, db, req, res)
 {
-    //default granularity is month
-    var dateParts = dateQueryParts(req);
-    var sql = summationQuery(req, dateParts, partner, true);
+    function executeStatsQuery(partner, assetNames, db, req, res) {
+        //default granularity is month
+        var dateParts = dateQueryParts(req);
+        var sql = summationQuery(req, dateParts, assetNames, partner, true);
 
-    var json = utils.standardJson(req);
-    json.stats = [];
+        var json = utils.standardJson(req);
+        json.stats = [];
 
-    //console.log("trying " + sql.query + " with " + sql.params);
-    var q = db.query(
-        sql.query,
-        sql.params,
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-            json.stats = result.rows;
-            /*
-            json.stats = [];
-            for (var i = 0; i < result.rowCount; ++i) {
-                json.stats.push({
-                    dateof: result.rows[i].dateof,
-                    total: result.rows[i].total
-                });
-            }*/
-            res.json(json);
-        });
+        //console.log("trying " + sql.query + " with " + sql.params);
+        var q = db.query(
+            sql.query,
+            sql.params,
+            function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    return;
+                }
+
+                json.stats = result.rows;
+                res.json(json);
+            });
+    }
+
+    var ids = req.query.assets;
+    var assetNames = {};
+    if (ids && ids.length > 0) {
+        var nameQuery = "select id, name from assets where ";
+        var idParts = new Array();
+        for (var i = 1; i <= ids.length; ++i) {
+            idParts.push('id = $' + i);
+        }
+        nameQuery += idParts.join(' or ');
+        
+        db.query(
+            nameQuery,
+            ids,
+            function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    return;
+                }
+                for (i in result.rows) {
+                   assetNames[result.rows[i].id] = result.rows[i].name;
+                }
+
+                executeStatsQuery(partner, assetNames, db, req, res);
+            });
+    } else {
+        executeStatsQuery(partner, assetNames, db, req, res);
+    }
 }
 
 function storeStats(partner, db, req, res)
 {
     //default granularity is month
     var dateParts = dateQueryParts(req);
-    var sql = summationQuery(req, dateParts, partner, false);
+    var sql = summationQuery(req, dateParts, {}, partner, false);
 
     var json = utils.standardJson(req);
     json.stats = [];

@@ -105,7 +105,7 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[3].should.be.eql(expected[3][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
                 }
 
                 done();
@@ -142,10 +142,10 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
@@ -212,7 +212,7 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[3].should.be.eql(expected[3][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
                 }
                 done();
             },
@@ -247,10 +247,10 @@ describe('Asset statistics', function(){
                 for (var i in res.body.stats) {
                     var stats = res.body.stats[i];
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
@@ -316,10 +316,10 @@ describe('Asset statistics', function(){
                 for (var i in res.body.stats) {
                     var stats = res.body.stats[i];
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
@@ -392,10 +392,10 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
@@ -467,10 +467,10 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
@@ -542,10 +542,10 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
@@ -618,10 +618,10 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
@@ -693,10 +693,10 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
@@ -768,10 +768,10 @@ describe('Asset statistics', function(){
                     var stats = res.body.stats[i];
 
                     stats.dateof.should.be.eql(expected.dateof[i]);
-                    stats[2].should.be.eql(expected[2][i]);
-                    stats[3].should.be.eql(expected[3][i]);
-                    stats[4].should.be.eql(expected[4][i]);
-                    stats[7].should.be.eql(expected[7][i]);
+                    stats['Aquarium'].should.be.eql(expected[2][i]);
+                    stats['Dice'].should.be.eql(expected[3][i]);
+                    stats['Diamond Juice'].should.be.eql(expected[4][i]);
+                    stats['Jewels'].should.be.eql(expected[7][i]);
                 }
                 done();
             },
