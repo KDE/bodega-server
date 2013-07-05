@@ -470,7 +470,7 @@
             {
               "Name": "type",
               "Description": "Which kind of listing to use",
-              "Location": "URL"
+              "Location": "URL",
               "Required": "N",
               "Default": "published",
               "Type": "enumerated",
@@ -1427,39 +1427,32 @@
                     "Type": "string"
                 },
                 {
-                    "Name": "channel.parent",
+                    "Name": "parent",
                     "Location": "body",
                     "Description": "The parent channel for this channel; if less than 1 or not provided the channel is created as a top-level channel in the store",
                     "Required": "N",
                     "Type": "number"
                 },
                 {
-                    "Name": "channel.name",
+                    "Name": "name",
                     "Location": "body",
                     "Description": "The name for the channel",
                     "Required": "Y",
                     "Type": "string"
                 },
                 {
-                    "Name": "channel.description",
+                    "Name": "description",
                     "Location": "body",
                     "Description": "A descriptive text for the channel",
                     "Required": "N",
                     "Type": "string"
                 },
                 {
-                    "Name": "channel.parent",
-                    "Location": "body",
-                    "Description": "The parent channel for this channel; if less than 1 or not provided the channel is created as a top-level channel in the store",
-                    "Required": "N",
-                    "Type": "number"
-                },
-                {
-                    "Name": "channel.tags",
+                    "Name": "tags",
                     "Location": "body",
                     "Description": "Tags (by id) to associate with the channel",
                     "Required": "N",
-                    "Type": "Array[number}"
+                    "Type": "Array[number]"
                 }
             ]
         },
@@ -1477,46 +1470,39 @@
                     "Type": "string"
                 },
                 {
-                    "Name": "channel.parent",
+                    "Name": "parent",
                     "Location": "body",
-                    "Description": "The parent channel for this channel; if less than 1 or not provided the channel is created as a top-level channel in the store",
+                    "Description": "The parent channel for this channel; if 0, the channel is turned into a top-level channel in the store; if less than 0 then the parent is untouched",
                     "Required": "N",
                     "Type": "number"
                 },
                 {
-                    "Name": "channel.name",
+                    "Name": "name",
                     "Location": "body",
-                    "Description": "The name for the channel",
-                    "Required": "Y",
-                    "Type": "string"
-                },
-                {
-                    "Name": "channel.description",
-                    "Location": "body",
-                    "Description": "A descriptive text for the channel",
+                    "Description": "The new name for the channel",
                     "Required": "N",
                     "Type": "string"
                 },
                 {
-                    "Name": "channel.parent",
+                    "Name": "description",
                     "Location": "body",
-                    "Description": "The parent channel for this channel; if less than 1 or not provided the channel is created as a top-level channel in the store",
+                    "Description": "A new descriptive text for the channel",
                     "Required": "N",
-                    "Type": "number"
+                    "Type": "string"
                 },
                 {
-                    "Name": "channel.addTags",
+                    "Name": "addTags",
                     "Location": "body",
                     "Description": "Tags (by id) to associate with the channel",
                     "Required": "N",
-                    "Type": "Array[number}"
+                    "Type": "Array[number]"
                 },
                 {
-                    "Name": "channel.rmTags",
+                    "Name": "rmTags",
                     "Location": "body",
                     "Description": "Tags (by id) to disassociate with the channel",
                     "Required": "N",
-                    "Type": "Array[number}"
+                    "Type": "Array[number]"
                 }
             ]
         },
