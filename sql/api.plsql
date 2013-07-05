@@ -27,27 +27,43 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION ct_addTagsToChannel(channelId int, partnerId int, tags int[]) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION ct_addTagsToChannel(channelId int, tagList int[]) RETURNS VOID AS $$
 DECLARE
-    tagId   int;
+    partnerId int;
 BEGIN
-    FOREACH tagId IN ARRAY tags LOOP
-        PERFORM * FROM tags WHERE id = tagId AND (partner IS NULL OR partner = partnerId);
-        IF FOUND THEN
-            PERFORM * FROM channelTags WHERE channel = channelId AND tag = tagId;
-            IF NOT FOUND THEN
-                INSERT INTO channelTags (channel, tag) VALUES (channelId, tagId);
-            END IF;
-        END IF;
-    END LOOP;
+    SELECT INTO partnerId s.partner FROM channels c LEFT JOIN stores s ON (c.store = s.id AND c.id = channelId);
+    IF NOT FOUND
+    THEN
+        RETURN;
+    END IF;
+
+    INSERT INTO channelTags (channel, tag) SELECT channelId, t.id FROM tags t
+        WHERE id = any(tagList) AND (partner IS NULL OR partner = partnerId) AND
+        id NOT IN (SELECT tag FROM channelTags WHERE channel = channelId);
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION ct_rmTagsFromChannel(channelId int, tags int[]) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION ct_rmTagsFromChannel(channelId int, tagList int[]) RETURNS VOID AS $$
 DECLARE
     tagId   int;
 BEGIN
-    DELETE FROM channelTags WHERE channel = channelId AND tag = ANY(tags);
+    DELETE FROM channelTags WHERE channel = channelId AND tag = ANY(tagList);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ct_setChannelTags(channelId int, tagList int[]) RETURNS VOID AS $$
+DECLARE
+    partnerId int;
+BEGIN
+    SELECT INTO partnerId s.partner FROM channels c LEFT JOIN stores s ON (c.store = s.id AND c.id = channelId);
+    IF NOT FOUND
+    THEN
+        RETURN;
+    END IF;
+
+    DELETE FROM channelTags WHERE channel = channelId;
+    INSERT INTO channelTags (channel, tag) SELECT channelId, id FROM tags
+        WHERE id = any(tagList) AND (partner IS NULL OR partner = partnerId);
 END;
 $$ LANGUAGE plpgsql;
 

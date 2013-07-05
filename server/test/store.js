@@ -492,7 +492,7 @@ describe('Store management', function(){
 
         it('should allow adding of tags', function(done) {
             var params = {
-                    'addTags': [15]
+                    tags: [1, 22, 15]
                 }
             utils.postUrl(
                 server,
@@ -506,7 +506,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
                     res.body.channel.should.have.property('tags');
-                    res.body.channel.tags.length.should.eql(3);
+                    res.body.channel.tags.length.should.eql(params.tags.length);
                     done();
                 },
                 utils.cookie);
@@ -514,7 +514,7 @@ describe('Store management', function(){
 
         it('should allow removal of tags', function(done) {
             var params = {
-                    'rmTags': [15]
+                    tags: [1, 15]
                 }
             utils.postUrl(
                 server,
@@ -528,7 +528,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
                     res.body.channel.should.have.property('tags');
-                    res.body.channel.tags.length.should.eql(2);
+                    res.body.channel.tags.length.should.eql(params.tags.length);
                     done();
                 },
                 utils.cookie);
@@ -536,8 +536,7 @@ describe('Store management', function(){
 
         it('should allow simultaneous adding and removal of tags', function(done) {
             var params = {
-                    'addTags': [15, 24],
-                    'rmTags': [1]
+                    tags: [1, 22]
                 }
             utils.postUrl(
                 server,
@@ -551,7 +550,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
                     res.body.channel.should.have.property('tags');
-                    res.body.channel.tags.length.should.eql(3);
+                    res.body.channel.tags.length.should.eql(params.tags.length);
                     done();
                 },
                 utils.cookie);
