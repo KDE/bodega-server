@@ -375,13 +375,10 @@ describe('Store management', function(){
         var newChannelId = 0;
         it('should allow adding a new channel', function(done) {
             var query = {
-                'id': 'KDE-1',
-                'channel': {
-                    'name': 'Test Channel',
-                    'parent': 2,
-                    'description': 'A test channel',
-                    'addTags': [130, 131]
-                }
+                'name': 'Test Channel',
+                'parent': 2,
+                'description': 'A test channel',
+                'tags': [1, 22, 130]
             };
 
             utils.postUrl(
@@ -393,7 +390,7 @@ describe('Store management', function(){
                     res.headers.should.have.property('content-type',
                                                      'application/json');
                     res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('success', true);
+                   res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
                     res.body.channel.should.have.property('id');
                     res.body.channel.should.have.property('store', 'KDE-1');
@@ -425,7 +422,8 @@ describe('Store management', function(){
                             {
                               "id": 1,
                               "title": "application/x-plasma",
-                              "type": 'mimetype'},
+                              "type": 'mimetype'
+                            },
                             {
                               "id": 13,
                               "title": "game",
@@ -467,7 +465,18 @@ describe('Store management', function(){
                                         "description": "A test channel",
                                         "image": null,
                                         "active": true,
-                                        "tags": [],
+                                        "tags": [
+                                        {
+                                            "id": 1,
+                                            "title": "application/x-plasma",
+                                            "type": 'mimetype'
+                                        },
+                                        {
+                                            "id": 22,
+                                            "title": "Card Game",
+                                            "type": 'market'
+                                        }
+                                        ],
                                         "channels": []
                                     });
                     var expected = [ channel2 ];
@@ -476,6 +485,73 @@ describe('Store management', function(){
                                                      'application/json');
                     res.body.should.have.property('success', true);
                     res.body.channels.should.eql(expected);
+                    done();
+                },
+                utils.cookie);
+        });
+
+        it('should allow adding of tags', function(done) {
+            var params = {
+                    'addTags': [15]
+                }
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('channel');
+                    res.body.channel.should.have.property('tags');
+                    res.body.channel.tags.length.should.eql(3);
+                    done();
+                },
+                utils.cookie);
+        });
+
+        it('should allow removal of tags', function(done) {
+            var params = {
+                    'rmTags': [15]
+                }
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('channel');
+                    res.body.channel.should.have.property('tags');
+                    res.body.channel.tags.length.should.eql(2);
+                    done();
+                },
+                utils.cookie);
+        });
+
+        it('should allow simultaneous adding and removal of tags', function(done) {
+            var params = {
+                    'addTags': [15, 24],
+                    'rmTags': [1]
+                }
+            utils.postUrl(
+                server,
+                '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,
+                params,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type',
+                                                     'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    res.body.should.have.property('channel');
+                    res.body.channel.should.have.property('tags');
+                    res.body.channel.tags.length.should.eql(3);
                     done();
                 },
                 utils.cookie);
