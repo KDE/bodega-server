@@ -38,7 +38,7 @@ describe('Point operations', function(){
         var updateQuery = 'UPDATE people SET points=$1 WHERE \
                            email=\'zack@kde.org\'';
         //console.log(url);
-        if (!cookie) {
+        if (!utils.cookie) {
             return;
         }
 
@@ -53,7 +53,7 @@ describe('Point operations', function(){
                     done();
                 });
             });
-        }, cookie);
+        }, utils.cookie);
     });
 
     utils.auth(server, {}, function(res, done) {
@@ -78,7 +78,7 @@ describe('Point operations', function(){
                         'PurchaseMethodMissing');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should error without card card', function(done){
             utils.getUrl(
@@ -96,7 +96,7 @@ describe('Point operations', function(){
                         'PurchaseMethodMissing');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
         it('should emit card_declined', function(done){
             var url = '/bodega/v1/json/participant/changeAccountDetails?';
@@ -125,7 +125,7 @@ describe('Point operations', function(){
                         'CardDeclined');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should emit CardIncorrectNumber', function(done){
@@ -155,7 +155,7 @@ describe('Point operations', function(){
                         'CardIncorrectNumber');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should emit CardInvalidExpiryMonth', function(done){
@@ -185,7 +185,7 @@ describe('Point operations', function(){
                         'CardInvalidExpiryMonth');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should emit CardInvalidExpiryYear', function(done){
@@ -215,7 +215,7 @@ describe('Point operations', function(){
                         'CardInvalidExpiryYear');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should emit CardInvalidCVC', function(done){
@@ -245,7 +245,7 @@ describe('Point operations', function(){
                         'CardInvalidCVC');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should register successfully', function(done){
@@ -273,7 +273,7 @@ describe('Point operations', function(){
                     res.body.should.not.have.property('error');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should delete successfully', function(done){
@@ -292,7 +292,7 @@ describe('Point operations', function(){
                     res.body.should.not.have.property('error');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
@@ -322,7 +322,7 @@ describe('Point operations', function(){
                     res.body.should.not.have.property('error');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('succeeds', function(done){
@@ -339,7 +339,7 @@ describe('Point operations', function(){
                     res.body.should.have.property('success', true);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('errors on too few points', function(done){
@@ -357,7 +357,7 @@ describe('Point operations', function(){
                         'type', 'PurchaseNotEnoughPoints');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('errors on too many points', function(done){
@@ -375,7 +375,7 @@ describe('Point operations', function(){
                         'type', 'PurchaseTooManyPoints');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 
@@ -402,7 +402,7 @@ describe('Point operations', function(){
                     res.body.should.have.property('success', true);
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('shouldnt change to an invalid card', function(done){
@@ -427,7 +427,7 @@ describe('Point operations', function(){
                                                         'CardIncorrectNumber');
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
 
         it('should fetch the payment method', function(done){
@@ -450,7 +450,7 @@ describe('Point operations', function(){
                                               validCard.substr(-4));
                     done();
                 },
-                cookie);
+                utils.cookie);
         });
     });
 });

@@ -291,15 +291,15 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.setBankTransferAccount = function(req, res) {
         this.dbQuery(dbBanking.setTransferAccount, req, res);
-    }
+    };
 
     BodegaDb.prototype.listBankAccounts = function(req, res) {
         this.dbQuery(dbBanking.listAccounts, req, res);
-    }
+    };
 
     BodegaDb.prototype.deleteBankAccount = function(req, res) {
         this.dbQuery(dbBanking.deleteAccount, req, res);
-    }
+    };
 
     BodegaDb.prototype.listPersonRoles = function(req, res) {
         this.dbQuery(dbPartners.listPersonRoles, req, res);

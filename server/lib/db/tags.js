@@ -93,14 +93,14 @@ module.exports.listChannelTags = function(db, req, res) {
 module.exports.listTags = function(db, req, res) {
 
     var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title \
-                 from tags join tagtypes on (tagtypes.id = tags.type)"
+                 from tags join tagtypes on (tagtypes.id = tags.type)";
 
-    var params = new Array();
+    var params = [];
 
     var type = utils.parseNumber(req.params.type);
     if (type > 0) {
         query += " where tags.type = $1";
-        params.push(req.params.type)
+        params.push(req.params.type);
     }
 
     query += " order by title";

@@ -90,12 +90,12 @@ function auth(app, params, cb)
 
             if (!cb &&
                 module.exports.cookie !== '' &&
-                (((!params.user && currentlyAuthed.user == defaultAuth.user) ||
-                   params.user == currentlyAuthed.user) &&
-                 ((!params.password && currentlyAuthed.user == defaultAuth.user) ||
-                   params.password == currentlyAuthed.password) &&
-                 ((!params.store && currentlyAuthed.store == defaultAuth.store) ||
-                   params.store == currentlyAuthed.store))) {
+                (((!params.user && currentlyAuthed.user === defaultAuth.user) ||
+                   params.user === currentlyAuthed.user) &&
+                 ((!params.password && currentlyAuthed.user === defaultAuth.user) ||
+                   params.password === currentlyAuthed.password) &&
+                 ((!params.store && currentlyAuthed.store === defaultAuth.store) ||
+                   params.store === currentlyAuthed.store))) {
                 // we are already authed as requested
                 done();
                 return;

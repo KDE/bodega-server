@@ -357,7 +357,7 @@ function processInfo(assetInfo, db, req, res)
     }
 
     if (assetInfo.posted !== undefined && typeof assetInfo.posted !== 'boolean') {
-        assetInfo.posted = utils.parseBool(assetInfo.posted)
+        assetInfo.posted = utils.parseBool(assetInfo.posted);
     }
 
     createUtils.isContentCreator(

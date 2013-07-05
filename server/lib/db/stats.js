@@ -196,12 +196,12 @@ function assetStats(partner, db, req, res)
     var assetNames = {};
     if (ids && ids.length > 0) {
         var nameQuery = "select id, name from assets where ";
-        var idParts = new Array();
+        var idParts = [];
         for (var i = 1; i <= ids.length; ++i) {
             idParts.push('id = $' + i);
         }
         nameQuery += idParts.join(' or ');
-        
+
         db.query(
             nameQuery,
             ids,
@@ -210,7 +210,7 @@ function assetStats(partner, db, req, res)
                     errors.report('Database', req, res, err);
                     return;
                 }
-                for (i in result.rows) {
+                for (var i in result.rows) {
                    assetNames[result.rows[i].id] = result.rows[i].name;
                 }
 

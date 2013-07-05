@@ -617,7 +617,7 @@ describe('Partner management', function() {
             });
 
             it('should be able to set roles for a partner we are a manager for', function(done) {
-                params = {
+                var params = {
                             person: 'aseigo@kde.org',
                             roles: [ 'Validator', 'Accounts' ],
                          };
@@ -650,7 +650,7 @@ describe('Partner management', function() {
                                 "Partner Manager"
                             ]
                         }
-                    ]
+                    ];
 
                     checkPartnerList(expected, done);
                 },
@@ -659,7 +659,7 @@ describe('Partner management', function() {
                });
 
             it('should be able to delete a role for a partner we are a manager for', function(done) {
-                params = {
+               var params = {
                             person: 'aseigo@kde.org',
                             roles: [ 'Accounts' ],
                          };
@@ -691,7 +691,7 @@ describe('Partner management', function() {
                                 "Partner Manager"
                             ]
                         }
-                    ]
+                    ];
 
                     checkPartnerList(expected, done);
                 },
@@ -700,7 +700,7 @@ describe('Partner management', function() {
                });
 
             it('should be able to delete all roles for a person with a partner we are a manager for', function(done) {
-                params = {
+                var params = {
                     person: 'aseigo@kde.org'
                 };
 
@@ -734,7 +734,7 @@ describe('Partner management', function() {
                });
 
             it('request publisher status', function(done) {
-                params = {
+               var params = {
                     reason: 'So we can upload content.'
                 };
 
@@ -754,7 +754,7 @@ describe('Partner management', function() {
             });
 
             it('request distributor status', function(done) {
-                params = {
+               var params = {
                     reason: 'So we can make stores.'
                 };
 

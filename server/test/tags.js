@@ -96,7 +96,7 @@ describe('Tags manipulation', function(){
                 res.body.tags[0].type.should.be.eql('contentrating');
                 res.body.tags[0].title.should.be.eql('Adults Only');
                 done();
-            }
+            };
             listTags(null, null, null, cb);
         });
 
@@ -115,7 +115,7 @@ describe('Tags manipulation', function(){
                 res.body.tags[0].type.should.be.eql('mimetype');
                 res.body.tags[0].title.should.be.eql('application/x-plasma');
                 done();
-            }
+            };
             listTags(2, null, null, cb);
         });
 
@@ -134,7 +134,7 @@ describe('Tags manipulation', function(){
                 res.body.tags[0].type.should.be.eql('mimetype');
                 res.body.tags[0].title.should.be.eql('application/x-plasma');
                 done();
-            }
+            };
             listTags(null, 2, null, cb);
         });
 
@@ -153,7 +153,7 @@ describe('Tags manipulation', function(){
                 res.body.tags[0].type.should.be.eql('contentrating');
                 res.body.tags[0].title.should.be.eql('Adults Only');
                 done();
-            }
+            };
             listTags(null, null, 8, cb);
         });
 

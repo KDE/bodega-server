@@ -100,7 +100,7 @@ module.exports.deleteAccount = function(db, req, res)
                                        res.json(utils.standardJson(req));
                                    });
                       });
-}
+};
 
 module.exports.listAccounts = function(db, req, res)
 {
@@ -132,5 +132,5 @@ module.exports.listAccounts = function(db, req, res)
                                         res.json(json);
                                    });
                       });
-}
+};
 

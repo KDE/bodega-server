@@ -55,8 +55,9 @@ function assetTagFetcher(asset, cb)
         });
 }
 
-function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb) {
-
+function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb)
+{
+    var error;
     function errorReporter(err) {
         error = err;
     }

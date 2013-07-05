@@ -493,7 +493,7 @@ describe('Store management', function(){
         it('should allow adding of tags', function(done) {
             var params = {
                     tags: [1, 22, 15]
-                }
+                };
             utils.postUrl(
                 server,
                 '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,
@@ -515,7 +515,7 @@ describe('Store management', function(){
         it('should allow removal of tags', function(done) {
             var params = {
                     tags: [1, 15]
-                }
+                };
             utils.postUrl(
                 server,
                 '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,
@@ -537,7 +537,7 @@ describe('Store management', function(){
         it('should allow simultaneous adding and removal of tags', function(done) {
             var params = {
                     tags: [1, 22]
-                }
+                };
             utils.postUrl(
                 server,
                 '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,

@@ -119,13 +119,13 @@ function setupTag(db, req, res, assetInfo, tagInfo, cb)
 
 module.exports.setupTags = function(db, req, res, assetInfo, fn)
 {
-    var params = new Array();
+    var params = [];
     params.push(assetInfo.id);
 
     var query = "delete from incomingAssetTags where asset = $1 ";
 
     if (assetInfo.tags.length > 0) {
-        var placeHolders = new Array();
+        var placeHolders = [];
         for (var i = 0; i < assetInfo.tags.length; ++i) {
             placeHolders.push('$'+ (i + 2));
             params.push(assetInfo.tags[i].id);
@@ -140,7 +140,6 @@ module.exports.setupTags = function(db, req, res, assetInfo, fn)
         params,
         function(err, result) {
             if (err) {
-                e = errors.create('Database', err.message);
                 fn(err, db, req, res, assetInfo);
                 return;
             }

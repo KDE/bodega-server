@@ -47,7 +47,7 @@ function affiliationFetcher(task, cb)
                      ++i;
                      while (i < result.rowCount) {
                         row = result.rows[i];
-                        if (row.fullname == person.name) {
+                        if (row.fullname === person.name) {
                             person.roles.push(row.description);
                             ++i;
                         } else {
@@ -282,7 +282,7 @@ function setPersonRole(db, req, res, partner, data, cb)
                 if (err) {
                     cb(errors.create('Database', err.message));
                     return;
-                };
+                }
 
                 if (Array.isArray(req.body.roles) && req.body.roles.length > 0) {
                     var params = [ data.person, partner ];
@@ -496,7 +496,7 @@ module.exports.listPersonRoles = function(db, req, res)
 
                 res.json(json);
              });
-}
+};
 
 module.exports.setPersonRole = function(db, req, res)
 {
@@ -527,7 +527,7 @@ module.exports.setPersonRole = function(db, req, res)
                                 db, req, res,
                                 partner, 'Partner Manager', { 'person': result.rows[0].id } );
     });
-}
+};
 
 module.exports.requestDistributorStatus = function(db, req, res)
 {

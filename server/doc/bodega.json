@@ -951,7 +951,7 @@
                 "Description": "The IBAN transfer number for the account",
                 "Required": "Y",
                 "Type": "string"
-            },
+            }
             ]
         },
         {
