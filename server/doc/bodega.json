@@ -876,6 +876,100 @@
             ]
         },
         {
+            "MethodName": "List bank account information",
+            "Synopsis": "Lists banking details; requires the Accounts role for the currently authorized person",
+            "HTTPMethod": "GET",
+            "URI": "/partner/:partner/banking/account/list",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            }
+            ]
+        },
+        {
+            "MethodName": "Set bank account information",
+            "Synopsis": "Sets the banking details for where funds from converted earned points should be sent; if neither a SWIFT nor IBAN identifier is provided, the account information will be removed; requires the Accounts role for the  currently authorized person",
+            "HTTPMethod": "POST",
+            "URI": "/partner/:partner/banking/account/update",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            },
+            {
+                "Name": "nameOnAccount",
+                "Location": "Body",
+                "Description": "The name of the account holder",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "address",
+                "Location": "Body",
+                "Description": "Address of account holder",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "bank",
+                "Location": "Body",
+                "Description": "Name of the banking institution",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "bankAddress",
+                "Location": "Body",
+                "Description": "Address of the banking institution",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "account",
+                "Location": "Body",
+                "Description": "The account number",
+                "Required": "Y",
+                "Type": "string"
+            },
+            {
+                "Name": "swift",
+                "Location": "Body",
+                "Description": "The SWIFT ID of the banking institution",
+                "Required": "N",
+                "Type": "string"
+            },
+            {
+                "Name": "iban",
+                "Location": "Body",
+                "Description": "The IBAN transfer number for the account",
+                "Required": "Y",
+                "Type": "string"
+            },
+            ]
+        },
+        {
+            "MethodName": "Delete bank account information",
+            "Synopsis": "Removes banking details; requires the Accounts role for the currently authorized person",
+            "HTTPMethod": "GET",
+            "URI": "/partner/:partner/banking/account/delete",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            }
+            ]
+        },
+        {
             "MethodName": "Set roles",
             "Synopsis": "Sets roles for one or more person for a given partner. The account must have the Partner Manager role to be able to do this",
             "HTTPMethod": "POST",

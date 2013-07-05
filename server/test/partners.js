@@ -425,6 +425,178 @@ describe('Partner management', function() {
 
         });
 
+        describe('bank account information', function(done) {
+            var account =
+            {
+                type: 'destination',
+                nameOnAccount: 'Big Time Inc.',
+                address: '1200 Nowhere Ave',
+                bank: 'Fable Bank',
+                bankAddress: '1000 Banking Way',
+                account: '1111-111-1111-111',
+                swift: '',
+                iban: '10101011010101'
+            };
+
+            it('should allow setting the transfer account info', function(done) {
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    account,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('success', true);
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('should fail setting the transfer account if missing iban or swift', function(done) {
+                var badAccount = JSON.parse(JSON.stringify(account));
+                badAccount.swift = '';
+                badAccount.iban = '';
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    badAccount,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'MissingParameters');
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('should fail setting the transfer account if missing the name', function(done) {
+                var badAccount = JSON.parse(JSON.stringify(account));
+                badAccount.nameOnAccount = '';
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    badAccount,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'MissingParameters');
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('should fail setting the transfer account if missing the address', function(done) {
+                var badAccount = JSON.parse(JSON.stringify(account));
+                badAccount.address = '';
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    badAccount,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'MissingParameters');
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('should fail setting the transfer account if missing the bank name', function(done) {
+                var badAccount = JSON.parse(JSON.stringify(account));
+                badAccount.bank = '';
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    badAccount,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'MissingParameters');
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('should fail setting the transfer account if missing the bank address', function(done) {
+                var badAccount = JSON.parse(JSON.stringify(account));
+                badAccount.bankAddress = '';
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    badAccount,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'MissingParameters');
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('should fail setting the transfer account if missing the account number', function(done) {
+                var badAccount = JSON.parse(JSON.stringify(account));
+                badAccount.account = '';
+                utils.postUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    badAccount,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'MissingParameters');
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('should list the current account', function(done) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/list',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('success', true);
+                        res.body.accounts.should.eql([ account ]);
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('deletion should succeed', function(done) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/delete',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('success', true);
+                        done();
+                    },
+                    utils.cookie);
+            });
+
+            it('should list no account', function(done) {
+                utils.getUrl(
+                    server,
+                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/list',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type', 'application/json');
+                        res.body.should.have.property('success', true);
+                        res.body.accounts.should.eql([]);
+                        done();
+                    },
+                    utils.cookie);
+            });
+        });
+
         describe('role management', function(done) {
             it('should allow listing known roles', function(done) {
                 utils.getUrl(

@@ -45,6 +45,7 @@ var dbContactInfo = require('./db/contactInfo.js');
 var dbPostAsset = require('./db/postasset.js');
 var dbPublishAsset = require('./db/publishasset.js');
 var dbPartners = require('./db/partners.js');
+var dbBanking = require('./db/banking.js');
 var dbParticipantInfo = require('./db/participantInfo.js');
 
 var BodegaDb = (function() {
@@ -287,6 +288,18 @@ var BodegaDb = (function() {
     BodegaDb.prototype.deletePartnerLink = function(req, res) {
         this.dbQuery(dbPartners.deleteLink, req, res);
     };
+
+    BodegaDb.prototype.setBankTransferAccount = function(req, res) {
+        this.dbQuery(dbBanking.setTransferAccount, req, res);
+    }
+
+    BodegaDb.prototype.listBankAccounts = function(req, res) {
+        this.dbQuery(dbBanking.listAccounts, req, res);
+    }
+
+    BodegaDb.prototype.deleteBankAccount = function(req, res) {
+        this.dbQuery(dbBanking.deleteAccount, req, res);
+    }
 
     BodegaDb.prototype.listPersonRoles = function(req, res) {
         this.dbQuery(dbPartners.listPersonRoles, req, res);

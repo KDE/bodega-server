@@ -475,6 +475,24 @@ app.post(serverPath('partner/:partner/link/delete'), isAuthorized,
     }
 );
 
+app.get(serverPath('partner/:partner/banking/account/list'), isAuthorized,
+    function(req, res) {
+        app.db.listBankAccounts(req, res);
+    }
+);
+
+app.get(serverPath('partner/:partner/banking/account/delete'), isAuthorized,
+    function(req, res) {
+        app.db.deleteBankAccount(req, res);
+    }
+);
+
+app.post(serverPath('partner/:partner/banking/account/update'), isAuthorized,
+    function(req, res) {
+        app.db.setBankTransferAccount(req, res);
+    }
+);
+
 app.get(serverPath('partner/roles/list'), isAuthorized,
     function(req, res) {
         app.db.listPersonRoles(req, res);
