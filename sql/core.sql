@@ -34,10 +34,12 @@ create table partnerBanking
     partner     int         not null references partners(id) on delete cascade,
     type        text        not null,
     name        text,
+    address     text,
+    bank        text,
+    bankAddress text,
     account     text,
     swift       text,
-    iban        text,
-    address     text
+    iban        text
 );
 
 create table partnerContactServices
