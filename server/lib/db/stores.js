@@ -236,7 +236,7 @@ function rmChannelTags(partner, store, channelId, db, req, res)
         req.body.rmTags.each(function(val) { var tag = utils.parseNumber(val); if (tag > 0) { rmTags.push(tag); } });
         if (rmTags.length > 0) {
             immediateSend = false;
-            db.query("select ct_rmTagsFromChannel($1, $2, '{" + rmTags.join(', ') + "}'::INT);", [channelId, partner],
+            db.query("select ct_rmTagsFromChannel($1, $2, '{" + rmTags.join(', ') + "}'::INT[]);", [channelId, partner],
                      function(err, res) {
                          if (err) {
                              errors.report('Database', req, res, err);
@@ -258,15 +258,17 @@ function addChannelTags(tags, partner, store, channelId, db, req, res)
     var immediateRm = true;
     if (Array.isArray(tags)) {
         var addTags = [];
-        tags.each(function(val) {
-            var tag = utils.parseNumber(val);
+        console.log(tags)
+        for (var i = 0; i < tags.length; ++i) {
+            var tag = utils.parseNumber(tags[i].id);
             if (tag > 0) {
                 addTags.push(tag);
             }
-        });
+        }
+
         if (addTags.length > 0) {
             immediateRm = false;
-            db.query("select ct_addTagsToChannel($1, $2, '{" + addTags.join(', ') + "}'::INT);", [channelId, partner],
+            db.query("select ct_addTagsToChannel($1, $2, '{" + addTags.join(', ') + "}'::INT[]);", [channelId, partner],
                      function(err, res) {
                          if (err) {
                              errors.report('Database', req, res, err);
@@ -313,7 +315,7 @@ function createChannel(partner, store, db, req, res)
 
 function updateChannel(partner, store, db, req, res)
 {
-    if (!req.body.channel) {
+    if (!req.body.channel || typeof req.body.channel !== 'object') {
         errors.report("MissingParameters", req, res);
         return;
     }
@@ -342,6 +344,7 @@ function updateChannel(partner, store, db, req, res)
                               function(err, result) {
                                   // the next two blocks will be process async, but we return right away
                                   // if a tagging fails, we don't both to send an error to the client
+
                                   addChannelTags(req.body.addTags, partner, store, channelId, db, req, res);
                               });
 
