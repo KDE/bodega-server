@@ -389,11 +389,15 @@ describe('Asset manipulation', function(){
         for (i = 0; i < numToDelete; ++i) {
             funcs.push(deleteAsset);
         }
-        async.waterfall(funcs,
-            function()
-            {
-                db.query("delete from tags where id not in (select id from tags_pretest)", []);
-                done();
+
+        funcs.push(function(asset, id, cb) {
+                db.query("delete from tags where id not in (select id from tags_pretest)", [],
+                         function() {
+                             db.finis();
+                             cb();
+                         });
             });
+
+        async.waterfall(funcs, function() { done(); });
     });
 });
