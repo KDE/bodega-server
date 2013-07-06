@@ -319,7 +319,7 @@ describe('Changing passwords', function() {
     });
 });
 
-describe('getting account information', function() {
+describe('Getting account information', function() {
     it('should fail to get personal information before authorization', function(done) {
         utils.getUrl(
             server,

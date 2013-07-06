@@ -82,7 +82,7 @@ var currentlyAuthed = {
 
 function auth(app, params, cb)
 {
-    describe('authorization', function() {
+    describe('Authorization', function() {
         it('succeeds', function(done) {
             if (!params) {
                 params = defaultAuth;
