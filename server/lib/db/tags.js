@@ -214,7 +214,7 @@ function update(partner, db, req, res) {
         return;
     }
 
-    var type = utils.parseNumber(req.body.typeid);
+    var type = utils.parseNumber(req.body.type);
     if (type <= 0) {
         errors.report('MissingParameters', req, res);
         return;
