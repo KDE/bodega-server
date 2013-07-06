@@ -461,6 +461,23 @@
           ]
         },
         {
+          "MethodName": "Check for updates",
+          "read-only": "true",
+          "Synopsis": "Checks a set of assets (e.g. that are locally installed) for updates",
+          "HTTPMethod": "POST",
+          "URI": "/asset/list/updates",
+          "parameters": [
+            {
+              "Name": "assets",
+              "Description": "An array of asset ids and dates (of download) to check against the contents of the warehouse",
+              "Location": "Body",
+              "Required": "N",
+              "Default": "",
+              "Type": "Array[ [int, date] ]"
+            }
+          ]
+        },
+        {
           "MethodName": "List",
           "read-only": "true",
           "Synopsis": "Lists the assets that either belong to you or, if you are a content validator,  have been posted.",
