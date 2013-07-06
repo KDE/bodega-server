@@ -28,9 +28,9 @@ describe('Fetch contact information', function() {
                 function(res) {
                     var expected = {
                         name: app.config.warehouseInfo.name,
-                description: app.config.warehouseInfo.description,
-                url: app.config.warehouseInfo.url,
-                contact: app.config.warehouseInfo.contact
+                        description: app.config.warehouseInfo.description,
+                        url: app.config.warehouseInfo.url,
+                        contact: app.config.warehouseInfo.contact
                     };
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property( 'content-type', 'application/json');
