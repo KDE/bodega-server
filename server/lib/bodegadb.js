@@ -47,6 +47,7 @@ var dbPublishAsset = require('./db/publishasset.js');
 var dbPartners = require('./db/partners.js');
 var dbBanking = require('./db/banking.js');
 var dbParticipantInfo = require('./db/participantInfo.js');
+var dbUpdates = require('./db/updates.js');
 
 var BodegaDb = (function() {
     var connectionString;
@@ -319,6 +320,10 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.participantInfo = function(req, res) {
         this.dbQuery(dbParticipantInfo, req, res);
+    };
+
+    BodegaDb.prototype.checkUpdates = function(req, res) {
+        this.dbQuery(dbUpdates, req, res);
     };
 
     return BodegaDb;

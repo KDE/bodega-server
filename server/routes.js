@@ -314,6 +314,11 @@ app.get(serverPath('asset/tags/:assetId'), isAuthorized,
     }
 );
 
+app.post(serverPath('asset/list/updates'),
+        function(req, res) {
+            app.db.checkUpdates(req, res);
+        });
+
 app.get(serverPath('asset/list/:type?*'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
