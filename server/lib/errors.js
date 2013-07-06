@@ -38,6 +38,7 @@ var ErrorType = {
     "InvalidAsset"           : 1001,//The asset doesn't exist in this store
     "InvalidRole"            : 1002,//The account lacks the necessary person role
     "InvalidAccount"         : 1003,//The account does not exist
+    "TooManyParameters"      : 1004,//Too many parameters were passed in to a call
 
     "PurchaseMethodCreation" : 17,//could not link credit card to customer
     "PurchaseMethodDeletion" : 18,//delete card details
