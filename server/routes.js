@@ -538,7 +538,7 @@ app.get(serverPath('hunt/:store/:code'),
  * Note: This must be the last route with a serverPath
  *       because we use to catch invalid urls.
  */
-app.get(serverPath('*'), function(req, res) {
+app.all(serverPath('*'), function(req, res) {
     var json = utils.standardJson(req, false);
     json.error = {
         type : "InvalidUrl",
