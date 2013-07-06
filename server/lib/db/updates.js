@@ -44,7 +44,7 @@ module.exports = function(db, req, res)
                 var params = [];
                 var count = 0;
                 req.body.assets.forEach(function(asset) {
-                    if (!Array.isArray(asset) || asset.length != 2) {
+                    if (!Array.isArray(asset) || asset.length !== 2) {
                         return;
                     }
 
@@ -98,8 +98,8 @@ module.exports = function(db, req, res)
 
                                      res.json(json);
                                  });
-                         })
+                         });
              });
-}
+};
 
 

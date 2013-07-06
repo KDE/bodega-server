@@ -78,7 +78,7 @@ describe('Asset update checks', function() {
     it('Should find updates', function(done) {
         var currentDate = new Date();
         var params = { assets: [] };
-        for (i in [1, 2, 3, 4]) {
+        for (var i in [1, 2, 3, 4]) {
             params.assets.push([ i, currentDate ]);
         }
         var oldDate = new Date();
