@@ -20,7 +20,7 @@
         {"type" : "assetType", "title" : "book" },
         {"type" : "author", "title" : "Zack Rusin"},
         {"type" : "publisher", "title" : "Coherent Theory" },
-        {"type" : "isbn", "title" : "00000000"},
+        {"type" : "isbn", "title" : "0123456789"},
         {"type" : "created", "title" : "2013"},
         {"type" : "url", "title" : "http://makeplaylive.com"}
     ]

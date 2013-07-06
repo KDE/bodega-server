@@ -169,6 +169,12 @@ insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 
 insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 'Util');
 insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 'Misc');
 
+INSERT INTO tags (type, title) SELECT id, 'Zack Rusin' FROM tagtypes WHERE type = 'author';
+INSERT INTO tags (type, title) SELECT id, 'Coherent Theory' FROM tagtypes WHERE type = 'publisher';
+INSERT INTO tags (type, title) SELECT id, '0123456789' FROM tagtypes WHERE type = 'isbn';
+INSERT INTO tags (type, title) SELECT id, '2013' FROM tagtypes WHERE type = 'created';
+INSERT INTO tags (type, title) SELECT id, 'http://makeplaylive.com' FROM tagtypes WHERE type = 'url';
+
 insert into stores (id, partner, name) values ('null', ct_testing_partnerId('Management'), 'No Store');
 insert into stores (id, partner, name, description) values ('VIVALDI-1', ct_testing_partnerId('Make Play Live'), 'Vivaldi', 'Plasma Active tablet from Make Play Live');
 insert into stores (id, partner, name, description) values ('KDE-1', ct_testing_partnerId('KDE'), 'Plasma Workspace', 'KDE Plasma user interfaces');

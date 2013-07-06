@@ -38,13 +38,13 @@ function associateTag(db, req, res, assetInfo, tagInfo, cb)
         });
 }
 
-function recordTag(db, req, res, assetInfo, tagInfo, cb)
+function findTag(db, req, res, assetInfo, tagInfo, cb)
 {
-    var insertTagQuery =
-            'insert into tags (partner, type, title) values ($1, $2, $3) returning id;';
+    var findTagQuery =
+            'select id from tags where type = $1 and title = $2;';
     var e;
     db.query(
-        insertTagQuery, [assetInfo.partner, tagInfo.typeId, tagInfo.title],
+        findTagQuery, [tagInfo.typeId, tagInfo.title],
         function(err, result) {
             if (err) {
                 e = errors.create('Database', err.message);
@@ -58,33 +58,8 @@ function recordTag(db, req, res, assetInfo, tagInfo, cb)
             } else {
                 e = errors.create(
                     'NoMatch',
-                    "Tag '" + tagInfo.type + "'doesn't exist!");
+                    "Tag '" + tagInfo.title + "' doesn't exist!");
                 cb(e, db, req, res, assetInfo, tagInfo);
-                return;
-            }
-        });
-}
-
-function findTag(db, req, res, assetInfo, tagInfo, cb)
-{
-    var findTagQuery =
-            'select id from tags where partner = $1 and type = $2 and title = $3;';
-    var e;
-    db.query(
-        findTagQuery, [assetInfo.partner, tagInfo.typeId, tagInfo.title],
-        function(err, result) {
-            if (err) {
-                e = errors.create('Database', err.message);
-                cb(e, db, req, res, assetInfo, tagInfo);
-                return;
-            }
-            if (result && result.rows.length > 0) {
-                tagInfo.tagId = result.rows[0].id;
-                associateTag(db, req, res, assetInfo,
-                             tagInfo, cb);
-            } else {
-                recordTag(db, req, res, assetInfo,
-                          tagInfo, cb);
             }
         });
 }
@@ -109,7 +84,7 @@ function setupTag(db, req, res, assetInfo, tagInfo, cb)
             } else {
                 e = errors.create(
                     'NoMatch',
-                    "Tag '" + tagInfo.type + "'doesn't exist!");
+                    "Tag type '" + tagInfo.type + "' doesn't exist!");
                 cb(e, db, req, res, assetInfo, tagInfo);
                 return;
             }
