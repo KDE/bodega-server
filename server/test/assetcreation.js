@@ -20,6 +20,7 @@ var utils = require('./support/http');
 
 var mime = require('mime');
 var path = require('path');
+var pg = require('pg');
 var fs = require('fs');
 var http = require('http');
 var async = require('async');
@@ -56,6 +57,24 @@ utils.auth(server, {}, function(res, done) {
 });
 
 describe('Asset manipulation', function(){
+    var db;
+    before(function(done) {
+        var connectionString = server.config.service.database.protocol + "://" +
+                               server.config.service.database.user + ":" + server.config.service.database.password +
+                               "@" + server.config.service.database.host + "/" +
+                               server.config.service.database.name;
+
+        pg.connect(connectionString, function(err, client, finis) {
+            db = client;
+            db.finis = finis;
+            db.query("create temporary table tags_pretest (id int)", [],
+                     function() {
+                         db.query("insert into tags_pretest (id) select id from tags");
+                         done();
+                     });
+        });
+    });
+
     var incompleteAssetId;
     var completeAssetId;
     var cleanupAssets = [];
@@ -370,6 +389,11 @@ describe('Asset manipulation', function(){
         for (i = 0; i < numToDelete; ++i) {
             funcs.push(deleteAsset);
         }
-        async.waterfall(funcs, function(){ done(); });
+        async.waterfall(funcs,
+            function()
+            {
+                db.query("delete from tags where id not in (select id from tags_pretest)", []);
+                done();
+            });
     });
 });
