@@ -3,6 +3,8 @@ var http = require('http');
 var paths = require('path');
 var request = require('request');
 var assert = require('assert');
+var async = require('async');
+var pg = require('pg');
 
 function getUrl(app, url, fn, cookie, expectsHtml)
 {
@@ -124,8 +126,68 @@ function auth(app, params, cb)
     });
 }
 
+function snapshotTable(db, table, res, cb)
+{
+    var query = 'select md5(array_to_string(array(select ' +
+        table + '::text from ' + table + ' order by '+ table +
+        '), \', \')) as md5, (select count(*) from ' + table +
+        ') as count';
+    db.query(query, [], function(err, result) {
+        if (err) {
+            console.log("Snapshot: database error:");
+            console.log(err);
+            cb(err, table, res);
+            return;
+        }
+        if (result.rows.length !== 1) {
+            console.log("Snapshot: unexpected number of rows: ");
+            console.log(result.rows);
+        }
+        res[table] = result.rows[0];
+        cb(null, table, res);
+    });
+}
+
+function takeSnapshot(db, fn)
+{
+    var res = {};
+    var tables = ['partners', 'people', 'stores', 'warehouses',
+                  'tagTypes', 'tags', 'tagText', 'assets', 'assetTags',
+                  'assetText', 'assetPreviews', 'assetChangelogs',
+                  'channels', 'channelTags', 'channelAssets',
+                  'subChannelAssets', 'assetPrices', 'purchases',
+                  'downloads' ];
+    async.each(tables, function(table, callback) {
+        snapshotTable(db, table, res, callback);
+    }, function(err) {
+        fn(err, res);
+    });
+}
+
+function dbSnapshot(server, db, fn)
+{
+    if (db) {
+        takeSnapshot(db, fn);
+        return;
+    }
+    var connectionString = server.config.service.database.protocol +
+        "://" +
+        server.config.service.database.user + ":" +
+        server.config.service.database.password +
+        "@" + server.config.service.database.host + "/" +
+        server.config.service.database.name;
+    pg.connect(connectionString, function(err, client, finis) {
+        takeSnapshot(client, function(err, res) {
+            fn(err, res);
+            finis();
+        });
+    });
+}
+
 module.exports.getUrl = getUrl;
 module.exports.getHtml = getHtml;
 module.exports.postUrl = postUrl;
 module.exports.auth = auth;
 module.exports.cookie = '';
+module.exports.dbSnapshot = dbSnapshot;
+

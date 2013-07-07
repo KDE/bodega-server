@@ -22,6 +22,7 @@ var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Store management', function(){
+    var dbSnapshotBefore;
     describe('Creating a store without authenticating', function(){
         it('should fail', function(done) {
             utils.postUrl(
@@ -643,6 +644,15 @@ describe('Store management', function(){
            });
     });
 
+    before(function(done) {
+        utils.dbSnapshot(server, null, function(err, res) {
+            if (err) {
+                console.log("Couldn't snapthot db!");
+            }
+            dbSnapshotBefore = res;
+            done();
+        });
+    });
     // always delete the two stores we made, even on error
     after(function(done) {
         var connectionString = server.config.service.database.protocol + "://" +
@@ -655,8 +665,15 @@ describe('Store management', function(){
                    function(err, result) {
                        client.query("delete from channels where name = 'Test Channel';", [],
                        function(err, result) {
-                           finis();
-                           done();
+                           utils.dbSnapshot(server, client, function(err, res) {
+                               var dbSnapshotAfter = res;
+                               if (err) {
+                                   console.log("Couldn't snapthot db!");
+                               }
+                               dbSnapshotAfter.should.eql(dbSnapshotBefore);
+                               finis();
+                               done();
+                           });
                        });
                    });
         });

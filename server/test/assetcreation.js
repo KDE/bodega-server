@@ -58,20 +58,14 @@ utils.auth(server, {}, function(res, done) {
 
 describe('Asset manipulation', function(){
     var db;
+    var dbSnapshotBefore;
     before(function(done) {
-        var connectionString = server.config.service.database.protocol + "://" +
-                               server.config.service.database.user + ":" + server.config.service.database.password +
-                               "@" + server.config.service.database.host + "/" +
-                               server.config.service.database.name;
-
-        pg.connect(connectionString, function(err, client, finis) {
-            db = client;
-            db.finis = finis;
-            db.query("create temporary table tags_pretest (id int)", [],
-                     function() {
-                         db.query("insert into tags_pretest (id) select id from tags");
-                         done();
-                     });
+        utils.dbSnapshot(server, null, function(err, res) {
+            if (err) {
+                console.log("Couldn't snapshot the db!");
+            }
+            dbSnapshotBefore = res;
+            done();
         });
     });
 
@@ -390,14 +384,15 @@ describe('Asset manipulation', function(){
             funcs.push(deleteAsset);
         }
 
-        funcs.push(function(asset, id, cb) {
-                db.query("delete from tags where id not in (select id from tags_pretest)", [],
-                         function() {
-                             db.finis();
-                             cb();
-                         });
+        async.waterfall(funcs, function() {
+            utils.dbSnapshot(server, null, function(err, res) {
+                var dbSnapshotAfter = res;
+                if (err) {
+                    console.log("Couldn't snapshot the db!");
+                }
+                dbSnapshotAfter.should.eql(dbSnapshotBefore);
+                done();
             });
-
-        async.waterfall(funcs, function() { done(); });
+        });
     });
 });
