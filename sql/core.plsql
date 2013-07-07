@@ -149,6 +149,7 @@ DECLARE
     warehouse        RECORD;
     pricesRow        RECORD;
     noJobsInProgress bool;
+    assetPriceExists bool;
 BEGIN
     IF (TG_OP = 'DELETE') THEN
         alteredChannel := OLD.channel;
@@ -177,7 +178,9 @@ BEGIN
                         FROM assets WHERE id = assetRow.id;
             UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
                    WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
-            IF pricesRow.retailpoints > 0 THEN
+            SELECT INTO assetPriceExists exists(select 1
+                   FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store);
+            IF pricesRow.retailpoints > 0 AND NOT assetPriceExists THEN
                 INSERT INTO assetPrices (asset, store, points, toStore)
                        VALUES (assetRow.id, markupRow.store, pricesRow.retailpoints, pricesRow.tostorepoints);
             END IF;
