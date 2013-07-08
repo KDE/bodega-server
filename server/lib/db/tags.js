@@ -36,7 +36,7 @@ module.exports.listTypes = function(db, req, res) {
         });
 };
 
-module.exports.listAssetTags = function(db, req, res) {
+function listAssetTags(partner, db, req, res) {
     var asset = utils.parseNumber(req.params.assetId);
 
     if (asset < 1) {
@@ -47,11 +47,11 @@ module.exports.listAssetTags = function(db, req, res) {
     var json = utils.standardJson(req);
 
     var q = db.query(
-         "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title, partner\
+         "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable\
           from assettags join tags on assettags.tag = tags.id\
           join tagtypes on tagtypes.id = tags.type\
-          where asset = $1",
-        [asset],
+          where asset = $2",
+        [partner, asset],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
@@ -63,7 +63,11 @@ module.exports.listAssetTags = function(db, req, res) {
         });
 };
 
-module.exports.listChannelTags = function(db, req, res) {
+module.exports.listAssetTags = function(db, req, res) {
+    utils.partnerId(db, req, res, listAssetTags);
+};
+
+function listChannelTags(partner, db, req, res) {
     var channel = utils.parseNumber(req.params.channel);
 
     if (channel < 1) {
@@ -74,11 +78,11 @@ module.exports.listChannelTags = function(db, req, res) {
     var json = utils.standardJson(req);
 
     var q = db.query(
-         "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title, partner\
+         "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable\
           from channeltags join tags on channeltags.tag = tags.id\
           join tagtypes on tagtypes.id = tags.type\
-          where channel = $1",
-        [channel],
+          where channel = $2",
+        [partner, channel],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
@@ -90,16 +94,20 @@ module.exports.listChannelTags = function(db, req, res) {
         });
 };
 
-module.exports.listTags = function(db, req, res) {
+module.exports.listChannelTags = function(db, req, res) {
+    utils.partnerId(db, req, res, listChannelTags);
+};
 
-    var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, partner \
+function listTags(partner, db, req, res) {
+
+    var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable \
                  from tags join tagtypes on (tagtypes.id = tags.type)";
 
-    var params = [];
+    var params = [partner];
 
     var type = utils.parseNumber(req.params.type);
     if (type > 0) {
-        query += " where tags.type = $1";
+        query += " where tags.type = $2";
         params.push(req.params.type);
     }
 
@@ -123,6 +131,9 @@ module.exports.listTags = function(db, req, res) {
         });
 };
 
+module.exports.listTags = function(db, req, res) {
+    utils.partnerId(db, req, res, listTags);
+};
 
 function create(partner, db, req, res) {
 
