@@ -369,7 +369,7 @@ function channelStructureLaunch(results, json, leafObj, db, req, res)
 
 function channelStructureFetch(json, leafObj, parent, db, req, res)
 {
-    db.query('select t.id as id, t.title as title, tt.type as type from channelTags ct left join tags t on (ct.tag = t.id) left join tagTypes tt on (t.type = tt.id) where ct.channel = $1',
+    db.query('select t.id as id, t.title as title, tt.type as type, t.type as typeid, partner from channelTags ct left join tags t on (ct.tag = t.id) left join tagTypes tt on (t.type = tt.id) where ct.channel = $1',
              [parent],
     function(err, results) {
     if (err) {

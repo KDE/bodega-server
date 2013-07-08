@@ -47,7 +47,7 @@ module.exports.listAssetTags = function(db, req, res) {
     var json = utils.standardJson(req);
 
     var q = db.query(
-         "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title\
+         "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title, partner\
           from assettags join tags on assettags.tag = tags.id\
           join tagtypes on tagtypes.id = tags.type\
           where asset = $1",
@@ -74,7 +74,7 @@ module.exports.listChannelTags = function(db, req, res) {
     var json = utils.standardJson(req);
 
     var q = db.query(
-         "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title\
+         "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title, partner\
           from channeltags join tags on channeltags.tag = tags.id\
           join tagtypes on tagtypes.id = tags.type\
           where channel = $1",
@@ -92,7 +92,7 @@ module.exports.listChannelTags = function(db, req, res) {
 
 module.exports.listTags = function(db, req, res) {
 
-    var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title \
+    var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, partner \
                  from tags join tagtypes on (tagtypes.id = tags.type)";
 
     var params = [];
