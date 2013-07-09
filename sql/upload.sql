@@ -23,7 +23,7 @@ create table incomingAssetTags
     asset       int         references incomingAssets(id) on delete cascade,
     tag         int         references tags(id) on delete cascade
 );
-create index idx_incomingAssetTags_byAsset on incomingAssettags(incomingAsset);
+create index idx_incomingAssetTags_byAsset on incomingAssettags(asset);
 create index idx_incomingAssetTags_byTag on incomingAssettags(tag);
 
 create table incomingAssetPreviews
