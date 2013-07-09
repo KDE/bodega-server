@@ -423,12 +423,14 @@ describe('Store management', function(){
                             {
                               "id": 1,
                               "title": "application/x-plasma",
-                              "type": 'mimetype'
+                              "type": 'mimetype',
+                              "typeid": 7
                             },
                             {
                               "id": 13,
                               "title": "game",
-                              "type": 'assetType'
+                              "type": 'assetType',
+                              "typeid": 9
                             }
                             ],
                             "channels": [
@@ -442,17 +444,20 @@ describe('Store management', function(){
                                     {
                                       "id":1,
                                       "title": "application/x-plasma",
-                                      "type": 'mimetype'
+                                      "type": 'mimetype',
+                                      "typeid": 7
                                     },
                                     {
                                       "id": 13,
                                       "title": "game",
-                                      "type": 'assetType'
+                                      "type": 'assetType',
+                                      "typeid": 9
                                     },
                                     {
                                       "id": 22,
                                       "title": "Card Game",
-                                      "type": 'market'
+                                      "type": 'market',
+                                      "typeid": 3
                                     }
                                 ],
                                 "channels": []
@@ -470,12 +475,14 @@ describe('Store management', function(){
                                         {
                                             "id": 1,
                                             "title": "application/x-plasma",
-                                            "type": 'mimetype'
+                                            "type": 'mimetype',
+                                            "typeid": 7
                                         },
                                         {
                                             "id": 22,
                                             "title": "Card Game",
-                                            "type": 'market'
+                                            "type": 'market',
+                                            "typeid": 3
                                         }
                                         ],
                                         "channels": []
