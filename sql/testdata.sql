@@ -1,25 +1,5 @@
 begin;
 
--- reset the database
-delete from pointtransactions;
-delete from people;
-delete from purchases;
-delete from downloads;
-delete from channels;
-delete from stores;
-delete from assets;
-delete from partners;
-delete from affiliations;
-delete from languages;
-
-select setval('seq_assetsids', 1);
-select setval('seq_languageids', 1);
-select setval('seq_peopleids', 1);
-select setval('seq_partnerids', 1005);
-select setval('seq_channelids', 1);
-select setval('seq_purchaseids', 1);
-select setval('seq_tagids', 20);
-
 -- create some handy functions
 
 CREATE OR REPLACE FUNCTION ct_testing_favoriteBooksByAuthor(email text, author text) RETURNS void
@@ -134,6 +114,28 @@ BEGIN
     RETURN partnerId;
 END
 $$ LANGUAGE 'plpgsql';
+
+-- reset the database
+delete from pointtransactions;
+delete from people;
+delete from purchases;
+delete from downloads;
+delete from channels;
+delete from stores;
+delete from assets;
+delete from partners;
+delete from affiliations;
+delete from languages;
+delete from tags where id > ct_testing_tagByName('wallpaper');
+
+select setval('seq_assetsids', 1);
+select setval('seq_languageids', 1);
+select setval('seq_peopleids', 1);
+select setval('seq_partnerids', 1005);
+select setval('seq_channelids', 1);
+select setval('seq_purchaseids', 1);
+select setval('seq_tagids', 20);
+
 
 -- now start setting up the data
 insert into people (lastname, firstname, email, points, password, active)
