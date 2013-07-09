@@ -98,6 +98,17 @@ BEGIN
 END;
 ' LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION ct_markNonExtantPricesDone() RETURNS VOID AS $$
+BEGIN
+    update assetprices set ending = (current_timestamp AT TIME ZONE 'UTC')
+        where ending is null and
+              asset || '_' || store not in
+                (select distinct sca.asset || '_' || ca.store from subchannelassets sca
+                 left join channels ca on (sca.channel = ca.id)
+                 left join stores s on (ca.store = s.id));
+END;
+$$ LANGUAGE plpgsql;
+
 --        ct_associateAssetWithParentChannel(parent, alteredAsset);
 -- TRIGGER functions to associate channels and assets when the tags change
 CREATE OR REPLACE FUNCTION ct_associateAssetWithChannels() RETURNS TRIGGER AS '
@@ -128,6 +139,7 @@ BEGIN
         UPDATE channels SET assetCount = (SELECT count(channel) FROM subChannelAssets WHERE channel = channels.id);
     END IF;
 
+    PERFORM ct_markNonExtantPricesDone();
     IF (TG_OP = ''DELETE'') THEN
         RETURN OLD;
     ELSE
@@ -149,7 +161,6 @@ DECLARE
     warehouse        RECORD;
     pricesRow        RECORD;
     noJobsInProgress bool;
-    assetPriceExists bool;
 BEGIN
     IF (TG_OP = 'DELETE') THEN
         alteredChannel := OLD.channel;
@@ -172,23 +183,23 @@ BEGIN
         IF (assetRow.matches) THEN
             INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
             PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
-            SELECT INTO pricesRow
+            PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
+            IF NOT FOUND THEN
+                SELECT INTO pricesRow
                         (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
                                       warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
                         FROM assets WHERE id = assetRow.id;
-            UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
-                   WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
-            SELECT INTO assetPriceExists exists(select 1
-                   FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store);
-            IF pricesRow.retailpoints > 0 AND NOT assetPriceExists THEN
+                IF pricesRow.retailpoints > 0 THEN
                 INSERT INTO assetPrices (asset, store, points, toStore)
                        VALUES (assetRow.id, markupRow.store, pricesRow.retailpoints, pricesRow.tostorepoints);
+                END IF;
             END IF;
         END IF;
     END LOOP;
 
     select into noJobsInProgress NOT bool_or(dowork) from batchjobsinprogress;
     IF (noJobsInProgress) THEN
+        PERFORM ct_markNonExtantPricesDone();
         UPDATE channels SET assetCount = (SELECT count(channel) FROM subChannelAssets WHERE channel = channels.id);
     END IF;
 
@@ -328,6 +339,7 @@ DECLARE
     storeRec  RECORD;
     price int := 0;
 BEGIN
+    RETURN;
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
     WHERE asset = assetId AND ending IS NULL;
 
