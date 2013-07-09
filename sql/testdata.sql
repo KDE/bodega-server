@@ -115,6 +115,20 @@ BEGIN
 END
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE function ct_testing_getRidOfPriorTestingTags() RETURNS VOID
+AS
+$$
+DECLARE
+    tagId int;
+BEGIN
+    SELECT INTO tagId ct_testing_tagByName('Zack Rusin');
+    IF tagId > -1 THEN
+        DELETE FROM tags WHERE id >= tagId;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- reset the database
 delete from pointtransactions;
 delete from people;
@@ -126,7 +140,8 @@ delete from assets;
 delete from partners;
 delete from affiliations;
 delete from languages;
-delete from tags where id > ct_testing_tagByName('wallpaper');
+delete from assetprices where ending is not null;
+select ct_testing_getRidOfPriorTestingTags();
 
 select setval('seq_assetsids', 1);
 select setval('seq_languageids', 1);
@@ -578,4 +593,5 @@ drop function ct_testing_licenseByName(text);
 drop function ct_testing_assetByName(text);
 drop function ct_testing_personByEmail(text);
 drop function ct_testing_partnerId(text);
+drop function ct_testing_getRidOfPriorTestingTags();
 commit;
