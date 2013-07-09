@@ -139,6 +139,7 @@ BEGIN
         UPDATE channels SET assetCount = (SELECT count(channel) FROM subChannelAssets WHERE channel = channels.id);
     END IF;
 
+    PERFORM ct_updateAssetPrices(alteredAsset, basePrice) FROM assets WHERE id = alteredAsset;
     PERFORM ct_markNonExtantPricesDone();
     IF (TG_OP = ''DELETE'') THEN
         RETURN OLD;
@@ -339,7 +340,6 @@ DECLARE
     storeRec  RECORD;
     price int := 0;
 BEGIN
-    RETURN;
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
     WHERE asset = assetId AND ending IS NULL;
 
@@ -394,11 +394,11 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_processUpdatedAsset ON assets;
-CREATE TRIGGER trg_ct_processUpdatedAsset BEFORE UPDATE ON assets
+CREATE TRIGGER trg_ct_processUpdatedAsset AFTER UPDATE ON assets
 FOR EACH ROW EXECUTE PROCEDURE ct_processUpdatedAsset();
 
 DROP TRIGGER IF EXISTS trg_ct_processNewAsset ON assets;
-CREATE TRIGGER trg_ct_processNewAsset BEFORE INSERT ON assets
+CREATE TRIGGER trg_ct_processNewAsset AFTER INSERT ON assets
 FOR EACH ROW EXECUTE PROCEDURE ct_processNewAsset();
 
 CREATE OR REPLACE function affiliatePerson(text, text, text) returns BOOL
