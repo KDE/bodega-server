@@ -95,7 +95,6 @@ function storeAsset(db, req, res, assetInfo)
     db.query("select nextval('seq_assetsids') as assetId;", [],
              function(err, result) {
                  var fromFile = req.files.asset.path;
-                 var name = req.files.asset.name;
                  assetInfo.id = result.rows[0].assetid;
                  //console.log(req.files.asset);
                  //console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + assetInfo.file);

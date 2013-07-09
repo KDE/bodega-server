@@ -137,12 +137,38 @@ function writeIncomingAsset(db, req, res, assetInfo, cb)
     });
 }
 
+function uploadIncomingAsset(db, req, res, assetInfo, cb)
+{
+    var fromFile = null;
+    var e;
+
+    if (req.files && req.files.asset) {
+        fromFile = req.files.asset.path;
+    }
+
+    if (!fromFile) {
+        cb(null, db, req, res, assetInfo);
+        return;
+    }
+
+    app.assetStore.upload(fromFile, assetInfo, function(err) {
+        if (err) {
+            //console.log("error due to bad rename?");
+            e = errors.create('UploadFailed', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
 function updateIncomingAsset(db, req, res, assetInfo)
 {
     var funcs = [function(cb) {
         cb(null, db, req, res, assetInfo);
     }];
 
+    funcs.push(uploadIncomingAsset);
     funcs.push(writeIncomingAsset);
     funcs.push(setupTags);
     funcs.push(setupPreviews);
