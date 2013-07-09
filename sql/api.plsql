@@ -55,14 +55,14 @@ CREATE OR REPLACE FUNCTION ct_setChannelTags(channelId int, tagList int[]) RETUR
 DECLARE
     partnerId int;
 BEGIN
-    SELECT INTO partnerId s.partner FROM channels c LEFT JOIN stores s ON (c.store = s.id AND c.id = channelId);
-    IF NOT FOUND
-    THEN
+    SELECT INTO partnerId s.partner FROM channels c LEFT JOIN stores s ON (c.store = s.id) WHERE c.id = channelId;
+    IF NOT FOUND THEN
         RETURN;
     END IF;
 
     DELETE FROM channelTags WHERE channel = channelId;
-    INSERT INTO channelTags (channel, tag) SELECT channelId, id FROM tags
+    INSERT INTO channelTags (channel, tag)
+        SELECT channelId, id FROM tags
         WHERE id = any(tagList) AND (partner IS NULL OR partner = partnerId);
 END;
 $$ LANGUAGE plpgsql;
