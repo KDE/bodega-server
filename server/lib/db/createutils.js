@@ -16,8 +16,10 @@
 */
 
 var async = require('async');
-var errors = require('../errors.js');
 var path = require('path');
+
+var errors = require('../errors.js');
+var utils = require('../utils.js');
 
 function associateTag(db, req, res, assetInfo, tagInfo, cb)
 {
@@ -38,91 +40,137 @@ function associateTag(db, req, res, assetInfo, tagInfo, cb)
         });
 }
 
-function findTag(db, req, res, assetInfo, tagInfo, cb)
-{
-    var findTagQuery =
-            'select id from tags where type = $1 and title = $2;';
-    var e;
-    db.query(
-        findTagQuery, [tagInfo.typeId, tagInfo.title],
-        function(err, result) {
-            if (err) {
-                e = errors.create('Database', err.message);
-                cb(e, db, req, res, assetInfo, tagInfo);
-                return;
-            }
-            if (result && result.rows.length > 0) {
-                tagInfo.tagId = result.rows[0].id;
-                associateTag(db, req, res, assetInfo,
-                             tagInfo, cb);
-            } else {
-                e = errors.create(
-                    'NoMatch',
-                    "Tag '" + tagInfo.title + "' doesn't exist!");
-                cb(e, db, req, res, assetInfo, tagInfo);
-            }
-        });
-}
-
-function setupTag(db, req, res, assetInfo, tagInfo, cb)
-{
-    var tagIdQuery =
-            "select id from tagtypes t where t.type=$1;";
-    var e;
-
-    db.query(
-        tagIdQuery, [tagInfo.type],
-        function(err, result) {
-            if (err) {
-                e = errors.create('Database', err.message);
-                cb(e, db, req, res, assetInfo, tagInfo);
-                return;
-            }
-            if (result && result.rows.length > 0) {
-                tagInfo.typeId = result.rows[0].id;
-                findTag(db, req, res, assetInfo, tagInfo, cb);
-            } else {
-                e = errors.create(
-                    'NoMatch',
-                    "Tag type '" + tagInfo.type + "' doesn't exist!");
-                cb(e, db, req, res, assetInfo, tagInfo);
-                return;
-            }
-        }
-    );
-}
-
 module.exports.setupTags = function(db, req, res, assetInfo, fn)
 {
-    var params = [];
-    params.push(assetInfo.id);
-
-    var query = "delete from incomingAssetTags where asset = $1 ";
-
-    if (assetInfo.tags.length > 0) {
-        var placeHolders = [];
-        for (var i = 0; i < assetInfo.tags.length; ++i) {
-            placeHolders.push('$'+ (i + 2));
-            params.push(assetInfo.tags[i].id);
-        }
-
-        query += " and tag not in (" + placeHolders.join(',') + ")";
+    if (!Array.isArray(assetInfo.tags) ||  assetInfo.tags.length < 1) {
+        //FIXME: should delete all tags
+        return;
     }
 
+    /* first we create all the tags that are missing and set them to be owned by
+       requesting partner; this involves a monster query that looks like this:
 
-    db.query(
-        query,
-        params,
-        function(err, result) {
-            if (err) {
-                fn(err, db, req, res, assetInfo);
-                return;
-            }
-        });
+    insert into tags (type, title, partner) 
+        select tt.id, pm.author, 1002 from
+        (select *, 1002 from (values ('author', 'Zack Rusin'), ('author', 'Aaron Seigo'), ('assetType', 'book')) as tmp
+             except select y.type, t.title, 1002 as key from tags t left join tagtypes y on (t.type = y.id)
+                         where ((y.type = 'assetType' and t.title = 'book') or
+                                (y.type = 'author' and t.title = 'Zack Rusin')) and
+                               (t.partner is null or t.partner = 1002)) as pm (type, author)
+        left join tagtypes tt on (tt.type = pm.type);
+    */
+    // $1 is the partner id
+    var params = [ utils.parseNumber(assetInfo.partner) ];
+    // the list of values: ('tag type', 'tag name')
+    var tagValueList = [];
+    // the where clause for the extant tags: (y.type = 'tag type' and t.title = 'tag name')
+    var existingTagWhere = [];
+    // the list of values used at insertion: (tt.type = 'tag type' and title = 'tag name')
+    var insertWhere = [];
 
-    async.each(assetInfo.tags, function(tag, callback) {
-        setupTag(db, req, res, assetInfo, tag, callback);
-    }, function(err) {
+    assetInfo.tags.forEach(function(tag) {
+        if (typeof tag !== 'object' || !tag.type || !tag.title) {
+            return;
+        }
+
+        tagValueList.push("($" + (params.length + 1) + ", $" + (params.length  + 2) + ")");
+        existingTagWhere.push("(y.type = $"  + (params.length + 1) + " and title = $" + (params.length  + 2) + ")");
+        insertWhere.push("(tt.type = $" + (params.length + 1) + " and title = $" + (params.length + 2) + ")");
+        params.push(tag.type);
+        params.push(tag.title);
+    });
+
+    //FIXME: check that params has anything in it
+    var createMissingSql = "insert into tags (type, title, partner) \
+                            select tt.id, pm.author, $1::int from (select *, $1::int from (values " +
+                            tagValueList.join(', ') + ") as tmp \
+                            except select y.type, t.title, $1::int as key from tags t \
+                                left join tagtypes y on (t.type = y.id) where (" +
+                            existingTagWhere.join(' or ') +
+                            ") and (t.partner is null or t.partner = $1)) as pm (type, author, asset) \
+                             left join tagtypes tt on (tt.type = pm.type)";
+
+
+    // at this point we are guaranteed to have all the tags we need in the database
+    // well, assuming nobody has deleted them on us between the previous query and this one :/
+
+    /* so now we insert the appropriate tags into the table; we want to use tags owned by the partner
+       over global tags. we do this using another monster query.
+
+       insert into assetTags (asset, tag)
+       select 1000, t.id from (select max(partner) as partner, tags.type, title from tags
+                         left join tagtypes tt on (tags.type = tt.id)
+                         where (tt.type = 'author' and title = 'Aaron Seigo') or
+                                (tt.type = 'author' and title = 'Zack Rusin')
+                    group by tags.type, title) as finder
+                left join tags t on (CASE WHEN finder.partner is null
+                                          THEN t.partner IS NULL
+                                          ELSE finder.partner = t.partner END
+                                     and (t.partner = 1002  or t.partner is null)
+                                     and finder.type = t.type and finder.title = t.title);
+    */
+    var deleteSql = "delete from incomingAssetTags where asset = $2 and tag in \
+                     (select at.tag from assettags at left join tags t on \
+                     (at.tag = t.id and (t.partner = $1 or t.partner is null)) where at.asset = $2)";
+
+    var insertSql = "insert into incomingAssetTags (asset, tag) select $" +
+                     (params.length + 1) +
+                     ", t.id from (select max(partner) as partner, tags.type, title from tags \
+                     left join tagtypes tt on (tags.type = tt.id) where (";
+    insertSql += insertWhere.join(' or ');
+    insertSql += ") group by tags.type, title) as finder \
+                  left join tags t on (CASE WHEN finder.partner is null \
+                                       THEN t.partner IS NULL \
+                                       ELSE finder.partner = t.partner END \
+                                   and (t.partner = $1 or t.partner is null) \
+                                   and finder.type = t.type and finder.title = t.title)";
+
+    utils.wrapInTransaction(
+    [
+    function(db, req, res, createMissingSql, deleteSql, insertSql, params, cb)
+    {
+        //console.log("Creation: " + createMissingSql);
+        //console.log("Params: " + JSON.stringify(params));
+        db.query(createMissingSql, params,
+                 function(err) {
+                    if (err) {
+                        cb(err);
+                        return;
+                    }
+
+                    cb(null, db, req, res, deleteSql, insertSql, params);
+                 });
+    },
+    function(db, req, res, deleteSql, insertSql, params, cb)
+    {
+        //console.log("Deleting: " + deleteSql);
+        db.query(deleteSql, [ assetInfo.partner, assetInfo.id ],
+                 function(err) {
+                    if (err) {
+                        cb(err);
+                        return;
+                    }
+
+                    cb(null, db, req, res, insertSql, params);
+                 });
+    },
+    function(db, req, res,  insertSql, params, cb)
+    {
+        //console.log("Insertion: " + insertSql);
+        params.push(assetInfo.id);
+        db.query(insertSql, params,
+                 function(err) {
+                    if (err) {
+                        cb(err);
+                        return;
+                    }
+
+                    cb(null);
+                 });
+    }
+    ],
+    db, req, res, createMissingSql, deleteSql, insertSql, params,
+    function(err) {
         fn(err, db, req, res, assetInfo);
     });
 };

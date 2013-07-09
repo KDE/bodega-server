@@ -296,6 +296,10 @@ module.exports.copyFile = function(source, target, cb) {
  *
  * any number of parameters may be passed in after res and those will
  * be sent as additional parameters to this first function.
+ *
+ * if the last parameter passed in is a function, it is  used as a callback
+ * that will be called with the usual (error, db, req, res) tuple
+ * when the transaction is complete
  */
 module.exports.wrapInTransaction = function(functions, db, req, res)
 {
@@ -306,6 +310,10 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
 
     var startArgs = Array.prototype.slice.call(arguments, 1);
     startArgs.unshift(null);
+    var cb;
+    if (typeof startArgs[startArgs.length - 1] === 'function') {
+        cb = startArgs.pop();
+    }
 
     var funcs = [
         function(cb) {
@@ -326,7 +334,11 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
         if (err) {
             db.query("rollback", [],
                      function() {
-                        errors.report(err.name, req, res, err);
+                          if (cb) {
+                              cb(err, db, req, res);
+                          } else {
+                              errors.report(err.name, req, res, err);
+                          }
                      });
         } else {
             db.query("commit", [],
@@ -334,15 +346,13 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
                           if (json) {
                               res.json(json);
                           }
+
+                          if (cb) {
+                              cb(null, db, req, res);
+                          }
                      });
         }
     }
     );
 };
-
-module.exports.update = function(db, req, res)
-{
-
-};
-
 
