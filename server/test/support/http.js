@@ -155,7 +155,7 @@ function takeSnapshot(db, fn)
                   'tagTypes', 'tags', 'tagText', 'assets', 'assetTags',
                   'assetText', 'assetPreviews', 'assetChangelogs',
                   'channels', 'channelTags', 'channelAssets',
-                  'subChannelAssets', 'assetPrices', 'purchases',
+                  'subChannelAssets', 'purchases',
                   'downloads' ];
     async.each(tables, function(table, callback) {
         snapshotTable(db, table, res, callback);
