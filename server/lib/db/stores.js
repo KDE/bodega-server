@@ -367,25 +367,23 @@ function channelStructureLaunch(results, json, leafObj, db, req, res)
     }
 }
 
-function channelStructureFetch(json, leafObj, parent, db, req, res)
+function channelStructureFetch(json, leafObj, channelId, db, req, res)
 {
     db.query('select t.id as id, t.title as title, tt.type as type, t.type as typeid from channelTags ct left join tags t on (ct.tag = t.id) left join tagTypes tt on (t.type = tt.id) where ct.channel = $1',
-             [parent],
+             [channelId],
     function(err, results) {
     if (err) {
         errors.report('Database', req, res, err);
         return;
     }
 
-    for (var i = 0; i < results.rowCount; ++i) {
-        leafObj.tags.push(results.rows[i]);
-    }
+    leafObj.tags = leafObj.tags.concat(results.rows);
 
     db.query('select id, parent, image, name, description, active, assetCount from channels where parent = $1 order by id',
-             [parent],
+             [channelId],
              function(err, results) {
                 if (err) {
-                    errors.report('Databsae', req, res, err);
+                    errors.report('Database', req, res, err);
                     return;
                 }
 
