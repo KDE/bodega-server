@@ -16,7 +16,7 @@
 */
 
 var pg = require('pg');
-var utils = require('./support/http');
+var utils = require('./support/utils');
 var querystring = require('querystring');
 
 describe('Database environment for accurate statistics', function() {

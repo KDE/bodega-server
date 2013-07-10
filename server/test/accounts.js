@@ -18,7 +18,7 @@
 var pg = require('pg');
 var queryString = require('querystring');
 
-var utils = require('./support/http.js');
+var utils = require('./support/utils');
 var assert = require('assert');
 
 describe('Create user', function() {

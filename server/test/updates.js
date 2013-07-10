@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var utils = require('./support/http');
+var utils = require('./support/utils');
 
 describe('Asset update checks', function() {
     it('should succeed quietly with no assets member in the body', function(done) {

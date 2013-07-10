@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var utils = require('./support/http');
+var utils = require('./support/utils');
 var assert = require('assert');
 
 describe('Fetch contact information', function() {

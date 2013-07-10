@@ -17,7 +17,7 @@
 
 var pg = require('pg');
 
-var utils = require('./support/http');
+var utils = require('./support/utils');
 
 describe('Collections', function(){
     var collectionId;

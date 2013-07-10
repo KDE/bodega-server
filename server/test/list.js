@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var utils = require('./support/http');
+var utils = require('./support/utils');
 
 var authedBrowsing = !(app.config.anonAccess && app.config.anonAccess.browsing === true);
 //console.log("Testing with " + (authedBrowsing ? "authenticated" : "anonymous" ) + " browsing");

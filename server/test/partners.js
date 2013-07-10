@@ -19,7 +19,7 @@ var async = require('async');
 var pg = require('pg');
 var queryString = require('qs');
 
-var utils = require('./support/http');
+var utils = require('./support/utils');
 
 describe('Partner management', function() {
     var existingPartnerJson = [
