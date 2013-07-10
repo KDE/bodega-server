@@ -31,7 +31,7 @@ describe('Database environment for accurate statistics', function() {
              });
         });
 
-    utils.auth(server);
+    utils.auth();
 });
 
 

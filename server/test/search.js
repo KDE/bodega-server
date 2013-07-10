@@ -15,14 +15,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Searching', function(){
     var gamesChannelId;
     var cardGamesChannelId;
 
-    utils.auth(server);
+    utils.auth();
 
     describe('initialization', function(){
         it('find the games channel', function(done){

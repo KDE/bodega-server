@@ -17,7 +17,6 @@
 
 var pg = require('pg');
 
-var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Collections', function(){
@@ -76,7 +75,7 @@ describe('Collections', function(){
         });
     });
 
-    utils.auth(server);
+    utils.auth();
 
     var createdId;
     describe('After authentication', function(){

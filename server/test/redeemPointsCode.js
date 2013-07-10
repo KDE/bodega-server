@@ -15,7 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Redeeming points code', function(){

@@ -15,11 +15,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Asset info', function(){
-    utils.auth(server);
+    utils.auth();
 
     describe('Basic fetch', function(){
         it('should show info for an asset', function(done){

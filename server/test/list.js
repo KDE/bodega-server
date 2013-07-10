@@ -15,7 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var server = require('../app.js');
 var utils = require('./support/http');
 
 var authedBrowsing = !(app.config.anonAccess && app.config.anonAccess.browsing === true);

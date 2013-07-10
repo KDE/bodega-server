@@ -18,7 +18,6 @@
 var pg = require('pg');
 var queryString = require('qs');
 
-var server = require('../app.js');
 var utils = require('./support/http');
 
 describe('Store management', function(){
