@@ -185,12 +185,12 @@ function dbSnapshot(db, fn)
         takeSnapshot(db, fn);
         return;
     }
-    var connectionString = server.config.service.database.protocol +
+    var connectionString = app.config.service.database.protocol +
         "://" +
-        server.config.service.database.user + ":" +
-        server.config.service.database.password +
-        "@" + server.config.service.database.host + "/" +
-        server.config.service.database.name;
+        app.config.service.database.user + ":" +
+        app.config.service.database.password +
+        "@" + app.config.service.database.host + "/" +
+        app.config.service.database.name;
     pg.connect(connectionString, function(err, client, finis) {
         takeSnapshot(client, function(err, res) {
             fn(err, res);
