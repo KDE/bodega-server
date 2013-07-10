@@ -105,9 +105,8 @@ function listTags(partner, db, req, res) {
 
     var params = [partner];
 
-    var type = utils.parseNumber(req.params.type);
-    if (type > 0) {
-        query += " where tags.type = $2";
+    if (req.params.type !== undefined) {
+        query += " where tagtypes.type = $2";
         params.push(req.params.type);
     }
 
