@@ -179,7 +179,7 @@ function takeSnapshot(db, fn)
     });
 }
 
-function dbSnapshot(server, db, fn)
+function dbSnapshot(db, fn)
 {
     if (db) {
         takeSnapshot(db, fn);

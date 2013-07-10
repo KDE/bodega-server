@@ -66,7 +66,7 @@ describe('Asset manipulation', function(){
     var db;
     var dbSnapshotBefore;
     before(function(done) {
-        utils.dbSnapshot(server, null, function(err, res) {
+        utils.dbSnapshot(null, function(err, res) {
             if (err) {
                 console.log("Couldn't snapshot the db!");
             }
@@ -371,7 +371,7 @@ describe('Asset manipulation', function(){
         }
 
         async.waterfall(funcs, function() {
-            utils.dbSnapshot(server, null, function(err, res) {
+            utils.dbSnapshot(null, function(err, res) {
                 var dbSnapshotAfter = res;
                 if (err) {
                     console.log("Couldn't snapshot the db!");

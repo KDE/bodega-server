@@ -608,7 +608,7 @@ describe('Store management', function(){
     });
 
     before(function(done) {
-        utils.dbSnapshot(server, null, function(err, res) {
+        utils.dbSnapshot(null, function(err, res) {
             if (err) {
                 console.log("Couldn't snapthot db!");
             }
@@ -628,7 +628,7 @@ describe('Store management', function(){
                    function(err, result) {
                        client.query("delete from channels where name = 'Test Channel';", [],
                        function(err, result) {
-                           utils.dbSnapshot(server, client, function(err, res) {
+                           utils.dbSnapshot(client, function(err, res) {
                                var dbSnapshotAfter = res;
                                if (err) {
                                    console.log("Couldn't snapthot db!");
