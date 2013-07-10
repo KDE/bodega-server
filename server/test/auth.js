@@ -29,8 +29,7 @@ describe('Authentication', function(){
                 "success": false,
                 "error": {"type": "MissingParameters"}
             };
-            utils.getUrl(server,
-                         'auth',
+            utils.getUrl('auth',
                          function(res) {
                              res.statusCode.should.equal(200);
                              res.headers.should.have.property(

@@ -42,7 +42,7 @@ describe('Point operations', function(){
             return;
         }
 
-        utils.getUrl(server, url, function(res) {
+        utils.getUrl(url, function(res) {
             app.db.dbQuery(function (db) {
                 db.query(updateQuery, [startPoints], function(err, result) {
                     if (err) {
