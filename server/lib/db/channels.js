@@ -32,27 +32,27 @@ module.exports = function(db, req, res) {
          ORDER BY c.name LIMIT $3 OFFSET $4";
     var defaultPageSize = 25;
     var args = {
-        channelId: req.params.parentChannel,
-        offset: req.query.offset || 0,
-        pageSize: req.query.pageSize || defaultPageSize
+        channelId: utils.parseNumber(req.params.parentChannel),
+        offset: utils.parseNumber(req.query.offset),
+        pageSize: utils.parseNumber(req.query.pageSize, defaultPageSize)
     };
 
     var query;
-    var values = [];
+    var params = [];
 
 
-    values[0] = req.session.user.store;
+    params.push(req.session.user.store);
 
     if (!args.channelId) {
         query = listTopChannelsQuery;
     } else {
         query = listParentChannelsQuery;
-        values[1] = args.channelId;
+        params.push(args.channelId);
     }
-    values.push(args.pageSize, args.offset);
 
-    db.query(
-        query, values,
+    params.push(args.pageSize, args.offset);
+
+    db.query(query, params,
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
