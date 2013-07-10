@@ -44,9 +44,7 @@ describe('Collections', function(){
         });
         it('shouldnt allow creating collections', function(done) {
             var params = { name: 'hello' };
-            utils.postUrl(
-                server,
-                'collection/create',
+            utils.postUrl('collection/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -88,9 +86,7 @@ describe('Collections', function(){
                 public: true,
                 type: 'wishlist'
             };
-            utils.postUrl(
-                server,
-                'collection/create',
+            utils.postUrl('collection/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -115,9 +111,7 @@ describe('Collections', function(){
                 public: false,
                 type: 'wishlist'
             };
-            utils.postUrl(
-                server,
-                'collection/update/' + createdId,
+            utils.postUrl('collection/update/' + createdId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -140,9 +134,7 @@ describe('Collections', function(){
                 public: true,
                 type: 'wishlist'
             };
-            utils.postUrl(
-                server,
-                'collection/update/' + createdId,
+            utils.postUrl('collection/update/' + createdId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);

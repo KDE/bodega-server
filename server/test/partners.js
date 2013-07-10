@@ -73,9 +73,7 @@ describe('Partner management', function() {
 
     describe('without authenticating', function(){
         it('Creating a partner should fail', function(done) {
-            utils.postUrl(
-                server,
-                'partner/create', {},
+            utils.postUrl('partner/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -89,9 +87,7 @@ describe('Partner management', function() {
         });
 
         it('Updating a partner should fail', function(done) {
-            utils.postUrl(
-                server,
-                'partner/update/1002', {},
+            utils.postUrl('partner/update/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -119,9 +115,7 @@ describe('Partner management', function() {
         });
 
         it('Requesting publisher status should fail', function(done) {
-            utils.postUrl(
-                server,
-                'partner/request/publisher/1002', {},
+            utils.postUrl('partner/request/publisher/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -135,9 +129,7 @@ describe('Partner management', function() {
         });
 
         it('Requesting distributor status should fail', function(done) {
-            utils.postUrl(
-                server,
-                'partner/request/distributor/1002', {},
+            utils.postUrl('partner/request/distributor/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -215,9 +207,7 @@ describe('Partner management', function() {
         it('creation should fail with an existing partner name', function(done) {
             server.config.printErrors = false;
             var params = { name: 'KDE', email: 'foo@somewhere.org' };
-            utils.postUrl(
-                server,
-                'partner/create',
+            utils.postUrl('partner/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -235,9 +225,7 @@ describe('Partner management', function() {
         it('creation should fail with an invalid email', function(done) {
             var params = { name: 'Somewhere', email: 'foo..somewhere.org' };
             server.config.printErrors = false;
-            utils.postUrl(
-                server,
-                'partner/create',
+            utils.postUrl('partner/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -254,9 +242,7 @@ describe('Partner management', function() {
 
         it('creation should succeed with good data', function(done) {
             var params = { name: 'Somewhere', email: 'foo@somewhere.org' };
-            utils.postUrl(
-                server,
-                'partner/create',
+            utils.postUrl('partner/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -273,9 +259,7 @@ describe('Partner management', function() {
 
         it('update should succeed with good data', function(done) {
             var params = { name: 'Sometime', email: 'foo@sometime.org' };
-            utils.postUrl(
-                server,
-                'partner/update/' + newPartnerId,
+            utils.postUrl('partner/update/' + newPartnerId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -292,9 +276,7 @@ describe('Partner management', function() {
             var params = { service: 'Not Even Close', email: 'foo..somewhere.org' };
             server.config.printErrors = false;
             var queue = async.queue(function(task, cb) {
-            utils.postUrl(
-                server,
-                'partner/' + task.partner + '/link/create',
+            utils.postUrl('partner/' + task.partner + '/link/create',
                 task.params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -340,9 +322,7 @@ describe('Partner management', function() {
 
         it('adding contact links with proper data should succeed', function(done) {
             var queue = async.queue(function(params, cb) {
-            utils.postUrl(
-                server,
-                'partner/' + newPartnerId + '/link/create',
+            utils.postUrl('partner/' + newPartnerId + '/link/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -378,9 +358,7 @@ describe('Partner management', function() {
                 service: 'facebook',
                 account: 'meh'
             };
-            utils.postUrl(
-                server,
-                'partner/' + newPartnerId + '/link/delete',
+            utils.postUrl('partner/' + newPartnerId + '/link/delete',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -402,9 +380,7 @@ describe('Partner management', function() {
         it('should not allow updating a partner we are not a manager for', function(done) {
             var params = { name: 'Sometime', email: 'foo@sometime.org' };
             server.config.printErrors = false;
-            utils.postUrl(
-                server,
-                'partner/update/' + 1003,
+            utils.postUrl('partner/update/' + 1003,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -435,9 +411,7 @@ describe('Partner management', function() {
             };
 
             it('should allow setting the transfer account info', function(done) {
-                utils.postUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/update',
+                utils.postUrl('partner/' + newPartnerId + '/banking/account/update',
                     account,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -452,9 +426,7 @@ describe('Partner management', function() {
                 var badAccount = JSON.parse(JSON.stringify(account));
                 badAccount.swift = '';
                 badAccount.iban = '';
-                utils.postUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/update',
+                utils.postUrl('partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -469,9 +441,7 @@ describe('Partner management', function() {
             it('should fail setting the transfer account if missing the name', function(done) {
                 var badAccount = JSON.parse(JSON.stringify(account));
                 badAccount.nameOnAccount = '';
-                utils.postUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/update',
+                utils.postUrl('partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -486,9 +456,7 @@ describe('Partner management', function() {
             it('should fail setting the transfer account if missing the address', function(done) {
                 var badAccount = JSON.parse(JSON.stringify(account));
                 badAccount.address = '';
-                utils.postUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/update',
+                utils.postUrl('partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -503,9 +471,7 @@ describe('Partner management', function() {
             it('should fail setting the transfer account if missing the bank name', function(done) {
                 var badAccount = JSON.parse(JSON.stringify(account));
                 badAccount.bank = '';
-                utils.postUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/update',
+                utils.postUrl('partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -520,9 +486,7 @@ describe('Partner management', function() {
             it('should fail setting the transfer account if missing the bank address', function(done) {
                 var badAccount = JSON.parse(JSON.stringify(account));
                 badAccount.bankAddress = '';
-                utils.postUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/update',
+                utils.postUrl('partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -537,9 +501,7 @@ describe('Partner management', function() {
             it('should fail setting the transfer account if missing the account number', function(done) {
                 var badAccount = JSON.parse(JSON.stringify(account));
                 badAccount.account = '';
-                utils.postUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/update',
+                utils.postUrl('partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -609,9 +571,7 @@ describe('Partner management', function() {
                             person: 'aseigo@kde.org',
                             roles: [ 'Validator', 'Accounts' ],
                          };
-                utils.postUrl(
-                    server,
-                    'partner/roles/update/' + newPartnerId,
+                utils.postUrl('partner/roles/update/' + newPartnerId,
                     params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -651,9 +611,7 @@ describe('Partner management', function() {
                             person: 'aseigo@kde.org',
                             roles: [ 'Accounts' ],
                          };
-                utils.postUrl(
-                    server,
-                    'partner/roles/update/' + newPartnerId,
+                utils.postUrl('partner/roles/update/' + newPartnerId,
                     params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -692,9 +650,7 @@ describe('Partner management', function() {
                     person: 'aseigo@kde.org'
                 };
 
-                utils.postUrl(
-                    server,
-                    'partner/roles/update/' + newPartnerId,
+                utils.postUrl('partner/roles/update/' + newPartnerId,
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -726,9 +682,7 @@ describe('Partner management', function() {
                     reason: 'So we can upload content.'
                 };
 
-                utils.postUrl(
-                    server,
-                    'partner/request/publisher/' + newPartnerId,
+                utils.postUrl('partner/request/publisher/' + newPartnerId,
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -746,9 +700,7 @@ describe('Partner management', function() {
                     reason: 'So we can make stores.'
                 };
 
-                utils.postUrl(
-                    server,
-                    'partner/request/publisher/' + newPartnerId,
+                utils.postUrl('partner/request/publisher/' + newPartnerId,
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);

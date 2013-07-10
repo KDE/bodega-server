@@ -25,9 +25,7 @@ describe('Store management', function(){
     var dbSnapshotBefore;
     describe('Creating a store without authenticating', function(){
         it('should fail', function(done) {
-            utils.postUrl(
-                server,
-                'store/create', {},
+            utils.postUrl('store/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -51,9 +49,7 @@ describe('Store management', function(){
 
     describe('Create a store with someone who is not authorized to do so', function(){
         it('Creation request should fail', function(done) {
-            utils.postUrl(
-                server,
-                'store/create', {},
+            utils.postUrl('store/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -75,9 +71,7 @@ describe('Store management', function(){
 
     describe('Store creation', function(){
         it('should fail with an invalid partner', function(done){
-            utils.postUrl(
-                server,
-                'store/create',
+            utils.postUrl('store/create',
                 { partner: 1003 },
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -93,9 +87,7 @@ describe('Store management', function(){
         });
 
         it('should fail without a name', function(done){
-            utils.postUrl(
-                server,
-                'store/create',
+            utils.postUrl('store/create',
                 { partner: 1002 },
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -117,9 +109,7 @@ describe('Store management', function(){
                   'name': 'Fun Times With Clowns',
                   'desc': 'Clowns are actually scary'
                 };
-            utils.postUrl(
-                server,
-                'store/create',
+            utils.postUrl('store/create',
                 query,
                 function(res) {
                     var expected = [ {
@@ -148,9 +138,7 @@ describe('Store management', function(){
                   'name': 'More Fun',
                   'desc': ''
                 };
-            utils.postUrl(
-                server,
-                'store/create',
+            utils.postUrl('store/create',
                 query,
                 function(res) {
                     var expected = [ {
@@ -179,9 +167,7 @@ describe('Store management', function(){
                   'partner' : 1002,
                   'name': 'Fun Times With Clowns'
                 };
-            utils.postUrl(
-                server,
-                'store/create',
+            utils.postUrl('store/create',
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -260,9 +246,7 @@ describe('Store management', function(){
                 'markup': 20
             };
 
-            utils.postUrl(
-                server,
-                'store/update/does_not_exist',
+            utils.postUrl('store/update/does_not_exist',
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -284,9 +268,7 @@ describe('Store management', function(){
                 'markup': 20
             };
 
-            utils.postUrl(
-                server,
-                'store/update/does_not_exist',
+            utils.postUrl('store/update/does_not_exist',
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -309,9 +291,7 @@ describe('Store management', function(){
                 'desc': 'Clowns are not scary'
             };
 
-            utils.postUrl(
-                server,
-                'store/update/1002_FUN_TIMES_WITH_CLOWNS',
+            utils.postUrl('store/update/1002_FUN_TIMES_WITH_CLOWNS',
                 query,
                 function(res) {
                     var expected = [
@@ -341,9 +321,7 @@ describe('Store management', function(){
                 'markup': 15
             };
 
-            utils.postUrl(
-                server,
-                'store/update/1002_FUN_TIMES_WITH_CLOWNS',
+            utils.postUrl('store/update/1002_FUN_TIMES_WITH_CLOWNS',
                 query,
                 function(res) {
                     var expected = [
@@ -378,9 +356,7 @@ describe('Store management', function(){
                 'tags': [1, 22, 130]
             };
 
-            utils.postUrl(
-                server,
-                'store/channel/create/KDE-1',
+            utils.postUrl('store/channel/create/KDE-1',
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -496,9 +472,7 @@ describe('Store management', function(){
             var params = {
                     tags: [1, 22, 15]
                 };
-            utils.postUrl(
-                server,
-                'store/channel/update/KDE-1/' + newChannelId,
+            utils.postUrl('store/channel/update/KDE-1/' + newChannelId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -518,9 +492,7 @@ describe('Store management', function(){
             var params = {
                     tags: [1, 15]
                 };
-            utils.postUrl(
-                server,
-                'store/channel/update/KDE-1/' + newChannelId,
+            utils.postUrl('store/channel/update/KDE-1/' + newChannelId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -540,9 +512,7 @@ describe('Store management', function(){
             var params = {
                     tags: [1, 22]
                 };
-            utils.postUrl(
-                server,
-                'store/channel/update/KDE-1/' + newChannelId,
+            utils.postUrl('store/channel/update/KDE-1/' + newChannelId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);

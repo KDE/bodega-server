@@ -342,9 +342,7 @@ describe('Asset manipulation', function(){
                       });
         });
         it('should work with a complete asset', function(done){
-            utils.postUrl(
-                server,
-                'asset/post/' + completeAssetId, null,
+            utils.postUrl('asset/post/' + completeAssetId, null,
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');

@@ -21,9 +21,7 @@ var utils = require('./support/http');
 describe('Asset update checks', function() {
     it('should succeed quietly with no assets member in the body', function(done) {
         var params = { };
-        utils.postUrl(
-            server,
-            'asset/list/updates',
+        utils.postUrl('asset/list/updates',
             params,
             function(res) {
                 res.statusCode.should.equal(200);
@@ -39,9 +37,7 @@ describe('Asset update checks', function() {
 
     it('should succeed quietly with no assets listed', function(done) {
         var params = { assets: [] };
-        utils.postUrl(
-            server,
-            'asset/list/updates',
+        utils.postUrl('asset/list/updates',
             params,
             function(res) {
                 res.statusCode.should.equal(200);
@@ -62,9 +58,7 @@ describe('Asset update checks', function() {
             params.assets.push([ i, currentDate ]);
         }
 
-        utils.postUrl(
-            server,
-            'asset/list/updates',
+        utils.postUrl('asset/list/updates',
             params,
             function(res) {
                 res.statusCode.should.equal(200);
@@ -92,9 +86,7 @@ describe('Asset update checks', function() {
         params.assets.push({ rubbish: true });
         params.assets.push([ 6, 'alsdjfl;sadjf' ]);
 
-        utils.postUrl(
-            server,
-            'asset/list/updates',
+        utils.postUrl('asset/list/updates',
             params,
             function(res) {
                 res.statusCode.should.equal(200);

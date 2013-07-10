@@ -112,9 +112,7 @@ describe('Changing account information', function() {
         var query = {
             firstName: 'Bunny'
         };
-        utils.postUrl(
-            server,
-            'participant/changeAccountDetails', query,
+        utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -130,9 +128,7 @@ describe('Changing account information', function() {
         var query = {
             middleNames: 'Rabbit'
         };
-        utils.postUrl(
-            server,
-            'participant/changeAccountDetails', query,
+        utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -148,9 +144,7 @@ describe('Changing account information', function() {
         var query = {
             lastName: 'Foofoo'
         };
-        utils.postUrl(
-            server,
-            'participant/changeAccountDetails', query,
+        utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -166,9 +160,7 @@ describe('Changing account information', function() {
         var query = {
             email: 'bunny_rabbit@foofoo.com'
         };
-        utils.postUrl(
-            server,
-            'participant/changeAccountDetails', query,
+        utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -186,9 +178,7 @@ describe('Changing account information', function() {
         };
 
         server.config.printErrors = false;
-        utils.postUrl(
-            server,
-            'participant/changeAccountDetails', query,
+        utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -207,9 +197,7 @@ describe('Changing account information', function() {
         var query = {
             email: 'aseigo@kde.org'
         };
-        utils.postUrl(
-            server,
-            'participant/changeAccountDetails', query,
+        utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(

@@ -46,9 +46,7 @@ describe('Tags manipulation', function(){
     }
 
     function createTag(title, type, cb) {
-        utils.postUrl(
-            server,
-            'tag/create', {'title': title, 'type': type},
+        utils.postUrl('tag/create', {'title': title, 'type': type},
             function(res) {
                 cb(res);
             },
@@ -56,9 +54,7 @@ describe('Tags manipulation', function(){
     }
 
     function updateTag(id, title, type, cb) {
-        utils.postUrl(
-            server,
-            'tag/update/' + id, {'title': title, 'type': type},
+        utils.postUrl('tag/update/' + id, {'title': title, 'type': type},
             function(res) {
                 cb(res);
             },
