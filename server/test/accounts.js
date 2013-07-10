@@ -43,9 +43,7 @@ describe('Create user', function() {
     });
     describe('needs to activate', function() {
         it('should activate', function(done) {
-            utils.getHtml(
-                server,
-                'register/confirm?' + queryString.stringify(userInfo),
+            utils.getHtml('register/confirm?' + queryString.stringify(userInfo),
                 function(res) {
                     var activationState = res.body.indexOf('Success!') > -1;
 
