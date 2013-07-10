@@ -6,10 +6,13 @@ var assert = require('assert');
 var async = require('async');
 var pg = require('pg');
 
+var app = require('../app.js');
+module.exports.app = app;
+
 var baseJsonPath = '/bodega/v1/json/';
 module.exports.baseJsonPath = baseJsonPath;
 
-function getUrl(app, path, fn, cookie, expectsHtml)
+function getUrl(path, fn, cookie, expectsHtml)
 {
     if (path[0] !== '/') {
         path = baseJsonPath + path;
@@ -48,12 +51,12 @@ function getUrl(app, path, fn, cookie, expectsHtml)
     });
 }
 
-function getHtml(app, path, fn, cookie)
+function getHtml(path, fn, cookie)
 {
-    getUrl(app, path, fn, cookie, true);
+    getUrl(path, fn, cookie, true);
 }
 
-function postUrl(app, path, formData, fn, cookie)
+function postUrl(path, formData, fn, cookie)
 {
     if (path[0] !== '/') {
         path = baseJsonPath + path;
@@ -95,7 +98,7 @@ var currentlyAuthed = {
     store: ''
 };
 
-function auth(app, params, cb)
+function auth(params, cb)
 {
     describe('Authorization', function() {
         it('succeeds', function(done) {
@@ -119,8 +122,7 @@ function auth(app, params, cb)
             currentlyAuthed.user = params.user ? params.user : defaultAuth.user;
             currentlyAuthed.password = params.password ? params.password : defaultAuth.password;
             currentlyAuthed.store = params.store ? params.store : defaultAuth.store;
-            getUrl(app,
-                   '/bodega/v1/json/auth?auth_user=' + currentlyAuthed.user +
+            getUrl('/bodega/v1/json/auth?auth_user=' + currentlyAuthed.user +
                    '&auth_password=' + currentlyAuthed.password +
                    '&auth_store=' + currentlyAuthed.store,
                    function(res) {
