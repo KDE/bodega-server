@@ -33,7 +33,8 @@ describe('Fetch contact information', function() {
                     res.headers.should.have.property( 'content-type', 'application/json');
                     res.body.should.eql(expected);
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 

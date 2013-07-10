@@ -7,19 +7,16 @@ var async = require('async');
 var pg = require('pg');
 
 var app = require('../../app.js');
-module.exports.app = app;
 
 var baseJsonPath = '/bodega/v1/json/';
-module.exports.baseJsonPath = baseJsonPath;
 
 var dbConnectionString = app.config.service.database.protocol + "://" +
                        app.config.service.database.user + ":" +
                        app.config.service.database.password +
                        "@" + app.config.service.database.host + "/" +
                        app.config.service.database.name;
-module.exports.dbConnectionString = dbConnectionString;
 
-function getUrl(path, fn, cookie, expectsHtml)
+function getUrl(path, fn, opts)
 {
     if (path[0] !== '/') {
         path = baseJsonPath + path;
@@ -30,7 +27,7 @@ function getUrl(path, fn, cookie, expectsHtml)
         port: app.config.port,
         path: path,
         headers : {
-            'Cookie': cookie
+            'Cookie': (opts && opts.noAuth) ? null : module.exports.cookie
         }
     };
 
@@ -41,7 +38,7 @@ function getUrl(path, fn, cookie, expectsHtml)
         });
         res.on("end", function(chunk) {
             var contentType = res.headers['content-type'];
-            if (expectsHtml) {
+            if (opts && opts.html) {
                 assert.deepEqual(contentType, 'text/html; charset=utf-8');
                 res.body = buf;
             } else {
@@ -58,12 +55,16 @@ function getUrl(path, fn, cookie, expectsHtml)
     });
 }
 
-function getHtml(path, fn, cookie)
+function getHtml(path, fn, opts)
 {
-    getUrl(path, fn, cookie, true);
+    if (!opts) {
+        opts = {};
+    }
+    opts.html = true;
+    getUrl(path, fn, opts);
 }
 
-function postUrl(path, formData, fn, cookie)
+function postUrl(path, formData, fn, opts)
 {
     if (path[0] !== '/') {
         path = baseJsonPath + path;
@@ -74,7 +75,7 @@ function postUrl(path, formData, fn, cookie)
         form: formData,
         jar: false,
         headers : {
-            'Cookie': cookie
+            'Cookie': (opts && opts.noAuth) ? null : module.exports.cookie
         }
     };
 
@@ -143,7 +144,8 @@ function auth(params, cb)
                        } else {
                            done();
                        }
-                   });
+                   },
+                   { noAuth: true });
         });
     });
 }
@@ -201,10 +203,16 @@ function dbSnapshot(db, fn)
     });
 }
 
+// public variables
+module.exports.app = app;
+module.exports.baseJsonPath = baseJsonPath;
+module.exports.dbConnectionString = dbConnectionString;
+module.exports.cookie = '';
+
+// public functions
 module.exports.getUrl = getUrl;
 module.exports.getHtml = getHtml;
 module.exports.postUrl = postUrl;
 module.exports.auth = auth;
-module.exports.cookie = '';
 module.exports.dbSnapshot = dbSnapshot;
 

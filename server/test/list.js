@@ -41,7 +41,8 @@ describe('Listing', function(){
                         res.body.should.have.property('authStatus', true);
                     }
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 

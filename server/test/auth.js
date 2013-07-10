@@ -36,7 +36,8 @@ describe('Authentication', function(){
                                  'application/json');
                              res.body.should.eql(expected);
                              done();
-                         });
+                         },
+                         { noAuth: true });
         });
     });
 
@@ -58,7 +59,8 @@ describe('Authentication', function(){
                         'application/json');
                     res.body.should.eql(expected);
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 
@@ -79,7 +81,8 @@ describe('Authentication', function(){
                         'application/json');
                     res.body.should.eql(expected);
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 
@@ -100,7 +103,8 @@ describe('Authentication', function(){
                         'application/json');
                     res.body.should.eql(expected);
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 
@@ -121,7 +125,8 @@ describe('Authentication', function(){
                         'application/json');
                     res.body.should.eql(expected);
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 
@@ -152,7 +157,8 @@ describe('Authentication', function(){
                         'application/json');
                     res.body.should.eql(expected);
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 });

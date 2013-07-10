@@ -39,7 +39,8 @@ describe('Collections', function(){
                     res.body.error.should.have.property('type',
                                                         'Unauthorized');
                     done();
-                });
+                },
+                { noAuth: true });
         });
         it('shouldnt allow creating collections', function(done) {
             var params = { name: 'hello' };
@@ -56,7 +57,8 @@ describe('Collections', function(){
                     res.body.error.should.have.property('type',
                                                         'Unauthorized');
                     done();
-                });
+                },
+                { noAuth: true });
         });
         it('shouldnt allow deleting collections', function(done) {
             utils.getUrl('collection/delete/hello',
@@ -71,7 +73,8 @@ describe('Collections', function(){
                     res.body.error.should.have.property('type',
                                                         'Unauthorized');
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 

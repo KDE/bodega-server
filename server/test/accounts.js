@@ -38,7 +38,8 @@ describe('Create user', function() {
                     'code': res.body.confirmationCode
                 };
                 done();
-            });
+            },
+            { noAuth: true });
     });
     describe('needs to activate', function() {
         it('should activate', function(done) {
@@ -48,7 +49,8 @@ describe('Create user', function() {
 
                     assert.equal(activationState, true);
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 });
@@ -288,7 +290,8 @@ describe('Getting account information', function() {
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'Unauthorized');
                 done();
-            });
+            },
+            { noAuth: true });
     });
 
     it('should fail to get a history before authorization', function(done) {
@@ -301,7 +304,8 @@ describe('Getting account information', function() {
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'Unauthorized');
                 done();
-            });
+            },
+            { noAuth: true });
     });
 
     it('authorizes correctly', function(done) {
@@ -315,7 +319,8 @@ describe('Getting account information', function() {
                 utils.cookie = res.headers['set-cookie'];
                 res.body.should.have.property('authStatus', true);
                 done();
-            });
+            },
+            { noAuth: true });
     });
 
     it('fetches personal information', function(done) {

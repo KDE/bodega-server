@@ -36,7 +36,8 @@ describe('Store management', function(){
                     res.body.error.should.have.property('type',
                                                         'Unauthorized');
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 
