@@ -142,14 +142,13 @@ function create(partner, db, req, res) {
         return;
     }
 
-    var type = utils.parseNumber(req.body.type);
-    if (type <= 0) {
+    if (req.body.type === undefined) {
         errors.report('MissingParameters', req, res);
         return;
     }
 
-    db.query("select * from tags where partner = $1 and type = $2 and title = $3",
-             [partner, type, title],
+    db.query("select * from tags, tagtypes where partner = $1 and tags.type = tagtypes.id and tagtypes.type = $2 and title = $3",
+             [partner, req.body.type, title],
              function(err, result) {
                  if (err) {
                      errors.report('Database', req, res, err);
@@ -161,8 +160,10 @@ function create(partner, db, req, res) {
                      return;
                  }
 
-                db.query("insert into tags (partner, type, title) values ($1, $2, $3) returning id as id",
-                         [partner, type, title],
+                db.query("insert into tags (partner, type, title) \
+                         (select $1, id, $2\
+                         from tagtypes where type = $3 limit 1) returning id as id",
+                         [partner, title, req.body.type],
                          function(err, result) {
                              if (err) {
                                  errors.report('Database', req, res, err);
@@ -224,24 +225,36 @@ function update(partner, db, req, res) {
         return;
     }
 
-    var type = utils.parseNumber(req.body.type);
-    if (type <= 0) {
+    if (req.body.type === undefined) {
         errors.report('MissingParameters', req, res);
         return;
     }
 
     db.query(
-        "update tags set type = $1, title = $2 where id = $3 and partner = $4",
-        [type, title, id, partner],
+        "select id from tagtypes where type = $1",
+        [req.body.type],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
             } else if (result.rowCount === 0) {
-                errors.report('TagIdInvalid', req, res, err);
+                errors.report('TagTypeInvalid', req, res, err);
                 return;
             }
-            res.json(utils.standardJson(req));
+            var type = result.rows[0].id;
+            db.query(
+                "update tags set type = $1, title = $2 where id = $3 and partner = $4",
+                [type, title, id, partner],
+                function(err, result) {
+                    if (err) {
+                        errors.report('Database', req, res, err);
+                        return;
+                    } else if (result.rowCount === 0) {
+                        errors.report('TagIdInvalid', req, res, err);
+                        return;
+                    }
+                    res.json(utils.standardJson(req));
+                });
         });
 }
 

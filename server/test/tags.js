@@ -142,7 +142,7 @@ describe('Tags manipulation', function(){
         });
 
         it('create a tag', function(done) {
-            createTag('test', 8, function(res) {
+            createTag('test', 'contentrating', function(res) {
                 createdTagId = res.body.id;
 
                 listTags(null, null, 'contentrating', function(res) {
@@ -163,7 +163,7 @@ describe('Tags manipulation', function(){
         });
 
         it('edit the created tag', function(done) {
-            updateTag(createdTagId, 'new title', 9, function(res) {
+            updateTag(createdTagId, 'new title', 'assetType', function(res) {
 
                 listTags(null, null, 'assetType', function(res) {
                     res.statusCode.should.equal(200);
@@ -208,7 +208,7 @@ describe('Tags manipulation', function(){
                 error: { type: 'TagIdInvalid' }
             };
 
-            updateTag(createdTagId, 'new title', 9, function(res) {
+            updateTag(createdTagId, 'new title', 'assetType', function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
                     'content-type',
