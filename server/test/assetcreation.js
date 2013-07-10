@@ -15,7 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var server = require('../app.js');
 var utils = require('./support/http');
 
 var mime = require('mime');
@@ -27,10 +26,10 @@ var async = require('async');
 var request = require('request');
 var Cookie = require('cookie-jar');
 
-function postFiles(server, dst, files, cookie, fn)
+function postFiles(dst, files, cookie, fn)
 {
-    var url = 'http://' + server.address().address + ':' +
-            server.address().port + utils.baseJsonPath + dst;
+    var url = 'http://' + utils.app.server.address().address + ':' +
+            utils.app.server.address().port + utils.baseJsonPath + dst;
     var obj = {
         url : url,
         cookie: cookie
@@ -102,8 +101,7 @@ describe('Asset manipulation', function(){
 
     describe('Creation', function(){
         it('allow incomplete assets', function(done){
-            postFiles(server.server,
-                    'asset/create',
+            postFiles('asset/create',
                     [{
                         "name" : "info",
                         "filename" : "sampleasset/sample-info-incomplete.json"
@@ -123,8 +121,7 @@ describe('Asset manipulation', function(){
         });
 
         it('of a simple asset', function(done){
-            postFiles(server.server,
-                    'asset/create',
+            postFiles('asset/create',
                     [{
                         "name" : "info",
                         "filename" : "sampleasset/sample-info.json"
@@ -157,8 +154,7 @@ describe('Asset manipulation', function(){
 
     describe('Updates', function(){
         it('works with incomplete assets', function(done){
-            postFiles(server.server,
-                      'asset/update/' + incompleteAssetId,
+            postFiles('asset/update/' + incompleteAssetId,
                       [{
                           "name" : "info",
                           "filename" : "sampleasset/sample-info-update1.json"
@@ -288,8 +284,7 @@ describe('Asset manipulation', function(){
     describe('Posting', function(){
         before(function(done){
             var finished = 0;
-            postFiles(server.server,
-                    'asset/create',
+            postFiles('asset/create',
                     [{
                         "name" : "info",
                         "filename" : "sampleasset/sample-info-incomplete.json"
@@ -309,8 +304,7 @@ describe('Asset manipulation', function(){
                               done();
                           }
                       });
-            postFiles(server.server,
-                    'asset/create',
+            postFiles('asset/create',
                     [{
                         "name" : "info",
                         "filename" : "sampleasset/sample-info.json"
@@ -362,7 +356,7 @@ describe('Asset manipulation', function(){
         var funcs = [function(cb) {
             cb(null, cleanupAssets, 0);
         }];
-        if (!server || !numToDelete) {
+        if (!numToDelete) {
             done();
             return;
         }
