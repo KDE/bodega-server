@@ -150,11 +150,15 @@ function checkPartner(db, req, res, assetInfo)
 function processInfo(data, db, req, res)
 {
     var assetInfo;
-    try {
-        assetInfo = JSON.parse(data);
-    } catch (err) {
-        //JSON parser failed
-        assetInfo = null;
+    if (typeof data === 'object') {
+        assetInfo = data;
+    } else {
+        try {
+            assetInfo = JSON.parse(data);
+        } catch (err) {
+            //JSON parser failed
+            assetInfo = null;
+        }
     }
 
     if (!assetInfo || !assetInfo.file || assetInfo.id) {
