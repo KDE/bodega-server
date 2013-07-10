@@ -123,10 +123,11 @@ module.exports.listAssets = function listAssets(db, req, res, args, json)
         'SELECT a.id, a.license, partners.id as partnerId, \
          partners.name AS partnername, a.version, a.file, a.image, a.name, \
          CASE WHEN p.points IS NULL THEN 0 ELSE p.points END AS points \
-         FROM assets a LEFT JOIN partners ON (a.partner = partners.id) \
-         INNER JOIN subChannelAssets s ON (a.id = s.asset) \
-         LEFT JOIN assetPrices p ON (p.asset = s.asset AND p.store = $1) ';
-    var whereQuery = 'WHERE s.channel = $2';
+         FROM channelAssets s \
+         LEFT JOIN assets a ON (a.id = s.asset) \
+         LEFT JOIN partners ON (a.partner = partners.id) \
+         LEFT JOIN assetPrices p ON (p.asset = s.asset)';
+    var whereQuery = 'WHERE p.store = $1 and p.ending is null and s.channel = $2';
     var queryString = constructQuery(baseQuery, whereQuery, 2,
                                      [{
                                          type : SortType.ByName,
