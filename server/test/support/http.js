@@ -6,7 +6,7 @@ var assert = require('assert');
 var async = require('async');
 var pg = require('pg');
 
-var app = require('../app.js');
+var app = require('../../app.js');
 module.exports.app = app;
 
 var baseJsonPath = '/bodega/v1/json/';
