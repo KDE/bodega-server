@@ -6,16 +6,24 @@ var assert = require('assert');
 var async = require('async');
 var pg = require('pg');
 
-function getUrl(app, url, fn, cookie, expectsHtml)
+var baseJsonPath = '/bodega/v1/json/';
+module.exports.baseJsonPath = baseJsonPath;
+
+function getUrl(app, path, fn, cookie, expectsHtml)
 {
+    if (path[0] !== '/') {
+        path = baseJsonPath + path;
+    }
+
     var options = {
         host: app.config.host,
         port: app.config.port,
-        path: url,
+        path: path,
         headers : {
             'Cookie': cookie
         }
     };
+
     http.get(options, function(res) {
         var buf = '';
         res.on("data", function(chunk) {
@@ -40,13 +48,17 @@ function getUrl(app, url, fn, cookie, expectsHtml)
     });
 }
 
-function getHtml(app, url, fn, cookie)
+function getHtml(app, path, fn, cookie)
 {
-    getUrl(app, url, fn, cookie, true);
+    getUrl(app, path, fn, cookie, true);
 }
 
 function postUrl(app, path, formData, fn, cookie)
 {
+    if (path[0] !== '/') {
+        path = baseJsonPath + path;
+    }
+
     var options = {
         uri: 'http://' + app.config.host + ':' + app.config.port + path,
         form: formData,
@@ -55,6 +67,7 @@ function postUrl(app, path, formData, fn, cookie)
             'Cookie': cookie
         }
     };
+
     request.post(options,
         function(err, res, body) {
             if (err) {
