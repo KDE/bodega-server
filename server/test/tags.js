@@ -38,9 +38,7 @@ describe('Tags manipulation', function(){
             query += '/tag/list';
         }
 
-        utils.getUrl(
-            server,
-            query,
+        utils.getUrl(query,
             function(res) {
                 cb(res);
             },
@@ -68,9 +66,7 @@ describe('Tags manipulation', function(){
     }
 
     function deleteTag(tag, cb) {
-        utils.getUrl(
-            server,
-            'tag/delete/' + tag,
+        utils.getUrl('tag/delete/' + tag,
             function(res) {
                 cb(res);
             },

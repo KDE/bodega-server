@@ -23,9 +23,7 @@ describe('Asset info', function(){
 
     describe('Basic fetch', function(){
         it('should show info for an asset', function(done){
-            utils.getUrl(
-                server,
-                'asset/6',
+            utils.getUrl('asset/6',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -46,9 +44,7 @@ describe('Asset info', function(){
                 utils.cookie);
         });
         it('should fetch tags', function(done){
-            utils.getUrl(
-                server,
-                'asset/6',
+            utils.getUrl('asset/6',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -68,9 +64,7 @@ describe('Asset info', function(){
 
     describe('Advanced fetch', function(){
         it('should show chanagelog', function(done){
-            utils.getUrl(
-                server,
-                'asset/6?changelog=1',
+            utils.getUrl('asset/6?changelog=1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -84,9 +78,7 @@ describe('Asset info', function(){
                 utils.cookie);
         });
         it('should show previews', function(done){
-            utils.getUrl(
-                server,
-                'asset/6?previews=1',
+            utils.getUrl('asset/6?previews=1',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(

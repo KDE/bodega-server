@@ -25,9 +25,7 @@ var assert = require('assert');
 describe('Create user', function() {
     var userInfo;
     it('register successful', function(done) {
-        utils.getUrl(
-            server,
-            'register?firstname=antonis&lastname=tsiapaliokas&email=kok3rs@gmail.com&password=123456789',
+        utils.getUrl('register?firstname=antonis&lastname=tsiapaliokas&email=kok3rs@gmail.com&password=123456789',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -62,9 +60,7 @@ utils.auth(server);
 
 describe('Deactivate user', function() {
     it('succeeds', function(done) {
-        utils.getUrl(
-            server,
-            'participant/changeAccountDetails&active=false',
+        utils.getUrl('participant/changeAccountDetails&active=false',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -98,9 +94,7 @@ describe('Deactivate user', function() {
 function checkPersonInfo(cookie, key, value, done)
 {
     //console.log("checking " + key + " == " + value);
-    utils.getUrl(
-        server,
-        'participant/info',
+    utils.getUrl('participant/info',
         function(res) {
             res.statusCode.should.equal(200);
             res.headers.should.have.property(
@@ -251,9 +245,7 @@ describe('Changing passwords', function() {
         var query = {
             newPassword: 'zack'
         };
-        utils.getUrl(
-            server,
-            'participant/changePassword?' + queryString.stringify(query),
+        utils.getUrl('participant/changePassword?' + queryString.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -268,9 +260,7 @@ describe('Changing passwords', function() {
     });
 
     it('rejects changing to no password', function(done) {
-        utils.getUrl(
-            server,
-            'participant/changePassword',
+        utils.getUrl('participant/changePassword',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -288,9 +278,7 @@ describe('Changing passwords', function() {
         var query = {
             newPassword: 'alphabetical'
         };
-        utils.getUrl(
-            server,
-            'participant/changePassword?' + queryString.stringify(query),
+        utils.getUrl('participant/changePassword?' + queryString.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -321,9 +309,7 @@ describe('Changing passwords', function() {
 
 describe('Getting account information', function() {
     it('should fail to get personal information before authorization', function(done) {
-        utils.getUrl(
-            server,
-            'participant/info',
+        utils.getUrl('participant/info',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -336,9 +322,7 @@ describe('Getting account information', function() {
     });
 
     it('should fail to get a history before authorization', function(done) {
-        utils.getUrl(
-            server,
-            'participant/history',
+        utils.getUrl('participant/history',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -351,9 +335,7 @@ describe('Getting account information', function() {
     });
 
     it('authorizes correctly', function(done) {
-        utils.getUrl(
-            server,
-            'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
+        utils.getUrl('auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -367,9 +349,7 @@ describe('Getting account information', function() {
     });
 
     it('fetches personal information', function(done) {
-        utils.getUrl(
-            server,
-            'participant/info',
+        utils.getUrl('participant/info',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -391,9 +371,7 @@ describe('Getting account information', function() {
     });
 
     it('fetch history', function(done) {
-        utils.getUrl(
-            server,
-            'participant/history',
+        utils.getUrl('participant/history',
             function(res) {
                 var expected = [
                     {

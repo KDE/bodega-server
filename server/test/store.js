@@ -201,9 +201,7 @@ describe('Store management', function(){
     describe('Store listing', function() {
         it('should list all stores associated with the authentication person',
            function(done) {
-                utils.getUrl(
-                    server,
-                    'store/list',
+                utils.getUrl('store/list',
                     function(res) {
                         var expected = [
                         {
@@ -407,9 +405,7 @@ describe('Store management', function(){
             });
 
         it('fetch the structure of the store', function(done) {
-           utils.getUrl(
-                server,
-                'store/structure/KDE-1',
+           utils.getUrl('store/structure/KDE-1',
                 function(res) {
                     var channel2 =
                         { "id": 2,
@@ -563,9 +559,7 @@ describe('Store management', function(){
         });
 
         it('should be possible to delete that channel', function(done) {
-            utils.getUrl(
-                server,
-                'store/channel/delete/KDE-1/' + newChannelId,
+            utils.getUrl('store/channel/delete/KDE-1/' + newChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
@@ -580,9 +574,7 @@ describe('Store management', function(){
 
     describe('Store deletion', function() {
         it('should succeed with a valid store', function(done) {
-            utils.getUrl(
-                server,
-                'store/delete/1002_FUN_TIMES_WITH_CLOWNS',
+            utils.getUrl('store/delete/1002_FUN_TIMES_WITH_CLOWNS',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -596,9 +588,7 @@ describe('Store management', function(){
         });
 
         it('should succeed with another valid store', function(done){
-            utils.getUrl(
-                server,
-                'store/delete/somethingcrazy',
+            utils.getUrl('store/delete/somethingcrazy',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -613,9 +603,7 @@ describe('Store management', function(){
 
         it('listing should reflect deletions',
            function(done) {
-                utils.getUrl(
-                    server,
-                    'store/list',
+                utils.getUrl('store/list',
                     function(res) {
                         var expected = [
                         {

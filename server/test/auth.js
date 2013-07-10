@@ -51,9 +51,7 @@ describe('Authentication', function(){
                 "success": false,
                 "error": {"type" : "MissingParameters"}
             };
-            utils.getUrl(
-                server,
-                'auth?auth_user=&auth_password=&auth_store=',
+            utils.getUrl('auth?auth_user=&auth_password=&auth_store=',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -74,9 +72,7 @@ describe('Authentication', function(){
                 "points":0,
                 "success":false,
                 "error": {"type" : "MissingParameters"}};
-            utils.getUrl(
-                server,
-                'auth?auth_user=&auth_password=&auth_store=',
+            utils.getUrl('auth?auth_user=&auth_password=&auth_store=',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -97,9 +93,7 @@ describe('Authentication', function(){
                 "points":0,
                 "success":false,
                 "error": {"type" : "NoMatch"}};
-            utils.getUrl(
-                server,
-                'auth?auth_user=zack@kde.org&auth_password=bad_password&auth_store=2',
+            utils.getUrl('auth?auth_user=zack@kde.org&auth_password=bad_password&auth_store=2',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -120,9 +114,7 @@ describe('Authentication', function(){
                 "points":0,
                 "success":false,
                 "error": {"type" : "NoMatch" }};
-            utils.getUrl(
-                server,
-                'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=5',
+            utils.getUrl('auth?auth_user=zack@kde.org&auth_password=zack&auth_store=5',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -153,9 +145,7 @@ describe('Authentication', function(){
                 },
                 "active": true
             };
-            utils.getUrl(
-                server,
-                'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
+            utils.getUrl('auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

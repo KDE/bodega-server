@@ -82,9 +82,7 @@ describe('Asset manipulation', function(){
     function deleteAsset(assets, i, cb)
     {
         var asset = assets[i];
-        utils.getUrl(
-            server,
-            'asset/delete/' + asset,
+        utils.getUrl('asset/delete/' + asset,
             function(res) {
                 ++i;
                 cb(null, assets, i);
@@ -183,9 +181,7 @@ describe('Asset manipulation', function(){
 
     describe('Listing assets', function(){
         it('lists published by default', function(done){
-            utils.getUrl(
-                server,
-                'asset/list',
+            utils.getUrl('asset/list',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -196,9 +192,7 @@ describe('Asset manipulation', function(){
                 utils.cookie);
         });
         it('lists published when asked', function(done){
-            utils.getUrl(
-                server,
-                'asset/list/published',
+            utils.getUrl('asset/list/published',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -209,9 +203,7 @@ describe('Asset manipulation', function(){
                 utils.cookie);
         });
         it('lists incoming when asked', function(done){
-            utils.getUrl(
-                server,
-                'asset/list/incoming',
+            utils.getUrl('asset/list/incoming',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -222,9 +214,7 @@ describe('Asset manipulation', function(){
                 utils.cookie);
         });
         it('lists all when asked', function(done){
-            utils.getUrl(
-                server,
-                'asset/list/all',
+            utils.getUrl('asset/list/all',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -238,9 +228,7 @@ describe('Asset manipulation', function(){
 
     describe('Deletion', function(){
         it('should work a complete assets', function(done){
-            utils.getUrl(
-                server,
-                'asset/delete/' + completeAssetId,
+            utils.getUrl('asset/delete/' + completeAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -255,9 +243,7 @@ describe('Asset manipulation', function(){
                 utils.cookie);
         });
         it('should work with incomplete assets', function(done){
-            utils.getUrl(
-                server,
-                'asset/delete/' + incompleteAssetId,
+            utils.getUrl('asset/delete/' + incompleteAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -272,9 +258,7 @@ describe('Asset manipulation', function(){
                 utils.cookie);
         });
         it('should not work with already delete assets', function(done){
-            utils.getUrl(
-                server,
-                'asset/delete/' + incompleteAssetId,
+            utils.getUrl('asset/delete/' + incompleteAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -289,9 +273,7 @@ describe('Asset manipulation', function(){
         });
 
         it('listing incoming after deletion shouldnt return any', function(done){
-            utils.getUrl(
-                server,
-                'asset/list/incoming',
+            utils.getUrl('asset/list/incoming',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');

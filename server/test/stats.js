@@ -49,9 +49,7 @@ describe('Asset statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/points?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -84,9 +82,7 @@ describe('Asset statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/points?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -119,9 +115,7 @@ describe('Asset statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/points?'+querystring.stringify(query),
+        utils.getUrl('stats/assets/points?'+querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -160,9 +154,7 @@ describe('Asset statistics', function(){
             from: "2013-05-01",
             to: "2013-10-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -192,9 +184,7 @@ describe('Asset statistics', function(){
             from: "2013-05-01",
             to: "2013-09-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -225,9 +215,7 @@ describe('Asset statistics', function(){
             from: "2013-05-01",
             to: "2013-09-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -262,9 +250,7 @@ describe('Asset statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -294,9 +280,7 @@ describe('Asset statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/count?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/count?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -333,9 +317,7 @@ describe('Asset statistics', function(){
             from: "2013-05-23",
             to: "2013-05-27"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/points?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -369,9 +351,7 @@ describe('Asset statistics', function(){
             from: "2013-05-31",
             to: "2013-06-04"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/points?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -408,9 +388,7 @@ describe('Asset statistics', function(){
             from: "2013-05-24",
             to: "2013-06-03"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -444,9 +422,7 @@ describe('Asset statistics', function(){
             from: "2013-05-24",
             to: "2013-06-03"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -483,9 +459,7 @@ describe('Asset statistics', function(){
             from: "2013-05-24",
             to: "2013-06-03"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -519,9 +493,7 @@ describe('Asset statistics', function(){
             from: "2013-05-24",
             to: "2013-06-03"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -559,9 +531,7 @@ describe('Asset statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/points?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -595,9 +565,7 @@ describe('Asset statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/points?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -634,9 +602,7 @@ describe('Asset statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -670,9 +636,7 @@ describe('Asset statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -709,9 +673,7 @@ describe('Asset statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -745,9 +707,7 @@ describe('Asset statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/assets/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -786,9 +746,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/points?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -822,9 +780,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/points?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -857,9 +813,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/points?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -892,9 +846,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/points?'+querystring.stringify(query),
+        utils.getUrl('stats/stores/points?'+querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -929,9 +881,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-10-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -961,9 +911,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-09-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -994,9 +942,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-09-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1027,9 +973,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1059,9 +1003,7 @@ describe('Store statistics', function(){
             from: "2013-05-01",
             to: "2013-07-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/count?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/count?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1094,9 +1036,7 @@ describe('Store statistics', function(){
             from: "2013-05-23",
             to: "2013-05-27"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/points?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1130,9 +1070,7 @@ describe('Store statistics', function(){
             from: "2013-05-31",
             to: "2013-06-04"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/points?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1165,9 +1103,7 @@ describe('Store statistics', function(){
             from: "2013-05-24",
             to: "2013-06-03"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1201,9 +1137,7 @@ describe('Store statistics', function(){
             from: "2013-05-24",
             to: "2013-06-03"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1236,9 +1170,7 @@ describe('Store statistics', function(){
             from: "2013-05-24",
             to: "2013-06-03"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1272,9 +1204,7 @@ describe('Store statistics', function(){
             from: "2013-05-24",
             to: "2013-06-03"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1308,9 +1238,7 @@ describe('Store statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/points?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1344,9 +1272,7 @@ describe('Store statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/points?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1379,9 +1305,7 @@ describe('Store statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1415,9 +1339,7 @@ describe('Store statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/downloads?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1450,9 +1372,7 @@ describe('Store statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1486,9 +1406,7 @@ describe('Store statistics', function(){
             from: "2012-01-01",
             to: "2014-01-01"
         };
-        utils.getUrl(
-            server,
-            'stats/stores/purchases?' + querystring.stringify(query),
+        utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(

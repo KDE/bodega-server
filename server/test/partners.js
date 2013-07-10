@@ -105,9 +105,7 @@ describe('Partner management', function() {
         });
 
         it('Listing partners should fail', function(done) {
-            utils.getUrl(
-                server,
-                'partner/list',
+            utils.getUrl('partner/list',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -156,9 +154,7 @@ describe('Partner management', function() {
     utils.auth({ store: 'null' });
 
     function checkPartnerList(expected, done) {
-        utils.getUrl(
-                server,
-                'partner/list',
+        utils.getUrl('partner/list',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -556,9 +552,7 @@ describe('Partner management', function() {
             });
 
             it('should list the current account', function(done) {
-                utils.getUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/list',
+                utils.getUrl('partner/' + newPartnerId + '/banking/account/list',
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type', 'application/json');
@@ -570,9 +564,7 @@ describe('Partner management', function() {
             });
 
             it('deletion should succeed', function(done) {
-                utils.getUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/delete',
+                utils.getUrl('partner/' + newPartnerId + '/banking/account/delete',
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type', 'application/json');
@@ -583,9 +575,7 @@ describe('Partner management', function() {
             });
 
             it('should list no account', function(done) {
-                utils.getUrl(
-                    server,
-                    'partner/' + newPartnerId + '/banking/account/list',
+                utils.getUrl('partner/' + newPartnerId + '/banking/account/list',
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type', 'application/json');
@@ -599,9 +589,7 @@ describe('Partner management', function() {
 
         describe('role management', function(done) {
             it('should allow listing known roles', function(done) {
-                utils.getUrl(
-                    server,
-                    'partner/roles/list',
+                utils.getUrl('partner/roles/list',
                 function(res) {
                     var expected = ['Accounts', 'Content Creator', 'Partner Manager', 'Store Manager', 'Validator'];
                     res.statusCode.should.equal(200);

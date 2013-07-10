@@ -29,9 +29,7 @@ describe('Listing', function(){
 
     describe(authedBrowsing ? 'needs to authenticate first' : 'needs to create a session', function(){
         it('authorize correctly.', function(done){
-            utils.getUrl(
-                server,
-                authedBrowsing ? 'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1' :
+            utils.getUrl(authedBrowsing ? 'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1' :
                                  'auth?auth_store=KDE-1',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -50,9 +48,7 @@ describe('Listing', function(){
 
     describe('channels', function(){
         it('should list top level channels', function(done){
-            utils.getUrl(
-                server,
-                'channels',
+            utils.getUrl('channels',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -77,9 +73,7 @@ describe('Listing', function(){
         });
 
         it('should list sub channels of a top channel', function(done){
-            utils.getUrl(
-                server,
-                'channel/' + gamesChannelId,
+            utils.getUrl('channel/' + gamesChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -104,9 +98,7 @@ describe('Listing', function(){
         });
 
         it('should list channel with assets', function(done){
-            utils.getUrl(
-                server,
-                'channel/' + cardsChannelId,
+            utils.getUrl('channel/' + cardsChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -128,9 +120,7 @@ describe('Listing', function(){
             // we need to figure out when they all finish and call
             // done() only then
             var runningTests = 3;
-            utils.getUrl(
-                server,
-                'channel/' + cardsChannelId +  '?pageSize=1',
+            utils.getUrl('channel/' + cardsChannelId +  '?pageSize=1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -147,9 +137,7 @@ describe('Listing', function(){
                     }
                 },
                 cookie);
-            utils.getUrl(
-                server,
-                'channel/' + cardsChannelId + '?pageSize=10',
+            utils.getUrl('channel/' + cardsChannelId + '?pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -166,9 +154,7 @@ describe('Listing', function(){
                     }
                 },
                 cookie);
-            utils.getUrl(
-                server,
-                'channel/' + cardsChannelId + '?pageSize=21',
+            utils.getUrl('channel/' + cardsChannelId + '?pageSize=21',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -191,9 +177,7 @@ describe('Listing', function(){
 
     describe('Listing assets', function(){
         it('by name', function(done){
-            utils.getUrl(
-                server,
-                'channel/' + cardsChannelId,
+            utils.getUrl('channel/' + cardsChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -210,9 +194,7 @@ describe('Listing', function(){
         });
 
         it('list channels by name with pageSize', function(done){
-            utils.getUrl(
-                server,
-                'channel/' + cardsChannelId +
+            utils.getUrl('channel/' + cardsChannelId +
                     '?listType=Channel&pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -231,9 +213,7 @@ describe('Listing', function(){
         });
 
         it('list channels by name with offset', function(done){
-            utils.getUrl(
-                server,
-                'channel/' + cardsChannelId +
+            utils.getUrl('channel/' + cardsChannelId +
                     '?listType=Channel&offset=10&pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);

@@ -87,9 +87,7 @@ describe('Redeeming points code', function(){
                 "points":startPoints,
                 "success": false,
                 "error": {'type' : 'RedeemCodeFailure'}};
-            utils.getUrl(
-                server,
-                'points/redeemCode/1111111111',
+            utils.getUrl('points/redeemCode/1111111111',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -109,9 +107,7 @@ describe('Redeeming points code', function(){
                 "success": true,
                 "addedPoints":testPoints
                 };
-            utils.getUrl(
-                server,
-                'points/redeemCode/' + testCode,
+            utils.getUrl('points/redeemCode/' + testCode,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

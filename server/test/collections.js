@@ -28,9 +28,7 @@ describe('Collections', function(){
     var numCollections = 0;
     describe('without authentication', function(){
         it('shouldnt allow listing collections', function(done) {
-            utils.getUrl(
-                server,
-                'collection/list',
+            utils.getUrl('collection/list',
                 function(res){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -64,9 +62,7 @@ describe('Collections', function(){
                 });
         });
         it('shouldnt allow deleting collections', function(done) {
-            utils.getUrl(
-                server,
-                'collection/delete/hello',
+            utils.getUrl('collection/delete/hello',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -164,9 +160,7 @@ describe('Collections', function(){
                 utils.cookie);
         });
         it('should list', function(done){
-            utils.getUrl(
-                server,
-                'collection/list',
+            utils.getUrl('collection/list',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -195,9 +189,7 @@ describe('Collections', function(){
             var addedAssets = 0;
             /*jshint loopfunc:true */
             for (var i = 0; i < assets.length; ++i) {
-                utils.getUrl(
-                    server,
-                    'collection/' + collectionId + '/add/' + assets[i],
+                utils.getUrl('collection/' + collectionId + '/add/' + assets[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -219,9 +211,7 @@ describe('Collections', function(){
         });
 
         it('should list added assets', function(done){
-            utils.getUrl(
-                server,
-                'collection/list/' + collectionId,
+            utils.getUrl('collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -242,9 +232,7 @@ describe('Collections', function(){
             var removedAssets = 0;
             /*jshint loopfunc:true */
             for (var i = 0; i < assetsToRemove.length; ++i) {
-                utils.getUrl(
-                    server,
-                    'collection/' + collectionId + '/remove/' + assetsToRemove[i],
+                utils.getUrl('collection/' + collectionId + '/remove/' + assetsToRemove[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -266,9 +254,7 @@ describe('Collections', function(){
         });
 
         it('should list assets after removal', function(done){
-            utils.getUrl(
-                server,
-                'collection/list/' + collectionId,
+            utils.getUrl('collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -289,9 +275,7 @@ describe('Collections', function(){
             var addedAssets = 0;
             /*jshint loopfunc:true */
             for (var i = 0; i < assetsToRemove.length; ++i) {
-                utils.getUrl(
-                    server,
-                    'collection/' + collectionId + '/add/' + assetsToRemove[i],
+                utils.getUrl('collection/' + collectionId + '/add/' + assetsToRemove[i],
                     function(res) {
                         res.should.have.status(200);
                         res.headers.should.have.property(
@@ -313,9 +297,7 @@ describe('Collections', function(){
         });
 
         it('should list assets after readding', function(done){
-            utils.getUrl(
-                server,
-                'collection/list/' + collectionId,
+            utils.getUrl('collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -333,9 +315,7 @@ describe('Collections', function(){
         });
 
         it('should allow deletion of a collection', function(done){
-            utils.getUrl(
-                server,
-                'collection/delete/' + collectionId,
+            utils.getUrl('collection/delete/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -349,9 +329,7 @@ describe('Collections', function(){
         });
 
         it('should not list collection after deletion', function(done){
-            utils.getUrl(
-                server,
-                'collection/list',
+            utils.getUrl('collection/list',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(

@@ -22,9 +22,7 @@ var assert = require('assert');
 describe('Fetch contact information', function() {
     describe('when not authenticated', function() {
         it('should return only warehouse info', function(done) {
-            utils.getUrl(
-                server,
-                'contact',
+            utils.getUrl('contact',
                 function(res) {
                     var expected = {
                         name: app.config.warehouseInfo.name,
@@ -44,9 +42,7 @@ describe('Fetch contact information', function() {
 
      describe('when authenticated', function() {
         it('should return both warehouse and store information when authenticated', function(done) {
-         utils.getUrl(
-             server,
-             'contact',
+         utils.getUrl('contact',
              function(res) {
                 var warehouse = {
                     name: app.config.warehouseInfo.name,

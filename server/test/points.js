@@ -63,9 +63,7 @@ describe('Point operations', function(){
 
     describe('Payment registration', function(){
         it('should not have any card', function(done){
-            utils.getUrl(
-                server,
-                'participant/paymentMethod',
+            utils.getUrl('participant/paymentMethod',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -81,9 +79,7 @@ describe('Point operations', function(){
                 utils.cookie);
         });
         it('should error without card card', function(done){
-            utils.getUrl(
-                server,
-                'points/buy?amount=500',
+            utils.getUrl('points/buy?amount=500',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -110,9 +106,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[name]=' + encodeURIComponent('Zack Rusin');
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -140,9 +134,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[name]=' + encodeURIComponent('Zack Rusin');
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -170,9 +162,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[name]=' + encodeURIComponent('Zack Rusin');
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -200,9 +190,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[name]=' + encodeURIComponent('Zack Rusin');
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -230,9 +218,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[name]=' + encodeURIComponent('Zack Rusin');
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -260,9 +246,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[name]=' + encodeURIComponent('Zack Rusin');
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -279,9 +263,7 @@ describe('Point operations', function(){
         it('should delete successfully', function(done){
             var url = 'participant/deletePaymentMethod';
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -309,9 +291,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[name]=' + encodeURIComponent('Zack Rusin');
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -326,9 +306,7 @@ describe('Point operations', function(){
         });
 
         it('succeeds', function(done){
-            utils.getUrl(
-                server,
-                'points/buy?amount=500',
+            utils.getUrl('points/buy?amount=500',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -343,9 +321,7 @@ describe('Point operations', function(){
         });
 
         it('errors on too few points', function(done){
-            utils.getUrl(
-                server,
-                'points/buy?amount=5',
+            utils.getUrl('points/buy?amount=5',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -361,9 +337,7 @@ describe('Point operations', function(){
         });
 
         it('errors on too many points', function(done){
-            utils.getUrl(
-                server,
-                'points/buy?amount=5000000000',
+            utils.getUrl('points/buy?amount=5000000000',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -389,9 +363,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[exp_year]=2013';
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -413,9 +385,7 @@ describe('Point operations', function(){
             url += '&';
             url += 'card[exp_year]=2013';
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -433,9 +403,7 @@ describe('Point operations', function(){
         it('should fetch the payment method', function(done){
             var url = 'participant/paymentMethod';
             //console.log(url);
-            utils.getUrl(
-                server,
-                url,
+            utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
