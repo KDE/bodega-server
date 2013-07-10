@@ -205,7 +205,7 @@ describe('Partner management', function() {
                     ]
                 };
         it('creation should fail with an existing partner name', function(done) {
-            server.config.printErrors = false;
+            utils.app.config.printErrors = false;
             var params = { name: 'KDE', email: 'foo@somewhere.org' };
             utils.postUrl('partner/create',
                 params,
@@ -217,14 +217,14 @@ describe('Partner management', function() {
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'PartnerNameExists');
                     done();
-                    server.config.printErrors = true;
+                    utils.app.config.printErrors = true;
                 },
                 utils.cookie);
         });
 
         it('creation should fail with an invalid email', function(done) {
             var params = { name: 'Somewhere', email: 'foo..somewhere.org' };
-            server.config.printErrors = false;
+            utils.app.config.printErrors = false;
             utils.postUrl('partner/create',
                 params,
                 function(res) {
@@ -234,7 +234,7 @@ describe('Partner management', function() {
                         'application/json');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'InvalidEmailAddress');
-                    server.config.printErrors = true;
+                    utils.app.config.printErrors = true;
                     done();
                 },
                 utils.cookie);
@@ -274,7 +274,7 @@ describe('Partner management', function() {
 
         it('adding invalid contact links should fail', function(done) {
             var params = { service: 'Not Even Close', email: 'foo..somewhere.org' };
-            server.config.printErrors = false;
+            utils.app.config.printErrors = false;
             var queue = async.queue(function(task, cb) {
             utils.postUrl('partner/' + task.partner + '/link/create',
                 task.params,
@@ -315,7 +315,7 @@ describe('Partner management', function() {
 
             queue.push(tasks);
             queue.drain = function() {
-                    server.config.printErrors = true;
+                    utils.app.config.printErrors = true;
                     done();
             };
         });
@@ -379,7 +379,7 @@ describe('Partner management', function() {
 
         it('should not allow updating a partner we are not a manager for', function(done) {
             var params = { name: 'Sometime', email: 'foo@sometime.org' };
-            server.config.printErrors = false;
+            utils.app.config.printErrors = false;
             utils.postUrl('partner/update/' + 1003,
                 params,
                 function(res) {
@@ -390,7 +390,7 @@ describe('Partner management', function() {
                     res.body.should.have.property('success', false);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'InvalidRole');
-                    server.config.printErrors = true;
+                    utils.app.config.printErrors = true;
                     done();
                 },
                 utils.cookie);

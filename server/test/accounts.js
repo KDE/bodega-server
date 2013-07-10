@@ -18,7 +18,6 @@
 var pg = require('pg');
 var queryString = require('querystring');
 
-var server = require('../app.js');
 var utils = require('./support/http.js');
 var assert = require('assert');
 
@@ -175,7 +174,7 @@ describe('Changing account information', function() {
             email: 'bunny_rabbit'
         };
 
-        server.config.printErrors = false;
+        utils.app.config.printErrors = false;
         utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
@@ -186,7 +185,7 @@ describe('Changing account information', function() {
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'InvalidEmailAddress');
                 done();
-                server.config.printErrors = true;
+                utils.app.config.printErrors = true;
             },
             utils.cookie);
     });
