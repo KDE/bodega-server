@@ -22,16 +22,14 @@ var assert = require('assert');
 describe('List api', function() {
     describe('Request index page', function() {
      it('should work with no trailing slash (/api)', function(done) {
-        utils.getHtml(server,
-            '/api',
+        utils.getHtml('/api',
             function(res) {
                 res.statusCode.should.equal(200);
                 done();
             });
      });
      it('should work with  atrailing slash (/api/)', function(done) {
-        utils.getHtml(server,
-            '/api/',
+        utils.getHtml('/api/',
             function(res) {
                 res.statusCode.should.equal(200);
                 done();
@@ -41,8 +39,7 @@ describe('List api', function() {
 
     describe('when markdown file is found', function() {
      it('should show the content', function(done) {
-        utils.getHtml(server,
-            '/api/json_api',
+        utils.getHtml('/api/json_api',
             function(res) {
                 res.statusCode.should.equal(200);
                 done();
@@ -51,8 +48,7 @@ describe('List api', function() {
 
     describe('when markdown file is not found', function() {
         it('should return the 404 page', function(done) {
-            utils.getHtml(server,
-                '/api/wrongPath',
+            utils.getHtml('/api/wrongPath',
                 function(res) {
                     res.statusCode.should.equal(200);
                     var pageNotFound = res.body.indexOf('Page Not Found') > -1;
