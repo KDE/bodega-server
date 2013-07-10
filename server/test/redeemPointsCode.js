@@ -73,7 +73,7 @@ describe('Redeeming points code', function(){
         });
     });
 
-    utils.auth(server, { store: 'VIVALDI-1' }, function(res, done) {
+    utils.auth({ store: 'VIVALDI-1' }, function(res, done) {
         startPoints = res.body.points;
         done();
     });

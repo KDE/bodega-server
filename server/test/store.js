@@ -43,8 +43,7 @@ describe('Store management', function(){
         });
     });
 
-    utils.auth(server,
-               {
+    utils.auth({
                    user: 'aseigo@kde.org',
                    password: 'aseigo',
                    store: 'null'
@@ -70,8 +69,7 @@ describe('Store management', function(){
         });
     });
 
-    utils.auth(server,
-               {
+    utils.auth(               {
                    store: 'null'
                });
 

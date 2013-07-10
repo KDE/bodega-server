@@ -153,7 +153,7 @@ describe('Partner management', function() {
         });
     });
 
-    utils.auth(server, { store: 'null' });
+    utils.auth({ store: 'null' });
 
     function checkPartnerList(expected, done) {
         utils.getUrl(

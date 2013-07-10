@@ -24,10 +24,7 @@ var querystring = require('querystring');
 describe('Tags manipulation', function(){
     var createdTagId;
 
-    utils.auth(server,
-               {
-                   store: 'null'
-               });
+    utils.auth({ store: 'null' });
 
     function listTags(asset, channel, type, cb) {
         var query = '/bodega/v1/json';

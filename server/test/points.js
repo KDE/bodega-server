@@ -56,7 +56,7 @@ describe('Point operations', function(){
         }, utils.cookie);
     });
 
-    utils.auth(server, {}, function(res, done) {
+    utils.auth({}, function(res, done) {
         startPoints = res.body.points;
         done();
     });

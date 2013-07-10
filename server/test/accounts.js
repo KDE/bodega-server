@@ -302,7 +302,7 @@ describe('Changing passwords', function() {
             utils.cookie);
     });
 
-    utils.auth(server, { password: 'alphabetical' });
+    utils.auth({ password: 'alphabetical' });
 
     after(function(done) {
         var connectionString = app.config.service.database.protocol + "://" +

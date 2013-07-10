@@ -40,7 +40,7 @@ describe('Fetch contact information', function() {
         });
     });
 
-     utils.auth(server, { store: 'VIVALDI-1' });
+     utils.auth({ store: 'VIVALDI-1' });
 
      describe('when authenticated', function() {
         it('should return both warehouse and store information when authenticated', function(done) {

@@ -55,7 +55,7 @@ function postFiles(server, dst, files, cookie, fn)
     }
 }
 
-utils.auth(server, {}, function(res, done) {
+utils.auth({}, function(res, done) {
     var j = request.jar();
     request = request.defaults({jar :j });
     j.add(new Cookie(utils.cookie[0]));
