@@ -122,7 +122,7 @@ describe('Tags manipulation', function(){
             listTags(null, 2, null, cb);
         });
 
-        it('List all tags of type 8', function(done) {
+        it('List all tags of type contentrating', function(done) {
             var cb = function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -138,14 +138,14 @@ describe('Tags manipulation', function(){
                 res.body.tags[0].title.should.be.eql('Adults Only');
                 done();
             };
-            listTags(null, null, 8, cb);
+            listTags(null, null, 'contentrating', cb);
         });
 
         it('create a tag', function(done) {
             createTag('test', 8, function(res) {
                 createdTagId = res.body.id;
 
-                listTags(null, null, 8, function(res) {
+                listTags(null, null, 'contentrating', function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -165,7 +165,7 @@ describe('Tags manipulation', function(){
         it('edit the created tag', function(done) {
             updateTag(createdTagId, 'new title', 9, function(res) {
 
-                listTags(null, null, 9, function(res) {
+                listTags(null, null, 'assetType', function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
@@ -184,7 +184,7 @@ describe('Tags manipulation', function(){
 
         it('delete the created tag', function(done) {
             deleteTag(createdTagId, function(res) {
-                listTags(null, null, 8, function(res) {
+                listTags(null, null, 'contentrating', function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
                         'content-type',
