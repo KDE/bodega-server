@@ -30,7 +30,7 @@ describe('Authentication', function(){
                 "error": {"type": "MissingParameters"}
             };
             utils.getUrl(server,
-                         '/bodega/v1/json/auth',
+                         'auth',
                          function(res) {
                              res.statusCode.should.equal(200);
                              res.headers.should.have.property(
@@ -54,7 +54,7 @@ describe('Authentication', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=&auth_password=&auth_store=',
+                'auth?auth_user=&auth_password=&auth_store=',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -77,7 +77,7 @@ describe('Authentication', function(){
                 "error": {"type" : "MissingParameters"}};
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=&auth_password=&auth_store=',
+                'auth?auth_user=&auth_password=&auth_store=',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -100,7 +100,7 @@ describe('Authentication', function(){
                 "error": {"type" : "NoMatch"}};
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=bad_password&auth_store=2',
+                'auth?auth_user=zack@kde.org&auth_password=bad_password&auth_store=2',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -123,7 +123,7 @@ describe('Authentication', function(){
                 "error": {"type" : "NoMatch" }};
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=5',
+                'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=5',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -156,7 +156,7 @@ describe('Authentication', function(){
             };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
+                'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

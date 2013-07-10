@@ -23,7 +23,7 @@ describe('Asset update checks', function() {
         var params = { };
         utils.postUrl(
             server,
-            '/bodega/v1/json/asset/list/updates',
+            'asset/list/updates',
             params,
             function(res) {
                 res.statusCode.should.equal(200);
@@ -41,7 +41,7 @@ describe('Asset update checks', function() {
         var params = { assets: [] };
         utils.postUrl(
             server,
-            '/bodega/v1/json/asset/list/updates',
+            'asset/list/updates',
             params,
             function(res) {
                 res.statusCode.should.equal(200);
@@ -64,7 +64,7 @@ describe('Asset update checks', function() {
 
         utils.postUrl(
             server,
-            '/bodega/v1/json/asset/list/updates',
+            'asset/list/updates',
             params,
             function(res) {
                 res.statusCode.should.equal(200);
@@ -94,7 +94,7 @@ describe('Asset update checks', function() {
 
         utils.postUrl(
             server,
-            '/bodega/v1/json/asset/list/updates',
+            'asset/list/updates',
             params,
             function(res) {
                 res.statusCode.should.equal(200);

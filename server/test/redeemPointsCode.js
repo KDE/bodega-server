@@ -89,7 +89,7 @@ describe('Redeeming points code', function(){
                 "error": {'type' : 'RedeemCodeFailure'}};
             utils.getUrl(
                 server,
-                '/bodega/v1/json/points/redeemCode/1111111111',
+                'points/redeemCode/1111111111',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -111,7 +111,7 @@ describe('Redeeming points code', function(){
                 };
             utils.getUrl(
                 server,
-                '/bodega/v1/json/points/redeemCode/' + testCode,
+                'points/redeemCode/' + testCode,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(

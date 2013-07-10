@@ -51,7 +51,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            'stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -86,7 +86,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            'stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -121,7 +121,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/points?'+querystring.stringify(query),
+            'stats/assets/points?'+querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -162,7 +162,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            'stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -194,7 +194,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            'stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -227,7 +227,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            'stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -264,7 +264,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            'stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -296,7 +296,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/count?' + querystring.stringify(query),
+            'stats/assets/count?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -335,7 +335,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            'stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -371,7 +371,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            'stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -410,7 +410,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            'stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -446,7 +446,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            'stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -485,7 +485,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            'stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -521,7 +521,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            'stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -561,7 +561,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            'stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -597,7 +597,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/points?' + querystring.stringify(query),
+            'stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -636,7 +636,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            'stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -672,7 +672,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/downloads?' + querystring.stringify(query),
+            'stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -711,7 +711,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            'stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -747,7 +747,7 @@ describe('Asset statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/assets/purchases?' + querystring.stringify(query),
+            'stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -788,7 +788,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/points?' + querystring.stringify(query),
+            'stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -824,7 +824,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/points?' + querystring.stringify(query),
+            'stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -859,7 +859,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/points?' + querystring.stringify(query),
+            'stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -894,7 +894,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/points?'+querystring.stringify(query),
+            'stats/stores/points?'+querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -931,7 +931,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/downloads?' + querystring.stringify(query),
+            'stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -963,7 +963,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/downloads?' + querystring.stringify(query),
+            'stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -996,7 +996,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/downloads?' + querystring.stringify(query),
+            'stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1029,7 +1029,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/purchases?' + querystring.stringify(query),
+            'stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1061,7 +1061,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/count?' + querystring.stringify(query),
+            'stats/stores/count?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1096,7 +1096,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/points?' + querystring.stringify(query),
+            'stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1132,7 +1132,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/points?' + querystring.stringify(query),
+            'stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1167,7 +1167,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/downloads?' + querystring.stringify(query),
+            'stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1203,7 +1203,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/downloads?' + querystring.stringify(query),
+            'stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1238,7 +1238,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/purchases?' + querystring.stringify(query),
+            'stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1274,7 +1274,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/purchases?' + querystring.stringify(query),
+            'stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1310,7 +1310,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/points?' + querystring.stringify(query),
+            'stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1346,7 +1346,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/points?' + querystring.stringify(query),
+            'stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1381,7 +1381,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/downloads?' + querystring.stringify(query),
+            'stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1417,7 +1417,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/downloads?' + querystring.stringify(query),
+            'stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1452,7 +1452,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/purchases?' + querystring.stringify(query),
+            'stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -1488,7 +1488,7 @@ describe('Store statistics', function(){
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/stats/stores/purchases?' + querystring.stringify(query),
+            'stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(

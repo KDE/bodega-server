@@ -34,7 +34,7 @@ describe('Point operations', function(){
 
     after(function(done) {
         //try to delete the account if one was created
-        var url = '/bodega/v1/json/participant/deletePaymentMethod';
+        var url = 'participant/deletePaymentMethod';
         var updateQuery = 'UPDATE people SET points=$1 WHERE \
                            email=\'zack@kde.org\'';
         //console.log(url);
@@ -65,7 +65,7 @@ describe('Point operations', function(){
         it('should not have any card', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/participant/paymentMethod',
+                'participant/paymentMethod',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -83,7 +83,7 @@ describe('Point operations', function(){
         it('should error without card card', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/points/buy?amount=500',
+                'points/buy?amount=500',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -99,7 +99,7 @@ describe('Point operations', function(){
                 utils.cookie);
         });
         it('should emit card_declined', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4000000000000002');
             url += '&';
             url += 'card[exp_month]=12';
@@ -129,7 +129,7 @@ describe('Point operations', function(){
         });
 
         it('should emit CardIncorrectNumber', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424241');
             url += '&';
             url += 'card[exp_month]=12';
@@ -159,7 +159,7 @@ describe('Point operations', function(){
         });
 
         it('should emit CardInvalidExpiryMonth', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
             url += 'card[exp_month]=13';
@@ -189,7 +189,7 @@ describe('Point operations', function(){
         });
 
         it('should emit CardInvalidExpiryYear', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
             url += 'card[exp_month]=12';
@@ -219,7 +219,7 @@ describe('Point operations', function(){
         });
 
         it('should emit CardInvalidCVC', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
             url += 'card[exp_month]=12';
@@ -249,7 +249,7 @@ describe('Point operations', function(){
         });
 
         it('should register successfully', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
             url += 'card[exp_month]=12';
@@ -277,7 +277,7 @@ describe('Point operations', function(){
         });
 
         it('should delete successfully', function(done){
-            var url = '/bodega/v1/json/participant/deletePaymentMethod';
+            var url = 'participant/deletePaymentMethod';
             //console.log(url);
             utils.getUrl(
                 server,
@@ -298,7 +298,7 @@ describe('Point operations', function(){
 
     describe('Buying points', function(){
         it('should register successfully', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
             url += 'card[exp_month]=12';
@@ -328,7 +328,7 @@ describe('Point operations', function(){
         it('succeeds', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/points/buy?amount=500',
+                'points/buy?amount=500',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -345,7 +345,7 @@ describe('Point operations', function(){
         it('errors on too few points', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/points/buy?amount=5',
+                'points/buy?amount=5',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -363,7 +363,7 @@ describe('Point operations', function(){
         it('errors on too many points', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/points/buy?amount=5000000000',
+                'points/buy?amount=5000000000',
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property(
@@ -382,7 +382,7 @@ describe('Point operations', function(){
     describe('on users ', function(){
         var validCard = '4408041234567893';
         it('should allow changing the card', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent(validCard);
             url += '&';
             url += 'card[exp_month]=12';
@@ -406,7 +406,7 @@ describe('Point operations', function(){
         });
 
         it('shouldnt change to an invalid card', function(done){
-            var url = '/bodega/v1/json/participant/changeAccountDetails?';
+            var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4408041234567890');
             url += '&';
             url += 'card[exp_month]=12';
@@ -431,7 +431,7 @@ describe('Point operations', function(){
         });
 
         it('should fetch the payment method', function(done){
-            var url = '/bodega/v1/json/participant/paymentMethod';
+            var url = 'participant/paymentMethod';
             //console.log(url);
             utils.getUrl(
                 server,

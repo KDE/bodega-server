@@ -53,7 +53,7 @@ describe('Tags manipulation', function(){
     function createTag(title, type, cb) {
         utils.postUrl(
             server,
-            '/bodega/v1/json/tag/create', {'title': title, 'type': type},
+            'tag/create', {'title': title, 'type': type},
             function(res) {
                 cb(res);
             },
@@ -63,7 +63,7 @@ describe('Tags manipulation', function(){
     function updateTag(id, title, type, cb) {
         utils.postUrl(
             server,
-            '/bodega/v1/json/tag/update/' + id, {'title': title, 'type': type},
+            'tag/update/' + id, {'title': title, 'type': type},
             function(res) {
                 cb(res);
             },
@@ -73,7 +73,7 @@ describe('Tags manipulation', function(){
     function deleteTag(tag, cb) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/tag/delete/' + tag,
+            'tag/delete/' + tag,
             function(res) {
                 cb(res);
             },

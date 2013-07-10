@@ -24,7 +24,7 @@ describe('Fetch contact information', function() {
         it('should return only warehouse info', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/contact',
+                'contact',
                 function(res) {
                     var expected = {
                         name: app.config.warehouseInfo.name,
@@ -46,7 +46,7 @@ describe('Fetch contact information', function() {
         it('should return both warehouse and store information when authenticated', function(done) {
          utils.getUrl(
              server,
-             '/bodega/v1/json/contact',
+             'contact',
              function(res) {
                 var warehouse = {
                     name: app.config.warehouseInfo.name,

@@ -27,7 +27,7 @@ describe('Create user', function() {
     it('register successful', function(done) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/register?firstname=antonis&lastname=tsiapaliokas&email=kok3rs@gmail.com&password=123456789',
+            'register?firstname=antonis&lastname=tsiapaliokas&email=kok3rs@gmail.com&password=123456789',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -47,7 +47,7 @@ describe('Create user', function() {
         it('should activate', function(done) {
             utils.getHtml(
                 server,
-                '/bodega/v1/json/register/confirm?' + queryString.stringify(userInfo),
+                'register/confirm?' + queryString.stringify(userInfo),
                 function(res) {
                     var activationState = res.body.indexOf('Success!') > -1;
 
@@ -64,7 +64,7 @@ describe('Deactivate user', function() {
     it('succeeds', function(done) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/participant/changeAccountDetails&active=false',
+            'participant/changeAccountDetails&active=false',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -100,7 +100,7 @@ function checkPersonInfo(cookie, key, value, done)
     //console.log("checking " + key + " == " + value);
     utils.getUrl(
         server,
-        '/bodega/v1/json/participant/info',
+        'participant/info',
         function(res) {
             res.statusCode.should.equal(200);
             res.headers.should.have.property(
@@ -120,7 +120,7 @@ describe('Changing account information', function() {
         };
         utils.postUrl(
             server,
-            '/bodega/v1/json/participant/changeAccountDetails', query,
+            'participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -138,7 +138,7 @@ describe('Changing account information', function() {
         };
         utils.postUrl(
             server,
-            '/bodega/v1/json/participant/changeAccountDetails', query,
+            'participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -156,7 +156,7 @@ describe('Changing account information', function() {
         };
         utils.postUrl(
             server,
-            '/bodega/v1/json/participant/changeAccountDetails', query,
+            'participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -174,7 +174,7 @@ describe('Changing account information', function() {
         };
         utils.postUrl(
             server,
-            '/bodega/v1/json/participant/changeAccountDetails', query,
+            'participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -194,7 +194,7 @@ describe('Changing account information', function() {
         server.config.printErrors = false;
         utils.postUrl(
             server,
-            '/bodega/v1/json/participant/changeAccountDetails', query,
+            'participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -215,7 +215,7 @@ describe('Changing account information', function() {
         };
         utils.postUrl(
             server,
-            '/bodega/v1/json/participant/changeAccountDetails', query,
+            'participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -253,7 +253,7 @@ describe('Changing passwords', function() {
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/participant/changePassword?' + queryString.stringify(query),
+            'participant/changePassword?' + queryString.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -270,7 +270,7 @@ describe('Changing passwords', function() {
     it('rejects changing to no password', function(done) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/participant/changePassword',
+            'participant/changePassword',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -290,7 +290,7 @@ describe('Changing passwords', function() {
         };
         utils.getUrl(
             server,
-            '/bodega/v1/json/participant/changePassword?' + queryString.stringify(query),
+            'participant/changePassword?' + queryString.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -323,7 +323,7 @@ describe('Getting account information', function() {
     it('should fail to get personal information before authorization', function(done) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/participant/info',
+            'participant/info',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -338,7 +338,7 @@ describe('Getting account information', function() {
     it('should fail to get a history before authorization', function(done) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/participant/history',
+            'participant/history',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -353,7 +353,7 @@ describe('Getting account information', function() {
     it('authorizes correctly', function(done) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
+            'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -369,7 +369,7 @@ describe('Getting account information', function() {
     it('fetches personal information', function(done) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/participant/info',
+            'participant/info',
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property(
@@ -393,7 +393,7 @@ describe('Getting account information', function() {
     it('fetch history', function(done) {
         utils.getUrl(
             server,
-            '/bodega/v1/json/participant/history',
+            'participant/history',
             function(res) {
                 var expected = [
                     {

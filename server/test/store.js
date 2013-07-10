@@ -27,7 +27,7 @@ describe('Store management', function(){
         it('should fail', function(done) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create', {},
+                'store/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -54,7 +54,7 @@ describe('Store management', function(){
         it('Creation request should fail', function(done) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create', {},
+                'store/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -79,7 +79,7 @@ describe('Store management', function(){
         it('should fail with an invalid partner', function(done){
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create',
+                'store/create',
                 { partner: 1003 },
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -97,7 +97,7 @@ describe('Store management', function(){
         it('should fail without a name', function(done){
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create',
+                'store/create',
                 { partner: 1002 },
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -121,7 +121,7 @@ describe('Store management', function(){
                 };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create',
+                'store/create',
                 query,
                 function(res) {
                     var expected = [ {
@@ -152,7 +152,7 @@ describe('Store management', function(){
                 };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create',
+                'store/create',
                 query,
                 function(res) {
                     var expected = [ {
@@ -183,7 +183,7 @@ describe('Store management', function(){
                 };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/create',
+                'store/create',
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -205,7 +205,7 @@ describe('Store management', function(){
            function(done) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/store/list',
+                    'store/list',
                     function(res) {
                         var expected = [
                         {
@@ -266,7 +266,7 @@ describe('Store management', function(){
 
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/update/does_not_exist',
+                'store/update/does_not_exist',
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -290,7 +290,7 @@ describe('Store management', function(){
 
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/update/does_not_exist',
+                'store/update/does_not_exist',
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -315,7 +315,7 @@ describe('Store management', function(){
 
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/update/1002_FUN_TIMES_WITH_CLOWNS',
+                'store/update/1002_FUN_TIMES_WITH_CLOWNS',
                 query,
                 function(res) {
                     var expected = [
@@ -347,7 +347,7 @@ describe('Store management', function(){
 
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/update/1002_FUN_TIMES_WITH_CLOWNS',
+                'store/update/1002_FUN_TIMES_WITH_CLOWNS',
                 query,
                 function(res) {
                     var expected = [
@@ -384,7 +384,7 @@ describe('Store management', function(){
 
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/channel/create/KDE-1',
+                'store/channel/create/KDE-1',
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -411,7 +411,7 @@ describe('Store management', function(){
         it('fetch the structure of the store', function(done) {
            utils.getUrl(
                 server,
-                '/bodega/v1/json/store/structure/KDE-1',
+                'store/structure/KDE-1',
                 function(res) {
                     var channel2 =
                         { "id": 2,
@@ -504,7 +504,7 @@ describe('Store management', function(){
                 };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,
+                'store/channel/update/KDE-1/' + newChannelId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -526,7 +526,7 @@ describe('Store management', function(){
                 };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,
+                'store/channel/update/KDE-1/' + newChannelId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -548,7 +548,7 @@ describe('Store management', function(){
                 };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/store/channel/update/KDE-1/' + newChannelId,
+                'store/channel/update/KDE-1/' + newChannelId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -567,7 +567,7 @@ describe('Store management', function(){
         it('should be possible to delete that channel', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/channel/delete/KDE-1/' + newChannelId,
+                'store/channel/delete/KDE-1/' + newChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type',
@@ -584,7 +584,7 @@ describe('Store management', function(){
         it('should succeed with a valid store', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/delete/1002_FUN_TIMES_WITH_CLOWNS',
+                'store/delete/1002_FUN_TIMES_WITH_CLOWNS',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -600,7 +600,7 @@ describe('Store management', function(){
         it('should succeed with another valid store', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/store/delete/somethingcrazy',
+                'store/delete/somethingcrazy',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -617,7 +617,7 @@ describe('Store management', function(){
            function(done) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/store/list',
+                    'store/list',
                     function(res) {
                         var expected = [
                         {

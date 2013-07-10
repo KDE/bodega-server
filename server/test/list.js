@@ -31,8 +31,8 @@ describe('Listing', function(){
         it('authorize correctly.', function(done){
             utils.getUrl(
                 server,
-                authedBrowsing ? '/bodega/v1/json/auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1' :
-                                 '/bodega/v1/json/auth?auth_store=KDE-1',
+                authedBrowsing ? 'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1' :
+                                 'auth?auth_store=KDE-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -52,7 +52,7 @@ describe('Listing', function(){
         it('should list top level channels', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channels',
+                'channels',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -79,7 +79,7 @@ describe('Listing', function(){
         it('should list sub channels of a top channel', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + gamesChannelId,
+                'channel/' + gamesChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -106,7 +106,7 @@ describe('Listing', function(){
         it('should list channel with assets', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + cardsChannelId,
+                'channel/' + cardsChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -130,7 +130,7 @@ describe('Listing', function(){
             var runningTests = 3;
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + cardsChannelId +  '?pageSize=1',
+                'channel/' + cardsChannelId +  '?pageSize=1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -149,7 +149,7 @@ describe('Listing', function(){
                 cookie);
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + cardsChannelId + '?pageSize=10',
+                'channel/' + cardsChannelId + '?pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -168,7 +168,7 @@ describe('Listing', function(){
                 cookie);
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + cardsChannelId + '?pageSize=21',
+                'channel/' + cardsChannelId + '?pageSize=21',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -193,7 +193,7 @@ describe('Listing', function(){
         it('by name', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + cardsChannelId,
+                'channel/' + cardsChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -212,7 +212,7 @@ describe('Listing', function(){
         it('list channels by name with pageSize', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + cardsChannelId +
+                'channel/' + cardsChannelId +
                     '?listType=Channel&pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -233,7 +233,7 @@ describe('Listing', function(){
         it('list channels by name with offset', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + cardsChannelId +
+                'channel/' + cardsChannelId +
                     '?listType=Channel&offset=10&pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);

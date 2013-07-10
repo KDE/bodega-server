@@ -28,7 +28,7 @@ describe('Searching', function(){
         it('find the games channel', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channels',
+                'channels',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -53,7 +53,7 @@ describe('Searching', function(){
         it('find the card games channel', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/channel/' + gamesChannelId,
+                'channel/' + gamesChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -80,7 +80,7 @@ describe('Searching', function(){
         it('should error an missing query', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/search',
+                'search',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -98,7 +98,7 @@ describe('Searching', function(){
         it('should error an missing channel', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/search?' +
+                'search?' +
                     '&query=\'mathematica\'',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -118,7 +118,7 @@ describe('Searching', function(){
         it('should find an asset', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/search?channelId=' + gamesChannelId +
+                'search?channelId=' + gamesChannelId +
                     '&query=\'diamond\'',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -140,7 +140,7 @@ describe('Searching', function(){
         it('work with plaintext query', function(done){
             utils.getUrl(
                 server,
-                '/bodega/v1/json/search?channelId=' + gamesChannelId +
+                'search?channelId=' + gamesChannelId +
                     '&query=\'best+app+from+Diamond+to+date\'',
                 function(res) {
                     res.statusCode.should.equal(200);

@@ -75,7 +75,7 @@ describe('Partner management', function() {
         it('Creating a partner should fail', function(done) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/create', {},
+                'partner/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -91,7 +91,7 @@ describe('Partner management', function() {
         it('Updating a partner should fail', function(done) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/update/1002', {},
+                'partner/update/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -107,7 +107,7 @@ describe('Partner management', function() {
         it('Listing partners should fail', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/partner/list',
+                'partner/list',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -123,7 +123,7 @@ describe('Partner management', function() {
         it('Requesting publisher status should fail', function(done) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/request/publisher/1002', {},
+                'partner/request/publisher/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -139,7 +139,7 @@ describe('Partner management', function() {
         it('Requesting distributor status should fail', function(done) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/request/distributor/1002', {},
+                'partner/request/distributor/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -158,7 +158,7 @@ describe('Partner management', function() {
     function checkPartnerList(expected, done) {
         utils.getUrl(
                 server,
-                '/bodega/v1/json/partner/list',
+                'partner/list',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -221,7 +221,7 @@ describe('Partner management', function() {
             var params = { name: 'KDE', email: 'foo@somewhere.org' };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/create',
+                'partner/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -241,7 +241,7 @@ describe('Partner management', function() {
             server.config.printErrors = false;
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/create',
+                'partner/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -260,7 +260,7 @@ describe('Partner management', function() {
             var params = { name: 'Somewhere', email: 'foo@somewhere.org' };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/create',
+                'partner/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -279,7 +279,7 @@ describe('Partner management', function() {
             var params = { name: 'Sometime', email: 'foo@sometime.org' };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/update/' + newPartnerId,
+                'partner/update/' + newPartnerId,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -298,7 +298,7 @@ describe('Partner management', function() {
             var queue = async.queue(function(task, cb) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/' + task.partner + '/link/create',
+                'partner/' + task.partner + '/link/create',
                 task.params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -346,7 +346,7 @@ describe('Partner management', function() {
             var queue = async.queue(function(params, cb) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/' + newPartnerId + '/link/create',
+                'partner/' + newPartnerId + '/link/create',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -384,7 +384,7 @@ describe('Partner management', function() {
             };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/' + newPartnerId + '/link/delete',
+                'partner/' + newPartnerId + '/link/delete',
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -408,7 +408,7 @@ describe('Partner management', function() {
             server.config.printErrors = false;
             utils.postUrl(
                 server,
-                '/bodega/v1/json/partner/update/' + 1003,
+                'partner/update/' + 1003,
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -441,7 +441,7 @@ describe('Partner management', function() {
             it('should allow setting the transfer account info', function(done) {
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    'partner/' + newPartnerId + '/banking/account/update',
                     account,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -458,7 +458,7 @@ describe('Partner management', function() {
                 badAccount.iban = '';
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    'partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -475,7 +475,7 @@ describe('Partner management', function() {
                 badAccount.nameOnAccount = '';
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    'partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -492,7 +492,7 @@ describe('Partner management', function() {
                 badAccount.address = '';
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    'partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -509,7 +509,7 @@ describe('Partner management', function() {
                 badAccount.bank = '';
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    'partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -526,7 +526,7 @@ describe('Partner management', function() {
                 badAccount.bankAddress = '';
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    'partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -543,7 +543,7 @@ describe('Partner management', function() {
                 badAccount.account = '';
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/update',
+                    'partner/' + newPartnerId + '/banking/account/update',
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -558,7 +558,7 @@ describe('Partner management', function() {
             it('should list the current account', function(done) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/list',
+                    'partner/' + newPartnerId + '/banking/account/list',
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type', 'application/json');
@@ -572,7 +572,7 @@ describe('Partner management', function() {
             it('deletion should succeed', function(done) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/delete',
+                    'partner/' + newPartnerId + '/banking/account/delete',
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type', 'application/json');
@@ -585,7 +585,7 @@ describe('Partner management', function() {
             it('should list no account', function(done) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/partner/' + newPartnerId + '/banking/account/list',
+                    'partner/' + newPartnerId + '/banking/account/list',
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type', 'application/json');
@@ -601,7 +601,7 @@ describe('Partner management', function() {
             it('should allow listing known roles', function(done) {
                 utils.getUrl(
                     server,
-                    '/bodega/v1/json/partner/roles/list',
+                    'partner/roles/list',
                 function(res) {
                     var expected = ['Accounts', 'Content Creator', 'Partner Manager', 'Store Manager', 'Validator'];
                     res.statusCode.should.equal(200);
@@ -623,7 +623,7 @@ describe('Partner management', function() {
                          };
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/roles/update/' + newPartnerId,
+                    'partner/roles/update/' + newPartnerId,
                     params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -665,7 +665,7 @@ describe('Partner management', function() {
                          };
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/roles/update/' + newPartnerId,
+                    'partner/roles/update/' + newPartnerId,
                     params,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -706,7 +706,7 @@ describe('Partner management', function() {
 
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/roles/update/' + newPartnerId,
+                    'partner/roles/update/' + newPartnerId,
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -740,7 +740,7 @@ describe('Partner management', function() {
 
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/request/publisher/' + newPartnerId,
+                    'partner/request/publisher/' + newPartnerId,
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -760,7 +760,7 @@ describe('Partner management', function() {
 
                 utils.postUrl(
                     server,
-                    '/bodega/v1/json/partner/request/publisher/' + newPartnerId,
+                    'partner/request/publisher/' + newPartnerId,
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
