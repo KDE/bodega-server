@@ -36,7 +36,13 @@ function postFiles(server, dst, files, cookie, fn)
         cookie: cookie
     };
     var r = request.post(obj, function(err, res, body) {
-        res.body = JSON.parse(body);
+        try {
+            res.body = JSON.parse(body);
+        } catch (e) {
+            console.log('Error parsing JSON response to ' + url + ': ' + e.message);
+            console.log('Body returned was ' + body);
+            res.body = body;
+        }
         fn(res);
     });
     var form = r.form();
