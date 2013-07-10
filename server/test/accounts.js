@@ -54,7 +54,7 @@ describe('Create user', function() {
     });
 });
 
-utils.auth(server);
+utils.auth();
 
 describe('Deactivate user', function() {
     it('succeeds', function(done) {
