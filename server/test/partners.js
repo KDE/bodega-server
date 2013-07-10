@@ -719,12 +719,7 @@ describe('Partner management', function() {
                 return;
             }
 
-            var connectionString = server.config.service.database.protocol + "://" +
-                                   server.config.service.database.user + ":" + server.config.service.database.password +
-                                   "@" + server.config.service.database.host + "/" +
-                                   server.config.service.database.name;
-
-            pg.connect(connectionString,
+            pg.connect(utils.dbConnectionString,
                        function(err, client, finis) {
                             client.query("delete from partners where id = $1", [newPartnerId],
                                     function() {

@@ -16,18 +16,12 @@
 */
 
 var pg = require('pg');
-var server = require('../app.js');
 var utils = require('./support/http');
 var querystring = require('querystring');
 
 describe('Database environment for accurate statistics', function() {
         it('timezone set to UTC in postgresql.conf or db session', function(done) {
-            var connectionString = app.config.service.database.protocol + "://" +
-                                   app.config.service.database.user + ":" + app.config.service.database.password +
-                                   "@" + app.config.service.database.host + "/" +
-                                   app.config.service.database.name;
-
-             pg.connect(connectionString, function(err, client, finis) {
+             pg.connect(utils.dbConnectionString, function(err, client, finis) {
                  client.query("SHOW time zone;", [],
                      function(err, result) {
                          result.rows[0].TimeZone.should.eql('UTC');

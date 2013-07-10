@@ -73,12 +73,7 @@ describe('Deactivate user', function() {
     });
 
     after(function(done) {
-        var connectionString = app.config.service.database.protocol + "://" +
-                               app.config.service.database.user + ":" + app.config.service.database.password +
-                               "@" + app.config.service.database.host + "/" +
-                               app.config.service.database.name;
-
-        pg.connect(connectionString, function(err, client, finis) {
+        pg.connect(utils.dbConnectionString, function(err, client, finis) {
                    client.query("delete from people where email = 'kok3rs@gmail.com'", [],
                         function(err, res) {
                            finis();
@@ -209,12 +204,7 @@ describe('Changing account information', function() {
     });
 
     after(function(done) {
-        var connectionString = app.config.service.database.protocol + "://" +
-                               app.config.service.database.user + ":" + app.config.service.database.password +
-                               "@" + app.config.service.database.host + "/" +
-                               app.config.service.database.name;
-
-        pg.connect(connectionString, function(err, client, finis) {
+        pg.connect(utils.dbConnectionString, function(err, client, finis) {
                    client.query("update people set email = $1, firstname = $2, middlenames = $3, lastname = $4 where id = 2",
                    ['zack@kde.org', 'Zack', null, 'Rusin'],
                         function(err, res) {
@@ -278,12 +268,7 @@ describe('Changing passwords', function() {
     utils.auth({ password: 'alphabetical' });
 
     after(function(done) {
-        var connectionString = app.config.service.database.protocol + "://" +
-                               app.config.service.database.user + ":" + app.config.service.database.password +
-                               "@" + app.config.service.database.host + "/" +
-                               app.config.service.database.name;
-
-        pg.connect(connectionString, function(err, client, finis) {
+        pg.connect(utils.dbConnectionString, function(err, client, finis) {
                    client.query("update people set password = '$2a$10$Iejk3uw6uGFCGR5OKaOOZO2tmnlIhPCsCvw7G1pLa81QH4fonDC.C' where id = 2", [],
                    function(err, result) {
                            done();

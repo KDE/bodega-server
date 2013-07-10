@@ -12,6 +12,13 @@ module.exports.app = app;
 var baseJsonPath = '/bodega/v1/json/';
 module.exports.baseJsonPath = baseJsonPath;
 
+var dbConnectionString = app.config.service.database.protocol + "://" +
+                       app.config.service.database.user + ":" +
+                       app.config.service.database.password +
+                       "@" + app.config.service.database.host + "/" +
+                       app.config.service.database.name;
+module.exports.dbConnectionString = dbConnectionString;
+
 function getUrl(path, fn, cookie, expectsHtml)
 {
     if (path[0] !== '/') {
@@ -185,13 +192,8 @@ function dbSnapshot(db, fn)
         takeSnapshot(db, fn);
         return;
     }
-    var connectionString = app.config.service.database.protocol +
-        "://" +
-        app.config.service.database.user + ":" +
-        app.config.service.database.password +
-        "@" + app.config.service.database.host + "/" +
-        app.config.service.database.name;
-    pg.connect(connectionString, function(err, client, finis) {
+
+    pg.connect(dbConnectionString, function(err, client, finis) {
         takeSnapshot(client, function(err, res) {
             fn(err, res);
             finis();
