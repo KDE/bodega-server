@@ -26,13 +26,13 @@ var async = require('async');
 var request = require('request');
 var Cookie = require('cookie-jar');
 
-function postFiles(dst, files, cookie, fn)
+function postFiles(dst, files, fn)
 {
     var url = 'http://' + utils.app.server.address().address + ':' +
             utils.app.server.address().port + utils.baseJsonPath + dst;
     var obj = {
         url : url,
-        cookie: cookie
+        cookie: utils.cookie
     };
     var r = request.post(obj, function(err, res, body) {
         try {
@@ -108,7 +108,7 @@ describe('Asset manipulation', function(){
                     }, {
                         "name" : "asset",
                         "filename" : "sampleasset/sample.pdf"
-                    }], utils.cookie,
+                    }],
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -137,7 +137,7 @@ describe('Asset manipulation', function(){
                     },{
                         "name" : "cover.jpg",
                         "filename" : "sampleasset/cover.jpg"
-                    }], utils.cookie,
+                    }],
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -164,7 +164,7 @@ describe('Asset manipulation', function(){
                       }, {
                           "name" : "sample-1.png",
                           "filename" : "sampleasset/sample-1.png"
-                      }], utils.cookie,
+                      }],
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -291,7 +291,7 @@ describe('Asset manipulation', function(){
                     }, {
                         "name" : "asset",
                         "filename" : "sampleasset/sample.pdf"
-                    }], utils.cookie,
+                    }],
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
@@ -320,7 +320,7 @@ describe('Asset manipulation', function(){
                     },{
                         "name" : "cover.jpg",
                         "filename" : "sampleasset/cover.jpg"
-                    }], utils.cookie,
+                    }],
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
