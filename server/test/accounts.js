@@ -70,8 +70,7 @@ describe('Deactivate user', function() {
                 res.body.should.have.property('points');
                 res.body.should.have.property('success');
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     after(function(done) {
@@ -85,7 +84,7 @@ describe('Deactivate user', function() {
     });
 });
 
-function checkPersonInfo(cookie, key, value, done)
+function checkPersonInfo(key, value, done)
 {
     //console.log("checking " + key + " == " + value);
     utils.getUrl('participant/info',
@@ -97,8 +96,7 @@ function checkPersonInfo(cookie, key, value, done)
             res.body.should.have.property('success', true);
             res.body.should.have.property(key, value);
             done();
-        },
-        utils.cookie);
+        });
 }
 
 describe('Changing account information', function() {
@@ -113,9 +111,8 @@ describe('Changing account information', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('success', true);
-                checkPersonInfo(utils.cookie, 'firstName', 'Bunny', done);
-            },
-            utils.cookie);
+                checkPersonInfo('firstName', 'Bunny', done);
+            });
     });
 
     it('change middle name to "Rabbit"', function(done) {
@@ -129,9 +126,8 @@ describe('Changing account information', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('success', true);
-                checkPersonInfo(utils.cookie, 'middleNames', 'Rabbit', done);
-            },
-            utils.cookie);
+                checkPersonInfo('middleNames', 'Rabbit', done);
+            });
     });
 
     it('change last name to "Foofoo"', function(done) {
@@ -145,9 +141,8 @@ describe('Changing account information', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('success', true);
-                checkPersonInfo(utils.cookie, 'lastName', 'Foofoo', done);
-            },
-            utils.cookie);
+                checkPersonInfo('lastName', 'Foofoo', done);
+            });
     });
 
     it('change email to "bunny_rabbit@foofoo.com"', function(done) {
@@ -161,9 +156,8 @@ describe('Changing account information', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('success', true);
-                checkPersonInfo(utils.cookie, 'email', 'bunny_rabbit@foofoo.com', done);
-            },
-            utils.cookie);
+                checkPersonInfo('email', 'bunny_rabbit@foofoo.com', done);
+            });
     });
 
     it('invalid email should fail', function(done) {
@@ -183,8 +177,7 @@ describe('Changing account information', function() {
                 res.body.error.should.have.property('type', 'InvalidEmailAddress');
                 done();
                 utils.app.config.printErrors = true;
-            },
-            utils.cookie);
+            });
     });
 
     it('duplicate email should fail', function(done) {
@@ -201,8 +194,7 @@ describe('Changing account information', function() {
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'AccountExists');
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     after(function(done) {
@@ -232,8 +224,7 @@ describe('Changing passwords', function() {
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'PasswordTooShort');
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('rejects changing to no password', function(done) {
@@ -247,8 +238,7 @@ describe('Changing passwords', function() {
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'MissingParameters');
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('change the password to "alphabetical"', function(done) {
@@ -263,8 +253,7 @@ describe('Changing passwords', function() {
                     'application/json');
                 res.body.should.have.property('success', true);
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     utils.auth({ password: 'alphabetical' });
@@ -308,20 +297,7 @@ describe('Getting account information', function() {
             { noAuth: true });
     });
 
-    it('authorizes correctly', function(done) {
-        utils.getUrl('auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1',
-            function(res) {
-                res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
-                res.headers.should.have.property('set-cookie');
-                utils.cookie = res.headers['set-cookie'];
-                res.body.should.have.property('authStatus', true);
-                done();
-            },
-            { noAuth: true });
-    });
+    utils.auth();
 
     it('fetches personal information', function(done) {
         utils.getUrl('participant/info',
@@ -341,8 +317,7 @@ describe('Getting account information', function() {
                 res.body.should.have.property('email', 'zack@kde.org');
                 res.body.should.have.property('active', true);
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('fetch history', function(done) {
@@ -400,7 +375,6 @@ describe('Getting account information', function() {
                 res.body.should.have.property('history');
                 res.body.history.should.eql(expected);
                 done();
-            },
-            utils.cookie);
+            });
     });
 });
