@@ -28,7 +28,7 @@ describe('Listing', function(){
     if (authedBrowsing) {
         utils.auth();
     } else {
-        describe('Creat a session', function() {
+        describe('Create a session', function() {
             it('succeeds', function(done) {
                 utils.getUrl('auth?auth_store=KDE-1',
                     function(res) {
