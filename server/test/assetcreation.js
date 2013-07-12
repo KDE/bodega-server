@@ -220,6 +220,19 @@ describe('Asset manipulation', function(){
                 },
                 utils.cookie);
         });
+        
+        it('shoudl show info for incoming asset', function(done){
+            utils.getUrl(
+                'asset/' + incompleteAssetId + "?incoming=true",
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('asset');
+                    res.body.asset.should.have.property('id', incompleteAssetId);
+                    done();
+                },
+                utils.cookie);
+        });
     });
 
     describe('Deletion', function(){

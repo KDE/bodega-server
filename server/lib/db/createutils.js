@@ -307,7 +307,6 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
     }
 };
 
-
 module.exports.isValidator = function(db, req, res, assetInfo, fn)
 {
     //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
