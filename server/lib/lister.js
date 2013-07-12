@@ -126,8 +126,8 @@ module.exports.listAssets = function listAssets(db, req, res, args, json)
          FROM channelAssets s \
          LEFT JOIN assets a ON (a.id = s.asset) \
          LEFT JOIN partners ON (a.partner = partners.id) \
-         LEFT JOIN assetPrices p ON (p.asset = s.asset)';
-    var whereQuery = 'WHERE p.store = $1 and p.ending is null and s.channel = $2';
+         LEFT JOIN assetPrices p ON (p.asset = s.asset and p.store = $1 and p.ending is null) ';
+    var whereQuery = 'WHERE s.channel = $2';
     var queryString = constructQuery(baseQuery, whereQuery, 2,
                                      [{
                                          type : SortType.ByName,
