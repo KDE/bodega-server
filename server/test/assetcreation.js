@@ -25,6 +25,7 @@ var http = require('http');
 var async = require('async');
 var request = require('request');
 var Cookie = require('cookie-jar');
+var querystring = require('querystring');
 
 function postFiles(dst, files, cookie, fn)
 {
@@ -151,30 +152,6 @@ describe('Asset manipulation', function(){
         });
     });
 
-
-    describe('Updates', function(){
-        it('works with incomplete assets', function(done){
-            postFiles('asset/update/' + incompleteAssetId,
-                      [{
-                          "name" : "info",
-                          "filename" : "sampleasset/sample-info-update1.json"
-                      }, {
-                          "name" : "cover.jpg",
-                          "filename" : "sampleasset/cover.jpg"
-                      }, {
-                          "name" : "sample-1.png",
-                          "filename" : "sampleasset/sample-1.png"
-                      }], utils.cookie,
-                      function(res) {
-                          res.body.should.have.property('authStatus', true);
-                          res.body.should.not.have.property('error');
-                          res.body.should.have.property('asset');
-                          res.body.asset.should.have.property('id');
-                          done();
-                      });
-        });
-    });
-
     describe('Listing assets', function(){
         it('lists published by default', function(done){
             utils.getUrl('asset/list',
@@ -220,8 +197,8 @@ describe('Asset manipulation', function(){
                 },
                 utils.cookie);
         });
-        
-        it('shoudl show info for incoming asset', function(done){
+
+        it('should show info for incoming asset', function(done){
             utils.getUrl(
                 'asset/' + incompleteAssetId + "?incoming=true",
                 function(res) {
@@ -232,6 +209,49 @@ describe('Asset manipulation', function(){
                     done();
                 },
                 utils.cookie);
+        });
+    });
+
+
+    describe('Updates', function(){
+        it('work with incomplete assets', function(done){
+            postFiles('asset/update/' + incompleteAssetId,
+                      [{
+                          "name" : "info",
+                          "filename" : "sampleasset/sample-info-update1.json"
+                      }, {
+                          "name" : "cover.jpg",
+                          "filename" : "sampleasset/cover.jpg"
+                      }, {
+                          "name" : "sample-1.png",
+                          "filename" : "sampleasset/sample-1.png"
+                      }], utils.cookie,
+                      function(res) {
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          done();
+                      });
+        });
+
+        it('work with assetInfo in the url', function(done){
+            var name = 'sample 123456';
+            var description = 'sample description of a new asset';
+            var query = '?info[name]=' + querystring.escape(name) +
+                '&info[description]='+querystring.escape(description);
+
+            utils.postUrl('asset/update/' + incompleteAssetId + query, null,
+                          function(res) {
+                              res.body.should.have.property('authStatus', true);
+                              res.body.should.not.have.property('error');
+                              res.body.should.have.property('asset');
+                              res.body.asset.should.have.property('id', incompleteAssetId);
+                              res.body.asset.should.have.property('name', name);
+                              res.body.asset.should.have.property('description', description);
+                              done();
+                          },
+                          utils.cookie);
         });
     });
 

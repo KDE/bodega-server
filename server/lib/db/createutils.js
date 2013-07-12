@@ -20,6 +20,7 @@ var path = require('path');
 
 var errors = require('../errors.js');
 var utils = require('../utils.js');
+var fs = require('fs');
 
 function associateTag(db, req, res, assetInfo, tagInfo, cb)
 {
@@ -50,7 +51,7 @@ module.exports.setupTags = function(db, req, res, assetInfo, fn)
     /* first we create all the tags that are missing and set them to be owned by
        requesting partner; this involves a monster query that looks like this:
 
-    insert into tags (type, title, partner) 
+    insert into tags (type, title, partner)
         select tt.id, pm.author, 1002 from
         (select *, 1002 from (values ('author', 'Zack Rusin'), ('author', 'Aaron Seigo'), ('assetType', 'book')) as tmp
              except select y.type, t.title, 1002 as key from tags t left join tagtypes y on (t.type = y.id)
@@ -492,4 +493,38 @@ module.exports.setupPreviews = function(db, req, res, assetInfo, fn)
             recordPreviews(db, req, res, assetInfo, fn);
         });
     });
+};
+
+module.exports.findAssetInfo = function(req, cb) {
+    var e;
+
+    if (req.query.info) {
+        cb(null, req.query.info);
+    } else if (req.body.info) {
+        cb(null, req.body.info);
+    } else if (req.files && req.files.info) {
+        fs.readFile(req.files.info.path, function (err, data) {
+            var assetInfo;
+            if (err) {
+                e = errors.create('UploadInvalidJson', err.message);
+                cb(e);
+                return;
+            }
+            try {
+                assetInfo = JSON.parse(data);
+            } catch (err) {
+                //JSON parser failed
+                assetInfo = null;
+                e = errors.create('UploadInvalidJson', err.message);
+                return cb(e, null);
+            }
+            cb(null, assetInfo);
+            return;
+        });
+    } else {
+        //"The asset info file is missing.",
+        e = errors.create('MissingParameters');
+        cb(e);
+        return;
+    }
 };

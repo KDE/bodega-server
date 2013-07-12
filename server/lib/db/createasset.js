@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2013 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -147,16 +147,8 @@ function checkPartner(db, req, res, assetInfo)
     }
 }
 
-function processInfo(data, db, req, res)
+function processInfo(assetInfo, db, req, res)
 {
-    var assetInfo;
-    try {
-        assetInfo = JSON.parse(data);
-    } catch (err) {
-        //JSON parser failed
-        assetInfo = null;
-    }
-
     if (!assetInfo || !assetInfo.file || assetInfo.id) {
         //"Unable to parse the asset info file.",
         errors.report('UploadInvalidJson', req, res);
@@ -171,21 +163,12 @@ module.exports = function(db, req, res) {
     //   icons
     //   previews
     //   asset
+    createUtils.findAssetInfo(req, function(err, assetInfo) {
+        if (err) {
+            errors.report(err.name, req, res, err.message);
+            return;
+        }
 
-    if (req.body.info) {
-        processInfo(req.body.info, db, req, res);
-    } else if (req.files && req.files.info) {
-        fs.readFile(req.files.info.path, function(err, data) {
-            if (err) {
-                errors.report('UploadInvalidJson', req, res, err);
-                return;
-            }
-
-            processInfo(data, db, req, res);
-        });
-    } else {
-        //"The asset info is missing.",
-        errors.report('MissingParameters', req, res);
-        return;
-    }
+        processInfo(assetInfo, db, req, res);
+    });
 };

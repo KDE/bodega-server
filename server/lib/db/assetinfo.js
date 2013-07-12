@@ -215,6 +215,11 @@ module.exports = function(db, req, res) {
         cb(null, db, req, res, assetInfo);
     }];
 
+    if (!req.params.assetId || req.params.assetId === 'undefined') {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
     if (req.query.incoming) {
         assetInfo.incoming = true;
         funcs.push(findIsValidator);

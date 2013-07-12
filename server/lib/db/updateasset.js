@@ -22,6 +22,12 @@ var fs = require('fs');
 var path = require('path');
 var async = require('async');
 
+function addToJson(json, obj, key) {
+    if (obj[key]) {
+        json[key] = obj[key];
+    }
+}
+
 function sendResponse(db, req, res, assetInfo)
 {
     var json = utils.standardJson(req, true);
@@ -30,6 +36,14 @@ function sendResponse(db, req, res, assetInfo)
         id : assetInfo.id,
         name : assetInfo.name
     };
+    addToJson(json.asset, assetInfo, 'license');
+    addToJson(json.asset, assetInfo, 'baseprice');
+    addToJson(json.asset, assetInfo, 'description');
+    addToJson(json.asset, assetInfo, 'version');
+    addToJson(json.asset, assetInfo, 'externpath');
+    addToJson(json.asset, assetInfo, 'file');
+    addToJson(json.asset, assetInfo, 'size');
+
     res.send(json);
 }
 
@@ -416,28 +430,12 @@ function processInfo(assetInfo, db, req, res)
 }
 
 module.exports = function(db, req, res) {
-    var assetInfo;
+    createUtils.findAssetInfo(req, function(err, assetInfo) {
+        if (err) {
+            errors.report(err.name, req, res, err.message);
+            return;
+        }
 
-    if (req.body.info) {
-        processInfo(req.body.info, db, req, res);
-    } else if (req.files && req.files.info) {
-        fs.readFile(req.files.info.path, function (err, data) {
-            if (err) {
-                errors.report('UploadInvalidJson', req, res, err);
-                return;
-            }
-            try {
-                assetInfo = JSON.parse(data);
-            } catch (err) {
-                //JSON parser failed
-                assetInfo = null;
-            }
-
-            processInfo(assetInfo, db, req, res);
-        });
-    } else {
-        //"The asset info file is missing.",
-        errors.report('MissingParameters', req, res);
-        return;
-    }
+        processInfo(assetInfo, db, req, res);
+    });
 };
