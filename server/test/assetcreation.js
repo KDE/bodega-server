@@ -86,8 +86,7 @@ describe('Asset manipulation', function(){
             function(res) {
                 ++i;
                 cb(null, assets, i);
-            },
-            utils.cookie);
+            });
     }
 
     function deleteCompleteAsset(assets, i, cb)
@@ -171,8 +170,7 @@ describe('Asset manipulation', function(){
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(25);
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('lists incoming when asked', function(done){
             utils.getUrl('asset/list/incoming',
@@ -182,8 +180,7 @@ describe('Asset manipulation', function(){
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(2);
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('lists all when asked', function(done){
             utils.getUrl('asset/list/all',
@@ -193,8 +190,7 @@ describe('Asset manipulation', function(){
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(27);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should show info for incoming asset', function(done){
@@ -206,8 +202,7 @@ describe('Asset manipulation', function(){
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('id', incompleteAssetId);
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -249,8 +244,7 @@ describe('Asset manipulation', function(){
                               res.body.asset.should.have.property('name', name);
                               res.body.asset.should.have.property('description', description);
                               done();
-                          },
-                          utils.cookie);
+                          });
         });
     });
 
@@ -267,8 +261,7 @@ describe('Asset manipulation', function(){
                     res.body.asset.should.have.property('id',
                                                         completeAssetId);
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should work with incomplete assets', function(done){
             utils.getUrl('asset/delete/' + incompleteAssetId,
@@ -282,8 +275,7 @@ describe('Asset manipulation', function(){
                     res.body.asset.should.have.property('id',
                                                         incompleteAssetId);
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should not work with already delete assets', function(done){
             utils.getUrl('asset/delete/' + incompleteAssetId,
@@ -296,8 +288,7 @@ describe('Asset manipulation', function(){
                     res.body.error.should.have.property(
                         'type', 'AssetMissing');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('listing incoming after deletion shouldnt return any', function(done){
@@ -308,8 +299,7 @@ describe('Asset manipulation', function(){
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(0);
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -374,8 +364,7 @@ describe('Asset manipulation', function(){
                     res.body.should.not.have.property('error');
                     deleteCompleteAsset([completeAssetId], 0, function(){});
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 

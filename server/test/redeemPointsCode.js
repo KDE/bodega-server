@@ -94,8 +94,7 @@ describe('Redeeming points code', function(){
                         'application/json');
                     res.body.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('A working code', function(done){
             var expected = {
@@ -114,8 +113,7 @@ describe('Redeeming points code', function(){
                         'application/json');
                     res.body.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 });

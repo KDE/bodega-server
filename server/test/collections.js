@@ -104,8 +104,7 @@ describe('Collections', function(){
                     res.body.collections[0].should.have.property('type', 'wishlist');
                     createdId = res.body.collections[0].id;
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should update', function(done){
             var params = {
@@ -127,8 +126,7 @@ describe('Collections', function(){
                     res.body.collections[0].should.have.property('public', false);
                     res.body.collections[0].should.have.property('type', 'wishlist');
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should update to the old values', function(done){
             var params = {
@@ -150,8 +148,7 @@ describe('Collections', function(){
                     res.body.collections[0].should.have.property('public', true);
                     res.body.collections[0].should.have.property('type', 'wishlist');
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should list', function(done){
             utils.getUrl('collection/list',
@@ -175,8 +172,7 @@ describe('Collections', function(){
                         }
                     }
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should allow adding assets', function(done){
@@ -199,8 +195,7 @@ describe('Collections', function(){
                         if (addedAssets === assets.length) {
                             done();
                         }
-                    },
-                    utils.cookie);
+                    });
             }
         });
 
@@ -218,8 +213,7 @@ describe('Collections', function(){
                     res.body.collection.should.have.property('assets');
                     res.body.collection.assets.length.should.be.equal(4);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should allow removing 2 assets', function(done){
@@ -242,8 +236,7 @@ describe('Collections', function(){
                         if (removedAssets === assetsToRemove.length) {
                             done();
                         }
-                    },
-                    utils.cookie);
+                    });
             }
         });
 
@@ -261,8 +254,7 @@ describe('Collections', function(){
                     res.body.collection.should.have.property('assets');
                     res.body.collection.assets.length.should.be.equal(2);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should allow readding assets', function(done){
@@ -285,8 +277,7 @@ describe('Collections', function(){
                         if (addedAssets === assetsToRemove.length) {
                             done();
                         }
-                    },
-                    utils.cookie);
+                    });
             }
         });
 
@@ -304,8 +295,7 @@ describe('Collections', function(){
                     res.body.collection.should.have.property('assets');
                     res.body.collection.assets.length.should.be.equal(4);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should allow deletion of a collection', function(done){
@@ -318,8 +308,7 @@ describe('Collections', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should not list collection after deletion', function(done){
@@ -333,8 +322,7 @@ describe('Collections', function(){
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(numCollections - 1);
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 

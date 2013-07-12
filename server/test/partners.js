@@ -159,8 +159,7 @@ describe('Partner management', function() {
                     res.body.should.have.property('partners');
                     res.body.partners.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
     }
 
     describe('listing pre-creation', function() {
@@ -222,8 +221,7 @@ describe('Partner management', function() {
                     res.body.error.should.have.property('type', 'PartnerNameExists');
                     done();
                     utils.app.config.printErrors = true;
-                },
-                utils.cookie);
+                });
         });
 
         it('creation should fail with an invalid email', function(done) {
@@ -240,8 +238,7 @@ describe('Partner management', function() {
                     res.body.error.should.have.property('type', 'InvalidEmailAddress');
                     utils.app.config.printErrors = true;
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('creation should succeed with good data', function(done) {
@@ -257,8 +254,7 @@ describe('Partner management', function() {
                     newPartnerId = res.body.partnerId;
                     newPartnerJson.id = newPartnerId;
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('update should succeed with good data', function(done) {
@@ -272,8 +268,7 @@ describe('Partner management', function() {
                         'application/json');
                     res.body.should.have.property('success', true);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('adding invalid contact links should fail', function(done) {
@@ -290,8 +285,7 @@ describe('Partner management', function() {
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', task.error);
                     cb();
-                },
-                utils.cookie);
+                });
             });
 
             var tasks = [
@@ -335,8 +329,7 @@ describe('Partner management', function() {
                         'application/json');
                     res.body.should.have.property('success', true);
                     cb();
-                },
-                utils.cookie);
+                });
             });
 
             var tasks = [
@@ -371,8 +364,7 @@ describe('Partner management', function() {
                         'application/json');
                     res.body.should.have.property('success', true);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('listing should show new partner', function(done) {
@@ -396,8 +388,7 @@ describe('Partner management', function() {
                     res.body.error.should.have.property('type', 'InvalidRole');
                     utils.app.config.printErrors = true;
                     done();
-                },
-                utils.cookie);
+                });
 
         });
 
@@ -422,8 +413,7 @@ describe('Partner management', function() {
                         res.headers.should.have.property('content-type', 'application/json');
                         res.body.should.have.property('success', true);
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('should fail setting the transfer account if missing iban or swift', function(done) {
@@ -438,8 +428,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('should fail setting the transfer account if missing the name', function(done) {
@@ -453,8 +442,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('should fail setting the transfer account if missing the address', function(done) {
@@ -468,8 +456,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('should fail setting the transfer account if missing the bank name', function(done) {
@@ -483,8 +470,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('should fail setting the transfer account if missing the bank address', function(done) {
@@ -498,8 +484,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('should fail setting the transfer account if missing the account number', function(done) {
@@ -513,8 +498,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('should list the current account', function(done) {
@@ -525,8 +509,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('success', true);
                         res.body.accounts.should.eql([ account ]);
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('deletion should succeed', function(done) {
@@ -536,8 +519,7 @@ describe('Partner management', function() {
                         res.headers.should.have.property('content-type', 'application/json');
                         res.body.should.have.property('success', true);
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('should list no account', function(done) {
@@ -548,8 +530,7 @@ describe('Partner management', function() {
                         res.body.should.have.property('success', true);
                         res.body.accounts.should.eql([]);
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
         });
 
@@ -566,8 +547,7 @@ describe('Partner management', function() {
                     res.body.should.have.property('roles');
                     res.body.roles.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
             });
 
             it('should be able to set roles for a partner we are a manager for', function(done) {
@@ -605,8 +585,7 @@ describe('Partner management', function() {
                     ];
 
                     checkPartnerList(expected, done);
-                },
-                utils.cookie);
+                });
 
                });
 
@@ -644,8 +623,7 @@ describe('Partner management', function() {
                     ];
 
                     checkPartnerList(expected, done);
-                },
-                utils.cookie);
+                });
 
                });
 
@@ -676,8 +654,7 @@ describe('Partner management', function() {
                         ];
 
                         checkPartnerList(expected, done);
-                },
-                utils.cookie);
+                });
 
                });
 
@@ -695,8 +672,7 @@ describe('Partner management', function() {
                             'application/json');
                         res.body.should.have.property('success', true);
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
 
             it('request distributor status', function(done) {
@@ -713,8 +689,7 @@ describe('Partner management', function() {
                             'application/json');
                         res.body.should.have.property('success', true);
                         done();
-                    },
-                    utils.cookie);
+                    });
             });
         });
 

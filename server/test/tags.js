@@ -40,32 +40,28 @@ describe('Tags manipulation', function(){
         utils.getUrl(query,
             function(res) {
                 cb(res);
-            },
-            utils.cookie);
+            });
     }
 
     function createTag(title, type, cb) {
         utils.postUrl('tag/create', {'title': title, 'type': type},
             function(res) {
                 cb(res);
-            },
-            utils.cookie);
+            });
     }
 
     function updateTag(id, title, type, cb) {
         utils.postUrl('tag/update/' + id, {'title': title, 'type': type},
             function(res) {
                 cb(res);
-            },
-            utils.cookie);
+            });
     }
 
     function deleteTag(tag, cb) {
         utils.getUrl('tag/delete/' + tag,
             function(res) {
                 cb(res);
-            },
-            utils.cookie);
+            });
     }
 
     describe('Tags', function() {

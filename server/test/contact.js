@@ -78,8 +78,7 @@ describe('Fetch contact information', function() {
                 res.body.warehouse.should.eql(warehouse);
                 res.body.store.should.eql(store);
                 done();
-             },
-             utils.cookie);
+             });
         });
      });
 });

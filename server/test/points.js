@@ -74,8 +74,7 @@ describe('Point operations', function(){
                         'type',
                         'PurchaseMethodMissing');
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should error without card card', function(done){
             utils.getUrl('points/buy?amount=500',
@@ -90,8 +89,7 @@ describe('Point operations', function(){
                         'type',
                         'PurchaseMethodMissing');
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should emit card_declined', function(done){
             var url = 'participant/changeAccountDetails?';
@@ -117,8 +115,7 @@ describe('Point operations', function(){
                         'type',
                         'CardDeclined');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should emit CardIncorrectNumber', function(done){
@@ -145,8 +142,7 @@ describe('Point operations', function(){
                         'type',
                         'CardIncorrectNumber');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should emit CardInvalidExpiryMonth', function(done){
@@ -173,8 +169,7 @@ describe('Point operations', function(){
                         'type',
                         'CardInvalidExpiryMonth');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should emit CardInvalidExpiryYear', function(done){
@@ -201,8 +196,7 @@ describe('Point operations', function(){
                         'type',
                         'CardInvalidExpiryYear');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should emit CardInvalidCVC', function(done){
@@ -229,8 +223,7 @@ describe('Point operations', function(){
                         'type',
                         'CardInvalidCVC');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should register successfully', function(done){
@@ -255,8 +248,7 @@ describe('Point operations', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should delete successfully', function(done){
@@ -272,8 +264,7 @@ describe('Point operations', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -300,8 +291,7 @@ describe('Point operations', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('succeeds', function(done){
@@ -315,8 +305,7 @@ describe('Point operations', function(){
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('success', true);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('errors on too few points', function(done){
@@ -331,8 +320,7 @@ describe('Point operations', function(){
                     res.body.error.should.have.property(
                         'type', 'PurchaseNotEnoughPoints');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('errors on too many points', function(done){
@@ -347,8 +335,7 @@ describe('Point operations', function(){
                     res.body.error.should.have.property(
                         'type', 'PurchaseTooManyPoints');
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -372,8 +359,7 @@ describe('Point operations', function(){
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('success', true);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('shouldnt change to an invalid card', function(done){
@@ -395,8 +381,7 @@ describe('Point operations', function(){
                     res.body.error.should.have.property('type',
                                                         'CardIncorrectNumber');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should fetch the payment method', function(done){
@@ -416,8 +401,7 @@ describe('Point operations', function(){
                     card.should.have.property('last4',
                                               validCard.substr(-4));
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 });

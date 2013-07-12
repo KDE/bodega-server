@@ -43,8 +43,7 @@ describe('Searching', function(){
                     }
                     gamesChannelId.should.be.above(0);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('find the card games channel', function(done){
@@ -66,8 +65,7 @@ describe('Searching', function(){
                     }
                     cardGamesChannelId.should.be.above(0);
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -84,8 +82,7 @@ describe('Searching', function(){
                     res.body.error.should.have.property('type',
                                                         'MissingParameters');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should error an missing channel', function(done){
@@ -101,8 +98,7 @@ describe('Searching', function(){
                     res.body.error.should.have.property('type',
                                                         'MissingParameters');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
 
@@ -122,8 +118,7 @@ describe('Searching', function(){
                     asset.name.should.be.eql(
                         'Diamond Juice');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('work with plaintext query', function(done){
@@ -142,8 +137,7 @@ describe('Searching', function(){
                     asset.name.should.be.eql(
                         'Diamond Juice');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
     });

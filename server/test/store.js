@@ -60,8 +60,7 @@ describe('Store management', function(){
                     res.body.error.should.have.property('type',
                                                         'StorePartnerInvalid');
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -82,8 +81,7 @@ describe('Store management', function(){
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StorePartnerInvalid');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should fail without a name', function(done){
@@ -98,8 +96,7 @@ describe('Store management', function(){
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StoreNameInvalid');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should succeed with a valid partner and name', function(done){
@@ -128,8 +125,7 @@ describe('Store management', function(){
                     res.body.should.have.property('storeInfo');
                     res.body.storeInfo.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should succeed with a name and no partner explicitly specified', function(done){
@@ -157,8 +153,7 @@ describe('Store management', function(){
                     res.body.should.have.property('storeInfo');
                     res.body.storeInfo.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should fail with an id that exists', function(done){
@@ -178,8 +173,7 @@ describe('Store management', function(){
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StoreIdExists');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
     });
@@ -232,8 +226,7 @@ describe('Store management', function(){
                         res.body.should.have.property('success', true);
                         res.body.storeInfo.should.eql(expected);
                         done();
-                    },
-                    utils.cookie);
+                    });
            });
     });
 
@@ -256,8 +249,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', false);
                     res.body.error.should.have.property('type', 'StoreIdInvalid');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should fail on a store that exists, but we are not authorized to manage', function(done) {
@@ -278,8 +270,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', false);
                     res.body.error.should.have.property('type', 'StoreIdInvalid');
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should succeed on an existing store', function(done) {
@@ -311,8 +302,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     res.body.storeInfo.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('partial updates work as well', function(done) {
@@ -341,8 +331,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     res.body.storeInfo.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -376,8 +365,7 @@ describe('Store management', function(){
                     newChannelId = res.body.channel.id;
 
                     done();
-                },
-                utils.cookie);
+                });
             });
 
         it('fetch the structure of the store', function(done) {
@@ -464,8 +452,7 @@ describe('Store management', function(){
                     res.body.should.have.property('success', true);
                     res.body.channels.should.eql(expected);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should allow adding of tags', function(done) {
@@ -484,8 +471,7 @@ describe('Store management', function(){
                     res.body.channel.should.have.property('tags');
                     res.body.channel.tags.length.should.eql(params.tags.length);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should allow removal of tags', function(done) {
@@ -504,8 +490,7 @@ describe('Store management', function(){
                     res.body.channel.should.have.property('tags');
                     res.body.channel.tags.length.should.eql(params.tags.length);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should allow simultaneous adding and removal of tags', function(done) {
@@ -524,8 +509,7 @@ describe('Store management', function(){
                     res.body.channel.should.have.property('tags');
                     res.body.channel.tags.length.should.eql(params.tags.length);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should be possible to delete that channel', function(done) {
@@ -537,8 +521,7 @@ describe('Store management', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -553,8 +536,7 @@ describe('Store management', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('should succeed with another valid store', function(done){
@@ -567,8 +549,7 @@ describe('Store management', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
-                },
-                utils.cookie);
+                });
         });
 
         it('listing should reflect deletions',
@@ -602,8 +583,7 @@ describe('Store management', function(){
                         res.body.should.have.property('success', true);
                         res.body.storeInfo.should.eql(expected);
                         done();
-                    },
-                    utils.cookie);
+                    });
            });
     });
 

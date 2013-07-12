@@ -66,8 +66,7 @@ describe('Asset statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Points stats with one asset number: month granularity', function(done) {
@@ -99,8 +98,7 @@ describe('Asset statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Points stats with four asset numbers: month granularity', function(done) {
@@ -136,8 +134,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
 
@@ -168,8 +165,7 @@ describe('Asset statistics', function(){
                     stats.total.should.be.eql(expected.total[i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats with one asset numbers: month granularity', function(done) {
@@ -199,8 +195,7 @@ describe('Asset statistics', function(){
                     stats.Dice.should.be.eql(expected[3][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats with four asset numbers: month granularity', function(done) {
@@ -235,8 +230,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats without numbers', function(done) {
@@ -264,8 +258,7 @@ describe('Asset statistics', function(){
                     stats.total.should.be.eql(expected.total[i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats with four asset numbers: month granularity', function(done) {
@@ -300,8 +293,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     //different Granularity: DAY
@@ -334,8 +326,7 @@ describe('Asset statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Points stats with four asset numbers: day granularity', function(done) {
@@ -372,8 +363,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats without asset numbers: day granularity', function(done){
@@ -405,8 +395,7 @@ describe('Asset statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats with four asset numbers: day granularity', function(done) {
@@ -443,8 +432,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats without asset numbers: day granularity', function(done){
@@ -476,8 +464,7 @@ describe('Asset statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats with four asset numbers: day granularity', function(done) {
@@ -514,8 +501,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     //different Granularity: YEAR
@@ -548,8 +534,7 @@ describe('Asset statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Points stats with four asset numbers: year granularity', function(done) {
@@ -586,8 +571,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats without asset numbers: year granularity', function(done){
@@ -619,8 +603,7 @@ describe('Asset statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats with four asset numbers: year granularity', function(done) {
@@ -657,8 +640,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats without asset numbers: year granularity', function(done){
@@ -690,8 +672,7 @@ describe('Asset statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats with four asset numbers: year granularity', function(done) {
@@ -728,8 +709,7 @@ describe('Asset statistics', function(){
                     stats.Jewels.should.be.eql(expected[7][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 });
 
@@ -763,8 +743,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     //Granularity: MONTH
@@ -797,8 +776,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Points stats with one store id: month granularity', function(done) {
@@ -830,8 +808,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Points stats with two store ids: month granularity', function(done) {
@@ -863,8 +840,7 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected["KDE-2"][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
 
@@ -895,8 +871,7 @@ describe('Store statistics', function(){
                     stats.total.should.be.eql(expected.total[i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats with one store id: month granularity', function(done) {
@@ -926,8 +901,7 @@ describe('Store statistics', function(){
                     stats["KDE-1"].should.be.eql(expected["KDE-1"][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats with two store ids: month granularity', function(done) {
@@ -958,8 +932,7 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected['KDE-2'][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats without numbers', function(done) {
@@ -987,8 +960,7 @@ describe('Store statistics', function(){
                     stats.total.should.be.eql(expected.total[i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats with two store ids: month granularity', function(done) {
@@ -1019,8 +991,7 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected['KDE-2'][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     //different Granularity: DAY
@@ -1053,8 +1024,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Points stats with two store ids: day granularity', function(done) {
@@ -1087,8 +1057,7 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected["KDE-2"][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats without store ids: day granularity', function(done){
@@ -1120,8 +1089,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats with two store ids: day granularity', function(done) {
@@ -1154,8 +1122,7 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected['KDE-2'][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats without store ids: day granularity', function(done){
@@ -1187,8 +1154,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats with two store ids: day granularity', function(done) {
@@ -1221,8 +1187,7 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected['KDE-2'][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     //different Granularity: YEAR
@@ -1255,8 +1220,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Points stats with two store ids: year granularity', function(done) {
@@ -1289,8 +1253,7 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected['KDE-2'][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats without store ids: year granularity', function(done){
@@ -1322,8 +1285,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Downloads stats with two store ids: year granularity', function(done) {
@@ -1356,8 +1318,7 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected['KDE-2'][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats without store ids: year granularity', function(done){
@@ -1389,8 +1350,7 @@ describe('Store statistics', function(){
                 }
 
                 done();
-            },
-            utils.cookie);
+            });
     });
 
     it('Purchases count stats with two store ids: year granularity', function(done) {
@@ -1423,7 +1383,6 @@ describe('Store statistics', function(){
                     stats["KDE-2"].should.be.eql(expected['KDE-2'][i]);
                 }
                 done();
-            },
-            utils.cookie);
+            });
     });
 });

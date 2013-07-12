@@ -39,8 +39,7 @@ describe('Asset info', function(){
                     res.body.asset.should.have.property('name');
                     res.body.asset.should.have.property('description');
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should fetch tags', function(done){
             utils.getUrl('asset/6',
@@ -56,8 +55,7 @@ describe('Asset info', function(){
                     tags.should.be.an.instanceOf(Array);
                     tags.length.should.be.above(0);
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 
@@ -73,8 +71,7 @@ describe('Asset info', function(){
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('changelog');
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('should show previews', function(done){
             utils.getUrl('asset/6?previews=1',
@@ -87,8 +84,7 @@ describe('Asset info', function(){
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('previews');
                     done();
-                },
-                utils.cookie);
+                });
         });
     });
 });
