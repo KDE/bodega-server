@@ -21,29 +21,29 @@ var authedBrowsing = !(app.config.anonAccess && app.config.anonAccess.browsing =
 //console.log("Testing with " + (authedBrowsing ? "authenticated" : "anonymous" ) + " browsing");
 
 describe('Listing', function(){
-    var cookie;
     var gamesChannelId;
     var cardsChannelId;
     var cardsChannelResponse;
 
-    describe(authedBrowsing ? 'needs to authenticate first' : 'needs to create a session', function(){
-        it('authorize correctly.', function(done){
-            utils.getUrl(authedBrowsing ? 'auth?auth_user=zack@kde.org&auth_password=zack&auth_store=KDE-1' :
-                                 'auth?auth_store=KDE-1',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.headers.should.have.property('set-cookie');
-                    cookie = res.headers['set-cookie'];
-                    if (authedBrowsing) {
-                        res.body.should.have.property('authStatus', true);
-                    }
-                    done();
-                });
+    if (authedBrowsing) {
+        utils.auth();
+    } else {
+        describe('Creat a session', function() {
+            it('succeeds', function(done) {
+                utils.getUrl('auth?auth_store=KDE-1',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property(
+                            'content-type',
+                            'application/json');
+                        res.headers.should.have.property('set-cookie');
+                        utils.cookie = res.headers['set-cookie'];
+                        done();
+                    },
+                    { noAuth: true });
+            });
         });
-    });
+    }
 
     describe('channels', function(){
         it('should list top level channels', function(done){
@@ -67,8 +67,7 @@ describe('Listing', function(){
                     }
                     gamesChannelId.should.be.above(0);
                     done();
-                },
-                cookie);
+                });
         });
 
         it('should list sub channels of a top channel', function(done){
@@ -92,8 +91,7 @@ describe('Listing', function(){
                     }
                     cardsChannelId.should.be.above(0);
                     done();
-                },
-                cookie);
+                });
         });
 
         it('should list channel with assets', function(done){
@@ -110,8 +108,7 @@ describe('Listing', function(){
                     Object.keys(res.body.assets).length.should.be.within(1, 25);
                     cardsChannelResponse = res.body;
                     done();
-                },
-                cookie);
+                });
         });
 
         it('should browse channels/assets with specified page size', function(done){
@@ -119,6 +116,7 @@ describe('Listing', function(){
             // we need to figure out when they all finish and call
             // done() only then
             var runningTests = 3;
+                    console.log("working with channel ... " + cardsChannelId);
             utils.getUrl('channel/' + cardsChannelId +  '?pageSize=1',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -134,8 +132,7 @@ describe('Listing', function(){
                     if (runningTests === 0) {
                         done();
                     }
-                },
-                cookie);
+                });
             utils.getUrl('channel/' + cardsChannelId + '?pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -151,8 +148,7 @@ describe('Listing', function(){
                     if (runningTests === 0) {
                         done();
                     }
-                },
-                cookie);
+                });
             utils.getUrl('channel/' + cardsChannelId + '?pageSize=21',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -168,8 +164,7 @@ describe('Listing', function(){
                     if (runningTests === 0) {
                         done();
                     }
-                },
-                cookie);
+                });
         });
     });
 
@@ -188,8 +183,7 @@ describe('Listing', function(){
                     res.body.should.have.property('assets');
                     res.body.should.be.eql(cardsChannelResponse);
                     done();
-                },
-                cookie);
+                });
         });
 
         it('list channels by name with pageSize', function(done){
@@ -207,8 +201,7 @@ describe('Listing', function(){
                     var assets = res.body.assets;
                     assets.length.should.be.equal(10);
                     done();
-                },
-                cookie);
+                });
         });
 
         it('list channels by name with offset', function(done){
@@ -227,8 +220,7 @@ describe('Listing', function(){
                     assets.length.should.be.equal(9);
                     cardsChannelResponse.assets[10].should.be.eql(assets[0]);
                     done();
-                },
-                cookie);
+                });
         });
     });
 });

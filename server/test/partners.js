@@ -82,7 +82,8 @@ describe('Partner management', function() {
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
                     done();
-                });
+                },
+                { noAuth: true });
         });
 
         it('Updating a partner should fail', function(done) {
@@ -96,7 +97,8 @@ describe('Partner management', function() {
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
                     done();
-                });
+                },
+                { noAuth: true });
         });
 
         it('Listing partners should fail', function(done) {
@@ -110,7 +112,8 @@ describe('Partner management', function() {
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
                     done();
-                });
+                },
+                { noAuth: true });
         });
 
         it('Requesting publisher status should fail', function(done) {
@@ -124,7 +127,8 @@ describe('Partner management', function() {
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
                     done();
-                });
+                },
+                { noAuth: true });
         });
 
         it('Requesting distributor status should fail', function(done) {
@@ -138,7 +142,8 @@ describe('Partner management', function() {
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
                     done();
-                });
+                },
+                { noAuth: true });
         });
     });
 

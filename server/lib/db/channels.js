@@ -22,12 +22,12 @@ var lister = require('../lister.js');
 module.exports = function(db, req, res) {
     /*jshint multistr:true */
     var listTopChannelsQuery =
-        "SELECT DISTINCT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
+        "SELECT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
          WHERE c.store = $1 and c.parent IS NULL \
          ORDER BY c.name LIMIT $2 OFFSET $3";
     /*jshint multistr:true */
     var listParentChannelsQuery =
-        "SELECT DISTINCT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
+        "SELECT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
          WHERE c.store = $1 and c.parent = $2 \
          ORDER BY c.name LIMIT $3 OFFSET $4";
     var defaultPageSize = 25;

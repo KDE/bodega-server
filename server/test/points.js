@@ -52,7 +52,7 @@ describe('Point operations', function(){
                     done();
                 });
             });
-        }, utils.cookie);
+        });
     });
 
     utils.auth({}, function(res, done) {
