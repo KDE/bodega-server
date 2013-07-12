@@ -161,8 +161,7 @@ describe('Asset manipulation', function(){
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(25);
                     done();
-                },
-                utils.cookie);
+                });
         });
         it('lists published when asked', function(done){
             utils.getUrl('asset/list/published',
@@ -225,7 +224,7 @@ describe('Asset manipulation', function(){
                       }, {
                           "name" : "sample-1.png",
                           "filename" : "sampleasset/sample-1.png"
-                      }], utils.cookie,
+                      }],
                       function(res) {
                           res.body.should.have.property('authStatus', true);
                           res.body.should.not.have.property('error');
