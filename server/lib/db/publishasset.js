@@ -347,7 +347,7 @@ function publishAssetFile(db, req, res, assetInfo, cb)
 
 function endTransaction(db, req, res, assetInfo, cb)
 {
-    var query = "END;";
+    var query = "commit;";
     var e;
 
     var q = db.query(query, [], function(err, result) {
@@ -403,7 +403,9 @@ function publishAsset(db, req, res, assetInfo)
 
     async.waterfall(funcs, function(err, assetInfo) {
         if (err) {
-            errors.report(err.name, req, res, err);
+            db.query("rollback", [], function() {
+                errors.report(err.name, req, res, err);
+            });
             return;
         }
         sendResponse(db, req, res, assetInfo);

@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -25,47 +25,48 @@ function launchDownload(db, req, res)
          FROM assets a LEFT JOIN channelAssets ca ON (a.id = ca.asset)  \
          LEFT JOIN channels c ON (c.id = ca.channel) \
          WHERE a.id = $1 and c.store = $2";
+    var args = [req.params.assetId, req.session.user.store];
 
-    var q = db.query(
-        assetInfoQuery, [req.params.assetId, req.session.user.store],
-        function(err, result) {
-            var assetInfo;
+    db.query(assetInfoQuery, args, function(err, result) {
+        var assetInfo;
+        if (err) {
+            errors.report('Database', req, res, err);
+            return;
+        }
+        if (!result || !result.rows || result.rows.length < 1) {
+            //"Could not find the specified asset.",
+            errors.report('NoMatch', req, res);
+            return;
+        }
+        assetInfo = result.rows[0];
+        app.assetStore.download(res, assetInfo, function(err) {
             if (err) {
-                errors.report('Database', req, res, err);
+                errors.report('Download', req, res, err);
                 return;
             }
-            if (!result || !result.rows || result.rows.length < 1) {
-                //"Could not find the specified asset.",
-                errors.report('NoMatch', req, res);
-                return;
-            }
-            assetInfo = result.rows[0];
-            app.assetStore.download(res, assetInfo, function(err) {
-                if (err) {
-                    errors.report('Download', req, res, err);
-                    return;
-                }
 
-                utils.recordDownload(db, req);
-            });
+            utils.recordDownload(db, req);
         });
+    });
 }
 
 module.exports = function(db, req, res) {
-    var q = db.query("SELECT ct_canDownload($1, $2, $3) as allowed;",
-                     [req.session.user.id, req.session.user.store, req.params.assetId],
-                     function(err, result) {
-                        if (err || !result || result.rows.length < 1) {
-                            errors.report('Database', req, res, err);
-                            return;
-                        }
+    var query = "SELECT ct_canDownload($1, $2, $3) as allowed;";
+    var args = [req.session.user.id,
+                req.session.user.store,
+                req.params.assetId];
+    db.query(query, args, function(err, result) {
+        if (err || !result || result.rows.length < 1) {
+            errors.report('Database', req, res, err);
+            return;
+        }
 
-                        if (!result.rows[0].allowed) {
-                            //"Access denied to requested asset.",
-                            errors.report('AccessDenied', req, res);
-                            return;
-                        }
+        if (!result.rows[0].allowed) {
+            //"Access denied to requested asset.",
+            errors.report('AccessDenied', req, res);
+            return;
+        }
 
-                        launchDownload(db, req, res);
-                     });
+        launchDownload(db, req, res);
+    });
 };

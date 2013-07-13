@@ -61,7 +61,7 @@ function listAssetTags(partner, db, req, res) {
             json.tags = result.rows;
             res.json(json);
         });
-};
+}
 
 module.exports.listAssetTags = function(db, req, res) {
     utils.partnerId(db, req, res, listAssetTags);
@@ -92,7 +92,7 @@ function listChannelTags(partner, db, req, res) {
             json.tags = result.rows;
             res.json(json);
         });
-};
+}
 
 module.exports.listChannelTags = function(db, req, res) {
     utils.partnerId(db, req, res, listChannelTags);
@@ -128,7 +128,7 @@ function listTags(partner, db, req, res) {
             json.tags = result.rows;
             res.json(json);
         });
-};
+}
 
 module.exports.listTags = function(db, req, res) {
     utils.partnerId(db, req, res, listTags);

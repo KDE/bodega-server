@@ -73,7 +73,7 @@ function validateAssetInfo(db, req, res, assetInfo, cb)
 function fetchTags(db, req, res, assetInfo, cb)
 {
     var tagsQuery =
-            "SELECT tagTypes.type, tags.title, a.tag \
+        "SELECT tagTypes.type, tags.title, a.tag \
     FROM incomingAssetTags a \
     JOIN tags ON (a.tag = tags.id) LEFT JOIN tagTypes ON \
     (tags.type = tagTypes.id) where a.asset = $1;";
