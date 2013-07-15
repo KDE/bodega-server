@@ -362,7 +362,34 @@ describe('Asset manipulation', function(){
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
-                    deleteCompleteAsset([completeAssetId], 0, function(){});
+                    done();
+                });
+        });
+    });
+    describe('Publishing', function(){
+        after(function(done){
+            var addr = utils.dbConnectionString;
+            pg.connect(addr, function(err, client, finis) {
+                client.query("delete from assets where id = $1", [completeAssetId],
+                             function() {
+                                 finis();
+                                 done();
+                             });
+            });
+        });
+        it('should complain about missing options', function(done){
+            utils.postUrl('asset/publish/' + completeAssetId, null,
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('error');
+                    done();
+                });
+        });
+        it('should work with a posted asset', function(done){
+            utils.postUrl('asset/publish/' + completeAssetId + "?approve=1", null,
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
                     done();
                 });
         });

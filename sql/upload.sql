@@ -44,4 +44,3 @@ create table incomingAssetChangelogs
     changes     text
 );
 create index idx_incomingAssetChangelogs_byAsset on incomingAssetChangelogs(asset);
-

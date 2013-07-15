@@ -47,33 +47,10 @@ function assetHasTag(assetInfo, tagType)
     return false;
 }
 
-function validateAssetInfo(db, req, res, assetInfo, cb)
-{
-    var e;
-    var fields = ['license', 'partner',
-                  'name', 'description',
-                  'version', 'file', 'size',
-                  'image'];
-    var field;
-    var i;
-    for (i = 0; i < fields.length; ++i) {
-        field = fields[i];
-        if (typeof assetInfo[field] === 'undefined' ||
-            assetInfo[field] === null) {
-            e = errors.create('AssetInfoMissing',
-                              'Asset is missing the ' + field +  ' field.');
-            cb(e, db, req, res, assetInfo);
-            return;
-        }
-    }
-
-    cb(null, db, req, res, assetInfo);
-}
-
 function fetchTags(db, req, res, assetInfo, cb)
 {
     var tagsQuery =
-            "SELECT tagTypes.type, tags.title, a.tag, a.action \
+            "SELECT tagTypes.type, tags.title, a.tag \
     FROM incomingAssetTags a \
     JOIN tags ON (a.tag = tags.id) LEFT JOIN tagTypes ON \
     (tags.type = tagTypes.id) where a.asset = $1;";
@@ -93,60 +70,10 @@ function fetchTags(db, req, res, assetInfo, cb)
         });
 }
 
-function validateTags(db, req, res, assetInfo, cb)
-{
-    var mandatoryTagsForAssetType = {
-        "application" : ["author", "license"],
-        "book" : ["author", "publisher"],
-        "game" : ["author", "license"]
-    };
-    var keys = Object.keys(assetInfo.tags);
-    var tagIdx = 0;
-    var tagCount = keys.length;
-    var assetType = null;
-    var err, tagType;
-
-    for (tagIdx = 0; tagIdx < tagCount; ++tagIdx) {
-        var tagInfo = assetInfo.tags[tagIdx];
-        if (tagInfo.type === "assetType") {
-            assetType = tagInfo.title;
-        }
-    }
-
-    if (!assetType) {
-        err = errors.create('UploadMissingTag',
-                            "Missing required tag 'assetType'");
-        cb(err, db, req, res, assetInfo);
-        return;
-    }
-
-    assetInfo.assetType = assetType;
-    var requiredTags = mandatoryTagsForAssetType[assetType];
-
-    if (!requiredTags) {
-        err = errors.create('UploadMissingTag',
-                            "Unrecognized assetType");
-        cb(err, db, req, res, assetInfo);
-        return;
-    }
-
-    for (tagIdx = 0; tagIdx < requiredTags.length; ++tagIdx) {
-        tagType = requiredTags[tagIdx];
-        if (!assetHasTag(assetInfo, tagType)) {
-            err = errors.create('UploadMissingTag',
-                                "Missing required tag: " + tagType);
-            cb(err, db, req, res, assetInfo);
-            return;
-        }
-    }
-
-    cb(null, db, req, res, assetInfo);
-}
-
 function fetchPreviews(db, req, res, assetInfo, cb)
 {
     var previewsQuery =
-            "SELECT p.path, p.mimetype, p.type, p.subtype, p.action \
+            "SELECT p.path, p.mimetype, p.type, p.subtype \
     FROM incomingAssetPreviews p where p.asset = $1;";
     var e;
 
@@ -164,13 +91,6 @@ function fetchPreviews(db, req, res, assetInfo, cb)
         });
 }
 
-function validatePreviews(db, req, res, assetInfo, cb)
-{
-    app.previewStore.canPublish(assetInfo, function(err) {
-        cb(err, db, req, res, assetInfo);
-    });
-}
-
 function beginTransaction(db, req, res, assetInfo, cb)
 {
     var query = "BEGIN;";
@@ -183,6 +103,7 @@ function beginTransaction(db, req, res, assetInfo, cb)
             cb(e, db, req, res, assetInfo);
             return;
         }
+        assetInfo.transaction = true;
         cb(null, db, req, res, assetInfo);
     });
 }
@@ -203,8 +124,8 @@ function writeAsset(db, req, res, assetInfo, cb)
 
     if (!assetInfo.published) {
         args.push(assetInfo.id);
-        fieldsStr += 'id, ';
-        valuesStr += '$' + idx + ', ';
+        fieldsStr += 'id';
+        valuesStr += '$' + idx;
         ++idx;
     }
 
@@ -212,14 +133,13 @@ function writeAsset(db, req, res, assetInfo, cb)
         field = fields[i];
         if (typeof assetInfo[field] !== 'undefined' &&
             assetInfo[field] !== null) {
+
+            fieldsStr += ', ';
+            valuesStr += ', ';
+
             fieldsStr += field;
             args.push(assetInfo[field]);
             valuesStr += "$" + idx;
-
-            if (i !== (fields.length - 1)) {
-                fieldsStr += ', ';
-                valuesStr += ', ';
-            }
             ++idx;
         }
     }
@@ -273,7 +193,7 @@ function deleteIncoming(db, req, res, assetInfo, cb)
 function writeTag(db, req, res, assetInfo, tag, cb)
 {
     var query = 'insert into assetTags (asset, tag) values ($1, $2);';
-    var args = [tag.asset, tag.tag];
+    var args = [assetInfo.id, tag.tag];
 
     db.query(query, args, function(err, result) {
         cb(err, db, req, res, assetInfo, tag);
@@ -304,7 +224,7 @@ function writePreview(db, req, res, assetInfo, preview, cb)
     var query = 'insert into assetPreviews \
     (asset, path, mimetype, type, subtype) \
     values ($1, $2, $3, $4, $5);';
-    var args = [preview.asset, preview.path, preview.mimetype,
+    var args = [assetInfo.id, preview.path, preview.mimetype,
                 preview.type, preview.subtype];
 
     db.query(query, args, function(err, result) {
@@ -366,19 +286,18 @@ function publishAsset(db, req, res, assetInfo)
     var funcs = [function(cb) {
         cb(null, db, req, res, assetInfo);
     }];
+}
+
+function approveAsset(db, req, res, assetInfo)
+{
+    var funcs = [function(cb) {
+        cb(null, db, req, res, assetInfo);
+    }];
 
     // fetch tags
     funcs.push(fetchTags);
-    // validateTags
-    funcs.push(validateTags);
-
     // fetch previews
     funcs.push(fetchPreviews);
-    // validatePreviews
-    funcs.push(validatePreviews);
-
-    // validate asset info
-    funcs.push(validateAssetInfo);
 
     //begin transaction
     funcs.push(beginTransaction);
@@ -403,23 +322,44 @@ function publishAsset(db, req, res, assetInfo)
 
     async.waterfall(funcs, function(err, assetInfo) {
         if (err) {
-            db.query("rollback", [], function() {
+            if (assetInfo.transaction) {
+                db.query("rollback", [], function() {
+                    errors.report(err.name, req, res, err);
+                });
+            } else {
                 errors.report(err.name, req, res, err);
-            });
+            }
             return;
         }
         sendResponse(db, req, res, assetInfo);
     });
 }
 
+function rejectAsset(db, req, res, assetInfo)
+{
+
+}
+
 module.exports = function(db, req, res) {
     var assetInfo = {};
+    var approve, reject;
 
     assetInfo.id = utils.parseNumber(req.params.assetId);
     if (!assetInfo.id) {
         errors.report('MissingParameters', req, res);
         return;
     }
+    approve = utils.parseBool(req.query.approve);
+    reject  = utils.parseBool(req.query.reject);
+    if (!approve && !reject) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+    if (approve && reject) {
+        errors.report('TooManyParameters', req, res);
+        return;
+    }
+
     assetInfo.partner = req.query.partner;
 
     createUtils.isValidator(
@@ -440,7 +380,11 @@ module.exports = function(db, req, res) {
                         errors.report('AssetMissing', req, res);
                         return;
                     }
-                    publishAsset(db, req, res, assetInfo);
+                    if (approve) {
+                        approveAsset(db, req, res, assetInfo);
+                    } else if (reject) {
+                        rejectAsset(db, req, res, assetInfo);
+                    }
                 }
             );
         });
