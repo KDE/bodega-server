@@ -81,9 +81,10 @@ DECLARE
     userId INTEGER;
     categorySlug TEXT;
     name TEXT;
+    topicTitle TEXT;
 BEGIN
     currentTime := current_timestamp AT TIME ZONE 'UTC';
-    userId := 0; -- this is the root of discourse
+    userId := 1; -- this is the root of discourse
 
     PERFORM dblink_connect('dbname=discourse_development');
     IF (TG_OP = 'INSERT') THEN
@@ -99,6 +100,15 @@ BEGIN
                             VALUES ('''||categoryName||''', '''||currentTime||''',
                             '''||currentTime||''', '''||categoryDescription||''',
                             '''||userId||''', '''||categorySlug||''');' );
+
+        -- in discourse every category must have at least one topic in order to be visible
+        topicTitle := 'Welcome to the' || NEW.name || 'category';
+        PERFORM dblink_exec('INSERT INTO topics (title, created_at, updated_at,
+                            user_id, last_post_user_id, bumped_at)
+                            VALUES('''||topicTitle||''', '''||currentTime||''', '''||currentTime||''',
+                            '''||userId||''', '''||userId||''', '''||currentTime||''');');
+
+
     ELSIF (TG_OP = 'UPDATE') THEN
         IF NEW.name IS NULL THEN
             RETURN OLD;
