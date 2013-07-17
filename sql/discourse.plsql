@@ -102,7 +102,7 @@ BEGIN
                             '''||userId||''', '''||categorySlug||''');' );
 
         -- in discourse every category must have at least one topic in order to be visible
-        topicTitle := 'Welcome to the' || NEW.name || 'category';
+        topicTitle := 'Welcome to the ' || NEW.name || ' category';
         PERFORM dblink_exec('INSERT INTO topics (title, created_at, updated_at,
                             user_id, last_post_user_id, bumped_at)
                             VALUES('''||topicTitle||''', '''||currentTime||''', '''||currentTime||''',
