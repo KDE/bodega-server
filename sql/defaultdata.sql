@@ -32,8 +32,10 @@ INSERT INTO tags (type, title) VALUES (8, 'Mature');
 INSERT INTO tags (type, title) VALUES (8, 'Adults Only');
 
 
-INSERT INTO tags (type, title) SELECT id, 'article' FROM tagtypes WHERE type = 'assetType';
+-- IMPORTANT NOTE: if you add to the assetType set you MUST also add an entry in the
+--                 mandatoryTags object in assetRules.js
 INSERT INTO tags (type, title) SELECt id, 'application' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'article' FROM tagtypes WHERE type = 'assetType';
 INSERT INTO tags (type, title) SELECt id, 'audio' FROM tagtypes WHERE type = 'assetType';
 INSERT INTO tags (type, title) SELECt id, 'audiobook' FROM tagtypes WHERE type = 'assetType';
 INSERT INTO tags (type, title) SELECt id, 'book' FROM tagtypes WHERE type = 'assetType';

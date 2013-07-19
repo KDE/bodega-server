@@ -48,6 +48,10 @@ safely ignore those blocks completely.
 
 Most (often, all) of the default settings should work.
 
+To adjust the type of content and rules for assets you can make adjustments to the definitions in
+server/assetRules.js as well as in the default dataset in sql/detaulData.sql. The latter must be
+done before running `make sql` or else be loaded by hand.
+
 ## Quick Start
 
    $ cd server
