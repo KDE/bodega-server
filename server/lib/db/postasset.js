@@ -17,6 +17,7 @@
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
+var assetRules = require('../../assetRules.js');
 var createUtils = require('./createutils.js');
 var fs = require('fs');
 var path = require('path');
@@ -95,11 +96,6 @@ function fetchTags(db, req, res, assetInfo, cb)
 
 function validateTags(db, req, res, assetInfo, cb)
 {
-    var mandatoryTagsForAssetType = {
-        "application" : ["author", "license"],
-        "book" : ["author", "publisher"],
-        "game" : ["author", "license"]
-    };
     var keys = Object.keys(assetInfo.tags);
     var tagIdx = 0;
     var tagCount = keys.length;
@@ -121,7 +117,7 @@ function validateTags(db, req, res, assetInfo, cb)
     }
 
     assetInfo.assetType = assetType;
-    var requiredTags = mandatoryTagsForAssetType[assetType];
+    var requiredTags = assetRules.mandatoryTags[assetType];
 
     if (!requiredTags) {
         err = errors.create('UploadMissingTag',
