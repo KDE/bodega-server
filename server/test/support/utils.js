@@ -6,15 +6,8 @@ var assert = require('assert');
 var async = require('async');
 var pg = require('pg');
 
-var app = require('../../app.js');
 
 var baseJsonPath = '/bodega/v1/json/';
-
-var dbConnectionString = app.config.service.database.protocol + "://" +
-                       app.config.service.database.user + ":" +
-                       app.config.service.database.password +
-                       "@" + app.config.service.database.host + "/" +
-                       app.config.service.database.name;
 
 function getUrl(path, fn, opts)
 {
@@ -23,8 +16,8 @@ function getUrl(path, fn, opts)
     }
 
     var options = {
-        host: app.config.host,
-        port: app.config.port,
+        host: module.exports.app.config.host,
+        port: module.exports.app.config.port,
         path: path,
         headers : {
             'Cookie': (opts && opts.noAuth) ? null : module.exports.cookie
@@ -71,7 +64,8 @@ function postUrl(path, formData, fn, opts)
     }
 
     var options = {
-        uri: 'http://' + app.config.host + ':' + app.config.port + path,
+        uri: 'http://' + module.exports.app.config.host + ':' +
+             module.exports.app.config.port + path,
         form: formData,
         jar: false,
         headers : {
@@ -195,7 +189,7 @@ function dbSnapshot(db, fn)
         return;
     }
 
-    pg.connect(dbConnectionString, function(err, client, finis) {
+    pg.connect(module.exports.dbConnectionString, function(err, client, finis) {
         takeSnapshot(client, function(err, res) {
             fn(err, res);
             finis();
@@ -204,9 +198,15 @@ function dbSnapshot(db, fn)
 }
 
 // public variables
-module.exports.app = app;
+module.exports.app = require('../../app.js');
 module.exports.baseJsonPath = baseJsonPath;
-module.exports.dbConnectionString = dbConnectionString;
+module.exports.dbConnectionString =
+                       module.exports.app.config.service.database.protocol + "://" +
+                       module.exports.app.config.service.database.user + ":" +
+                       module.exports.app.config.service.database.password +
+                       "@" + module.exports.app.config.service.database.host + "/" +
+                       module.exports.app.config.service.database.name;
+
 module.exports.cookie = '';
 
 // public functions
