@@ -21,6 +21,7 @@ INSERT INTO tagTypes (type) VALUES ('publisher');
 INSERT INTO tagTypes (type) VALUES ('url');
 INSERT INTO tagTypes (type) VALUES ('isbn');
 INSERT INTO tagTypes (type) VALUES ('platform');
+INSERT INTO tagTypes (type) VALUES ('grouping');
 
 INSERT INTO tags (type, title) VALUES (7, 'application/x-plasma');
 
