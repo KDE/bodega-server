@@ -146,6 +146,16 @@ create table tags
     title       text
 );
 
+create  index idx_tagsByType on tags(type);
+
+create table autoTags
+(
+    source      int         not null references tags(id) on delete cascade,
+    target      int         not null references tags(id) on delete cascade
+);
+
+create index idx_autoTagsBySource on autoTags(source);
+
 create sequence seq_assetsIds;
 
 create table tagText
@@ -179,7 +189,8 @@ create index idx_asset_partners on assets (partner);
 create table assetTags
 (
     asset       int         not null references assets(id) on delete cascade,
-    tag         int         not null references tags(id) on delete cascade
+    tag         int         not null references tags(id) on delete cascade,
+    sourceTag   int         references tags(id) on delete cascade
 );
 
 create index idx_assetTags_byAsset on assettags(asset);

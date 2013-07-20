@@ -109,15 +109,76 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
---        ct_associateAssetWithParentChannel(parent, alteredAsset);
+CREATE OR REPLACE FUNCTION ct_generateAutoTags() RETURNS TRIGGER AS $$
+DECLARE
+    groupTagTitle text;
+    groupingId int;
+BEGIN
+    IF  TG_OP = 'UPDATE' THEN
+        DELETE FROM autoTags WHERE source = NEW.id;
+    END IF;
+
+    SELECT INTO groupTagTitle type FROM tagTypes WHERE id = NEW.type AND type IN ('author');
+    IF FOUND THEN
+        groupTagTitle := groupTagTitle || '_' || lower(substr(NEW.title, 1, 1));
+        SELECT INTO groupingId id FROM tagTypes WHERE type = 'grouping';
+        INSERT INTO autoTags (source, target)
+            SELECT NEW.id, id FROM tags
+            WHERE type = groupingId AND title = groupTagTitle;
+        IF NOT FOUND THEN
+            INSERT INTO tags (type, title) VALUES (groupingId, groupTagTitle);
+
+            INSERT INTO autoTags (source, target)
+                SELECT NEW.id, id FROM tags
+                WHERE type = groupingId AND title = groupTagTitle;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_generateAutoTags ON tags;
+CREATE TRIGGER trg_ct_generateAutoTags AFTER INSERT OR UPDATE ON tags
+FOR EACH ROW EXECUTE PROCEDURE ct_generateAutoTags();
+
+CREATE OR REPLACE FUNCTION ct_validateAssetTag() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        IF OLD.sourceTag IS NULL THEN
+            -- delete any autotags
+            delete from assetTags where asset = OLD.asset AND sourceTag = OLD.tag;
+        END IF;
+        RETURN OLD;
+    ELSE
+        -- deny duplicate tags on the same asset
+        PERFORM tag FROM assetTags where asset = NEW.asset AND tag = NEW.tag;
+        IF FOUND THEN
+            RETURN null;
+        END IF;
+        -- add any auto tags on insert
+        IF TG_OP = 'INSERT' THEN
+            INSERT INTO assetTags (asset, tag, sourceTag)
+                SELECT NEW.asset, target, NEW.tag FROM autoTags WHERE source = NEW.tag;
+        END IF;
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_validateAssetTag ON assetTags;
+CREATE TRIGGER trg_ct_validateAssetTag BEFORE INSERT OR UPDATE OR DELETE ON assetTags
+FOR EACH ROW EXECUTE PROCEDURE ct_validateAssetTag();
+
 -- TRIGGER functions to associate channels and assets when the tags change
-CREATE OR REPLACE FUNCTION ct_associateAssetWithChannels() RETURNS TRIGGER AS '
+CREATE OR REPLACE FUNCTION ct_associateAssetWithChannels() RETURNS TRIGGER AS $$
 DECLARE
     alteredAsset   int;
     parentChannel  RECORD;
     noJobsInProgress bool;
 BEGIN
-    IF (TG_OP = ''DELETE'') THEN
+    IF TG_OP = 'DELETE' THEN
         alteredAsset := OLD.asset;
     ELSE
         alteredAsset := NEW.asset;
@@ -141,13 +202,13 @@ BEGIN
 
     PERFORM ct_updateAssetPrices(alteredAsset, basePrice) FROM assets WHERE id = alteredAsset;
     PERFORM ct_markNonExtantPricesDone();
-    IF (TG_OP = ''DELETE'') THEN
+    IF (TG_OP = 'DELETE') THEN
         RETURN OLD;
     ELSE
         RETURN NEW;
     END IF;
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS trg_ct_associateAssetWithChannels ON assetTags;
 CREATE TRIGGER trg_ct_associateAssetWithChannels AFTER INSERT OR UPDATE OR DELETE ON assetTags
