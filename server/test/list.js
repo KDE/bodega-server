@@ -116,7 +116,6 @@ describe('Listing', function(){
             // we need to figure out when they all finish and call
             // done() only then
             var runningTests = 3;
-                    console.log("working with channel ... " + cardsChannelId);
             utils.getUrl('channel/' + cardsChannelId +  '?pageSize=1',
                 function(res) {
                     res.statusCode.should.equal(200);
