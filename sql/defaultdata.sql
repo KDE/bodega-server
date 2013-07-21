@@ -23,8 +23,6 @@ INSERT INTO tagTypes (type) VALUES ('isbn');
 INSERT INTO tagTypes (type) VALUES ('platform');
 INSERT INTO tagTypes (type) VALUES ('grouping');
 
-INSERT INTO tags (type, title) VALUES (7, 'application/x-plasma');
-
 INSERT INTO tags (type, title) VALUES (8, 'Early Childhood');
 INSERT INTO tags (type, title) VALUES (8, 'Everyone');
 INSERT INTO tags (type, title) VALUES (8, 'Everyone 10+');
@@ -35,16 +33,16 @@ INSERT INTO tags (type, title) VALUES (8, 'Adults Only');
 
 -- IMPORTANT NOTE: if you add to the assetType set you MUST also add an entry in the
 --                 mandatoryTags object in assetRules.js
-INSERT INTO tags (type, title) SELECt id, 'application' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'application' FROM tagtypes WHERE type = 'assetType';
 INSERT INTO tags (type, title) SELECT id, 'article' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECt id, 'audio' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECt id, 'audiobook' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECt id, 'book' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECt id, 'game' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECt id, 'magazine' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECt id, 'movie' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECt id, 'tvshow' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECt id, 'wallpaper' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'audio' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'audiobook' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'book' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'game' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'magazine' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'movie' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'tvshow' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title) SELECT id, 'wallpaper' FROM tagtypes WHERE type = 'assetType';
 
 INSERT INTO licenses (name, text) VALUES ('GPL', '');
 INSERT INTO licenses (name, text) VALUES ('LGPL', '');

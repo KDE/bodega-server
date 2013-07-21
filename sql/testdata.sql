@@ -121,7 +121,7 @@ $$
 DECLARE
     tagId int;
 BEGIN
-    SELECT INTO tagId ct_testing_tagByName('Zack Rusin');
+    SELECT INTO tagId ct_testing_tagByName('Approved by KDE');
     IF tagId > -1 THEN
         DELETE FROM tags WHERE id >= tagId;
     END IF;
@@ -186,6 +186,7 @@ insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 
 insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 'Util');
 insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 'Misc');
 
+insert into tags (type, title) SELECT id, 'application/x-plasma' FROM tagtypes WHERE type = 'mimetype';
 INSERT INTO tags (type, title) SELECT id, 'Zack Rusin' FROM tagtypes WHERE type = 'author';
 INSERT INTO tags (type, title) SELECT id, 'Coherent Theory' FROM tagtypes WHERE type = 'publisher';
 INSERT INTO tags (type, title) SELECT id, '0123456789' FROM tagtypes WHERE type = 'isbn';
