@@ -17,6 +17,7 @@
           "mimetype" : "image/png" }
     ],
     "tags" : [
+        {"type" : "contentrating", "title" : "Everyone" },
         {"type" : "assetType", "title" : "book" },
         {"type" : "author", "title" : "Zack Rusin"},
         {"type" : "publisher", "title" : "Coherent Theory" },
