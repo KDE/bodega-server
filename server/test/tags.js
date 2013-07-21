@@ -91,9 +91,9 @@ describe('Tags manipulation', function(){
 
                 res.body.tags.length.should.equal(2);
                 res.body.tags[0].id.should.be.eql(1);
-                res.body.tags[0].typeid.should.be.eql(7);
-                res.body.tags[0].type.should.be.eql('mimetype');
-                res.body.tags[0].title.should.be.eql('application/x-plasma');
+                res.body.tags[0].typeid.should.be.eql(8);
+                res.body.tags[0].type.should.be.eql('contentrating');
+                res.body.tags[0].title.should.be.eql('Early Childhood');
                 done();
             };
             listTags(2, null, null, cb);
@@ -109,10 +109,10 @@ describe('Tags manipulation', function(){
                 res.body.should.have.property('tags');
 
                 res.body.tags.length.should.equal(2);
-                res.body.tags[0].id.should.be.eql(1);
-                res.body.tags[0].typeid.should.be.eql(7);
-                res.body.tags[0].type.should.be.eql('mimetype');
-                res.body.tags[0].title.should.be.eql('application/x-plasma');
+                res.body.tags[0].id.should.be.eql(12);
+                res.body.tags[0].typeid.should.be.eql(9);
+                res.body.tags[0].type.should.be.eql('assetType');
+                res.body.tags[0].title.should.be.eql('game');
                 done();
             };
             listTags(null, 2, null, cb);
@@ -128,7 +128,7 @@ describe('Tags manipulation', function(){
                 res.body.should.have.property('tags');
 
                 res.body.tags.length.should.equal(6);
-                res.body.tags[0].id.should.be.eql(7);
+                res.body.tags[0].id.should.be.eql(6);
                 res.body.tags[0].typeid.should.be.eql(8);
                 res.body.tags[0].type.should.be.eql('contentrating');
                 res.body.tags[0].title.should.be.eql('Adults Only');

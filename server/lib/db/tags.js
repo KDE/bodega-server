@@ -24,7 +24,7 @@ module.exports.listTypes = function(db, req, res) {
     var json = utils.standardJson(req);
 
     var q = db.query(
-        "select id, type from tagtypes",
+        "select id, type from tagtypes order by id",
         [],
         function(err, result) {
             if (err) {
@@ -50,7 +50,7 @@ function listAssetTags(partner, db, req, res) {
          "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable\
           from assettags join tags on assettags.tag = tags.id\
           join tagtypes on tagtypes.id = tags.type\
-          where asset = $2",
+          where asset = $2 order by tags.id",
         [partner, asset],
         function(err, result) {
             if (err) {
@@ -81,7 +81,7 @@ function listChannelTags(partner, db, req, res) {
          "select tags.id, tagtypes.id as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable\
           from channeltags join tags on channeltags.tag = tags.id\
           join tagtypes on tagtypes.id = tags.type\
-          where channel = $2",
+          where channel = $2 order by tags.id",
         [partner, channel],
         function(err, result) {
             if (err) {
