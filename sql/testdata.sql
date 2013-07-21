@@ -124,6 +124,7 @@ BEGIN
     SELECT INTO tagId ct_testing_tagByName('Approved by KDE');
     IF tagId > -1 THEN
         DELETE FROM tags WHERE id >= tagId;
+        PERFORM setval('seq_tagids', tagId - 1);
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -149,7 +150,6 @@ select setval('seq_peopleids', 1);
 select setval('seq_partnerids', 1005);
 select setval('seq_channelids', 1);
 select setval('seq_purchaseids', 1);
-select setval('seq_tagids', 20);
 
 
 -- now start setting up the data
@@ -181,17 +181,17 @@ select affiliatePerson('aseigo@kde.org', 'KDE', 'Partner Manager');
 select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Content Creator');
 select affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');
 
-insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 2, 'Approved by KDE');
-insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 'Card Game');
-insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 'Util');
-insert into tags (partner, type, title) values (ct_testing_partnerId('KDE'), 3, 'Misc');
+insert into tags (partner, type, title) SELECT ct_testing_partnerId('KDE'), id, 'Approved by KDE' FROM tagtypes WHERE type = 'signoff';
+insert into tags (partner, type, title) SELECT ct_testing_partnerId('KDE'), id, 'Card Game' FROM tagtypes WHERE type = 'category';
+insert into tags (partner, type, title) SELECT ct_testing_partnerId('KDE'), id, 'Util' FROM tagtypes WHERE type = 'category';
+insert into tags (partner, type, title) SELECT ct_testing_partnerId('KDE'), id, 'Misc' FROM tagtypes WHERE type = 'category';
 
 insert into tags (type, title) SELECT id, 'application/x-plasma' FROM tagtypes WHERE type = 'mimetype';
-INSERT INTO tags (type, title) SELECT id, 'Zack Rusin' FROM tagtypes WHERE type = 'author';
-INSERT INTO tags (type, title) SELECT id, 'Coherent Theory' FROM tagtypes WHERE type = 'publisher';
-INSERT INTO tags (type, title) SELECT id, '0123456789' FROM tagtypes WHERE type = 'isbn';
-INSERT INTO tags (type, title) SELECT id, '2013' FROM tagtypes WHERE type = 'created';
-INSERT INTO tags (type, title) SELECT id, 'http://makeplaylive.com' FROM tagtypes WHERE type = 'url';
+insert into tags (type, title) SELECT id, 'Zack Rusin' FROM tagtypes WHERE type = 'author';
+insert into tags (type, title) SELECT id, 'Coherent Theory' FROM tagtypes WHERE type = 'publisher';
+insert into tags (type, title) SELECT id, '0123456789' FROM tagtypes WHERE type = 'isbn';
+insert into tags (type, title) SELECT id, '2013' FROM tagtypes WHERE type = 'created';
+insert into tags (type, title) SELECT id, 'http://makeplaylive.com' FROM tagtypes WHERE type = 'url';
 
 insert into stores (id, partner, name) values ('null', ct_testing_partnerId('Management'), 'No Store');
 insert into stores (id, partner, name, description) values ('VIVALDI-1', ct_testing_partnerId('Make Play Live'), 'Vivaldi', 'Plasma Active tablet from Make Play Live');
