@@ -23,12 +23,12 @@ INSERT INTO tagTypes (type) VALUES ('isbn');
 INSERT INTO tagTypes (type) VALUES ('platform');
 INSERT INTO tagTypes (type) VALUES ('grouping');
 
-INSERT INTO tags (type, title) VALUES (8, 'Early Childhood');
-INSERT INTO tags (type, title) VALUES (8, 'Everyone');
-INSERT INTO tags (type, title) VALUES (8, 'Everyone 10+');
-INSERT INTO tags (type, title) VALUES (8, 'Teen');
-INSERT INTO tags (type, title) VALUES (8, 'Mature');
-INSERT INTO tags (type, title) VALUES (8, 'Adults Only');
+INSERT INTO tags (type, title) SELECT id, 'Early Childhood' FROM tagtypes WHERE type = 'contentrating';
+INSERT INTO tags (type, title) SELECT id, 'Everyone' FROM tagtypes WHERE type = 'contentrating';
+INSERT INTO tags (type, title) SELECT id, 'Everyone 10+' FROM tagtypes WHERE type = 'contentrating';
+INSERT INTO tags (type, title) SELECT id, 'Teen' FROM tagtypes WHERE type = 'contentrating';
+INSERT INTO tags (type, title) SELECT id, 'Mature' FROM tagtypes WHERE type = 'contentrating';
+INSERT INTO tags (type, title) SELECT id, 'Adults Only' FROM tagtypes WHERE type = 'contentrating';
 
 
 -- IMPORTANT NOTE: if you add to the assetType set you MUST also add an entry in the
