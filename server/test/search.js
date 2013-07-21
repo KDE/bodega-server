@@ -70,7 +70,7 @@ describe('Searching', function(){
     });
 
     describe('Search', function(){
-        it('should error an missing query', function(done){
+        it('should error on missing query', function(done){
             utils.getUrl('search',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -85,7 +85,7 @@ describe('Searching', function(){
                 });
         });
 
-        it('should error an missing channel', function(done){
+        it('should error on missing channel', function(done){
             utils.getUrl('search?' +
                     '&query=\'mathematica\'',
                 function(res) {
