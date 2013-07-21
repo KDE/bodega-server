@@ -26,48 +26,49 @@ function searchAssets(db, req, res, args, json)
     //      UNION the results into a single temporary table
     //      query on that table to generate the final results
     var query =
-       'SELECT a.id, sum(temp.namerank) as namerank, sum(temp.tagrank) as tagrank, \
-        (sum(temp.namerank) + sum(temp.tagrank)) / (1 + sum(CASE WHEN temp.tagrank > 0 THEN 1 ELSE 0 END)) as rank, \
-        max(a.license) as license, max(partners.id) as partnerid, \
-        max(partners.name) AS partnername, max(a.version) as version, max(a.image) as image, max(a.name) as name, \
-        (CASE WHEN max(temp.points) IS NULL THEN 0 ELSE max(temp.points) END)::int AS points \
+       'SELECT a.id, rankings.namerank, rankings.tagrank, rankings.rank, \
+        a.license, partners.id, \
+        partners.name, a.version, a.image, a.name, \
+        (CASE WHEN p.points IS NULL THEN 0 ELSE p.points END)::int AS points \
     FROM \
     ( \
-        SELECT a.id as id, p.points as points, \
-        ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) as namerank, \
-        0 as tagrank \
-        FROM assets a \
-        INNER JOIN subChannelAssets s ON (a.id = s.asset)  \
-        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $5)  \
-        WHERE \
-        a.en_index @@ plainto_tsquery(\'english\', $1) AND \
-        s.channel = $2 \
-      UNION \
-        SELECT a.id as id, p.points as points, \
-        0 as namerank, \
-        ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) as tagrank \
-        FROM assets a \
-        INNER JOIN subChannelAssets s ON (a.id = s.asset) \
-        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $5)  \
-        LEFT JOIN assetTags at ON (a.id = at.asset)  \
-        LEFT JOIN tags t on (t.id = at.tag) \
-        WHERE \
-        s.channel = $2 AND \
-        t.en_index @@ plainto_tsquery(\'english\', $1) AND \
-        t.type in (select id from tagtypes where type in (\'category\', \'descriptive\', \'author\', \'contributor\')) \
-      UNION \
-        SELECT a.id as id, p.points as points, 1 as namerank, 1 as tagrank \
-        FROM assets a \
-        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $5) \
-        LEFT JOIN assetTags at ON (a.id = at.asset)  \
-        LEFT JOIN tags t on (t.id = at.tag) \
-        WHERE \
-        t.title = $1 AND t.type in (SELECT id FROM tagtypes WHERE type = \'easter eggs\') \
-    ) as temp \
-        LEFT JOIN assets a ON (a.id = temp.id) \
+        SELECT id, sum(namerank) as namerank, sum(tagrank) as tagrank, \
+        (sum(namerank) + sum(tagrank)) / (1 + sum(CASE WHEN tagrank > 0 THEN 1 ELSE 0 END)) as rank \
+        FROM \
+        ( \
+            SELECT a.id as id,  \
+            ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) as namerank, \
+            0 as tagrank \
+            FROM assets a \
+            INNER JOIN subChannelAssets s ON (a.id = s.asset)  \
+            WHERE \
+            a.en_index @@ plainto_tsquery(\'english\', $1) AND \
+            s.channel = $2 \
+          UNION \
+            SELECT a.id as id, 0 as namerank, \
+            ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) as tagrank \
+            FROM assets a \
+            INNER JOIN subChannelAssets s ON (a.id = s.asset) \
+            LEFT JOIN assetTags at ON (a.id = at.asset)  \
+            LEFT JOIN tags t on (t.id = at.tag) \
+            WHERE \
+            s.channel = $2 AND \
+            t.en_index @@ plainto_tsquery(\'english\', $1) AND \
+            t.type in (select id from tagtypes where type in (\'assetName\', \'category\', \'descriptive\', \'author\', \'contributor\')) \
+          UNION \
+            SELECT a.id as id, 1 as namerank, 1 as tagrank \
+            FROM assets a \
+            LEFT JOIN assetTags at ON (a.id = at.asset)  \
+            LEFT JOIN tags t on (t.id = at.tag) \
+            WHERE \
+            t.title = $1 AND t.type in (SELECT id FROM tagtypes WHERE type = \'easter eggs\') \
+            ) as temp \
+        GROUP BY temp.id \
+    ) as rankings \
+        LEFT JOIN assets a ON (a.id = rankings.id) \
+        LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $5 AND p.ending IS null) \
         LEFT JOIN partners ON (a.partner = partners.id) \
-    GROUP BY a.id \
-    ORDER BY rank DESC, max(a.name) LIMIT $3 OFFSET $4   \
+    ORDER BY rank DESC LIMIT $3 OFFSET $4   \
     ;';
 
     db.query(
