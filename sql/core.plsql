@@ -293,7 +293,7 @@ BEGIN
     END IF;
 
     -- RAISE NOTICE 'markups for the store are % % %', storeMarkup, storeMinMarkup, storeMaxMarkup;
-    -- RAISE NOTICE 'markups for the warehosue are % % %', wareMarkup, wareMinMarkup, wareMaxMarkup;
+    -- RAISE NOTICE 'markups for the warehouse are % % %', wareMarkup, wareMinMarkup, wareMaxMarkup;
     price := (points / (1 - ((storeMarkup + wareMarkup) / 100.0)))::int;
     storeCut := (price * (storeMarkup / 100.0))::int;
     wareCut := (price * (wareMarkup / 100.0))::int;

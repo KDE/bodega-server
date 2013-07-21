@@ -114,8 +114,7 @@ describe('Store management', function(){
                         'name': 'Fun Times With Clowns',
                         'desc': 'Clowns are actually scary',
                         'partner': { 'id': 1002, 'name': 'KDE' },
-                        'markups': { 'min': 0, 'max': 0,
-                                     'flat': false, 'markup': 0 }
+                        'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                     } ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -142,8 +141,7 @@ describe('Store management', function(){
                         'name': 'More Fun',
                         'desc': '',
                         'partner': { 'id': 1002, 'name': 'KDE' },
-                        'markups': { 'min': 0, 'max': 0,
-                                     'flat': false, 'markup': 0 }
+                        'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                     } ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -189,32 +187,28 @@ describe('Store management', function(){
                             'name': 'Fun Times With Clowns',
                             'desc': 'Clowns are actually scary',
                             'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0,
-                            'flat': false, 'markup': 0 }
+                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                         },
                         {
                             'id': 'KDE-1',
                             'name': 'Plasma Workspace',
                             'desc': 'KDE Plasma user interfaces',
                             'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0,
-                            'flat': true, 'markup': 0 }
+                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                         },
                         {
                             'id': 'KDE-2',
                             'name': 'KDE Applications',
                             'desc': 'Variety of tools',
                             'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0,
-                            'flat': true, 'markup': 0 }
+                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                         },
                         {
                             'id': 'somethingcrazy',
                             'name': 'More Fun',
                             'desc': '',
                             'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0,
-                            'flat': false, 'markup': 0 }
+                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                         }
                         ];
 
@@ -235,7 +229,6 @@ describe('Store management', function(){
             var query = {
                 'maxmarkup': 100,
                 'minmarkup': 10,
-                'flatmarkup': true,
                 'markup': 20
             };
 
@@ -256,7 +249,6 @@ describe('Store management', function(){
             var query = {
                 'maxmarkup': 100,
                 'minmarkup': 10,
-                'flatmarkup': true,
                 'markup': 20
             };
 
@@ -277,7 +269,6 @@ describe('Store management', function(){
             var query = {
                 'maxmarkup': 100,
                 'minmarkup': 10,
-                'flatmarkup': true,
                 'markup': 20,
                 'desc': 'Clowns are not scary'
             };
@@ -291,8 +282,7 @@ describe('Store management', function(){
                             'name': 'Fun Times With Clowns',
                             'desc': 'Clowns are not scary',
                             'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 10, 'max': 100,
-                                         'flat': true, 'markup': 20 }
+                            'markups': { 'min': 10, 'max': 100, 'markup': 20 }
                         }
                     ];
                     res.statusCode.should.equal(200);
@@ -320,8 +310,7 @@ describe('Store management', function(){
                             'name': 'Fun Times With Clowns',
                             'desc': 'Clowns are not scary',
                             'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 10, 'max': 200,
-                                         'flat': true, 'markup': 15 }
+                            'markups': { 'min': 10, 'max': 200, 'markup': 15 }
                         }
                     ];
                     res.statusCode.should.equal(200);
@@ -379,16 +368,16 @@ describe('Store management', function(){
                           "active": true,
                           "tags": [
                             {
-                              "id": 1,
-                              "title": "application/x-plasma",
-                              "type": 'mimetype',
-                              "typeid": 7
-                            },
-                            {
-                              "id": 13,
+                              "id": 12,
                               "title": "game",
                               "type": 'assetType',
                               "typeid": 9
+                            },
+                            {
+                              "id": 21,
+                              "title": "application/x-plasma",
+                              "type": 'mimetype',
+                              "typeid": 7
                             }
                             ],
                             "channels": [
@@ -400,22 +389,22 @@ describe('Store management', function(){
                                 "active": true,
                                 "tags": [
                                     {
-                                      "id":1,
-                                      "title": "application/x-plasma",
-                                      "type": 'mimetype',
-                                      "typeid": 7
-                                    },
-                                    {
-                                      "id": 13,
+                                      "id": 12,
                                       "title": "game",
                                       "type": 'assetType',
                                       "typeid": 9
                                     },
                                     {
-                                      "id": 22,
+                                      "id": 18,
                                       "title": "Card Game",
-                                      "type": 'market',
-                                      "typeid": 3
+                                      "type": 'category',
+                                      "typeid": 4
+                                    },
+                                    {
+                                      "id": 21,
+                                      "title": "application/x-plasma",
+                                      "type": 'mimetype',
+                                      "typeid": 7
                                     }
                                 ],
                                 "channels": []
@@ -432,15 +421,15 @@ describe('Store management', function(){
                                         "tags": [
                                         {
                                             "id": 1,
-                                            "title": "application/x-plasma",
-                                            "type": 'mimetype',
-                                            "typeid": 7
+                                            "title": "Early Childhood",
+                                            "type": 'contentrating',
+                                            "typeid": 8
                                         },
                                         {
                                             "id": 22,
-                                            "title": "Card Game",
-                                            "type": 'market',
-                                            "typeid": 3
+                                            "title": "Zack Rusin",
+                                            "type": 'author',
+                                            "typeid": 11
                                         }
                                         ],
                                         "channels": []
@@ -562,16 +551,14 @@ describe('Store management', function(){
                             'name': 'Plasma Workspace',
                             'desc': 'KDE Plasma user interfaces',
                             'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0,
-                            'flat': true, 'markup': 0 }
+                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                         },
                         {
                             'id': 'KDE-2',
                             'name': 'KDE Applications',
                             'desc': 'Variety of tools',
                             'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0,
-                            'flat': true, 'markup': 0 }
+                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                         }
                         ];
 

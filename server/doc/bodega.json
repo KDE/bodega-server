@@ -1430,17 +1430,9 @@
                     "Type": "number"
                 },
                 {
-                    "Name": "flatMarkup",
-                    "Location": "body",
-                    "Description": "If true, then markup is interpreted as a flat point rate, otherwise as a percentage. See the markup parameter below for more details",
-                    "Required": "N",
-                    "Default": false,
-                    "Type": "boolean"
-                },
-                {
                     "Name": "markup",
                     "Location": "body",
-                    "Description": "The markup to apply to assets in the store; if flatMarkup is true, then this is a number of points to add to each asset otherwise it is interpreted as a percentage to mark up the base price of assets by (e.g. 15 = 15%, so an asset with a base price of 100 points would cost 115 points in the store)",
+                    "Description": "The markup to apply to assets in the store; it is interpreted as a percentage to mark up the base price of assets by (e.g. 15 = 15%, so an asset with a base price of 100 points would cost 115 points in the store)",
                     "Required": "N",
                     "Default": 0,
                     "Type": "number"
@@ -1489,16 +1481,9 @@
                     "Type": "number"
                 },
                 {
-                    "Name": "flatMarkup",
-                    "Location": "body",
-                    "Description": "If true, then markup is interpreted as a flat point rate, otherwise as a percentage. See the markup parameter below for more details. If not provided the value of flatMarkup is not changed",
-                    "Required": "N",
-                    "Type": "boolean"
-                },
-                {
                     "Name": "markup",
                     "Location": "body",
-                    "Description": "The markup to apply to assets in the store; if flatMarkup is true, then this is a number of points to add to each asset otherwise it is interpreted as a percentage to mark up the base price of assets by (e.g. 15 = 15%, so an asset with a base price of 100 points would cost 115 points in the store); if not provided the rate is unchanged",
+                    "Description": "The markup to apply to assets in the store; it is interpreted as a percentage to mark up the base price of assets by (e.g. 15 = 15%, so an asset with a base price of 100 points would cost 115 points in the store); if not provided the rate is unchanged",
                     "Required": "N",
                     "Type": "number"
                 }

@@ -115,8 +115,7 @@ create table stores
     description text,
     minMarkup   int         not null default 0 check (minMarkup >= 0),
     maxMarkup   int         not null default 0 check (maxMarkup >= minMarkup),
-    flatMarkup  bool        not null default true,
-    markup      int         not null default 0 check (not flatMarkup or (markup >= minMarkup and (maxMarkup = 0 or markup <= maxMarkup)))
+    markup      int         not null default 0
 );
 
 create table warehouses
@@ -124,8 +123,7 @@ create table warehouses
     id          text        primary key,
     minMarkup   int         not null default 0 check (minMarkup >= 0),
     maxMarkup   int         not null default 0 check (maxMarkup >= minMarkup),
-    flatMarkup  bool        not null default true,
-    markup      int         not null default 0 check (not flatMarkup or (markup >= minMarkup and (maxMarkup = 0 or markup <= maxMarkup)))
+    markup      int         not null default 0
 );
 
 create sequence seq_tagTypeIds;
