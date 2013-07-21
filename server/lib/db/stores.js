@@ -21,7 +21,7 @@ var utils = require('../utils.js');
 
 function sendStoreJson(id, db, req, res)
 {
-    var query = "select s.id, s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.flatMarkup, s.markup \
+    var query = "select s.id, s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.markup \
                  from stores s join partners p on (s.partner = p.id) \
                  where p.id in (select distinct partner from affiliations where person = $1)";
     var params = [req.session.user.id];
@@ -42,12 +42,11 @@ function sendStoreJson(id, db, req, res)
                  for (var i = 0; i < result.rows.length; ++i) {
                      var r = result.rows[i];
                      storeInfo.push(
-                         { 'id': r.id,
-                           'name': r.name,
-                           'desc': r.description,
-                           'partner': { 'id': r.partnerid, 'name': r.partnername },
-                           'markups': { 'min': r.minmarkup, 'max': r.maxmarkup,
-                           'flat': r.flatmarkup, 'markup': r.markup }
+                         { id: r.id,
+                           name: r.name,
+                           desc: r.description,
+                           partner: { id: r.partnerid, name: r.partnername },
+                           markups: { min: r.minmarkup, max: r.maxmarkup, markup: r.markup }
                      });
                  }
 
@@ -85,10 +84,9 @@ function createWithPartner(partner, db, req, res)
 
                  var minMarkup = utils.parseNumber(req.body.minMarkup);
                  var maxMarkup = utils.parseNumber(req.body.maxMarkup);
-                 var flatMarkup = utils.parseBool(req.body.flatMarkup);
                  var markup = utils.parseNumber(req.body.markup);
-                 db.query("insert into stores (id, partner, name, description, minMarkup, maxMarkup, flatMarkup, markup) values ($1, $2, $3, $4, $5, $6, $7, $8);",
-                          [id, partner, name, req.body.desc, minMarkup, maxMarkup, flatMarkup, markup],
+                 db.query("insert into stores (id, partner, name, description, minMarkup, maxMarkup, markup) values ($1, $2, $3, $4, $5, $6, $7);",
+                          [id, partner, name, req.body.desc, minMarkup, maxMarkup, markup],
                           function(err, result) {
                             if (err) {
                                 errors.report('Database', req, res, err);
@@ -177,13 +175,6 @@ function updateStore(store, db, req, res)
         params.push(max);
     }
 
-    var flat = req.body.flatmarkup;
-    if (flat) {
-        flat = utils.parseBool(flat);
-        updates.push("flatMarkup = $" + (++count));
-        params.push(flat);
-    }
-
     var markup = utils.parseNumber(req.body.markup, -1);
     if (markup >= 0) {
         updates.push("markup = $" + (++count));
@@ -225,7 +216,7 @@ function sendChannelInfo(channelId, db, req, res)
                 var json = utils.standardJson(req);
                 json.channel = result.rows[0];
                 json.channel.tags = [];
-                db.query('select t.id as id, t.title as title, tt.type as type from channelTags ct left join tags t on (ct.tag = t.id) left join tagTypes tt on (t.type = tt.id) where ct.channel = $1',
+                db.query('select t.id as id, t.title as title, tt.type as type from channelTags ct left join tags t on (ct.tag = t.id) left join tagTypes tt on (t.type = tt.id) where ct.channel = $1 order by t.id',
                     [channelId],
                     function(err, results) {
                         if (err) {
@@ -369,7 +360,7 @@ function channelStructureLaunch(results, json, leafObj, db, req, res)
 
 function channelStructureFetch(json, leafObj, channelId, db, req, res)
 {
-    db.query('select t.id as id, t.title as title, tt.type as type, t.type as typeid from channelTags ct left join tags t on (ct.tag = t.id) left join tagTypes tt on (t.type = tt.id) where ct.channel = $1',
+    db.query('select t.id as id, t.title as title, tt.type as type, t.type as typeid from channelTags ct left join tags t on (ct.tag = t.id) left join tagTypes tt on (t.type = tt.id) where ct.channel = $1 order by t.id',
              [channelId],
     function(err, results) {
     if (err) {
@@ -438,7 +429,6 @@ module.exports.list = function(db, req, res) {
  * * string description
  * * int minmarkup
  * * int maxmarkup
- * * int flatmarkup
  * * int markup
  *
  * Returns a store info structure
@@ -458,7 +448,6 @@ module.exports.remove = function(db, req, res) {
  * + string id
  * + int minMarkup
  * + int maxMarkup
- * + bool flatMarkup
  * + markup
  *
  * Returns a channel info structure
