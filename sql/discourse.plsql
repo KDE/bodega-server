@@ -83,6 +83,8 @@ DECLARE
     name TEXT;
     topicTitle TEXT;
     categoryId INT;
+    topicId INT;
+    someText TEXT;
 BEGIN
     currentTime := current_timestamp AT TIME ZONE 'UTC';
     userId := 1; -- this is the root of discourse
@@ -90,9 +92,9 @@ BEGIN
     PERFORM dblink_connect('dbname=discourse_development');
     IF (TG_OP = 'INSERT') THEN
         -- we will create forums only for the partners who have id >= 1000
-        IF (NEW.partner < 1000) THEN
-            RETURN NEW;
-        END IF;
+        --IF (NEW.partner < 1000) THEN
+        --    RETURN NEW;
+        --END IF;
 
         categoryName := 'Forum for ' || NEW.name;
         categoryDescription := 'In this forum you can contact the author of' || NEW.name;
@@ -118,6 +120,14 @@ BEGIN
                             '''||userId||''', '''||userId||''', '''||currentTime||''',
                             '''||categoryId||''');');
 
+        SELECT INTO topicId id FROM dblink('SELECT id FROM topics
+                                            WHERE title = '''||topicTitle||''';') AS f(id int);
+
+        someText := 'foo';
+        PERFORM dblink_exec('INSERT INTO posts (user_id, topic_id, post_number, raw, cooked,
+                            created_at, updated_at, last_version_at)
+                            VALUES ('''||userId||''', '''||topicId||''', 0, '''||someText||''', '''||someText||''',
+                                    '''||currentTime||''', '''||currentTime||''', '''||currentTime||'''); ');
 
     ELSIF (TG_OP = 'UPDATE') THEN
         IF NEW.name IS NULL THEN
