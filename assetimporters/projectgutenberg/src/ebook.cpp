@@ -309,8 +309,10 @@ QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
 {
     s.nospace() << "Ebook(id=" << book.bookId() << ", "
                 << "titles = " << book.titles() << ")\n";
+    s << "\tEPub" << book.epubFile().url << "\n";
     QList<Gutenberg::File> files = book.files();
-    for (int i=0; i<files.size(); ++i)
-        s << "\tFile " << i << files.at(i).url << '\n';
+    foreach (const Gutenberg::File &file, book.files()) {
+        s.nospace() << "\t" << file.format << ": " << file.url << '\n';
+    }
     return s;
 }
