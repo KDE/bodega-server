@@ -131,6 +131,7 @@ BEGIN
 
     ELSIF (TG_OP = 'UPDATE') THEN
         IF NEW.name IS NULL THEN
+            PERFORM dblink_disconnect();
             RETURN OLD;
         ELSE
             name := NEW.name;
