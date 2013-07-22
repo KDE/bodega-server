@@ -1,3 +1,55 @@
+CREATE OR REPLACE FUNCTION tsv_add(tsv1 tsvector, tsv2 tsvector) RETURNS tsvector AS $$
+BEGIN
+    IF tsv1 IS NULL THEN
+        RETURN tsv2;
+    END IF;
+
+    IF tsv2 IS NULL THEN
+        RETURN tsv1;
+    END IF;
+
+    RETURN tsv1 || tsv2;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP AGGREGATE IF EXISTS concat_tsvectors(tsvector);
+CREATE AGGREGATE concat_tsvectors (
+    BASETYPE = tsvector,
+    SFUNC = tsv_add,
+    STYPE = tsvector,
+    INITCOND = ''
+);
+
+CREATE OR REPLACE FUNCTION ct_updateAssetTagSearchIndex() RETURNS TRIGGER AS $$
+DECLARE
+    altered record;
+    indicies record;
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        altered := OLD;
+    ELSE
+        altered := NEW;
+    END IF;
+
+    SELECT INTO indicies at.asset as id, concat_tsvectors(t.en_index) as tags, concat_tsvectors(ee.en_index) as eggs
+        FROM assettags at
+            left join tags t on
+            (t.id = at.tag and t.type in
+                (select id from tagtypes where type in ('category', 'descriptive', 'author', 'contributor'))
+            )
+            left join tags ee on (ee.id = at.tag and ee.type in (select id from tagtypes where type = 'easter eggs'))
+        where at.asset = altered.asset group by at.asset;
+    UPDATE assets SET en_tagsIndex = indicies.tags, en_eggsIndex = indicies.eggs WHERE assets.id = indicies.id;
+
+    RETURN altered;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_updateAssetTagSearchIndexes ON assetTags;
+CREATE TRIGGER trg_ct_updateAssetTagSearchIndexes AFTER INSERT OR UPDATE OR DELETE ON assetTags
+FOR EACH ROW EXECUTE PROCEDURE ct_updateAssetTagSearchIndex();
+
+
 -- Search tags
 ALTER TABLE tags ADD COLUMN en_index tsvector;
 -- Trigger to update indices for the full text search
@@ -14,6 +66,8 @@ UPDATE tags SET en_index = setweight(to_tsvector('pg_catalog.english', coalesce(
 
 -- Search assets
 ALTER TABLE assets ADD COLUMN en_index tsvector;
+ALTER TABLE assets ADD COLUMN en_tagsIndex tsvector;
+ALTER TABLE assets ADD COLUMN en_eggsIndex tsvector;
 -- Trigger to update indices for the full text search
 CREATE FUNCTION ct_assetsIndexTrigger() RETURNS TRIGGER AS $$
 BEGIN
