@@ -32,7 +32,7 @@ QHash<QString, QStringList> LCC::categories() const
     return m_categories;
 }
 
-QStringList LCC::generalCats(const QString &lcc)
+QStringList LCC::generalSubCats(const QString &lcc)
 {
     QStringList cats;
     char sub = lcc.size() > 1 ? lcc[1].toLower().toAscii() : 0;
@@ -75,7 +75,7 @@ QStringList LCC::generalCats(const QString &lcc)
     return cats;
 }
 
-QString LCC::parseBCat(const QString &code, QStringList &subs)
+QString LCC::bSubCats(const QString &code, QStringList &subs)
 {
     QString cat(QLatin1String("Religion"));
     char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
@@ -135,38 +135,64 @@ QString LCC::parseBCat(const QString &code, QStringList &subs)
     return cat;
 }
 
+QStringList LCC::cSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'b':
+            subs << QString::fromLatin1("Civilization");
+            break;
+        default:
+            break;
+    }
+
+    return subs;
+}
+
 void LCC::setCategories(const QStringList &lccCodes)
 {
     m_categories.clear();
 
     foreach (const QString &code, lccCodes) {
-        parseCategory(code);
+        addCategory(code);
     }
 }
 
-void LCC::parseCategory(const QString &lcc)
+void LCC::addCategory(const QString &code)
 {
-    if (lcc.isEmpty()) {
+    if (code.isEmpty()) {
         return;
     }
 
-    char firstCharacter = lcc[0].toLower().toAscii();
+    char firstCharacter = code[0].toLower().toAscii();
 
     switch (firstCharacter) {
     case 'a':
-        m_categories["General"].append(generalCats(lcc));
+        m_categories["General"].append(generalSubCats(code));
         break;
     case 'b': {
         QStringList subs;
-        const QString cat = parseBCat(lcc, subs);
+        const QString cat = bSubCats(code, subs);
 
         if (!cat.isEmpty()) {
             m_categories[cat].append(subs);
         }
     }
         break;
-    case 'c':
+    case 'c': {
+        QStringList subs;
+        QString cat;
+        if (code.toLower() == QLatin1String("CT")) {
+            cat = QString::fromLatin1("Biographies");
+        } else {
+            cat = QString::fromLatin1("History");
+            subs = cSubCats(code);
+        }
+        m_categories[cat].append(subs);
         break;
+    }
     case 'd':
         break;
     case 'e':
@@ -204,7 +230,7 @@ void LCC::parseCategory(const QString &lcc)
     case 'z':
         break;
     default:
-        qDebug()<<"Unrecognized lcc class = "<<lcc;
+        qDebug() << "Unrecognized lcc class = " << code;
         break;
     }
 }

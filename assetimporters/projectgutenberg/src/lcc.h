@@ -40,9 +40,10 @@ public:
     QStringList subjects() const;
 
 private:
-    void parseCategory(const QString &lcc);
-    QStringList generalCats(const QString &lcc);
-    QString parseBCat(const QString &lcc, QStringList &subs);
+    void addCategory(const QString &code);
+    QStringList generalSubCats(const QString &code);
+    QString bSubCats(const QString &code, QStringList &subs);
+    QStringList cSubCats(const QString &code);
 
     void refineUsingSubjects();
 
