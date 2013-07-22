@@ -22,6 +22,7 @@ INSERT INTO tagTypes (type) VALUES ('url');
 INSERT INTO tagTypes (type) VALUES ('isbn');
 INSERT INTO tagTypes (type) VALUES ('platform');
 INSERT INTO tagTypes (type) VALUES ('grouping');
+INSERT INTO tagTypes (type) VALUES ('easter eggs');
 
 INSERT INTO tags (type, title) SELECT id, 'Early Childhood' FROM tagtypes WHERE type = 'contentrating';
 INSERT INTO tags (type, title) SELECT id, 'Everyone' FROM tagtypes WHERE type = 'contentrating';
