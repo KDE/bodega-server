@@ -46,8 +46,8 @@ function searchAssets(db, req, res, args, json)
               ts_rank_cd(a.en_tagsIndex, plainto_tsquery(\'english\', $1)) > 0 \
         ORDER BY rank DESC LIMIT $3 OFFSET $4;';
 
-    console.log(query);
-    console.log([args.query, args.channelId, args.pageSize, args.offset, req.session.user.store]);
+    //console.log(query);
+    //console.log([args.query, args.channelId, args.pageSize, args.offset, req.session.user.store]);
     db.query(
         query,
         [args.query, args.channelId, args.pageSize, args.offset, req.session.user.store],
