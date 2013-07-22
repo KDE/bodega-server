@@ -25,52 +25,29 @@ function searchAssets(db, req, res, args, json)
     //      then query for matching assets by tags
     //      UNION the results into a single temporary table
     //      query on that table to generate the final results
+        //(sum(namerank) + sum(tagrank)) / (1 + sum(CASE WHEN tagrank > 0 THEN 1 ELSE 0 END)) as rank \
     var query =
-       'SELECT a.id, rankings.namerank, rankings.tagrank, rankings.rank, \
-        a.license, partners.id, \
-        partners.name, a.version, a.image, a.name, \
-        (CASE WHEN p.points IS NULL THEN 0 ELSE p.points END)::int AS points \
-    FROM \
-    ( \
-        SELECT id, sum(namerank) as namerank, sum(tagrank) as tagrank, \
-        (sum(namerank) + sum(tagrank)) / (1 + sum(CASE WHEN tagrank > 0 THEN 1 ELSE 0 END)) as rank \
-        FROM \
-        ( \
-            SELECT a.id as id,  \
-            ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) as namerank, \
-            0 as tagrank \
-            FROM assets a \
-            INNER JOIN subChannelAssets s ON (a.id = s.asset)  \
-            WHERE \
-            a.en_index @@ plainto_tsquery(\'english\', $1) AND \
-            s.channel = $2 \
-          UNION \
-            SELECT a.id as id, 0 as namerank, \
-            ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) as tagrank \
-            FROM assets a \
-            INNER JOIN subChannelAssets s ON (a.id = s.asset) \
-            LEFT JOIN assetTags at ON (a.id = at.asset)  \
-            LEFT JOIN tags t on (t.id = at.tag) \
-            WHERE \
-            s.channel = $2 AND \
-            t.en_index @@ plainto_tsquery(\'english\', $1) AND \
-            t.type in (select id from tagtypes where type in (\'assetName\', \'category\', \'descriptive\', \'author\', \'contributor\')) \
-          UNION \
-            SELECT a.id as id, 1 as namerank, 1 as tagrank \
-            FROM assets a \
-            LEFT JOIN assetTags at ON (a.id = at.asset)  \
-            LEFT JOIN tags t on (t.id = at.tag) \
-            WHERE \
-            t.title = $1 AND t.type in (SELECT id FROM tagtypes WHERE type = \'easter eggs\') \
-            ) as temp \
-        GROUP BY temp.id \
-    ) as rankings \
-        LEFT JOIN assets a ON (a.id = rankings.id) \
+       'SELECT a.id, \
+               ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) as namerank, \
+               ts_rank_cd(a.en_tagsIndex, plainto_tsquery(\'english\', $1)) as tagrank, \
+               ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) + \
+               ts_rank_cd(a.en_tagsIndex, plainto_tsquery(\'english\', $1)) as rank, \
+               a.license, partners.id, \
+               partners.name, a.version, a.image, a.name, \
+               (CASE WHEN p.points IS NULL THEN 0 ELSE p.points END)::int AS points \
+        FROM assets a \
+        INNER JOIN subChannelAssets s ON (a.id = s.asset) \
+        JOIN channels c ON (c.id = s.channel) \
         LEFT JOIN assetPrices p ON (p.asset = a.id AND p.store = $5 AND p.ending IS null) \
         LEFT JOIN partners ON (a.partner = partners.id) \
-    ORDER BY rank DESC LIMIT $3 OFFSET $4   \
-    ;';
+        WHERE s.channel = $2 AND \
+              c.store = $5 AND \
+              ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) + \
+              ts_rank_cd(a.en_tagsIndex, plainto_tsquery(\'english\', $1)) > 0 \
+        ORDER BY rank DESC LIMIT $3 OFFSET $4;';
 
+    console.log(query);
+    console.log([args.query, args.channelId, args.pageSize, args.offset, req.session.user.store]);
     db.query(
         query,
         [args.query, args.channelId, args.pageSize, args.offset, req.session.user.store],
