@@ -161,7 +161,7 @@ void LCC::parseCategory(const QString &lcc)
         const QString cat = parseBCat(lcc, subs);
 
         if (!cat.isEmpty()) {
-            m_categories[cat] = QStringList();//.append(subs);
+            m_categories[cat].append(subs);
         }
     }
         break;
@@ -231,7 +231,8 @@ void LCC::refineUsingSubjects()
     const QString religion(QLatin1String("Religion"));
     if (m_categories.contains(religion)) {
         const QString islam(QLatin1String("Islam"));
-        const QString bahai(QLatin1String("Bahai"));
+        const QRegExp bahaiRE(QLatin1String("Baha[']?i"));
+        const QString bahai(QLatin1String("Baha'i"));
         const QString theosophyStem(QLatin1String("Theoso"));
         const QString theosophy(QLatin1String("Theosophy"));
         const QString general(QLatin1String("General"));
@@ -241,7 +242,7 @@ void LCC::refineUsingSubjects()
         QStringList subs = m_categories.value(religion);
         if (subs.contains(islam)) {
             foreach (const QString &subject, m_subjects) {
-                if (subject.contains(bahai)) {
+                if (subject.contains(bahaiRE)) {
                     subs.removeAll(islam);
                     subs.append(bahai);
                     break;
