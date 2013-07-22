@@ -61,30 +61,6 @@ function searchAssets(db, req, res, args, json)
         });
 }
 
-//XXX not sure if this makes
-function searchChannels(db, req, res, args, json)
-{
-    var query =
-        'SELECT c.id, c.image, c.name, c.description FROM channels c \
-         CROSS JOIN  plainto_tsquery(\'english\', $1) as query \
-         WHERE c.store = $2 and c.en_index @@ query  \
-         ORDER BY  ts_rank_cd(c.en_index, query) DESC, c.name  \
-         LIMIT $3 OFFSET $4;';
-
-    db.query(
-        query,
-        [args.query, req.session.user.store,
-         args.pageSize, args.offset],
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-            json.assets = result.rows;
-            res.json(json);
-        });
-}
-
 module.exports = function(db, req, res) {
     var defaultPageSize = 25;
     var pageSize = req.query.pageSize || defaultPageSize;
