@@ -22,235 +22,246 @@
 
 using namespace Gutenberg;
 
-LCC::LCC(const QString &lcc)
-    : m_categories(LCC_Miscellaneous)
+LCC::LCC()
+    : m_refinementPending(false)
 {
-    m_original += lcc;
-    m_categories = parse(lcc);
 }
 
-LCC::LCC(const QStringList &lccs)
-    : m_categories(LCC_Miscellaneous),
-      m_original(lccs)
-{
-    foreach(const QString &lcc, lccs) {
-        m_categories |= parse(lcc);
-    }
-}
-
-LCC::Categories LCC::categories() const
+QHash<QString, QStringList> LCC::categories() const
 {
     return m_categories;
 }
 
-QStringList LCC::topCategories() const
+QStringList LCC::generalCats(const QString &lcc)
 {
-    QStringList c;
+    QStringList cats;
+    char sub = lcc.size() > 1 ? lcc[1].toLower().toAscii() : 0;
 
-    if (m_categories == LCC_Miscellaneous) {
-        return QStringList() << QObject::tr("Miscellaneous");
+    switch (sub) {
+        case 'c':
+            cats << QString::fromLatin1("Collections");
+            break;
+        case 'e':
+            cats << QString::fromLatin1("Encyclopedias");
+            break;
+        case 'g':
+            cats << QString::fromLatin1("Dictionaries");
+            break;
+        case 'i':
+            cats << QString::fromLatin1("Indexes");
+            break;
+        case 'm':
+            cats << QString::fromLatin1("Museums and collecting");
+            break;
+        case 'n':
+            cats << QString::fromLatin1("Newspapers");
+            break;
+        case 'p':
+            cats << QString::fromLatin1("Periodicals");
+            break;
+        case 's':
+            cats << QString::fromLatin1("Academies");
+            break;
+        case 'y':
+            cats << QString::fromLatin1("Yearbooks and almanacs");
+            break;
+        case 'z':
+            cats << QString::fromLatin1("History of scholarship");
+            break;
+        default:
+            break;
     }
 
-    if ((m_categories & LCC_A_GeneralWorks)) {
-        c += QObject::tr("General Works");
-    }
-    if ((m_categories & LCC_B_PhilosophyPsychologyReligion)) {
-        c += QObject::tr("Philosophy, Psychology, Religion");
-    }
-    if ((m_categories & LCC_C_AuxiliarySciencesOfHistory)) {
-        c += QObject::tr("Auxiliary Sciences of History (General)");
-    }
-    if ((m_categories & LCC_D_WorldHistory)) {
-        c += QObject::tr("World History (except American History)");
-    }
-    if ((m_categories & LCC_E_HistoryOfTheAmericas) ||
-        (m_categories & LCC_F_HistoryOfTheAmericas)) {
-        c += QObject::tr("American History");
-    }
-    if ((m_categories & LCC_G_GeographyAnthropologyRecreation)) {
-        c += QObject::tr("Geography, Anthropology, Recreation");
-    }
-    if ((m_categories & LCC_H_SocialSciences)) {
-        c += QObject::tr("Social Sciences");
-    }
-    if ((m_categories & LCC_J_PoliticalScience)) {
-        c += QObject::tr("Political Science");
-    }
-    if ((m_categories & LCC_K_Law)) {
-        c += QObject::tr("Law");
-    }
-    if ((m_categories & LCC_L_Education)) {
-        c += QObject::tr("Education");
-    }
-    if ((m_categories & LCC_M_MusicAndBooksOnMusic)) {
-        c += QObject::tr("Music");
-    }
-    if ((m_categories & LCC_N_FineArts)) {
-        c += QObject::tr("Fine Arts");
-    }
-    if ((m_categories & LCC_P_LanguageAndLiterature)) {
-        c += QObject::tr("Language and Literature");
-    }
-    if ((m_categories & LCC_Q_Science)) {
-        c += QObject::tr("Science");
-    }
-    if ((m_categories & LCC_R_Medicine)) {
-        c += QObject::tr("Medicine");
-    }
-    if ((m_categories & LCC_S_Agriculture)) {
-        c += QObject::tr("Agriculture");
-    }
-    if ((m_categories & LCC_T_Technology)) {
-        c += QObject::tr("Technology");
-    }
-    if ((m_categories & LCC_U_MilitaryScience)) {
-        c += QObject::tr("Military Science");
-    }
-    if ((m_categories & LCC_V_NavalScience)) {
-        c += QObject::tr("Naval Science");
-    }
-    if ((m_categories & LCC_Z_BibliographyLibraryScienceInformationResources)) {
-        c += QObject::tr("Bibliography, Library Science");
-    }
-    return c;
+    return cats;
 }
 
-LCC::Category LCC::parse(const QString &lcc)
+QString LCC::parseBCat(const QString &code, QStringList &subs)
+{
+    QString cat(QLatin1String("Religion"));
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'c':
+            cat = QString::fromLatin1("Philosophy");
+            subs << QString::fromLatin1("Logic");
+            break;
+        case 'd':
+            cat = QString::fromLatin1("Philosophy");
+            subs << QString::fromLatin1("Speculative");
+            break;
+        case 'f':
+            cat = QString::fromLatin1("Psychology");
+            break;
+        case 'h':
+            cat = QString::fromLatin1("Philosophy");
+            subs << QString::fromLatin1("Aesthetics");
+            break;
+        case 'j':
+            cat = QString::fromLatin1("Philosophy");
+            subs << QString::fromLatin1("Ethics");
+            break;
+        case 'l':
+            subs << QString::fromLatin1("General");
+            m_refinementPending = true;
+            break;
+        case 'm':
+            subs << QString::fromLatin1("Judaism");
+            break;
+        case 'p':
+            subs << QString::fromLatin1("Islam");
+            m_refinementPending = true;
+            break;
+        case 'q':
+            subs << QString::fromLatin1("Buddhism");
+            break;
+        case 'r':
+        case 'x':
+            subs << QString::fromLatin1("Christianity");
+            break;
+        case 's':
+            subs << QString::fromLatin1("The Bible");
+            break;
+        case 't':
+        case 'v':
+            subs << QString::fromLatin1("Theology");
+            break;
+        default:
+            cat = QString::fromLatin1("Philosophy");
+            subs << QString::fromLatin1("General");
+            break;
+    }
+
+    refineUsingSubjects();
+    return cat;
+}
+
+void LCC::setCategories(const QStringList &lccCodes)
+{
+    m_categories.clear();
+
+    foreach (const QString &code, lccCodes) {
+        parseCategory(code);
+    }
+}
+
+void LCC::parseCategory(const QString &lcc)
 {
     if (lcc.isEmpty()) {
-        return LCC_Miscellaneous;
+        return;
     }
 
     char firstCharacter = lcc[0].toLower().toAscii();
 
     switch (firstCharacter) {
     case 'a':
-        return LCC_A_GeneralWorks;
+        m_categories["General"].append(generalCats(lcc));
         break;
-    case 'b':
-        return LCC_B_PhilosophyPsychologyReligion;
+    case 'b': {
+        QStringList subs;
+        const QString cat = parseBCat(lcc, subs);
+
+        if (!cat.isEmpty()) {
+            m_categories[cat] = QStringList();//.append(subs);
+        }
+    }
         break;
     case 'c':
-        return LCC_C_AuxiliarySciencesOfHistory;
         break;
     case 'd':
-        return LCC_D_WorldHistory;
         break;
     case 'e':
-        return LCC_E_HistoryOfTheAmericas;
         break;
     case 'f':
-        return LCC_F_HistoryOfTheAmericas;
         break;
     case 'g':
-        return LCC_G_GeographyAnthropologyRecreation;
         break;
     case 'h':
-        return LCC_H_SocialSciences;
         break;
     case 'j':
-        return LCC_J_PoliticalScience;
         break;
     case 'k':
-        return LCC_K_Law;
         break;
     case 'l':
-        return LCC_L_Education;
         break;
     case 'm':
-        return LCC_M_MusicAndBooksOnMusic;
         break;
     case 'n':
-        return LCC_N_FineArts;
         break;
     case 'p':
-        return LCC_P_LanguageAndLiterature;
         break;
     case 'q':
-        return LCC_Q_Science;
         break;
     case 'r':
-        return LCC_R_Medicine;
         break;
     case 's':
-        return LCC_S_Agriculture;
         break;
     case 't':
-        return LCC_T_Technology;
         break;
     case 'u':
-        return LCC_U_MilitaryScience;
         break;
     case 'v':
-        return LCC_V_NavalScience;
         break;
     case 'z':
-        return LCC_Z_BibliographyLibraryScienceInformationResources;
         break;
     default:
         qDebug()<<"Unrecognized lcc class = "<<lcc;
         break;
     }
-    return LCC_Miscellaneous;
 }
 
-QStringList LCC::originalText() const
+void LCC::setSubjects(const QStringList &subjects)
 {
-    return m_original;
+    m_subjects = subjects;
+    refineUsingSubjects();
 }
 
-QHash<LCC::Category, QString> LCC::categoryMap()
+QStringList LCC::subjects() const
 {
-    static QHash<LCC::Category, QString> cat;
+    return m_subjects;
+}
 
-    if (cat.isEmpty()) {
-        cat.insert(LCC_Miscellaneous,
-                   QObject::tr("Miscellaneous"));
-        cat.insert(LCC_A_GeneralWorks,
-                   QString::fromLatin1("General Works"));
-        cat.insert(LCC_B_PhilosophyPsychologyReligion,
-                   QString::fromLatin1("Philosophy, Psychology, Religion"));
-        cat.insert(
-            LCC_C_AuxiliarySciencesOfHistory,
-            QString::fromLatin1("Auxiliary Sciences of History (General)"));
-        cat.insert(
-            LCC_D_WorldHistory,
-            QString::fromLatin1("World History (except American History)"));
-        cat.insert(LCC_E_HistoryOfTheAmericas,
-                   QString::fromLatin1("American History"));
-        cat.insert(LCC_F_HistoryOfTheAmericas,
-                   QString::fromLatin1("American History"));
-        cat.insert(LCC_G_GeographyAnthropologyRecreation,
-                   QString::fromLatin1("Geography, Anthropology, Recreation"));
-        cat.insert(LCC_H_SocialSciences,
-                   QString::fromLatin1("Social Sciences"));
-        cat.insert(LCC_J_PoliticalScience,
-                   QString::fromLatin1("Political Science"));
-        cat.insert(LCC_K_Law,
-                   QString::fromLatin1("Law"));
-        cat.insert(LCC_L_Education,
-                   QString::fromLatin1("Education"));
-        cat.insert(LCC_M_MusicAndBooksOnMusic,
-                   QString::fromLatin1("Music"));
-        cat.insert(LCC_N_FineArts,
-                   QString::fromLatin1("Fine Arts"));
-        cat.insert(LCC_P_LanguageAndLiterature,
-                   QString::fromLatin1("Language and Literature"));
-        cat.insert(LCC_Q_Science,
-                   QString::fromLatin1("Science"));
-        cat.insert(LCC_R_Medicine,
-                   QString::fromLatin1("Medicine"));
-        cat.insert(LCC_S_Agriculture,
-                   QString::fromLatin1("Agriculture"));
-        cat.insert(LCC_T_Technology,
-                   QString::fromLatin1("Technology"));
-        cat.insert(LCC_U_MilitaryScience,
-                   QString::fromLatin1("Military Science"));
-        cat.insert(LCC_V_NavalScience,
-                   QString::fromLatin1("Naval Science"));
-        cat.insert(LCC_Z_BibliographyLibraryScienceInformationResources,
-                   QString::fromLatin1("Bibliography, Library Science"));
+void LCC::refineUsingSubjects()
+{
+    if (!m_refinementPending || m_subjects.isEmpty() || m_categories.isEmpty()) {
+        return;
     }
 
-    return cat;
+    m_refinementPending = false;
+
+    const QString religion(QLatin1String("Religion"));
+    if (m_categories.contains(religion)) {
+        const QString islam(QLatin1String("Islam"));
+        const QString bahai(QLatin1String("Bahai"));
+        const QString theosophyStem(QLatin1String("Theoso"));
+        const QString theosophy(QLatin1String("Theosophy"));
+        const QString general(QLatin1String("General"));
+        const QString taoismStem(QLatin1String("Tao"));
+        const QString taoism(QLatin1String("Taoism"));
+
+        QStringList subs = m_categories.value(religion);
+        if (subs.contains(islam)) {
+            foreach (const QString &subject, m_subjects) {
+                if (subject.contains(bahai)) {
+                    subs.removeAll(islam);
+                    subs.append(bahai);
+                    break;
+                } else if (subs.contains(theosophyStem)) {
+                    subs.removeAll(islam);
+                    subs.append(theosophy);
+                    break;
+                }
+            }
+        } else if (subs.contains(general)) {
+            foreach (const QString &subject, m_subjects) {
+                if (subject.contains(taoismStem)) {
+                    subs.removeAll(general);
+                    subs.append(taoism);
+                    break;
+                }
+            }
+        }
+
+        m_categories[religion] = subs;
+    }
 }
+

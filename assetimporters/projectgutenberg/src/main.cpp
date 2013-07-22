@@ -17,7 +17,6 @@
 
 #include "catalog.h"
 #include "gutenbergdatabase.h"
-#include "parser.h"
 
 #include "reader.h"
 
@@ -52,7 +51,7 @@ void descend(const QString &path)
 
 void addEbook(const Gutenberg::Ebook &book)
 {
-    if (book.titles().isEmpty()) {
+    if (book.title().isEmpty()) {
         //qDebug() << "ha!, no title!";
         return;
     }
@@ -75,10 +74,17 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
     descend(argv[1]);
     qDebug() << "we have" << paths.size() << "files to process now";
+    QList<Gutenberg::Ebook> files;
 
-    QList<Gutenberg::Ebook> files = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Reader::parseRdf);
+#if 0
+    foreach (const QString &path, paths) { files << Reader::parseRdf(path); }
+    qDebug() << "we have" << files.size() << "books to process now";
+    foreach (const Gutenberg::Ebook &book, files) { addEbook(book); }
+#else
+    files = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Reader::parseRdf);
     qDebug() << "we have" << files.size() << "books to process now";
     QtConcurrent::blockingMap(files, addEbook);
+#endif
     exit(1);
     //Gutenberg::Catalog catalog = Gutenberg::Parser::parse(QString::fromLatin1(argv[1]));
     //catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());

@@ -45,9 +45,9 @@ QStringList Ebook::contributors() const
     return m_contributors;
 }
 
-QStringList Ebook::titles() const
+QString Ebook::title() const
 {
-    return m_titles;
+    return m_title;
 }
 
 QString Ebook::friendlyTitle() const
@@ -72,9 +72,9 @@ void Gutenberg::Ebook::setPublisher(const QString &publisher)
     m_publisher = publisher;
 }
 
-void Ebook::addTitle(const QString &title)
+void Ebook::setTitle(const QString &title)
 {
-    m_titles += title;
+    m_title = title;
 }
 
 void Gutenberg::Ebook::setCreators(const QStringList &creators)
@@ -101,15 +101,14 @@ void Ebook::setLanguages(const QStringList &langs)
     m_languages = langs;
 }
 
-QString Ebook::created() const
+QString Ebook::issued() const
 {
-    return m_created;
+    return m_issued;
 }
 
-void Ebook::setCreated(const QString &date)
+void Ebook::setIssued(const QString &date)
 {
-    Q_ASSERT(m_created.isEmpty());
-    m_created = date;
+    m_issued = date;
 }
 
 Ebook::Rights Ebook::rights() const
@@ -165,25 +164,19 @@ void Ebook::setTableOfContents(const QString &toc)
     m_toc = toc;
 }
 
-QStringList Ebook::lcsh() const
+void Gutenberg::Ebook::setSubjects(const QStringList &lst)
 {
-    return m_lcsh;
+    m_lcc.setSubjects(lst);
 }
 
-void Gutenberg::Ebook::setLcsh(const QStringList &lst)
-{
-    Q_ASSERT(m_lcsh.isEmpty());
-    m_lcsh = lst;
-}
-
-Gutenberg::LCC Ebook::lcc() const
+const Gutenberg::LCC &Ebook::lcc() const
 {
     return m_lcc;
 }
 
-void Ebook::setLCC(const Gutenberg::LCC &lcc)
+void Ebook::setCategories(const QStringList &lcc)
 {
-    m_lcc = lcc;
+    m_lcc.setCategories(lcc);
 }
 
 QList<Gutenberg::File> Ebook::files() const
@@ -308,11 +301,23 @@ QString Ebook::typeString() const
 QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
 {
     s.nospace() << "Ebook(id=" << book.bookId() << ", "
-                << "titles = " << book.titles() << ")\n";
+                << "title = " << book.title() << ", issued: " << book.issued() << ")\n";
     s << "\tEPub" << book.epubFile().url << "\n";
     QList<Gutenberg::File> files = book.files();
     foreach (const Gutenberg::File &file, book.files()) {
         s.nospace() << "\t" << file.format << ": " << file.url << '\n';
     }
+
+    QHash<QString, QStringList> lccCats = book.lcc().categories();
+    QHashIterator<QString, QStringList> it(lccCats);
+    while (it.hasNext()) {
+        it.next();
+        s.nospace() << "\tLCC " << it.key() << '\n';
+        foreach (const QString &subCat, it.value()) {
+            s.nospace() << "\t\t" << subCat << '\n';
+        }
+    }
+
+    s.nospace() << "\tLCCH" << book.lcc().subjects() << '\n';
     return s;
 }

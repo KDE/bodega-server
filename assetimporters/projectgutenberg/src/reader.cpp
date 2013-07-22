@@ -40,6 +40,51 @@ void ignoreBlock(QXmlStreamReader &xml)
     }
 }
 
+void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
+{
+    QStringList subjects;
+    bool lcc = false;
+
+    while (!xml.atEnd()) {
+        QXmlStreamReader::TokenType token = xml.readNext();
+        const QString elem = xml.name().toString();
+        //qDebug() << "subject block..." << elem;
+
+        switch (token) {
+            case QXmlStreamReader::StartElement:
+                if (QString::fromLatin1("value") == elem) {
+                    xml.readNext();
+                    subjects << xml.text().toString();
+                    xml.readNext();
+                } else if (QString::fromLatin1("memberOf") == elem) {
+                    lcc = xml.attributes().value("rdf:resource").endsWith("LCC");
+                    xml.readNext();
+                } else if (QString::fromLatin1("Description") != elem) {
+                    ignoreBlock(xml);
+                }
+                break;
+
+            case QXmlStreamReader::EndElement:
+                if (QString::fromLatin1("subject") == elem) {
+                    if (!subjects.isEmpty()) {
+                        if (lcc) {
+                            book.setCategories(subjects);
+                        } else {
+                            book.setSubjects(subjects);
+                        }
+                        //qDebug() << "subject found:" << lcc << subjects;
+                    }
+                    return;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+    }
+}
+
 void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
 {
     QXmlStreamAttributes attrs = xml.attributes();
@@ -55,12 +100,19 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
-                const QStringRef elem = xml.name();
+                const QString elem = xml.name().toString();
                 //qDebug() << "    " << elem;
                 if (QString::fromLatin1("title") == elem) {
                     //qDebug() << "found the title!";
                     xml.readNext();
-                    book.addTitle(xml.text().toString());
+                    book.setTitle(xml.text().toString());
+                    xml.readNext();
+                } else if (QString::fromLatin1("issued") == elem) {
+                    xml.readNext();
+                    book.setIssued(xml.text().toString());
+                    xml.readNext();
+                } else if (QString::fromLatin1("subject") == elem) {
+                    parseSubject(xml, book);
                 } else {
                     ignoreBlock(xml);
                 }
@@ -93,7 +145,7 @@ void parseFileBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
-                const QStringRef elem = xml.name();
+                const QString elem = xml.name().toString();
                 if (QString::fromLatin1("format") == elem) {
                     while (!xml.atEnd())  {
                         QXmlStreamReader::TokenType token = xml.readNext();
@@ -159,7 +211,7 @@ Gutenberg::Ebook parseRdf(const QString &path)
         while (!xml.atEnd()) {
             switch (xml.readNext()) {
                 case QXmlStreamReader::StartElement: {
-                    const QStringRef elem = xml.name();
+                    const QString elem = xml.name().toString();
                     //qDebug() << "starting element:" << elem;
                     if (QString::fromLatin1("ebook") == elem) {
                         parseEbookBlock(xml, book);

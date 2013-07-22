@@ -70,8 +70,8 @@ public:
     QString publisher() const;
     void setPublisher(const QString &publisher);
 
-    QStringList titles() const;
-    void addTitle(const QString &title);
+    QString title() const;
+    void setTitle(const QString &title);
 
     QStringList creators() const;
     void setCreators(const QStringList &creators);
@@ -85,8 +85,8 @@ public:
     QStringList languages() const;
     void setLanguages(const QStringList &langs);
 
-    QString created() const;
-    void setCreated(const QString &date);
+    QString issued() const;
+    void setIssued(const QString &date);
 
     QString rightsString() const;
     Ebook::Rights rights() const;
@@ -105,11 +105,9 @@ public:
     QString tableOfContents() const;
     void setTableOfContents(const QString &toc);
 
-    QStringList lcsh() const;
-    void setLcsh(const QStringList &lst);
-
-    void setLCC(const Gutenberg::LCC &lcc);
-    Gutenberg::LCC lcc() const;
+    void setCategories(const QStringList &lst);
+    void setSubjects(const QStringList &subjects);
+    const Gutenberg::LCC &lcc() const;
 
     QList<Gutenberg::File> files() const;
     void addFile(const Gutenberg::File &file);
@@ -126,10 +124,10 @@ private:
     QString m_publisher;
     QStringList m_creators;
     QStringList m_contributors;
-    QStringList m_titles;
+    QString m_title;
     QString m_friendlyTitle;
     QStringList m_languages;
-    QString m_created;
+    QString m_issued;
     Ebook::Rights m_rights;
     QStringList m_descriptions;
     Ebook::Type m_type;
