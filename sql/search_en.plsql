@@ -80,6 +80,8 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER tsvectorupdate_assets BEFORE INSERT OR UPDATE
 ON assets FOR EACH ROW EXECUTE PROCEDURE ct_assetsIndexTrigger();
 CREATE INDEX assets_idx ON assets USING gin(en_index);
+CREATE INDEX assets_tagsidx ON assets USING gin(en_tagsIndex);
+CREATE INDEX assets_eggsidx ON assets USING gin(en_eggsIndex);
 
 -- Search channels
 ALTER TABLE channels ADD COLUMN en_index tsvector;
