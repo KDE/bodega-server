@@ -47,7 +47,7 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
 
     while (!xml.atEnd()) {
         QXmlStreamReader::TokenType token = xml.readNext();
-        const QString elem = xml.name().toString();
+        const QStringRef elem = xml.name();
         //qDebug() << "subject block..." << elem;
 
         switch (token) {
@@ -100,7 +100,7 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
-                const QString elem = xml.name().toString();
+                const QStringRef elem = xml.name();
                 //qDebug() << "    " << elem;
                 if (QString::fromLatin1("title") == elem) {
                     //qDebug() << "found the title!";
@@ -145,7 +145,7 @@ void parseFileBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
-                const QString elem = xml.name().toString();
+                const QStringRef elem = xml.name();
                 if (QString::fromLatin1("format") == elem) {
                     while (!xml.atEnd())  {
                         QXmlStreamReader::TokenType token = xml.readNext();
@@ -211,7 +211,7 @@ Gutenberg::Ebook parseRdf(const QString &path)
         while (!xml.atEnd()) {
             switch (xml.readNext()) {
                 case QXmlStreamReader::StartElement: {
-                    const QString elem = xml.name().toString();
+                    const QStringRef elem = xml.name();
                     //qDebug() << "starting element:" << elem;
                     if (QString::fromLatin1("ebook") == elem) {
                         parseEbookBlock(xml, book);
