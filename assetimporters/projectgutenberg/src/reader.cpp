@@ -19,6 +19,9 @@
 
 #include <QtCore>
 
+namespace Gutenberg
+{
+
 namespace Reader
 {
 
@@ -257,4 +260,6 @@ Gutenberg::Ebook parseRdf(const QString &path)
 }
 
 } //namespace Reader
+
+} // namespace Gutenberg
 

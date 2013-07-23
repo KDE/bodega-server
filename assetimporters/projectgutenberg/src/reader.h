@@ -15,10 +15,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+namespace Gutenberg
+{
+
 namespace Reader
 {
 
     Gutenberg::Ebook parseRdf(const QString &path);
 
 } //namespace Reader
+
+} // namespace Gutenberg
 

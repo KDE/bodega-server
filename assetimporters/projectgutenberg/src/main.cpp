@@ -81,7 +81,7 @@ int main(int argc, char **argv)
     qDebug() << "we have" << files.size() << "books to process now";
     foreach (const Gutenberg::Ebook &book, files) { addEbook(book); }
 #else
-    files = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Reader::parseRdf);
+    files = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Gutenberg::Reader::parseRdf);
     qDebug() << "we have" << files.size() << "books to process now";
     QtConcurrent::blockingMap(files, addEbook);
 #endif
