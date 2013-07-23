@@ -76,6 +76,9 @@ public:
     QString title() const;
     void setTitle(const QString &title);
 
+    QStringList alternativeNames() const;
+    void setAlternativeNames(const QStringList &lst);
+
     QStringList creators() const;
     void setCreators(const QStringList &creators);
 
@@ -99,9 +102,6 @@ public:
     Ebook::Type type() const;
     void setType(Ebook::Type type);
 
-    QStringList alternatives() const;
-    void setAlternatives(const QStringList &lst);
-
     QString tableOfContents() const;
     void setTableOfContents(const QString &toc);
 
@@ -111,7 +111,6 @@ public:
 
     QList<Gutenberg::File> files() const;
     void addFile(const Gutenberg::File &file);
-
 
     bool hasEpubFile() const;
     Gutenberg::File epubFile() const;
@@ -131,7 +130,7 @@ private:
     Ebook::Rights m_rights;
     QStringList m_descriptions;
     Ebook::Type m_type;
-    QStringList m_alternatives;
+    QStringList m_alternativeNames;
     QString m_toc;
 
     QStringList m_lcsh;

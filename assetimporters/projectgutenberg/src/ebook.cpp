@@ -131,15 +131,15 @@ void Ebook::setType(Ebook::Type type)
     m_type = type;
 }
 
-QStringList Ebook::alternatives() const
+QStringList Ebook::alternativeNames() const
 {
-    return m_alternatives;
+    return m_alternativeNames;
 }
 
-void Ebook::setAlternatives(const QStringList &lst)
+void Ebook::setAlternativeNames(const QStringList &lst)
 {
-    Q_ASSERT(m_alternatives.isEmpty());
-    m_alternatives = lst;
+    Q_ASSERT(m_alternativeNames.isEmpty());
+    m_alternativeNames = lst;
 }
 
 QString Ebook::tableOfContents() const
