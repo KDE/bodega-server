@@ -119,6 +119,10 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
                     parseSubject(xml, book);
                 } else if (coverImage == elem) {
                     xml.readNext();
+                    QString url = xml.text().toString();
+                    // some of the files have local(!) paths
+                    url.replace("file:///public/vhost/g/gutenberg/html/",
+                                "http://www.gutenberg.org/");
                     book.setCoverImage(xml.text().toString());
                     xml.readNext();
                 } else {
