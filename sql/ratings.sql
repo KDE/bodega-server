@@ -28,7 +28,7 @@ create table assetRatingAverages
 
 CREATE OR REPLACE FUNCTION ct_checkTagForRating() RETURNS TRIGGER AS $$
 DECLARE
-    tagId int;
+    tagId INT;
 BEGIN
     SELECT INTO tagID t.id from tags t INNER JOIN tagtypes ttype ON (t.type = ttype.id) WHERE ttype.type = 'assetType' AND t.id = NEW.assetType;
     IF NOT FOUND THEN
@@ -45,7 +45,6 @@ FOR EACH ROW EXECUTE PROCEDURE ct_checkTagForRating();
 
 CREATE OR REPLACE FUNCTION ct_sumForAssetRatings() RETURNS TRIGGER AS $$
 DECLARE
-    tagId int;
 BEGIN
     DELETE FROM assetRatingAverages WHERE asset = NEW.asset;
     INSERT INTO assetRatingAverages (asset, attribute, rating) SELECT asset, attribute, round(avg(rating), 1) from ratings WHERE asset = NEW.asset GROUP BY asset, attribute;
