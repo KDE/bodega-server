@@ -26,6 +26,8 @@ create table assetRatingAverages
     rating    float      not null check (rating > 0 AND rating < 6)
 );
 
+create index assetRatingAverages_asset on assetRatingAverages(asset);
+
 CREATE OR REPLACE FUNCTION ct_checkTagForRating() RETURNS TRIGGER AS $$
 DECLARE
     tagId INT;
