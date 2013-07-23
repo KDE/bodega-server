@@ -229,14 +229,6 @@ var BodegaDb = (function() {
         this.dbQuery(dbRatings.listAttributes, req, res);
     };
 
-    BodegaDb.prototype.createRating = function(req, res) {
-        this.dbQuery(dbRatings.create, req, res);
-    };
-
-    BodegaDb.prototype.deleteRating = function(req, res) {
-        this.dbQuery(dbRatings.remove, req, res);
-    };
-
     BodegaDb.prototype.ratingAsset = function(req, res) {
         this.dbQuery(dbRatings.asset, req, res);
     };
