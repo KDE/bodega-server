@@ -168,18 +168,14 @@ module.exports.removeAsset = function(db, req, res) {
     var assetDeleteQuery =
         'DELETE FROM ratings WHERE asset = $1 AND person = $2;';
     var userId = req.session.user.id;
-    var assetId = req.params.assetId;
+    var assetId = utils.parseNumber(req.params.assetId);
+
+    if (assetId > 0) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
 
     var json = utils.standardJson(req);
-
-    if (!userId) {
-        errors.report('MissingParameters', req, res);
-        return;
-    }
-    if (!assetId) {
-        errors.report('MissingParameters', req, res);
-        return;
-    }
 
     db.query(
         assetQuery, [assetId],
