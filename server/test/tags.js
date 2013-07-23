@@ -89,7 +89,7 @@ describe('Tags manipulation', function(){
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
-                res.body.tags.length.should.equal(2);
+                res.body.tags.length.should.equal(3);
                 res.body.tags[0].id.should.be.eql(1);
                 res.body.tags[0].typeid.should.be.eql(8);
                 res.body.tags[0].type.should.be.eql('contentrating');
