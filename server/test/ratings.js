@@ -64,11 +64,11 @@ describe('Ratings', function() {
         });
     });
 
-    describe('Remove asset rate', function() {
+    describe('Remove asset ratings', function() {
         it('it should fail because the asset is invalid', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/asset/rate/delete/1000',
+                '/bodega/v1/json/asset/ratings/delete/1000',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -85,7 +85,7 @@ describe('Ratings', function() {
         it('it should succeed', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/asset/rate/delete/2',
+                '/bodega/v1/json/asset/ratings/delete/2',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -178,11 +178,11 @@ describe('Ratings', function() {
             //remove the ratings from Zack
             utils.getUrl(
                 server,
-                '/bodega/v1/json/asset/rate/delete/8',
+                '/bodega/v1/json/asset/ratings/delete/8',
                 function(res) {
                     utils.getUrl(
                     server,
-                    '/bodega/v1/json/asset/rate/delete/9',
+                    '/bodega/v1/json/asset/ratings/delete/9',
                     function(res) {
                         utils.getUrl(
                         server,
@@ -207,7 +207,7 @@ describe('Ratings', function() {
         });
     });
 
-    describe('Add asset rate', function() {
+    describe('Add asset ratings', function() {
         it('it should fail because the asset is invalid', function(done) {
             utils.postUrl(
                 server,

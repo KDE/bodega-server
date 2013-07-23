@@ -1645,7 +1645,7 @@
                 "MethodName": "Remove rating",
                 "Synopsis": "Remove the rating for the specific asset",
                 "HTTPMethod": "GET",
-                "URI": "asset/rate/delete/:assetId",
+                "URI": "asset/ratings/delete/:assetId",
                 "parameters": [
                     {
                         "Name": "assetId",

@@ -338,7 +338,7 @@ app.post(serverPath('asset/ratings/list/:assetId'), isAuthorized,
             app.db.ratingAddAsset(req, res);
         });
 
-app.get(serverPath('asset/rate/delete/:assetId'), isAuthorized,
+app.get(serverPath('asset/ratings/delete/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.ratingRemoveAsset(req, res);
