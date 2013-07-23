@@ -225,26 +225,14 @@ File Ebook::epubFile() const
     return epubFiles[0];
 }
 
-bool Ebook::hasCoverImage() const
+QString Ebook::coverImage() const
 {
-    QLatin1String coverFile("cover.medium.jpg");
-    foreach(const Gutenberg::File &file, m_files) {
-        if (file.url.toString().contains(coverFile)) {
-            return true;
-        }
-    }
-    return false;
+    return m_coverUrl;
 }
 
-File Ebook::coverImage() const
+void Ebook::setCoverImage(const QString &coverUrl)
 {
-    QLatin1String coverFile("cover.medium.jpg");
-    foreach(const Gutenberg::File &file, m_files) {
-        if (file.url.toString().contains(coverFile)) {
-            return file;
-        }
-    }
-    return Gutenberg::File();
+    m_coverUrl = coverUrl;
 }
 
 QString Ebook::rightsString() const
@@ -302,7 +290,7 @@ QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
 {
     s.nospace() << "Ebook(id=" << book.bookId() << ", "
                 << "title = " << book.title() << ", issued: " << book.issued() << ")\n";
-    s << "\tEPub" << book.epubFile().url << "\n";
+    s << "\tEPub " << book.epubFile().url << "\n";
     QList<Gutenberg::File> files = book.files();
     foreach (const Gutenberg::File &file, book.files()) {
         s.nospace() << "\t" << file.format << ": " << file.url << '\n';

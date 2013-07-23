@@ -116,8 +116,8 @@ public:
     bool hasEpubFile() const;
     Gutenberg::File epubFile() const;
 
-    bool hasCoverImage() const;
-    Gutenberg::File coverImage() const;
+    QString coverImage() const;
+    void setCoverImage(const QString &coverUrl);
 
 private:
     QString m_id;
@@ -128,6 +128,7 @@ private:
     QString m_friendlyTitle;
     QStringList m_languages;
     QString m_issued;
+    QString m_coverUrl;
     Ebook::Rights m_rights;
     QStringList m_descriptions;
     Ebook::Type m_type;

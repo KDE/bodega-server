@@ -97,36 +97,41 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     }
     book.setBookId(id);
 
+    const QString title(QLatin1String("title"));
+    const QString issued(QLatin1String("issued"));
+    const QString subject(QLatin1String("subject"));
+    const QString coverImage(QLatin1String("marc901")); // don't ask
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
                 const QStringRef elem = xml.name();
-                //qDebug() << "    " << elem;
-                if (QString::fromLatin1("title") == elem) {
-                    //qDebug() << "found the title!";
+                qDebug() << "    " << elem;
+                if (title == elem) {
+                    qDebug() << "found the title!";
                     xml.readNext();
                     book.setTitle(xml.text().toString());
                     xml.readNext();
-                } else if (QString::fromLatin1("issued") == elem) {
+                } else if (issued == elem) {
                     xml.readNext();
                     book.setIssued(xml.text().toString());
                     xml.readNext();
-                } else if (QString::fromLatin1("subject") == elem) {
+                } else if (subject == elem) {
                     parseSubject(xml, book);
+                } else if (coverImage == elem) {
+                    xml.readNext();
+                    book.setCoverImage(xml.text().toString());
+                    xml.readNext();
                 } else {
                     ignoreBlock(xml);
                 }
                 break;
             }
 
-            case QXmlStreamReader::Characters:
-                //qDebug() << "got:" << xml.text();
-                break;
-
             case QXmlStreamReader::EndElement:
                 //qDebug() << "END!" << xml.name();
                 return;
                 break;
+
 
             default:
                 break;
