@@ -344,7 +344,7 @@ app.get(serverPath('asset/ratings/delete/:assetId'), isAuthorized,
             app.db.ratingRemoveAsset(req, res);
         });
 
-app.get(serverPath('asset/ratingAttributes/:assetId'), isAuthorized,
+app.get(serverPath('asset/ratings/attributes/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.listRatingAttributtes(req, res);
