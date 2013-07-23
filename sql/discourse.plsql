@@ -125,7 +125,6 @@ BEGIN
 
 
 
-        -- in discourse every category must have at least one topic in order to be visible
         PERFORM dblink_exec('INSERT INTO topics (title, created_at, updated_at,
                             user_id, last_post_user_id, bumped_at, category_id)
                             VALUES('''||ct_generateTopicTitle(NEW.name)||''', '''||currentTime||''', '''||currentTime||''',
@@ -153,6 +152,10 @@ BEGIN
         PERFORM dblink_exec('UPDATE categories SET name = '''||ct_generateCategoryName(NEW.name)||''',
                             updated_at = '''||currentTime||''', description = '''||ct_generateCategoryDescription(NEW.name)||''',
                             slug = '''||ct_generateCategoryName(NEW.name)||''' WHERE name = '''||ct_generateCategoryName(OLD.name)||''';');
+
+        PERFORM dblink_exec('UPDATE topics SET title = '''||ct_generateTopicTitle(NEW.name)||''', updated_at = '''||currentTime||'''
+                        WHERE title = '''||ct_generateTopicTitle(OLD.NAME)||''';');
+
     END IF;
     PERFORM dblink_disconnect();
 
