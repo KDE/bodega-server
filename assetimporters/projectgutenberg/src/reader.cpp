@@ -93,31 +93,27 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     }
 }
 
+QHash<QString, Ebook::Type> ebookTypes;
 Ebook::Type parseEbookType(const QString &str)
 {
-    if (str.isEmpty() || str == QLatin1String("Text")) {
-        return Ebook::Type_Book;
-    } else if (str == QLatin1String("Other recordings")) {
-        return Ebook::Type_OtherRecordings;
-    } else if (str == QLatin1String("Audio")) {
-        return Ebook::Type_AudioBook;
-    } else if (str == QLatin1String("Pictures, still")) {
-        return Ebook::Type_PicturesStill;
-    } else if (str == QLatin1String("Compilations")) {
-        return Ebook::Type_Compilations;
-    } else if (str == QLatin1String("Pictures, moving")) {
-        return Ebook::Type_PicturesMoving;
-    } else if (str == QLatin1String("Data")) {
-        return Ebook::Type_Data;
-    } else if (str == QLatin1String("Music, recorded")) {
-        return Ebook::Type_MusicRecorded;
-    } else if (str == QLatin1String("Music, Sheet")) {
-        return Ebook::Type_MusicSheet;
-    } else {
+    if (ebookTypes.isEmpty()) {
+        ebookTypes.insert(QString(), Ebook::Type_Book);
+        ebookTypes.insert(QString::fromLatin1("Text"), Ebook::Type_Book);
+        ebookTypes.insert(QString::fromLatin1("Sound"), Ebook::Type_AudioBook);
+        ebookTypes.insert(QString::fromLatin1("Collection"), Ebook::Type_Compilations);
+        ebookTypes.insert(QString::fromLatin1("Image"), Ebook::Type_PicturesStill);
+        ebookTypes.insert(QString::fromLatin1("StillImage"), Ebook::Type_PicturesStill);
+        ebookTypes.insert(QString::fromLatin1("MovingImage"), Ebook::Type_PicturesMoving);
+        ebookTypes.insert(QString::fromLatin1("Dataset"), Ebook::Type_Data);
+    }
+
+    Ebook::Type t = ebookTypes.value(str);
+    if (t == Ebook::Type_Unknown) {
         qDebug()<<"Unknown ebook type = "<<str;
         Q_ASSERT(!"unknown ebook type");
-        return Ebook::Type_Book;
     }
+
+    return Ebook::Type_Book;
 }
 
 void parseType(QXmlStreamReader &xml, Gutenberg::Ebook &book)
@@ -181,7 +177,7 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
                 const QStringRef elem = xml.name();
                 //qDebug() << "    " << elem;
                 if (title == elem) {
-                    qDebug() << "found the title!";
+                    //qDebug() << "found the title!";
                     xml.readNext();
                     book.setTitle(xml.text().toString());
                     xml.readNext();
