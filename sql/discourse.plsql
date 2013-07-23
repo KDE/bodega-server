@@ -123,6 +123,9 @@ BEGIN
         SELECT INTO topicId id FROM dblink('SELECT id FROM topics
                                             WHERE title = '''||topicTitle||''';') AS f(id int);
 
+        PERFORM dblink_exec('INSERT INTO category_featured_topics (category_id, topic_id, created_at, updated_at, rank)
+                            VALUES ('''||categoryId||''', '''||topicId||''', '''||currentTime||''', '''||currentTime||''', 0);');
+
         someText := 'foo';
         PERFORM dblink_exec('INSERT INTO posts (user_id, topic_id, post_number, raw, cooked,
                             created_at, updated_at, last_version_at)
