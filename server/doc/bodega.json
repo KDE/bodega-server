@@ -1675,7 +1675,7 @@
                 "MethodName": "Asset Rates",
                 "Synopsis": "The ratings of the asset",
                 "HTTPMethod": "GET",
-                "URI": "/ratings/asset/:assetId",
+                "URI": "/asset/ratings/list/:assetId",
                 "parameters": [
                     {
                         "Name": "assetId",
@@ -1697,7 +1697,7 @@
                 "MethodName": "Rate Asset",
                 "Synopsis": "Add ratings in the asset",
                 "HTTPMethod": "POST",
-                "URI": "/asset/rate/:assetId",
+                "URI": "/asset/ratings/list/:assetId",
                 "parameters": [
                     {
                         "Name": "ratings",

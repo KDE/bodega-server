@@ -103,7 +103,7 @@ describe('Ratings', function() {
         it('it should fail because the asset is invalid', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/ratings/asset/1000',
+                '/bodega/v1/json/asset/ratings/list/1000',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -120,7 +120,7 @@ describe('Ratings', function() {
         it('it should succeed', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/ratings/asset/8',
+                '/bodega/v1/json/asset/ratings/list/8',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -211,7 +211,7 @@ describe('Ratings', function() {
         it('it should fail because the asset is invalid', function(done) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/asset/rate/1000', {},
+                '/bodega/v1/json/asset/ratings/list/1000', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
