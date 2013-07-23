@@ -80,10 +80,16 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION ct_generateCategoryDescription(text) RETURNS TEXT AS $$
+DECLARE
+BEGIN
+    RETURN 'In this forum you can contact the author of ' || $1;
+END;
+$$ LANGUAGE 'plpgsql';
+
 CREATE OR REPLACE FUNCTION ct_createForumInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
     currentTime TIMESTAMP;
-    categoryDescription TEXT;
     userId INTEGER;
     topicTitle TEXT;
     categoryId INT;
@@ -100,17 +106,15 @@ BEGIN
         --    RETURN NEW;
         --END IF;
 
-        categoryDescription := 'In this forum you can contact the author of' || NEW.name;
-
         PERFORM dblink_exec('INSERT INTO categories (name, created_at, updated_at, description, user_id, slug)
                             VALUES ('''||ct_generateCategoryName(NEW.name)||''', '''||currentTime||''',
-                            '''||currentTime||''', '''||categoryDescription||''',
+                            '''||currentTime||''', '''||ct_generateCategoryDescription(NEW.name)||''',
                             '''||userId||''', '''||ct_generateCategoryName(NEW.name)||''');' );
 
 
         SELECT INTO categoryId id FROM dblink('SELECT id FROM categories
                                               WHERE name = '''||ct_generateCategoryName(NEW.name)||'''
-                                              AND description = '''||categoryDescription||''';')
+                                              AND description = '''||ct_generateCategoryDescription(NEW.name)||''';')
                                     AS f(id int);
 
 
@@ -141,10 +145,8 @@ BEGIN
             RETURN OLD;
         END IF;
 
-        categoryDescription := 'In this forum you can contact the author of ' || NEW.name;
-
         PERFORM dblink_exec('UPDATE categories SET name = '''||ct_generateCategoryName(NEW.name)||''',
-                            updated_at = '''||currentTime||''', description = '''||categoryDescription||''',
+                            updated_at = '''||currentTime||''', description = '''||ct_generateCategoryDescription(NEW.name)||''',
                             slug = '''||ct_generateCategoryName(NEW.name)||''' WHERE name = '''||ct_generateCategoryName(OLD.name)||''';');
     END IF;
     PERFORM dblink_disconnect();
