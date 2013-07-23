@@ -47,7 +47,7 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
 
     const QString valueTag(QLatin1String("value"));
     const QString memberTag(QLatin1String("memberOf"));
-    const QString resTag(QLatin1String("red:resource"));
+    const QString resTag(QLatin1String("rdf:resource"));
     const QString descriptionTag(QLatin1String("Description"));
     const QString subjectTag(QLatin1String("subject"));
     while (!xml.atEnd()) {
