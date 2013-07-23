@@ -45,6 +45,11 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     QStringList subjects;
     bool lcc = false;
 
+    const QString valueTag(QLatin1String("value"));
+    const QString memberTag(QLatin1String("memberOf"));
+    const QString resTag(QLatin1String("red:resource"));
+    const QString descriptionTag(QLatin1String("Description"));
+    const QString subjectTag(QLatin1String("subject"));
     while (!xml.atEnd()) {
         QXmlStreamReader::TokenType token = xml.readNext();
         const QStringRef elem = xml.name();
@@ -52,20 +57,20 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
 
         switch (token) {
             case QXmlStreamReader::StartElement:
-                if (QString::fromLatin1("value") == elem) {
+                if (valueTag == elem) {
                     xml.readNext();
                     subjects << xml.text().toString();
                     xml.readNext();
-                } else if (QString::fromLatin1("memberOf") == elem) {
-                    lcc = xml.attributes().value("rdf:resource").endsWith("LCC");
+                } else if (memberTag == elem) {
+                    lcc = xml.attributes().value(resTag).endsWith("LCC");
                     xml.readNext();
-                } else if (QString::fromLatin1("Description") != elem) {
+                } else if (descriptionTag != elem) {
                     ignoreBlock(xml);
                 }
                 break;
 
             case QXmlStreamReader::EndElement:
-                if (QString::fromLatin1("subject") == elem) {
+                if (subjectTag == elem) {
                     if (!subjects.isEmpty()) {
                         if (lcc) {
                             book.setCategories(subjects);
@@ -105,7 +110,7 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
                 const QStringRef elem = xml.name();
-                qDebug() << "    " << elem;
+                //qDebug() << "    " << elem;
                 if (title == elem) {
                     qDebug() << "found the title!";
                     xml.readNext();
@@ -151,23 +156,28 @@ void parseFileBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
 
     file.url = (attrs.value("rdf:about").toString());
 
+    const QString formatTag(QLatin1String("format"));
+    const QString valueTag(QLatin1String("value"));
+    const QString zipMimetype(QLatin1String("application/zip"));
+    const QString modifiedTag(QLatin1String("modified"));
+    const QString extentTag(QLatin1String("extent"));
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
                 const QStringRef elem = xml.name();
-                if (QString::fromLatin1("format") == elem) {
+                if (formatTag == elem) {
                     while (!xml.atEnd())  {
                         QXmlStreamReader::TokenType token = xml.readNext();
                         //qDebug() << "PARSING FILE BLOCK WITH" << xml.name();
                         if (token == QXmlStreamReader::EndElement) {
-                            if (QString::fromLatin1("format") == xml.name()) {
+                            if (formatTag == xml.name()) {
                                 break;
                             }
                         } else if (token == QXmlStreamReader::StartElement) {
-                            if (QString::fromLatin1("value") == xml.name()) {
+                            if (valueTag == xml.name()) {
                                 xml.readNext();
                                 file.format = xml.text().toString();
-                                if (file.format == QString::fromLatin1("application/zip")) {
+                                if (file.format == zipMimetype) {
                                     // this is a compressed version
                                     // there will an uncompressed version, too, just stick to those
                                     // but otherwise parse this block as normal
@@ -176,12 +186,12 @@ void parseFileBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
                             }
                         }
                     }
-                } else if (QString::fromLatin1("modified") == elem) {
+                } else if (modifiedTag == elem) {
                     xml.readNext();
                     file.modified = xml.text().toString();
                     xml.readNext();
                     //qDebug() << "found the modification" << file.modified;
-                } else if (QString::fromLatin1("extent") == elem) {
+                } else if (extentTag == elem) {
                     xml.readNext();
                     file.extent = xml.text().toString();
                     xml.readNext();
@@ -217,17 +227,21 @@ Gutenberg::Ebook parseRdf(const QString &path)
     Gutenberg::Ebook book;
     if (file.open(QIODevice::ReadOnly)) {
         QXmlStreamReader xml(&file);
+        const QString ebookTag(QLatin1String("ebook"));
+        const QString fileTag(QLatin1String("file"));
+        const QString openingTag(QLatin1String("RDF"));
         while (!xml.atEnd()) {
             switch (xml.readNext()) {
                 case QXmlStreamReader::StartElement: {
                     const QStringRef elem = xml.name();
                     //qDebug() << "starting element:" << elem;
-                    if (QString::fromLatin1("ebook") == elem) {
+                    if (ebookTag == elem) {
+                        //qDebug() << "EBOOK BLOCK";
                         parseEbookBlock(xml, book);
-                    } else if (QString::fromLatin1("file") == elem) {
+                    } else if (fileTag == elem) {
                         //qDebug() << "FILE BLOCK!";
                         parseFileBlock(xml, book);
-                    } else if (QString::fromLatin1("RDF") != elem) {
+                    } else if (openingTag != elem) {
                         //qDebug() << "ignoring" << elem;
                         ignoreBlock(xml);
                     }
