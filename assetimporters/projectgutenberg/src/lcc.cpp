@@ -175,9 +175,6 @@ QString LCC::dSubCats(const QString &code)
     char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
 
     switch (sub) {
-        case 's':
-            return QString::fromLatin1("Geneology");
-            break;
         default:
             break;
     }
@@ -537,7 +534,13 @@ void LCC::addCategory(const QString &code)
 
     if (!cat.isEmpty()) {
         refineUsingSubjects();
-        m_categories[cat].append(sub);
+        if (sub.isEmpty()) {
+            if (!m_categories.contains(cat)) {
+                m_categories[cat] = QStringList();
+            }
+        } else {
+            m_categories[cat].append(sub);
+        }
     }
 }
 
