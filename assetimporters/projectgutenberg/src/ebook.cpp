@@ -35,16 +35,6 @@ QString Ebook::publisher() const
     return m_publisher;
 }
 
-QStringList Ebook::creators() const
-{
-    return m_creators;
-}
-
-QStringList Ebook::contributors() const
-{
-    return m_contributors;
-}
-
 QString Ebook::title() const
 {
     return m_title;
@@ -70,18 +60,6 @@ void Gutenberg::Ebook::setPublisher(const QString &publisher)
 void Ebook::setTitle(const QString &title)
 {
     m_title = title;
-}
-
-void Gutenberg::Ebook::setCreators(const QStringList &creators)
-{
-    Q_ASSERT(m_creators.isEmpty());
-    m_creators = creators;
-}
-
-void Ebook::setContributors(const QStringList &lst)
-{
-    Q_ASSERT(m_contributors.isEmpty());
-    m_contributors.append(lst);
 }
 
 void Ebook::setLanguages(const QStringList &langs)

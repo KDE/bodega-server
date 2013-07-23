@@ -79,12 +79,6 @@ public:
     QStringList alternativeNames() const;
     void setAlternativeNames(const QStringList &lst);
 
-    QStringList creators() const;
-    void setCreators(const QStringList &creators);
-
-    QStringList contributors() const;
-    void setContributors(const QStringList &lst);
-
     QStringList languages() const;
     void setLanguages(const QStringList &langs);
 
@@ -121,8 +115,6 @@ public:
 private:
     QString m_id;
     QString m_publisher;
-    QStringList m_creators;
-    QStringList m_contributors;
     QString m_title;
     QStringList m_languages;
     QString m_issued;
