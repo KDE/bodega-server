@@ -163,8 +163,6 @@ module.exports.addAsset = function(db, req, res) {
 
 module.exports.removeAsset = function(db, req, res) {
     /*jshint multistr:true */
-    var assetQuery =
-        'SELECT r.asset FROM ratings r WHERE asset = $1;';
     var assetDeleteQuery =
         'DELETE FROM ratings WHERE asset = $1 AND person = $2;';
     var userId = req.session.user.id;
@@ -178,26 +176,13 @@ module.exports.removeAsset = function(db, req, res) {
     var json = utils.standardJson(req);
 
     db.query(
-        assetQuery, [assetId],
+        assetDeleteQuery, [assetId, userId],
         function(err, result) {
-            if (err || !result.rows) {
+            if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
-            if (!result.rows.length) {
-                errors.report('NoMatch', req, res);
-                return;
-            }
-
-            db.query(
-                assetDeleteQuery, [assetId, userId],
-                    function(err, result) {
-                        if (err) {
-                            errors.report('Database', req, res, err);
-                            return;
-                        }
-                        res.json(json);
-            });
+            res.json(json);
         });
 };
 
