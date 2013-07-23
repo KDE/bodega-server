@@ -46,9 +46,9 @@ class Ebook
 {
 public:
     enum Type {
+        Type_Unknown = 0,
         Type_Book,
-        Type_AudioBookHumanRead,
-        Type_AudioBookComputerGenerated,
+        Type_AudioBook,
         Type_PicturesStill,
         Type_PicturesMoving,
         Type_Compilations,
@@ -57,10 +57,13 @@ public:
         Type_OtherRecordings,
         Type_Data
     };
+    Q_ENUMS(Type)
+
     enum Rights {
         Rights_Gutenberg,
         Rights_Copyrighted
     };
+
 public:
     Ebook();
 

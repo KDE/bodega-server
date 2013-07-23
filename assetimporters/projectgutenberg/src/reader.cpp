@@ -93,6 +93,71 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     }
 }
 
+Ebook::Type parseEbookType(const QString &str)
+{
+    if (str.isEmpty() || str == QLatin1String("Text")) {
+        return Ebook::Type_Book;
+    } else if (str == QLatin1String("Other recordings")) {
+        return Ebook::Type_OtherRecordings;
+    } else if (str == QLatin1String("Audio")) {
+        return Ebook::Type_AudioBook;
+    } else if (str == QLatin1String("Pictures, still")) {
+        return Ebook::Type_PicturesStill;
+    } else if (str == QLatin1String("Compilations")) {
+        return Ebook::Type_Compilations;
+    } else if (str == QLatin1String("Pictures, moving")) {
+        return Ebook::Type_PicturesMoving;
+    } else if (str == QLatin1String("Data")) {
+        return Ebook::Type_Data;
+    } else if (str == QLatin1String("Music, recorded")) {
+        return Ebook::Type_MusicRecorded;
+    } else if (str == QLatin1String("Music, Sheet")) {
+        return Ebook::Type_MusicSheet;
+    } else {
+        qDebug()<<"Unknown ebook type = "<<str;
+        Q_ASSERT(!"unknown ebook type");
+        return Ebook::Type_Book;
+    }
+}
+
+void parseType(QXmlStreamReader &xml, Gutenberg::Ebook &book)
+{
+    QStringList subjects;
+    bool lcc = false;
+
+    const QString typeTag(QLatin1String("type"));
+    const QString valueTag(QLatin1String("value"));
+    const QString descriptionTag(QLatin1String("Description"));
+    const QString subjectTag(QLatin1String("subject"));
+    while (!xml.atEnd()) {
+        QXmlStreamReader::TokenType token = xml.readNext();
+        const QStringRef elem = xml.name();
+        //qDebug() << "subject block..." << elem;
+
+        switch (token) {
+            case QXmlStreamReader::StartElement:
+                if (valueTag == elem) {
+                    xml.readNext();
+                    book.setType(parseEbookType(xml.text().toString()));
+                    xml.readNext();
+                } else if (descriptionTag != elem) {
+                    ignoreBlock(xml);
+                }
+                break;
+
+            case QXmlStreamReader::EndElement:
+                if (typeTag == elem) {
+                    return;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+    }
+}
+
 void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
 {
     QXmlStreamAttributes attrs = xml.attributes();
@@ -109,6 +174,7 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     const QString issued(QLatin1String("issued"));
     const QString subject(QLatin1String("subject"));
     const QString coverImage(QLatin1String("marc901")); // don't ask
+    const QString typeTag(QLatin1String("type"));
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
@@ -133,6 +199,8 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
                                 "http://www.gutenberg.org/");
                     book.setCoverImage(xml.text().toString());
                     xml.readNext();
+                } else if (typeTag == elem) {
+                    parseType(xml, book);
                 } else {
                     ignoreBlock(xml);
                 }

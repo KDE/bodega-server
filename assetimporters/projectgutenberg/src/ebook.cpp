@@ -21,7 +21,7 @@ using namespace Gutenberg;
 
 Ebook::Ebook()
     : m_rights(Ebook::Rights_Gutenberg),
-      m_type(Ebook::Type_Book)
+      m_type(Ebook::Type_Unknown)
 {
 }
 
@@ -254,11 +254,8 @@ QString Ebook::typeString() const
     case Type_Book:
         return QString();
         break;
-    case Type_AudioBookHumanRead:
-        return QLatin1String("Audio Book, human-read");
-        break;
-    case Type_AudioBookComputerGenerated:
-        return QLatin1String("Audio Book, computer-generated");
+    case Type_AudioBook:
+        return QLatin1String("Audio Book");
         break;
     case Type_PicturesStill:
         return QLatin1String("Pictures, still");
@@ -289,6 +286,7 @@ QString Ebook::typeString() const
 QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
 {
     s.nospace() << "Ebook(id=" << book.bookId() << ", "
+                << "type = " << book.type() << ", "
                 << "title = " << book.title() << ", issued: " << book.issued() << ")\n";
     s << "\tEPub " << book.epubFile().url << "\n";
     QList<Gutenberg::File> files = book.files();
