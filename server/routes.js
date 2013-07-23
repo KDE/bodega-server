@@ -173,7 +173,7 @@ app.get(serverPath('collection/:collectionId/remove/:assetId'), isAuthorized,
 app.get(serverPath('ratings/asset/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
-            app.db.ratingAsset(req, res);
+            app.db.assetRatings(req, res);
         }
 );
 

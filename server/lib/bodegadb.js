@@ -229,7 +229,7 @@ var BodegaDb = (function() {
         this.dbQuery(dbRatings.listAttributes, req, res);
     };
 
-    BodegaDb.prototype.ratingAsset = function(req, res) {
+    BodegaDb.prototype.assetRatings = function(req, res) {
         this.dbQuery(dbRatings.asset, req, res);
     };
 
