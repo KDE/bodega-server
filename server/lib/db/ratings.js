@@ -22,12 +22,8 @@ module.exports.listAttributes = function(db, req, res) {
     /*jshint multistr:true */
     var queryString =
     'SELECT name, lowdesc, highdesc, assettype FROM ratingattributes ra \
-    INNER JOIN assettags at ON (ra.assettype = at.tag) \
-    WHERE at.asset = $1 LIMIT $2 OFFSET $3;';
+    LEFT JOIN assettags at ON (ra.assettype = at.tag);';
 
-    var defaultPageSize = 25;
-    var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
-    var offset = parseInt(req.query.offset, 10) || 0;
     var assetId = req.params.assetId;
 
     if (!assetId) {
