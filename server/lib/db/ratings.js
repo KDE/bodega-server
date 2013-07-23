@@ -90,11 +90,6 @@ module.exports.asset = function(db, req, res) {
 
 module.exports.participant = function(db, req, res) {
     /*jshint multistr:true */
-    var personQuery = 'SELECT firstname, lastname, \
-                      fullname, email, points, active \
-                      FROM people \
-                      WHERE people.id = $1;';
-
     var ratingsQuery = 'SELECT r.asset, r.attribute, r.rating \
                         FROM ratings r WHERE r.person = $1 \
                         ORDER BY r.asset LIMIT $2 OFFSET $3;';
@@ -105,43 +100,26 @@ module.exports.participant = function(db, req, res) {
 
     var json = utils.standardJson(req);
 
-    // TODO do we need this query?
-    // It provides as with data that we already have.
+    json.ratings = [];
     db.query(
-        personQuery, [req.session.user.id],
+        ratingsQuery, [req.session.user.id, pageSize + 1, offset],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
 
-            if (result.rows.length < 1) {
-                errors.report('NoMatch', req, res);
+            if (result.rows.length > pageSize) {
+                json.hasMoreRatings = true;
+                result.rows.pop();
             }
-
-            json.participant = result.rows[0];
-
-            json.ratings = [];
-            db.query(
-                ratingsQuery, [req.session.user.id, pageSize + 1, offset],
-                function(err, result) {
-                    if (err) {
-                        errors.report('Database', req, res, err);
-                        return;
-                    }
-                    if (result.rows.length > pageSize) {
-                        json.hasMoreRatings = true;
-                        result.rows.pop();
-                    }
-                    json.ratings = result.rows;
-                    res.json(json);
-            });
+            json.ratings = result.rows;
+            res.json(json);
     });
 };
 
 module.exports.addAsset = function(db, req, res) {
     /*jshint multistr:true */
-    var assetQuery = 'SELECT id FROM assets WHERE id = $1;';
     var assetInsertQuery =
         'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);';
 
@@ -156,45 +134,31 @@ module.exports.addAsset = function(db, req, res) {
         return;
     }
 
-    db.query(
-        assetQuery, [assetId],
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
+    json.ratings = [];
+    function next() {
+        var rate = ratings.shift();
 
-            if (result.rows.length < 1) {
-                errors.report('NoMatch', req, res);
-                return;
-            }
+        if (!rate || !rate.attribute || !rate.rating) {
+            res.json(json);
+            return;
+        }
 
-            json.ratings = [];
-            function next() {
-                var rate = ratings.shift();
+        rate.attribute = utils.parseNumber(rate.attribute);
+        rate.rating = utils.parseNumber(rate.rating);
 
-                if (!rate || !rate.attribute || !rate.rating) {
-                    res.json(json);
+        db.query(
+            assetInsertQuery, [assetId, rate.attribute, req.session.user.id, rate.rating],
+            function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res, err);
                     return;
                 }
 
-                rate.attribute = utils.parseNumber(rate.attribute);
-                rate.rating = utils.parseNumber(rate.rating);
-
-                db.query(
-                assetInsertQuery, [assetId, rate.attribute, req.session.user.id, rate.rating],
-                function(err, result) {
-                    if (err) {
-                        errors.report('Database', req, res, err);
-                        return;
-                    }
-
-                    json.ratings.push(rate);
-                    next();
-                });
-            }
-            next();
-    });
+                json.ratings.push(rate);
+                next();
+        });
+    }
+    next();
 };
 
 module.exports.removeAsset = function(db, req, res) {
