@@ -388,11 +388,37 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION ct_setNameGroupingTag(assetId int, name text) RETURNS VOID AS $$
+DECLARE
+    groupTagTitle text;
+    groupingId int;
+BEGIN
+    groupTagTitle := 'name_' || lower(substr(name, 1, 1));
+    SELECT INTO groupingId id FROM tagTypes WHERE type = 'grouping';
+    DELETE from assetTags WHERE asset = assetId AND tag IN
+        (SELECT id FROM tags WHERE type = groupingId AND title LIKE 'name_%');
+    INSERT INTO assetTags (asset, tag)
+        SELECT assetId, id as tagId FROM tags
+        WHERE type = groupingId AND title = groupTagTitle;
+    IF NOT FOUND THEN
+        INSERT INTO tags (type, title) VALUES (groupingId, groupTagTitle);
+
+        INSERT INTO assetTags (asset, tag)
+            SELECT assetId, id FROM tags
+            WHERE type = groupingId AND title = groupTagTitle;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 -- TRIGGER function to create changelog entries automatically and update prices
 CREATE OR REPLACE FUNCTION ct_processUpdatedAsset() RETURNS TRIGGER AS $$
 DECLARE
     dummy int;
 BEGIN
+    IF OLD.name != NEW.name THEN
+        PERFORM ct_setNameGroupingTag(NEW.id, NEW.name);
+    END IF;
+
     IF OLD.basePrice != NEW.basePrice THEN
         PERFORM ct_updateAssetPrices(NEW.id, NEW.basePrice);
     END IF;
@@ -414,6 +440,7 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION ct_processNewAsset() RETURNS TRIGGER AS $$
 DECLARE
 BEGIN
+    PERFORM ct_setNameGroupingTag(NEW.id, NEW.name);
     PERFORM ct_updateAssetPrices(NEW.id, NEW.basePrice);
     RETURN NEW;
 END;
