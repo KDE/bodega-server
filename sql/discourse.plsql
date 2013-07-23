@@ -73,14 +73,18 @@ DROP TRIGGER IF EXISTS trg_ct_createUserInDiscourse ON people;
 CREATE TRIGGER trg_ct_createUserInDiscourse AFTER UPDATE OR INSERT ON people
 FOR EACH ROW EXECUTE PROCEDURE ct_createUserInDiscourse();
 
+CREATE OR REPLACE FUNCTION ct_generateCategoryName(text) RETURNS TEXT AS $$
+DECLARE
+BEGIN
+    RETURN 'Forum for ' || $1;
+END;
+$$ LANGUAGE 'plpgsql';
+
 CREATE OR REPLACE FUNCTION ct_createForumInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
     currentTime TIMESTAMP;
-    categoryName TEXT;
     categoryDescription TEXT;
     userId INTEGER;
-    categorySlug TEXT;
-    name TEXT;
     topicTitle TEXT;
     categoryId INT;
     topicId INT;
@@ -96,17 +100,16 @@ BEGIN
         --    RETURN NEW;
         --END IF;
 
-        categoryName := 'Forum for ' || NEW.name;
         categoryDescription := 'In this forum you can contact the author of' || NEW.name;
-        categorySlug := categoryName;
+
         PERFORM dblink_exec('INSERT INTO categories (name, created_at, updated_at, description, user_id, slug)
-                            VALUES ('''||categoryName||''', '''||currentTime||''',
+                            VALUES ('''||ct_generateCategoryName(NEW.name)||''', '''||currentTime||''',
                             '''||currentTime||''', '''||categoryDescription||''',
-                            '''||userId||''', '''||categorySlug||''');' );
+                            '''||userId||''', '''||ct_generateCategoryName(NEW.name)||''');' );
 
 
         SELECT INTO categoryId id FROM dblink('SELECT id FROM categories
-                                              WHERE name = '''||categoryName||'''
+                                              WHERE name = '''||ct_generateCategoryName(NEW.name)||'''
                                               AND description = '''||categoryDescription||''';')
                                     AS f(id int);
 
@@ -136,17 +139,13 @@ BEGIN
         IF NEW.name IS NULL THEN
             PERFORM dblink_disconnect();
             RETURN OLD;
-        ELSE
-            name := NEW.name;
         END IF;
 
-        categoryName := 'Forum for ' || name;
-        categoryDescription := 'In this forum you can contact the author of ' || name;
-        categorySlug := categoryName;
-        name := 'Forum for ' || OLD.name;
-        PERFORM dblink_exec('UPDATE categories SET name = '''||categoryName||''',
+        categoryDescription := 'In this forum you can contact the author of ' || NEW.name;
+
+        PERFORM dblink_exec('UPDATE categories SET name = '''||ct_generateCategoryName(NEW.name)||''',
                             updated_at = '''||currentTime||''', description = '''||categoryDescription||''',
-                            slug = '''||categorySlug||''' WHERE name = '''||name||''';');
+                            slug = '''||ct_generateCategoryName(NEW.name)||''' WHERE name = '''||ct_generateCategoryName(OLD.name)||''';');
     END IF;
     PERFORM dblink_disconnect();
 
