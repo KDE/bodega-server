@@ -32,50 +32,49 @@ QHash<QString, QStringList> LCC::categories() const
     return m_categories;
 }
 
-QStringList LCC::generalSubCats(const QString &lcc)
+QString LCC::aSubCats(const QString &code)
 {
-    QStringList cats;
-    char sub = lcc.size() > 1 ? lcc[1].toLower().toAscii() : 0;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
 
     switch (sub) {
         case 'c':
-            cats << QString::fromLatin1("Collections");
+            return QString::fromLatin1("Collections");
             break;
         case 'e':
-            cats << QString::fromLatin1("Encyclopedias");
+            return QString::fromLatin1("Encyclopedias");
             break;
         case 'g':
-            cats << QString::fromLatin1("Dictionaries");
+            return QString::fromLatin1("Dictionaries");
             break;
         case 'i':
-            cats << QString::fromLatin1("Indexes");
+            return QString::fromLatin1("Indexes");
             break;
         case 'm':
-            cats << QString::fromLatin1("Museums and collecting");
+            return QString::fromLatin1("Museums and collecting");
             break;
         case 'n':
-            cats << QString::fromLatin1("Newspapers");
+            return QString::fromLatin1("Newspapers");
             break;
         case 'p':
-            cats << QString::fromLatin1("Periodicals");
+            return QString::fromLatin1("Periodicals");
             break;
         case 's':
-            cats << QString::fromLatin1("Academies");
+            return QString::fromLatin1("Academies");
             break;
         case 'y':
-            cats << QString::fromLatin1("Yearbooks and almanacs");
+            return QString::fromLatin1("Yearbooks and almanacs");
             break;
         case 'z':
-            cats << QString::fromLatin1("History of scholarship");
+            return QString::fromLatin1("History of scholarship");
             break;
         default:
             break;
     }
 
-    return cats;
+    return QString();
 }
 
-QString LCC::bSubCats(const QString &code, QStringList &subs)
+QString LCC::bSubCats(const QString &code, QString &subCat)
 {
     QString cat(QLatin1String("Religion"));
     char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
@@ -83,72 +82,379 @@ QString LCC::bSubCats(const QString &code, QStringList &subs)
     switch (sub) {
         case 'c':
             cat = QString::fromLatin1("Philosophy");
-            subs << QString::fromLatin1("Logic");
+            subCat = QString::fromLatin1("Logic");
             break;
         case 'd':
             cat = QString::fromLatin1("Philosophy");
-            subs << QString::fromLatin1("Speculative");
+            subCat = QString::fromLatin1("Speculative");
             break;
         case 'f':
             cat = QString::fromLatin1("Psychology");
             break;
         case 'h':
             cat = QString::fromLatin1("Philosophy");
-            subs << QString::fromLatin1("Aesthetics");
+            subCat = QString::fromLatin1("Aesthetics");
             break;
         case 'j':
             cat = QString::fromLatin1("Philosophy");
-            subs << QString::fromLatin1("Ethics");
+            subCat = QString::fromLatin1("Ethics");
             break;
         case 'l':
-            subs << QString::fromLatin1("General");
+            subCat = QString::fromLatin1("General");
             m_refinementPending = true;
             break;
         case 'm':
-            subs << QString::fromLatin1("Judaism");
+            subCat = QString::fromLatin1("Judaism");
             break;
         case 'p':
-            subs << QString::fromLatin1("Islam");
+            subCat = QString::fromLatin1("Islam");
             m_refinementPending = true;
             break;
         case 'q':
-            subs << QString::fromLatin1("Buddhism");
+            subCat = QString::fromLatin1("Buddhism");
             break;
         case 'r':
         case 'x':
-            subs << QString::fromLatin1("Christianity");
+            subCat = QString::fromLatin1("Christianity");
             break;
         case 's':
-            subs << QString::fromLatin1("The Bible");
+            subCat = QString::fromLatin1("The Bible");
             break;
         case 't':
         case 'v':
-            subs << QString::fromLatin1("Theology");
+            subCat = QString::fromLatin1("Theology");
             break;
         default:
             cat = QString::fromLatin1("Philosophy");
-            subs << QString::fromLatin1("General");
+            subCat = QString::fromLatin1("General");
             break;
     }
 
-    refineUsingSubjects();
     return cat;
 }
 
-QStringList LCC::cSubCats(const QString &code)
+QString LCC::cSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'b':
+            return QString::fromLatin1("Civilization");
+            break;
+        case 'c':
+            return QString::fromLatin1("Archeology");
+            break;
+        case 'd':
+            return QString::fromLatin1("Diplomatics");
+            break;
+        case 'e':
+            return QString::fromLatin1("Chronology");
+            break;
+        case 'j':
+            return QString::fromLatin1("Numismatics");
+            break;
+        case 'n':
+            return QString::fromLatin1("Inscriptions");
+            break;
+        case 'r':
+            return QString::fromLatin1("Heraldry");
+            break;
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::dSubCats(const QString &code)
 {
     QStringList subs;
     char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
 
     switch (sub) {
-        case 'b':
-            subs << QString::fromLatin1("Civilization");
+        case 's':
+            return QString::fromLatin1("Geneology");
             break;
         default:
             break;
     }
 
-    return subs;
+    return QString();
+}
+
+QString LCC::eSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::fSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::gSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::hSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::jSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::kSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::lSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::mSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::nSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::pSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::qSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::rSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::sSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::tSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::uSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::vSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
+}
+
+QString LCC::zSubCats(const QString &code)
+{
+    QStringList subs;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString();
 }
 
 void LCC::setCategories(const QStringList &lccCodes)
@@ -167,33 +473,28 @@ void LCC::addCategory(const QString &code)
     }
 
     char firstCharacter = code[0].toLower().toAscii();
+    QString sub;
+    QString cat;
 
     switch (firstCharacter) {
     case 'a':
-        m_categories["General"].append(generalSubCats(code));
+        cat = QLatin1String("General");
+        sub = aSubCats(code);
         break;
-    case 'b': {
-        QStringList subs;
-        const QString cat = bSubCats(code, subs);
-
-        if (!cat.isEmpty()) {
-            m_categories[cat].append(subs);
-        }
-    }
+    case 'b':
+        cat = bSubCats(code, sub);
         break;
-    case 'c': {
-        QStringList subs;
-        QString cat;
-        if (code.toLower() == QLatin1String("CT")) {
+    case 'c':
+        if (code.toLower() == QLatin1String("ct")) {
             cat = QString::fromLatin1("Biographies");
         } else {
             cat = QString::fromLatin1("History");
-            subs = cSubCats(code);
+            sub = cSubCats(code);
         }
-        m_categories[cat].append(subs);
         break;
-    }
     case 'd':
+        cat = QString::fromLatin1("History");
+        sub = dSubCats(code);
         break;
     case 'e':
         break;
@@ -232,6 +533,11 @@ void LCC::addCategory(const QString &code)
     default:
         qDebug() << "Unrecognized lcc class = " << code;
         break;
+    }
+
+    if (!cat.isEmpty()) {
+        refineUsingSubjects();
+        m_categories[cat].append(sub);
     }
 }
 

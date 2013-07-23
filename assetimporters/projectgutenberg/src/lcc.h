@@ -41,9 +41,27 @@ public:
 
 private:
     void addCategory(const QString &code);
-    QStringList generalSubCats(const QString &code);
-    QString bSubCats(const QString &code, QStringList &subs);
-    QStringList cSubCats(const QString &code);
+    QString aSubCats(const QString &code);
+    QString bSubCats(const QString &code, QString &subCat);
+    QString cSubCats(const QString &code);
+    QString dSubCats(const QString &code);
+    QString eSubCats(const QString &code);
+    QString fSubCats(const QString &code);
+    QString gSubCats(const QString &code);
+    QString hSubCats(const QString &code);
+    QString jSubCats(const QString &code);
+    QString kSubCats(const QString &code);
+    QString lSubCats(const QString &code);
+    QString mSubCats(const QString &code);
+    QString nSubCats(const QString &code);
+    QString pSubCats(const QString &code);
+    QString qSubCats(const QString &code);
+    QString rSubCats(const QString &code);
+    QString sSubCats(const QString &code);
+    QString tSubCats(const QString &code);
+    QString uSubCats(const QString &code);
+    QString vSubCats(const QString &code);
+    QString zSubCats(const QString &code);
 
     void refineUsingSubjects();
 
