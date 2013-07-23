@@ -56,6 +56,6 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_checkTagForRating ON ratings;
-CREATE TRIGGER trg_ct_sumForAssetRatings AFTER INSERT OR UPDATE ON ratings
+CREATE TRIGGER trg_ct_sumForAssetRatings AFTER INSERT OR UPDATE OR DELETE ON ratings
 FOR EACH ROW EXECUTE PROCEDURE ct_sumForAssetRatings();
 
