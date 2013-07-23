@@ -82,9 +82,6 @@ public:
     QStringList contributors() const;
     void setContributors(const QStringList &lst);
 
-    QString friendlyTitle() const;
-    void setFriendlyTitle(const QString &ft);
-
     QStringList languages() const;
     void setLanguages(const QStringList &langs);
 
@@ -128,7 +125,6 @@ private:
     QStringList m_creators;
     QStringList m_contributors;
     QString m_title;
-    QString m_friendlyTitle;
     QStringList m_languages;
     QString m_issued;
     QString m_coverUrl;

@@ -50,11 +50,6 @@ QString Ebook::title() const
     return m_title;
 }
 
-QString Ebook::friendlyTitle() const
-{
-    return m_friendlyTitle;
-}
-
 QStringList Ebook::languages() const
 {
     return m_languages;
@@ -87,12 +82,6 @@ void Ebook::setContributors(const QStringList &lst)
 {
     Q_ASSERT(m_contributors.isEmpty());
     m_contributors.append(lst);
-}
-
-void Ebook::setFriendlyTitle(const QString &ft)
-{
-    Q_ASSERT(m_friendlyTitle.isEmpty());
-    m_friendlyTitle = ft;
 }
 
 void Ebook::setLanguages(const QStringList &langs)
