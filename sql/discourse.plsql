@@ -87,11 +87,17 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION ct_generateTopicTitle(text) RETURNS TEXT AS $$
+DECLARE
+BEGIN
+    RETURN 'In this forum you can contact the author of ' || $1;
+END;
+$$ LANGUAGE 'plpgsql';
+
 CREATE OR REPLACE FUNCTION ct_createForumInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
     currentTime TIMESTAMP;
     userId INTEGER;
-    topicTitle TEXT;
     categoryId INT;
     topicId INT;
     someText TEXT;
@@ -120,15 +126,14 @@ BEGIN
 
 
         -- in discourse every category must have at least one topic in order to be visible
-        topicTitle := 'Welcome to the ' || NEW.name || ' category';
         PERFORM dblink_exec('INSERT INTO topics (title, created_at, updated_at,
                             user_id, last_post_user_id, bumped_at, category_id)
-                            VALUES('''||topicTitle||''', '''||currentTime||''', '''||currentTime||''',
+                            VALUES('''||ct_generateTopicTitle(NEW.name)||''', '''||currentTime||''', '''||currentTime||''',
                             '''||userId||''', '''||userId||''', '''||currentTime||''',
                             '''||categoryId||''');');
 
         SELECT INTO topicId id FROM dblink('SELECT id FROM topics
-                                            WHERE title = '''||topicTitle||''';') AS f(id int);
+                                            WHERE title = '''||ct_generateTopicTitle(NEW.name)||''';') AS f(id int);
 
         PERFORM dblink_exec('INSERT INTO category_featured_topics (category_id, topic_id, created_at, updated_at, rank)
                             VALUES ('''||categoryId||''', '''||topicId||''', '''||currentTime||''', '''||currentTime||''', 0);');
