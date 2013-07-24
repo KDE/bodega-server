@@ -48,21 +48,45 @@ FOR EACH ROW EXECUTE PROCEDURE ct_checkTagForRating();
 CREATE OR REPLACE FUNCTION ct_sumForAssetRatings() RETURNS TRIGGER AS $$
 DECLARE
     assetId INT;
+    attributeId INT;
+    average REAL;
 BEGIN
     IF TG_OP = 'DELETE' THEN
         assetId := OLD.asset;
+        attributeId := OLD.attribute;
     ELSE
-        assetId:= NEW.asset;
+        assetId := NEW.asset;
+        attributeId := NEW.attribute;
     END IF;
 
-    DELETE FROM assetRatingAverages WHERE asset = assetId;
-    INSERT INTO assetRatingAverages (asset, attribute, rating) SELECT asset, attribute, round(avg(rating), 1) from ratings WHERE asset = assetId GROUP BY asset, attribute;
+    DELETE FROM assetRatingAverages WHERE asset = assetId AND attribute = attributeId;
 
+    -- we have to check if the table ratings has a rating for the specified asset and attribute.
+    -- e.g. this query DELETE FROM ratings WHERE asset = 8; turns rating into NULL so if we try to
+    -- to an INSERT INTO it will fail. This can happen only ON DELETE.
+    SELECT INTO average round(avg(rating), 1) FROM ratings WHERE asset = assetId AND attribute = attributeId;
+    IF average IS NULL AND TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+
+    --INSERT INTO assetRatingAverages (asset, attribute, rating) SELECT assetId, attributeId, round(avg(rating), 1) from ratings WHERE asset = assetId AND attribute = attributeId;
+    INSERT INTO assetRatingAverages (asset, attribute, rating) VALUES (assetId, attributeId, average);
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_checkTagForRating ON ratings;
-CREATE TRIGGER trg_ct_sumForAssetRatings AFTER INSERT OR UPDATE OR DELETE ON ratings
+CREATE TRIGGER trg_ct_sumForAssetRatings AFTER INSERT OR DELETE ON ratings
 FOR EACH ROW EXECUTE PROCEDURE ct_sumForAssetRatings();
 
+CREATE OR REPLACE FUNCTION ct_blockSumForAssetRatings() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    RAISE EXCEPTION 'You can''t update the rating of an asset.';
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_ct_blockSumForAssetRatings ON ratings;
+CREATE TRIGGER trg_ct_blockSumForAssetRatings BEFORE UPDATE ON ratings
+FOR EACH ROW EXECUTE PROCEDURE ct_blockSumForAssetRatings();
