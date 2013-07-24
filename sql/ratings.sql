@@ -45,6 +45,36 @@ DROP TRIGGER IF EXISTS trg_ct_checkTagForRating ON ratingAttributes;
 CREATE TRIGGER trg_ct_checkTagForRating BEFORE INSERT OR UPDATE ON ratingAttributes
 FOR EACH ROW EXECUTE PROCEDURE ct_checkTagForRating();
 
+CREATE OR REPLACE FUNCTION ct_checkAssociationOfRatingAttributeWithAsset(int, int) RETURNS BOOL AS $$
+DECLARE
+    assetId INT;
+BEGIN
+
+    SELECT INTO assetId asset FROM assettags at INNER JOIN tags t ON (t.id = at.tag) INNER JOIN ratingattributes ra ON (ra.assettype = t.id) WHERE at.asset = $1 and ra.id = $2;
+
+    IF NOT FOUND THEN
+        RETURN FALSE;
+    END IF;
+
+    RETURN TRUE;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION ct_checkAssociationOfRatingAttributeWithAsset2() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    IF NOT ct_checkAssociationOfRatingAttributeWithAsset(NEW.asset, NEW.attribute) THEN
+        RAISE EXCEPTION 'The asset can''t be associated with the rating attribute ';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+DROP TRIGGER IF EXISTS trg_ct_checkAssociationOfRatingAttributeWithAsset ON ratings;
+CREATE TRIGGER trg_ct_checkAssociationOfRatingAttributeWithAsset BEFORE INSERT ON ratings
+FOR EACH ROW EXECUTE PROCEDURE ct_checkAssociationOfRatingAttributeWithAsset2();
+
 CREATE OR REPLACE FUNCTION ct_sumForAssetRatings() RETURNS TRIGGER AS $$
 DECLARE
     assetId INT;
@@ -74,6 +104,8 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
+
+select asset from assettags at inner join tags t on (t.id = at.tag) inner join ratingattributes ra on (ra.assettype = t.id) where at.asset = 2 and ra.id = 0;
 
 DROP TRIGGER IF EXISTS trg_ct_checkTagForRating ON ratings;
 CREATE TRIGGER trg_ct_sumForAssetRatings AFTER INSERT OR DELETE ON ratings
