@@ -25,12 +25,19 @@ namespace Gutenberg
 namespace Reader
 {
 
-void ignoreBlock(QXmlStreamReader &xml)
+struct ReaderState
 {
-    while (!xml.atEnd()) {
-        switch (xml.readNext()) {
+    QFile file;
+    QXmlStreamReader xml;
+    Ebook book;
+};
+
+void ignoreBlock(ReaderState &state)
+{
+    while (!state.xml.atEnd()) {
+        switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement:
-                ignoreBlock(xml);
+                ignoreBlock(state);
                 break;
 
             case QXmlStreamReader::EndElement:
@@ -43,7 +50,7 @@ void ignoreBlock(QXmlStreamReader &xml)
     }
 }
 
-void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
+void parseSubject(ReaderState &state)
 {
     QStringList subjects;
     bool lcc = false;
@@ -53,22 +60,22 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     static const QString resTag(QLatin1String("rdf:resource"));
     static const QString descriptionTag(QLatin1String("Description"));
     static const QString subjectTag(QLatin1String("subject"));
-    while (!xml.atEnd()) {
-        QXmlStreamReader::TokenType token = xml.readNext();
-        const QStringRef elem = xml.name();
+    while (!state.xml.atEnd()) {
+        QXmlStreamReader::TokenType token = state.xml.readNext();
+        const QStringRef elem = state.xml.name();
         //qDebug() << "subject block..." << elem;
 
         switch (token) {
             case QXmlStreamReader::StartElement:
                 if (valueTag == elem) {
-                    xml.readNext();
-                    subjects << xml.text().toString();
-                    xml.readNext();
+                    state.xml.readNext();
+                    subjects << state.xml.text().toString();
+                    state.xml.readNext();
                 } else if (memberTag == elem) {
-                    lcc = xml.attributes().value(resTag).endsWith("LCC");
-                    xml.readNext();
+                    lcc = state.xml.attributes().value(resTag).endsWith("LCC");
+                    state.xml.readNext();
                 } else if (descriptionTag != elem) {
-                    ignoreBlock(xml);
+                    ignoreBlock(state);
                 }
                 break;
 
@@ -76,9 +83,9 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
                 if (subjectTag == elem) {
                     if (!subjects.isEmpty()) {
                         if (lcc) {
-                            book.setCategories(subjects);
+                            state.book.setCategories(subjects);
                         } else {
-                            book.setSubjects(subjects);
+                            state.book.setSubjects(subjects);
                         }
                         //qDebug() << "subject found:" << lcc << subjects;
                     }
@@ -94,7 +101,7 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
 }
 
 QHash<QString, Ebook::Type> ebookTypes;
-Ebook::Type parseEbookType(const QString &str)
+Ebook::Type parseEbookType(ReaderState &state)
 {
     if (ebookTypes.isEmpty()) {
         ebookTypes.insert(QString(), Ebook::Type_Book);
@@ -107,16 +114,16 @@ Ebook::Type parseEbookType(const QString &str)
         ebookTypes.insert(QString::fromLatin1("Dataset"), Ebook::Type_Data);
     }
 
-    Ebook::Type t = ebookTypes.value(str);
+    Ebook::Type t = ebookTypes.value(state.xml.text().toString());
     if (t == Ebook::Type_Unknown) {
-        qDebug()<<"Unknown ebook type = "<<str;
+        qDebug() << "Unknown ebook type =" << state.xml.text() << "in file" << state.file.fileName();
         Q_ASSERT(!"unknown ebook type");
     }
 
     return Ebook::Type_Book;
 }
 
-void parseType(QXmlStreamReader &xml, Gutenberg::Ebook &book)
+void parseType(ReaderState &state)
 {
     QStringList subjects;
     bool lcc = false;
@@ -125,19 +132,19 @@ void parseType(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     static const QString valueTag(QLatin1String("value"));
     static const QString descriptionTag(QLatin1String("Description"));
     static const QString subjectTag(QLatin1String("subject"));
-    while (!xml.atEnd()) {
-        QXmlStreamReader::TokenType token = xml.readNext();
-        const QStringRef elem = xml.name();
+    while (!state.xml.atEnd()) {
+        QXmlStreamReader::TokenType token = state.xml.readNext();
+        const QStringRef elem = state.xml.name();
         //qDebug() << "subject block..." << elem;
 
         switch (token) {
             case QXmlStreamReader::StartElement:
                 if (valueTag == elem) {
-                    xml.readNext();
-                    book.setType(parseEbookType(xml.text().toString()));
-                    xml.readNext();
+                    state.xml.readNext();
+                    state.book.setType(parseEbookType(state));
+                    state.xml.readNext();
                 } else if (descriptionTag != elem) {
-                    ignoreBlock(xml);
+                    ignoreBlock(state);
                 }
                 break;
 
@@ -154,9 +161,9 @@ void parseType(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     }
 }
 
-void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
+void parseEbookBlock(ReaderState &state)
 {
-    QXmlStreamAttributes attrs = xml.attributes();
+    QXmlStreamAttributes attrs = state.xml.attributes();
     Q_ASSERT(attrs.hasAttribute("rdf:about"));
 
     QString id = attrs.value("rdf:about").toString();
@@ -164,7 +171,9 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     if (slash != -1) {
         id = id.right(id.count() - slash - 1);
     }
-    book.setBookId(id);
+    state.book.setBookId(id);
+
+    QStringList langs;
 
     static const QString titleTag(QLatin1String("title"));
     static const QString issuedTag(QLatin1String("issued"));
@@ -172,40 +181,47 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     static const QString coverImageTag(QLatin1String("marc901")); // don't ask
     static const QString typeTag(QLatin1String("type"));
     static const QString langTag(QLatin1String("language"));
-    while (!xml.atEnd()) {
-        switch (xml.readNext()) {
+    while (!state.xml.atEnd()) {
+        switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement: {
-                const QStringRef elem = xml.name();
+                const QStringRef elem = state.xml.name();
                 //qDebug() << "    " << elem;
                 if (titleTag == elem) {
                     //qDebug() << "found the title!";
-                    xml.readNext();
-                    book.setTitle(xml.text().toString());
-                    xml.readNext();
+                    state.xml.readNext();
+                    state.book.setTitle(state.xml.text().toString());
+                    state.xml.readNext();
                 } else if (issuedTag == elem) {
-                    xml.readNext();
-                    book.setIssued(xml.text().toString());
-                    xml.readNext();
+                    state.xml.readNext();
+                    state.book.setIssued(state.xml.text().toString());
+                    state.xml.readNext();
                 } else if (subjectTag == elem) {
-                    parseSubject(xml, book);
+                    parseSubject(state);
                 } else if (coverImageTag == elem) {
-                    xml.readNext();
-                    QString url = xml.text().toString();
+                    state.xml.readNext();
+                    QString url = state.xml.text().toString();
                     // some of the files have local(!) paths
                     url.replace("file:///public/vhost/g/gutenberg/html/",
                                 "http://www.gutenberg.org/");
-                    book.setCoverImage(xml.text().toString());
-                    xml.readNext();
+                    state.book.setCoverImage(state.xml.text().toString());
+                    state.xml.readNext();
                 } else if (typeTag == elem) {
-                    parseType(xml, book);
+                    parseType(state);
+                } else if (langTag == elem) {
+                    state.xml.readNext();
+                    langs.append(state.xml.text().toString());
+                    state.xml.readNext();
                 } else {
-                    ignoreBlock(xml);
+                    ignoreBlock(state);
                 }
                 break;
             }
 
             case QXmlStreamReader::EndElement:
-                //qDebug() << "END!" << xml.name();
+                //qDebug() << "END!" << state.xml.name();
+                if (langs.size() != 1) {
+                    qDebug() << "**************************************** langs:" << langs.size();
+                }
                 return;
                 break;
 
@@ -216,10 +232,10 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     }
 }
 
-void parseFileBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
+void parseFileBlock(ReaderState &state)
 {
     Gutenberg::File file;
-    QXmlStreamAttributes attrs = xml.attributes();
+    QXmlStreamAttributes attrs = state.xml.attributes();
     Q_ASSERT(attrs.hasAttribute("rdf:about"));
 
     file.url = (attrs.value("rdf:about").toString());
@@ -229,22 +245,22 @@ void parseFileBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     static const QString zipMimetype(QLatin1String("application/zip"));
     static const QString modifiedTag(QLatin1String("modified"));
     static const QString extentTag(QLatin1String("extent"));
-    while (!xml.atEnd()) {
-        switch (xml.readNext()) {
+    while (!state.xml.atEnd()) {
+        switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement: {
-                const QStringRef elem = xml.name();
+                const QStringRef elem = state.xml.name();
                 if (formatTag == elem) {
-                    while (!xml.atEnd())  {
-                        QXmlStreamReader::TokenType token = xml.readNext();
-                        //qDebug() << "PARSING FILE BLOCK WITH" << xml.name();
+                    while (!state.xml.atEnd())  {
+                        QXmlStreamReader::TokenType token = state.xml.readNext();
+                        //qDebug() << "PARSING FILE BLOCK WITH" << state.xml.name();
                         if (token == QXmlStreamReader::EndElement) {
-                            if (formatTag == xml.name()) {
+                            if (formatTag == state.xml.name()) {
                                 break;
                             }
                         } else if (token == QXmlStreamReader::StartElement) {
-                            if (valueTag == xml.name()) {
-                                xml.readNext();
-                                file.format = xml.text().toString();
+                            if (valueTag == state.xml.name()) {
+                                state.xml.readNext();
+                                file.format = state.xml.text().toString();
                                 if (file.format == zipMimetype) {
                                     // this is a compressed version
                                     // there will an uncompressed version, too, just stick to those
@@ -255,25 +271,25 @@ void parseFileBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
                         }
                     }
                 } else if (modifiedTag == elem) {
-                    xml.readNext();
-                    file.modified = xml.text().toString();
-                    xml.readNext();
+                    state.xml.readNext();
+                    file.modified = state.xml.text().toString();
+                    state.xml.readNext();
                     //qDebug() << "found the modification" << file.modified;
                 } else if (extentTag == elem) {
-                    xml.readNext();
-                    file.extent = xml.text().toString();
-                    xml.readNext();
+                    state.xml.readNext();
+                    file.extent = state.xml.text().toString();
+                    state.xml.readNext();
                     //qDebug() << "found the extent" << file.extent;
                 } else {
-                    ignoreBlock(xml);
+                    ignoreBlock(state);
                 }
                 break;
             }
 
             case QXmlStreamReader::EndElement:
-                //qDebug() << "ending with" << xml.name();
+                //qDebug() << "ending with" << state.xml.name();
                 if (!file.url.isEmpty()) {
-                    book.addFile(file);
+                    state.book.addFile(file);
                 }
                 return;
                 break;
@@ -290,28 +306,29 @@ Gutenberg::Ebook parseRdf(const QString &path)
     qDebug() << path;
 #endif
 
-    QFile file(path);
-
+    ReaderState state;
+    state.file.setFileName(path);
     Gutenberg::Ebook book;
-    if (file.open(QIODevice::ReadOnly)) {
-        QXmlStreamReader xml(&file);
+
+    if (state.file.open(QIODevice::ReadOnly)) {
+        state.xml.setDevice(&state.file);
         static const QString ebookTag(QLatin1String("ebook"));
         static const QString fileTag(QLatin1String("file"));
         static const QString openingTag(QLatin1String("RDF"));
-        while (!xml.atEnd()) {
-            switch (xml.readNext()) {
+        while (!state.xml.atEnd()) {
+            switch (state.xml.readNext()) {
                 case QXmlStreamReader::StartElement: {
-                    const QStringRef elem = xml.name();
+                    const QStringRef elem = state.xml.name();
                     //qDebug() << "starting element:" << elem;
                     if (ebookTag == elem) {
                         //qDebug() << "EBOOK BLOCK";
-                        parseEbookBlock(xml, book);
+                        parseEbookBlock(state);
                     } else if (fileTag == elem) {
                         //qDebug() << "FILE BLOCK!";
-                        parseFileBlock(xml, book);
+                        parseFileBlock(state);
                     } else if (openingTag != elem) {
                         //qDebug() << "ignoring" << elem;
-                        ignoreBlock(xml);
+                        ignoreBlock(state);
                     }
                 }
                     break;
@@ -321,7 +338,7 @@ Gutenberg::Ebook parseRdf(const QString &path)
         }
     }
 
-    return book;
+    return state.book;
 }
 
 } //namespace Reader

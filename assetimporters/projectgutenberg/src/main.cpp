@@ -24,7 +24,7 @@
 
 QStringList paths;
 
-#define TESTING 1
+//#define TESTING 1
 
 void descend(const QString &path)
 {
