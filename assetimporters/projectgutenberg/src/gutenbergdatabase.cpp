@@ -1,3 +1,20 @@
+/*
+    Copyright 2012-2013 Coherent Theory LLC
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of
+    the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+*/
+
 #include "gutenbergdatabase.h"
 
 #include "lcc.h"
@@ -37,7 +54,6 @@ GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
       m_authorTagId(0),
       m_categoryTagId(0),
       m_licenseId(0),
-      m_contributorTagId(0),
       m_mimetypeTagId(0)
 {
 }
@@ -70,7 +86,6 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
     m_mimetypeTagId = mimetypeTagId();
     m_partnerId = partnerId();
 
-    m_contributorTagId = contributorTagId();
     writeInit(clearOldData);
 }
 
@@ -113,12 +128,16 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
 
 void GutenbergDatabase::writeCategoryTags(const Catalog &catalog)
 {
-    const QHash<LCC::Category, QString> map = LCC::categoryMap();
-    QHash<LCC::Category, QString>::const_iterator itr;
-    for (itr = map.constBegin(); itr != map.constEnd(); ++itr) {
-        int category = categoryId(itr.value());
-        Q_ASSERT(category);
-        m_categoryTagIds[itr.value()] = category;
+    foreach (const QString &category, catalog.topLevelCategories()) {
+        const int id = categoryId(category);
+        Q_ASSERT(id);
+        m_categoryTagIds[category] = id;
+    }
+
+    foreach (const QString &category, catalog.subCategories()) {
+        const int id = categoryId(category);
+        Q_ASSERT(id);
+        m_subCategoryTagIds[category] = id;
     }
 }
 
@@ -133,12 +152,10 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
         qWarning()<<"Couldn't initiate transaction!";
     }
 
-    QHash<QString, Ebook> books = catalog.ebooks();
-    QHash<QString, Ebook>::const_iterator itr;
     int numSkipped = 0;
     int numBooksWritten = 0;
     // report progress every 5%
-    const int reportIncrement = books.count() / 20.;
+    const int reportIncrement = catalog.m_ebooks.count() / 20.;
     int lastReport = 0;
 
     QSqlQuery registerJobQuery;
@@ -155,9 +172,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
                   "(:name, :license, :partner, :version, :path, :file, :externid, :image, :size) "
                   "returning id;");
 
-    for (itr = books.constBegin(); itr != books.constEnd(); ++itr) {
-        const Ebook &book = *itr;
-
+    foreach (const Ebook &book, catalog.m_ebooks) {
         if (bookAssetQuery(book)) {
             // already in the database
             ++numSkipped;
@@ -175,7 +190,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
         int booksProcessed = numBooksWritten + numSkipped;
         if (booksProcessed - lastReport > reportIncrement) {
             double written = booksProcessed;
-            int percent = (written/books.count()) * 100;
+            int percent = (written/catalog.m_ebooks.count()) * 100;
             qDebug() << "Written "<< percent << "%...";
             lastReport = booksProcessed;
         }
@@ -201,6 +216,8 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 {
     const int booksChannel = writeChannel(QLatin1String("Books"), QLatin1String("Books"), "default/book.png");
 
+    /*
+FIXME:
     const QHash<LCC::Category, QString> map = LCC::categoryMap();
     QHash<LCC::Category, QString>::const_iterator itr;
     for (itr = map.constBegin(); itr != map.constEnd(); ++itr) {
@@ -214,6 +231,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         m_channelIds[itr.value()] = channel;
     }
     writeBookChannelTags();
+    */
 }
 
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
@@ -241,9 +259,8 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 {
     Gutenberg::File epubFile = book.epubFile();
     QFileInfo fi(epubFile.url.path());
-    Gutenberg::File coverFile = book.coverImage();
 
-    QString cover = QFileInfo(coverFile.url.path()).fileName();
+    QString cover = QFileInfo(book.coverImage()).fileName();
     if (cover.isEmpty()) {
         cover = QLatin1String("default/book.png");
     }
@@ -256,18 +273,10 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 
 void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
 {
-    QStringList authors = book.creators();
+    const QStringList authors = book.authors();
     foreach (QString author, authors) {
         int authorId = this->authorId(author);
         writeAssetTags(assetId, authorId);
-    }
-
-    QStringList contributors = book.contributors();
-    foreach (QString contributor, contributors) {
-
-        int contributorId = this->contributorId(contributor);
-
-        writeAssetTags(assetId, contributorId);
     }
 
     //qDebug()<<"Book = "<< book.title();
@@ -390,10 +399,5 @@ int GutenbergDatabase::categoryId(const QString &name)
         catId = categoryCreate(name);
     }
     return catId;
-}
-
-int GutenbergDatabase::contributorId(const QString &contributor)
-{
-    return tagId(m_contributorTagId, contributor, &m_contributorIds);
 }
 

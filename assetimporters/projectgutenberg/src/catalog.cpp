@@ -104,8 +104,8 @@ void Catalog::compile(const QString &imageCachePath)
     m_languages = languages.values();
     m_formats = formats.values();
     m_lccs = topLccs.values();
+    m_subLccs = subLccs.values();
     m_authors = authors.values();
-    m_sublccs = subLccs.values();
     dumpDebugInfo();
 }
 
