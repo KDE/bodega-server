@@ -47,9 +47,16 @@ FOR EACH ROW EXECUTE PROCEDURE ct_checkTagForRating();
 
 CREATE OR REPLACE FUNCTION ct_sumForAssetRatings() RETURNS TRIGGER AS $$
 DECLARE
+    assetId INT;
 BEGIN
-    DELETE FROM assetRatingAverages WHERE asset = NEW.asset;
-    INSERT INTO assetRatingAverages (asset, attribute, rating) SELECT asset, attribute, round(avg(rating), 1) from ratings WHERE asset = NEW.asset GROUP BY asset, attribute;
+    IF TG_OP = 'DELETE' THEN
+        assetId := OLD.asset;
+    ELSE
+        assetId:= NEW.asset;
+    END IF;
+
+    DELETE FROM assetRatingAverages WHERE asset = assetId;
+    INSERT INTO assetRatingAverages (asset, attribute, rating) SELECT asset, attribute, round(avg(rating), 1) from ratings WHERE asset = assetId GROUP BY asset, attribute;
 
     RETURN NEW;
 END;

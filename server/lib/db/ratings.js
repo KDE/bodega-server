@@ -22,7 +22,7 @@ module.exports.listAttributes = function(db, req, res) {
     /*jshint multistr:true */
     var queryString =
     'SELECT name, lowdesc, highdesc, assettype FROM ratingattributes ra \
-    LEFT JOIN assettags at ON (ra.assettype = at.tag);';
+    LEFT JOIN assettags at ON (ra.assettype = at.tag) WHERE at.asset = $1;';
 
     var assetId = req.params.assetId;
 
@@ -33,17 +33,13 @@ module.exports.listAttributes = function(db, req, res) {
     }
 
     db.query(
-        queryString, [assetId, pageSize + 1, offset],
+        queryString, [assetId],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
             }
 
-            if (result.rows.length > pageSize) {
-                json.hasMoreRatingAttributes = true;
-                result.rows.pop();
-            }
             var ok = result.rows.length > 0 ? true : false;
             var json = utils.standardJson(req, ok);
 
@@ -168,7 +164,7 @@ module.exports.removeAsset = function(db, req, res) {
     var userId = req.session.user.id;
     var assetId = utils.parseNumber(req.params.assetId);
 
-    if (assetId > 0) {
+    if (assetId < 0) {
         errors.report('MissingParameters', req, res);
         return;
     }

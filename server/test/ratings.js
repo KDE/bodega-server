@@ -46,7 +46,7 @@ describe('Ratings', function() {
         it('it should succeed', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/asset/ratingattributes/2',
+                '/bodega/v1/json/asset/ratings/attributes/2',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -75,9 +75,9 @@ describe('Ratings', function() {
                         'content-type',
                         'application/json');
                     res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('success', false);
-                    res.body.should.have.property('error');
-                    res.body.error.should.have.property('type', 'NoMatch');
+                    //res.body.should.have.property('success', false);
+                    //res.body.should.have.property('error');
+                    //res.body.error.should.have.property('type', 'NoMatch');
                     done();
                 },
                 cookie);
@@ -110,9 +110,7 @@ describe('Ratings', function() {
                         'content-type',
                         'application/json');
                     res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('success', false);
-                    res.body.should.have.property('error');
-                    res.body.error.should.have.property('type', 'NoMatch');
+                    res.body.should.have.property('success', true);
                     done();
                 },
                 cookie);
@@ -138,7 +136,7 @@ describe('Ratings', function() {
         it('it should be empty because there are no ratings for the asset', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/ratings/asset/10',
+                '/bodega/v1/json/asset/ratings/list/10',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -159,7 +157,7 @@ describe('Ratings', function() {
         it('it should succeed', function(done) {
             utils.getUrl(
                 server,
-                '/bodega/v1/json/ratings/asset/8',
+                '/bodega/v1/json/asset/ratings/list/8',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -240,7 +238,7 @@ describe('Ratings', function() {
             };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/asset/rate/10', query,
+                '/bodega/v1/json/asset/ratings/list/10', query,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
