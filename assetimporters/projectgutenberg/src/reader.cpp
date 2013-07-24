@@ -228,6 +228,7 @@ void parseEbookBlock(ReaderState &state)
     static const QString descriptionTag(QLatin1String("description"));
     static const QString alternativeTag(QLatin1String("alternative"));
     static const QString tocTag(QLatin1String("tableOfContents"));
+    static const QString rightsTag(QLatin1String("rights"));
     while (!state.xml.atEnd()) {
         switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement: {
@@ -269,6 +270,15 @@ void parseEbookBlock(ReaderState &state)
                     QString toc = state.xml.text().toString();
                     toc.replace(" -- ", "\n");
                     state.book.setTableOfContents(toc);
+                    state.xml.readNext();
+                } else if (rightsTag == elem) {
+                    state.xml.readNext();
+                    // hackish, but this is the only string that appears in the entire catalog
+                    // so it is safe to do this .. for now! *dum* *dum* *DUUUM*!
+                    static const QString crText(QLatin1String("Copyrighted. Read the copyright notice inside this book for details."));
+                    state.book.setRights(state.xml.text().compare(crText) == 0 ?
+                                             Ebook::Rights_Copyrighted :
+                                             Ebook::Rights_Gutenberg);
                     state.xml.readNext();
                 } else {
                     ignoreBlock(state);
@@ -362,15 +372,16 @@ Gutenberg::Ebook parseRdf(const QString &path)
     qDebug() << path;
 #endif
 
+    static const QString ebookTag(QLatin1String("ebook"));
+    static const QString fileTag(QLatin1String("file"));
+    static const QString openingTag(QLatin1String("RDF"));
+
     ReaderState state;
     state.file.setFileName(path);
     Gutenberg::Ebook book;
 
     if (state.file.open(QIODevice::ReadOnly)) {
         state.xml.setDevice(&state.file);
-        static const QString ebookTag(QLatin1String("ebook"));
-        static const QString fileTag(QLatin1String("file"));
-        static const QString openingTag(QLatin1String("RDF"));
         while (!state.xml.atEnd()) {
             switch (state.xml.readNext()) {
                 case QXmlStreamReader::StartElement: {
