@@ -207,7 +207,8 @@ void parseLangauges(ReaderState &state)
     }
 }
 
-void parseEbookBlock(ReaderState &state)
+// returns the list of creator references
+QStringList parseEbookBlock(ReaderState &state)
 {
     QXmlStreamAttributes attrs = state.xml.attributes();
     Q_ASSERT(attrs.hasAttribute("rdf:about"));
@@ -219,6 +220,8 @@ void parseEbookBlock(ReaderState &state)
     }
     state.book.setBookId(id);
 
+    QStringList creatorRefs;
+
     static const QString titleTag(QLatin1String("title"));
     static const QString issuedTag(QLatin1String("issued"));
     static const QString subjectTag(QLatin1String("subject"));
@@ -229,6 +232,7 @@ void parseEbookBlock(ReaderState &state)
     static const QString alternativeTag(QLatin1String("alternative"));
     static const QString tocTag(QLatin1String("tableOfContents"));
     static const QString rightsTag(QLatin1String("rights"));
+    static const QString creatorTag(QLatin1String("creator"));
     while (!state.xml.atEnd()) {
         switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement: {
@@ -280,6 +284,9 @@ void parseEbookBlock(ReaderState &state)
                                              Ebook::Rights_Copyrighted :
                                              Ebook::Rights_Gutenberg);
                     state.xml.readNext();
+                } else if (creatorTag == elem) {
+                    creatorRefs << state.xml.attributes().value("rdf:resource").toString();
+                    state.xml.readNext();
                 } else {
                     ignoreBlock(state);
                 }
@@ -288,7 +295,8 @@ void parseEbookBlock(ReaderState &state)
 
             case QXmlStreamReader::EndElement:
                 //qDebug() << "END!" << state.xml.name();
-                return;
+                //qDebug() << creatorRefs;
+                return creatorRefs;
                 break;
 
 
@@ -296,6 +304,8 @@ void parseEbookBlock(ReaderState &state)
                 break;
         }
     }
+
+    return creatorRefs;
 }
 
 void parseFileBlock(ReaderState &state)
@@ -375,10 +385,14 @@ Gutenberg::Ebook parseRdf(const QString &path)
     static const QString ebookTag(QLatin1String("ebook"));
     static const QString fileTag(QLatin1String("file"));
     static const QString openingTag(QLatin1String("RDF"));
+    static const QString agentTag(QLatin1String("agent"));
+    static const QString nameTag(QLatin1String("name"));
 
     ReaderState state;
     state.file.setFileName(path);
     Gutenberg::Ebook book;
+    QStringList creatorRefs;
+    QHash<QString, QString> agents;
 
     if (state.file.open(QIODevice::ReadOnly)) {
         state.xml.setDevice(&state.file);
@@ -389,10 +403,31 @@ Gutenberg::Ebook parseRdf(const QString &path)
                     //qDebug() << "starting element:" << elem;
                     if (ebookTag == elem) {
                         //qDebug() << "EBOOK BLOCK";
-                        parseEbookBlock(state);
+                        creatorRefs = parseEbookBlock(state);
                     } else if (fileTag == elem) {
                         //qDebug() << "FILE BLOCK!";
                         parseFileBlock(state);
+                    } else if (agentTag == elem) {
+                        const QString ref = state.xml.attributes().value("rdf:about").toString();
+                        QString name;
+                        while (!state.xml.atEnd()) {
+                            QXmlStreamReader::TokenType token = state.xml.readNext();
+                            if (token == QXmlStreamReader::StartElement) {
+                                if (nameTag == state.xml.name()) {
+                                    state.xml.readNext();
+                                    name = state.xml.text().toString();
+                                    state.xml.readNext();
+                                } else {
+                                    ignoreBlock(state);
+                                }
+                            } else if (token == QXmlStreamReader::EndElement) {
+                                break;
+                            }
+
+                            if (!name.isEmpty()) {
+                                agents.insert(ref, name);
+                            }
+                        }
                     } else if (openingTag != elem) {
                         //qDebug() << "ignoring" << elem;
                         ignoreBlock(state);
@@ -404,6 +439,15 @@ Gutenberg::Ebook parseRdf(const QString &path)
             }
         }
     }
+
+    QStringList authors;
+    foreach (const QString &ref, creatorRefs) {
+        if (agents.contains(ref)) {
+            authors << agents[ref];
+        }
+    }
+    state.book.setAuthors(authors);
+    qDebug() << "authors:" << state.book.authors() << authors;
 
     return state.book;
 }

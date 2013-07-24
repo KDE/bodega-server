@@ -60,6 +60,16 @@ void Ebook::setLanguages(const QStringList &lang)
     m_languages = lang;
 }
 
+QStringList Ebook::authors() const
+{
+    return m_authors;
+}
+
+void Ebook::setAuthors(const QStringList &authors)
+{
+    m_authors = authors;
+}
+
 QString Ebook::issued() const
 {
     return m_issued;

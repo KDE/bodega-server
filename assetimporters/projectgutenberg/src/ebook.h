@@ -70,6 +70,9 @@ public:
     QString bookId() const;
     void setBookId(const QString &bookId);
 
+    QStringList authors() const;
+    void setAuthors(const QStringList &authors);
+
     QString title() const;
     void setTitle(const QString &title);
 
@@ -120,6 +123,7 @@ private:
     Ebook::Rights m_rights;
     Ebook::Type m_type;
     QStringList m_alternativeNames;
+    QStringList m_authors;
     QString m_toc;
 
     QStringList m_lcsh;
