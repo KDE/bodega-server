@@ -161,6 +161,52 @@ void parseType(ReaderState &state)
     }
 }
 
+void parseLangauges(ReaderState &state)
+{
+    QStringList langs;
+    bool hasBag = false;
+
+    static const QString langTag(QLatin1String("language"));
+    static const QString bagTag(QLatin1String("Bag"));
+    static const QString itemTag(QLatin1String("li"));
+    while (!state.xml.atEnd()) {
+        QXmlStreamReader::TokenType token = state.xml.readNext();
+        const QStringRef elem = state.xml.name();
+        //qDebug() << "subject block..." << elem;
+
+        switch (token) {
+            case QXmlStreamReader::StartElement:
+                if (bagTag == elem) {
+                    hasBag = true;
+                } else if (itemTag == elem) {
+                    state.xml.readNext();
+                    langs << state.xml.text().toString();
+                    state.xml.readNext();
+                } else {
+                    ignoreBlock(state);
+                }
+                break;
+
+            case QXmlStreamReader::Characters:
+                if (!hasBag) {
+                    langs << state.xml.text().toString();
+                }
+                break;
+
+            case QXmlStreamReader::EndElement:
+                if (langTag == elem) {
+                    state.book.setLanguages(langs);
+                    return;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+    }
+}
+
 void parseEbookBlock(ReaderState &state)
 {
     QXmlStreamAttributes attrs = state.xml.attributes();
@@ -180,6 +226,7 @@ void parseEbookBlock(ReaderState &state)
     static const QString typeTag(QLatin1String("type"));
     static const QString langTag(QLatin1String("language"));
     static const QString descriptionTag(QLatin1String("description"));
+    static const QString alternativeTag(QLatin1String("alternative"));
     while (!state.xml.atEnd()) {
         switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement: {
@@ -207,12 +254,14 @@ void parseEbookBlock(ReaderState &state)
                 } else if (typeTag == elem) {
                     parseType(state);
                 } else if (langTag == elem) {
-                    state.xml.readNext();
-                    state.book.setLanguage(state.xml.text().toString());
-                    state.xml.readNext();
+                    parseLangauges(state);
                 } else if (descriptionTag == elem) {
                     state.xml.readNext();
                     state.book.setDescription(state.xml.text().toString());
+                    state.xml.readNext();
+                } else if (alternativeTag == elem) {
+                    state.xml.readNext();
+                    state.book.addAlternativeName(state.xml.text().toString());
                     state.xml.readNext();
                 } else {
                     ignoreBlock(state);

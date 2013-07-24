@@ -52,7 +52,7 @@ void descend(const QString &path)
 void addEbook(const Gutenberg::Ebook &book)
 {
     if (book.title().isEmpty()) {
-        //qDebug() << "ha!, no title!";
+        qDebug() << "no title on book" << book.bookId();
         return;
     }
 
@@ -74,8 +74,11 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
     descend(argv[1]);
     qDebug() << "we have" << paths.size() << "files to process now";
+    paths <<
+        "/home/aseigo/kdesrc/extragear/network/bodega-server/assetimporters/projectgutenberg/rdf/cache/epub/10040/pg10040.rdf";
     QList<Gutenberg::Ebook> files;
 
+    foreach (const QString &path, paths) { qDebug() << path; }
 #if 0
     foreach (const QString &path, paths) { files << Gutenberg::Reader::parseRdf(path); }
     qDebug() << "we have" << files.size() << "books to process now";
