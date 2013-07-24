@@ -17,6 +17,7 @@
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
+var async = require('async');
 
 module.exports.listAttributes = function(db, req, res) {
     /*jshint multistr:true */
@@ -59,13 +60,13 @@ module.exports.asset = function(db, req, res) {
     var offset = parseInt(req.query.offset, 10) || 0;
     var assetId = req.params.assetId;
 
-    var json = utils.standardJson(req);
-
     if (!assetId) {
         //Id of the collection is missing.
         errors.report('MissingParameters', req, res);
         return;
     }
+
+    var json = utils.standardJson(req);
 
     json.hasMoreRatings = false;
     json.ratings = [];
@@ -118,6 +119,11 @@ module.exports.addAsset = function(db, req, res) {
     /*jshint multistr:true */
     var assetInsertQuery =
         'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);';
+    var ratingsDeleteQuery = 'DELETE FROM ratings WHERE asset = $1 AND person $2 AND attribute $3';
+
+    // we don't have to check if the tag has assetType as tagtype, trg_ct_checkTagForRating
+    // does the job for as.
+    var checkAttributeQuery = 'SELECT ct_checkAssociationOfRatingAttributeWithAsset($1, $2) AS ok';
 
     var userId = req.session.user.id;
     var assetId = req.params.assetId;
@@ -131,30 +137,55 @@ module.exports.addAsset = function(db, req, res) {
     }
 
     json.ratings = [];
-    function next() {
-        var rate = ratings.shift();
 
-        if (!rate || !rate.attribute || !rate.rating) {
-            res.json(json);
-            return;
-        }
-
-        rate.attribute = utils.parseNumber(rate.attribute);
+    for (var i in ratings) {
+        var rate = ratings[i];
         rate.rating = utils.parseNumber(rate.rating);
+        rate.attribute= utils.parseNumber(rate.attribute);
 
-        db.query(
-            assetInsertQuery, [assetId, rate.attribute, req.session.user.id, rate.rating],
+        db.query (
+            checkAttributeQuery, [assetId, rate.attribute],
             function(err, result) {
                 if (err) {
-                    errors.report('Database', req, res, err);
+                    errors.report('Database', req, res);
                     return;
                 }
 
-                json.ratings.push(rate);
-                next();
+                if (json.ratings.indexOf(rate) === -1 && result.rows[0].ok) {
+                    json.ratings.push(rate);
+                }
         });
     }
-    next();
+
+    var queue = async.queue(function(rating, cb) {
+        db.query(
+            ratingsDeleteQuery, [assetId, userId, rating.attribute],
+            function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    cb();
+                    return;
+                }
+
+
+            db.query(
+                assetInsertQuery, [assetId, rating.attribute, userId, rating.rating],
+                function(err, result) {
+                    if (err) {
+                        errors.report('Database', req, res, err);
+                        cb();
+                        return;
+                    }
+                    cb();
+            });
+        });
+    });
+
+    queue.drain = function() {
+        res.json(json);
+    }
+
+    queue.push(json.ratings);
 };
 
 module.exports.removeAsset = function(db, req, res) {
