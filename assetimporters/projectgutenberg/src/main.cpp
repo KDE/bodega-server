@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     QList<Gutenberg::Ebook> files;
 
 #if 0
-    foreach (const QString &path, paths) { files << Reader::parseRdf(path); }
+    foreach (const QString &path, paths) { files << Gutenberg::Reader::parseRdf(path); }
     qDebug() << "we have" << files.size() << "books to process now";
     foreach (const Gutenberg::Ebook &book, files) { addEbook(book); }
 #else
@@ -85,6 +85,7 @@ int main(int argc, char **argv)
     qDebug() << "we have" << files.size() << "books to process now";
     QtConcurrent::blockingMap(files, addEbook);
 #endif
+
     exit(1);
     //Gutenberg::Catalog catalog = Gutenberg::Parser::parse(QString::fromLatin1(argv[1]));
     //catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
