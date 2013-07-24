@@ -30,11 +30,6 @@ QString Ebook::bookId() const
     return m_id;
 }
 
-QString Ebook::publisher() const
-{
-    return m_publisher;
-}
-
 QString Ebook::title() const
 {
     return m_title;
@@ -49,12 +44,6 @@ void Ebook::setBookId(const QString &bookId)
 {
     Q_ASSERT(m_id.isEmpty());
     m_id = bookId;
-}
-
-void Gutenberg::Ebook::setPublisher(const QString &publisher)
-{
-    Q_ASSERT(m_publisher.isEmpty());
-    m_publisher = publisher;
 }
 
 void Ebook::setTitle(const QString &title)

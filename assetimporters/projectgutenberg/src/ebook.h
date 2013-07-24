@@ -70,9 +70,6 @@ public:
     QString bookId() const;
     void setBookId(const QString &bookId);
 
-    QString publisher() const;
-    void setPublisher(const QString &publisher);
-
     QString title() const;
     void setTitle(const QString &title);
 
@@ -114,7 +111,6 @@ public:
 
 private:
     QString m_id;
-    QString m_publisher;
     QString m_title;
     QStringList m_languages;
     QString m_issued;
