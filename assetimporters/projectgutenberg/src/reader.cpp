@@ -48,11 +48,11 @@ void parseSubject(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     QStringList subjects;
     bool lcc = false;
 
-    const QString valueTag(QLatin1String("value"));
-    const QString memberTag(QLatin1String("memberOf"));
-    const QString resTag(QLatin1String("rdf:resource"));
-    const QString descriptionTag(QLatin1String("Description"));
-    const QString subjectTag(QLatin1String("subject"));
+    static const QString valueTag(QLatin1String("value"));
+    static const QString memberTag(QLatin1String("memberOf"));
+    static const QString resTag(QLatin1String("rdf:resource"));
+    static const QString descriptionTag(QLatin1String("Description"));
+    static const QString subjectTag(QLatin1String("subject"));
     while (!xml.atEnd()) {
         QXmlStreamReader::TokenType token = xml.readNext();
         const QStringRef elem = xml.name();
@@ -121,10 +121,10 @@ void parseType(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     QStringList subjects;
     bool lcc = false;
 
-    const QString typeTag(QLatin1String("type"));
-    const QString valueTag(QLatin1String("value"));
-    const QString descriptionTag(QLatin1String("Description"));
-    const QString subjectTag(QLatin1String("subject"));
+    static const QString typeTag(QLatin1String("type"));
+    static const QString valueTag(QLatin1String("value"));
+    static const QString descriptionTag(QLatin1String("Description"));
+    static const QString subjectTag(QLatin1String("subject"));
     while (!xml.atEnd()) {
         QXmlStreamReader::TokenType token = xml.readNext();
         const QStringRef elem = xml.name();
@@ -166,28 +166,29 @@ void parseEbookBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
     }
     book.setBookId(id);
 
-    const QString title(QLatin1String("title"));
-    const QString issued(QLatin1String("issued"));
-    const QString subject(QLatin1String("subject"));
-    const QString coverImage(QLatin1String("marc901")); // don't ask
-    const QString typeTag(QLatin1String("type"));
+    static const QString titleTag(QLatin1String("title"));
+    static const QString issuedTag(QLatin1String("issued"));
+    static const QString subjectTag(QLatin1String("subject"));
+    static const QString coverImageTag(QLatin1String("marc901")); // don't ask
+    static const QString typeTag(QLatin1String("type"));
+    static const QString langTag(QLatin1String("language"));
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
                 const QStringRef elem = xml.name();
                 //qDebug() << "    " << elem;
-                if (title == elem) {
+                if (titleTag == elem) {
                     //qDebug() << "found the title!";
                     xml.readNext();
                     book.setTitle(xml.text().toString());
                     xml.readNext();
-                } else if (issued == elem) {
+                } else if (issuedTag == elem) {
                     xml.readNext();
                     book.setIssued(xml.text().toString());
                     xml.readNext();
-                } else if (subject == elem) {
+                } else if (subjectTag == elem) {
                     parseSubject(xml, book);
-                } else if (coverImage == elem) {
+                } else if (coverImageTag == elem) {
                     xml.readNext();
                     QString url = xml.text().toString();
                     // some of the files have local(!) paths
@@ -223,11 +224,11 @@ void parseFileBlock(QXmlStreamReader &xml, Gutenberg::Ebook &book)
 
     file.url = (attrs.value("rdf:about").toString());
 
-    const QString formatTag(QLatin1String("format"));
-    const QString valueTag(QLatin1String("value"));
-    const QString zipMimetype(QLatin1String("application/zip"));
-    const QString modifiedTag(QLatin1String("modified"));
-    const QString extentTag(QLatin1String("extent"));
+    static const QString formatTag(QLatin1String("format"));
+    static const QString valueTag(QLatin1String("value"));
+    static const QString zipMimetype(QLatin1String("application/zip"));
+    static const QString modifiedTag(QLatin1String("modified"));
+    static const QString extentTag(QLatin1String("extent"));
     while (!xml.atEnd()) {
         switch (xml.readNext()) {
             case QXmlStreamReader::StartElement: {
@@ -294,9 +295,9 @@ Gutenberg::Ebook parseRdf(const QString &path)
     Gutenberg::Ebook book;
     if (file.open(QIODevice::ReadOnly)) {
         QXmlStreamReader xml(&file);
-        const QString ebookTag(QLatin1String("ebook"));
-        const QString fileTag(QLatin1String("file"));
-        const QString openingTag(QLatin1String("RDF"));
+        static const QString ebookTag(QLatin1String("ebook"));
+        static const QString fileTag(QLatin1String("file"));
+        static const QString openingTag(QLatin1String("RDF"));
         while (!xml.atEnd()) {
             switch (xml.readNext()) {
                 case QXmlStreamReader::StartElement: {
