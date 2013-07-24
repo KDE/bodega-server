@@ -48,7 +48,10 @@ void Ebook::setBookId(const QString &bookId)
 
 void Ebook::setTitle(const QString &title)
 {
+    static const QRegExp newlines("[\n\r]+");
+
     m_title = title;
+    m_title = m_title.replace(newlines, ": ").simplified();
 }
 
 void Ebook::setLanguage(const QString &lang)
@@ -243,7 +246,8 @@ QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
 {
     s.nospace() << "Ebook(id=" << book.bookId() << ", "
                 << "type = " << book.type() << ", "
-                << "title = " << book.title() << ", issued: " << book.issued() << ")\n";
+                << ", issued: " << book.issued() << ")\n"
+                << "\ttitle = " << QString(book.title()) << '\n';
     s << "\tEPub " << book.epubFile().url << "\n";
 
     if (!book.description().isEmpty()) {
