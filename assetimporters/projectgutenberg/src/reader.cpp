@@ -227,6 +227,7 @@ void parseEbookBlock(ReaderState &state)
     static const QString langTag(QLatin1String("language"));
     static const QString descriptionTag(QLatin1String("description"));
     static const QString alternativeTag(QLatin1String("alternative"));
+    static const QString tocTag(QLatin1String("tableOfContents"));
     while (!state.xml.atEnd()) {
         switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement: {
@@ -262,6 +263,12 @@ void parseEbookBlock(ReaderState &state)
                 } else if (alternativeTag == elem) {
                     state.xml.readNext();
                     state.book.addAlternativeName(state.xml.text().toString());
+                    state.xml.readNext();
+                } else if (tocTag == elem) {
+                    state.xml.readNext();
+                    QString toc = state.xml.text().toString();
+                    toc.replace(" -- ", "\n");
+                    state.book.setTableOfContents(toc);
                     state.xml.readNext();
                 } else {
                     ignoreBlock(state);

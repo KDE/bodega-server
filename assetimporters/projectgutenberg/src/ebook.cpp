@@ -249,6 +249,7 @@ QString Ebook::typeString() const
 
 QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
 {
+    s.nospace() << "---------------------------------------------------------\n";
     s.nospace() << "Ebook(id=" << book.bookId() << ", "
                 << "type = " << book.type() << ", "
                 << ", issued: " << book.issued() << ")\n"
@@ -281,5 +282,10 @@ QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
     }
 
     s.nospace() << "\tLCCH" << book.lcc().subjects() << '\n';
+    if (!book.tableOfContents().isEmpty()) {
+        s.nospace() << "\n\tTable of contents:" << "\n\t\t" << book.tableOfContents().replace('\n', "\n\t\t");
+    }
+
+    s.nospace() << "\n---------------------------------------------------------\n";
     return s;
 }
