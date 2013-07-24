@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 
 
     PackageDatabase db(argv[1], argv[2], argv[3]);
-    db.write(false);
+    db.write();
 
     return app.exec();
 }

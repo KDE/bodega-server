@@ -11,7 +11,7 @@ public:
     PackageDatabase(const QString &channelsCatalogPath,
                     const QString &packageCatalogPath,
                     const QString &packageDescPath);
-    void write(bool clearOldData);
+    void write();
 
 private:
     void writePackageChannels();

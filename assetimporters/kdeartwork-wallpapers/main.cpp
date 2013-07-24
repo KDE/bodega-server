@@ -27,6 +27,5 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    //TODO: make the write delete the data based on a command line switch
-    WallpapersDatabase::write(argv[1], false);
+    WallpapersDatabase::write(argv[1]);
 }

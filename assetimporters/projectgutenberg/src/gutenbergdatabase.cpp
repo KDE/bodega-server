@@ -51,7 +51,6 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
 GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
     : Database(contentPath, "VIVALDI-1"),
       m_partnerId(0),
-      m_authorTagId(0),
       m_categoryTagId(0),
       m_licenseId(0),
       m_mimetypeTagId(0)
@@ -62,31 +61,13 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
 {
     QSqlDatabase::database().transaction();
 
-    m_partnerId = partnerId();
-    if (m_partnerId <= 0) {
-        QSqlQuery query;
-        if (!query.exec("insert into partners (name, publisher, distributor) "
-                        "values ('Project Gutenberg', false, true);")) {
-            showError(query);
-            QSqlDatabase::database().rollback();
-            return;
-        }
-        m_partnerId = partnerId();
-    }
+    m_partnerId = partnerId("Project Gutenberg");
     //qDebug()<<"partner id = "<<m_partnerId;
 
-    m_licenseId = licenseId();
-    if (!m_licenseId) {
-        QSqlDatabase::database().rollback();
-        Q_ASSERT(!"couldn't create Project Gutenberg license id");
-        return;
-    }
-
+    m_licenseId = licenseId("Project Gutenberg License",
+                            "http://www.gutenberg.org/wiki/Gutenberg:The_Project_Gutenberg_License");
 
     m_mimetypeTagId = mimetypeTagId();
-    m_partnerId = partnerId();
-
-    writeInit(clearOldData);
 }
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
@@ -237,10 +218,8 @@ FIXME:
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
 {
     QSqlQuery query;
-    query.prepare("select id from assets where "
-                  "name=:name and externid=:externid;");
+    query.prepare("select id from assets where name = :name and externid = :externid;");
 
-    //FIXME: alternatives
     query.bindValue(":name", book.title());
     query.bindValue(":externid", book.bookId());
 
@@ -248,9 +227,11 @@ int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
         showError(query);
         return 0;
     }
+
     if (!query.first()) {
         return 0;
     }
+
     QVariant res = query.value(0);
     return res.toInt();
 }
@@ -263,12 +244,15 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
     QString cover = QFileInfo(book.coverImage()).fileName();
     if (cover.isEmpty()) {
         cover = QLatin1String("default/book.png");
+    } else {
+        cover.prepend("gutenberg/");
     }
 
-    cover.prepend("gutenberg/");
-
-    int foo = writeAsset(query, book.title(), QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), epubFile.url.toString(), fi.fileName(), book.bookId(), cover);
-    return foo;
+    //FIXME: alternatives
+    const int id = writeAsset(query, book.title(), QString(),
+                              m_licenseId, m_partnerId, QLatin1String("1.0"),
+                              epubFile.url.toString(), fi.fileName(), book.bookId(), cover);
+    return id;
 }
 
 void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
@@ -317,21 +301,6 @@ void GutenbergDatabase::writeBookChannelTags()
     }
 }
 
-int GutenbergDatabase::partnerId()
-{
-    QSqlQuery query;
-    if (!query.exec("select id from partners "
-                    "where name='Project Gutenberg';")) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
-
 int GutenbergDatabase::languageId(const QString &lang)
 {
     int id = m_languageIds.value(lang);
@@ -357,47 +326,5 @@ int GutenbergDatabase::languageId(const QString &lang)
     }
 
     return id;
-}
-
-int GutenbergDatabase::licenseId()
-{
-    QSqlQuery query;
-    if (!query.exec("select id from licenses where name = 'Project Gutenberg License';")) {
-        showError(query);
-        return 0;
-    }
-
-    if (query.first()) {
-        return query.value(0).toInt();
-    }
-
-    query.prepare("insert into licenses "
-                  "(name, text) "
-                  "values "
-                  "(:licenseName, :licenseText) returning id;");
-
-    query.bindValue(":licenseName",
-                    QObject::tr("Project Gutenberg License"));
-    query.bindValue(":licenseText",
-                    QObject::tr("http://www.gutenberg.org/wiki/Gutenberg:The_Project_Gutenberg_License"));
-
-    if (!query.exec()) {
-        showError(query);
-    }
-
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
-
-int GutenbergDatabase::categoryId(const QString &name)
-{
-    int catId = categoryQuery(name);
-    if (!catId) {
-        catId = categoryCreate(name);
-    }
-    return catId;
 }
 

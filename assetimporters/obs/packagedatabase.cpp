@@ -32,9 +32,8 @@ PackageDatabase::PackageDatabase(const QString &channelsCatalogPath,
 {
 }
 
-void PackageDatabase::write(bool clearOldData)
+void PackageDatabase::write()
 {
-    writeInit(clearOldData);
     writePackageChannels();
     writePackages();
 }
@@ -94,7 +93,9 @@ void PackageDatabase::writePackages()
         file.close();
 
         //TODO: check if the image exists
-        int assetId = writeAsset(query, package.name, package.description, licenseId(), partnerId(), package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
+        //FIXME: license and partner should BOTH be fetch from the package info!
+        int assetId = writeAsset(query, package.name, package.description, licenseId("LGPL"),
+                partnerId("KDE"), package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
         if (!assetId) {
             showError(query);
             QSqlDatabase::database().rollback();
@@ -109,7 +110,7 @@ void PackageDatabase::writePackages()
 
         foreach (const QString &channel, package.channels) {
             //FIXME: assumes the channel already exists
-            int packagesChannel = channelId(channel, QString());
+            int packagesChannel = channelId(channel);
             QSqlQuery subchannelassetQuery;
             subchannelassetQuery.prepare("insert into subchannelassets "
                             "(channel, leafchannel, asset) "

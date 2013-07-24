@@ -42,38 +42,27 @@ Database::Database(const QString &contentPath, const QString &store)
     m_db.setPassword("bodega");
     bool ok = m_db.open();
     qDebug()<<"db opened = "<<ok;
-}
 
-void Database::writeInit(bool clearOldData)
-{
-    m_partnerId = partnerId();
+    m_mimetypeTagId = tagTypeId(QLatin1String("mimetype"));
+    if (!m_mimetypeTagId) {
+        QSqlDatabase::database().rollback();
+        Q_ASSERT(!"couldn't create author tag id");
+        return;
+    }
 
-    QSqlDatabase::database().transaction();
 
-    m_authorTagId = this->authorTagId();
+    m_authorTagId = tagTypeId(QLatin1String("author"));
     if (!m_authorTagId) {
         QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
-    m_categoryTagId = this->categoryTagTypeId();
+
+    m_categoryTagId = tagTypeId(QLatin1String("category"));
     if (!m_categoryTagId) {
         QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create author tag id");
         return;
-    }
-
-    QSqlDatabase::database().commit();
-
-    if (clearOldData) {
-        qDebug() << "deleting data first ... this can take a fair while as the database triggers run";
-        QSqlQuery cleanupQuery;
-        cleanupQuery.prepare("delete from channels where partner = :partner;");
-        cleanupQuery.bindValue(":partner", m_partnerId);
-        cleanupQuery.exec();
-        cleanupQuery.prepare("delete from assets where author = :partner;");
-        cleanupQuery.bindValue(":partner", m_partnerId);
-        cleanupQuery.exec();
     }
 }
 
@@ -104,44 +93,93 @@ int Database::writeChannel(const QString &name, const QString &description, cons
     return id;
 }
 
-int Database::authorQuery(const QString &author) const
+int Database::mimetypeTagId()
 {
-    return tagQuery(m_authorTagId, author);
+    return m_mimetypeTagId;
 }
 
-int Database::partnerId()
+int Database::authorId(const QString &author) const
+{
+    return tagId(m_authorTagId, author);
+}
+
+int Database::partnerId(const QString &partner)
 {
     QSqlQuery query;
-    query.prepare("select id from partners "
-                  "where name = 'KDE'");
-    if (!query.exec() || !query.first()) {
+    query.prepare("select id from partners where name = :partner");
+    query.bindValue(":partner", partner);
+    if (!query.exec()) {
         showError(query);
+        return 0;
+    }
+
+    if (!query.first()) {
+        QSqlQuery createQuery;
+        createQuery.prepare("insert into partners (name, publisher, distributor) "
+                            "values (:partner, false, false) returning id;");
+        createQuery.bindValue(":partner", partner);
+        if (!createQuery.exec()) {
+            showError(createQuery);
+            QSqlDatabase::database().rollback();
+            return 0;
+        }
+
+        if (!createQuery.first()) {
+            QSqlDatabase::database().rollback();
+            return 0;
+        }
+
+        QVariant res = createQuery.value(0);
+        return res.toInt();
+    }
+
+    return query.value(0).toInt();
+}
+
+int Database::licenseId(const QString &license, const QString &licenseText)
+{
+    QSqlQuery query;
+    query.prepare("select id from licenses where name = :license");
+    query.bindValue(":license", license);
+
+    if (!query.exec()) {
+        showError(query);
+        return 0;
+    }
+
+    if (query.first()) {
+        return query.value(0).toInt();
+    }
+
+    query.prepare("insert into licenses "
+                  "(name, text) "
+                  "values "
+                  "(:licenseName, :licenseText) returning id;");
+
+    query.bindValue(":licenseName", license);
+    query.bindValue(":licenseText", licenseText);
+
+    if (!query.exec()) {
+        showError(query);
+        return 0;
+    }
+
+    if (!query.first()) {
         return 0;
     }
 
     return query.value(0).toInt();
 }
 
-int Database::licenseId()
+int Database::tagId(int tagTypeId, const QString &text, QHash<QString, int> *cache) const
 {
-    QSqlQuery query;
-
-    query.prepare("select id from licenses "
-                  "where name = 'LGPL'");
-    if (!query.exec() || !query.first()) {
-        showError(query);
-        return 0;
+    if (cache && cache->contains(text)) {
+        return (*cache)[text];
     }
 
-    return query.value(0).toInt();
-}
-
-int Database::tagQuery(int tagTypeId, const QString &text) const
-{
     QSqlQuery query;
-    query.prepare("select id from tags where partner=:partner "
-                  "and type=:type "
-                  " and title=:text;");
+    query.prepare("select id from tags where partner = :partner "
+                  "and type =: type and title =: text;");
 
     query.bindValue(":partner", m_partnerId);
     query.bindValue(":type", tagTypeId);
@@ -151,39 +189,84 @@ int Database::tagQuery(int tagTypeId, const QString &text) const
         showError(query);
         return 0;
     }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    return res.toInt();
-}
 
-int Database::tagTypeQuery(const QString &type) const
-{
-    QSqlQuery query;
-    query.prepare("select id from tagTypes where type=:type;");
-    query.bindValue(":type", type);
+    if (query.first()) {
+        int res = query.value(0).toInt();
+        if (cache) {
+            cache->insert(text, res);
+        }
+
+        return res;
+    }
+
+    query.prepare("insert into tags (partner, type, title) "
+                  "values (:partner, :type, :title) "
+                  "returning id;");
+    query.bindValue(":partner", m_partnerId);
+    query.bindValue(":type", tagTypeId);
+    query.bindValue(":title", text);
+
     if (!query.exec()) {
         showError(query);
         return 0;
     }
+
     if (!query.first()) {
         return 0;
     }
+
+    int res = query.value(0).toInt();
+    if (cache) {
+        cache->insert(text, res);
+    }
+
+    return res;
+}
+
+int Database::tagTypeId(const QString &type) const
+{
+    QSqlQuery query;
+    query.prepare("select id from tagTypes where type = :type;");
+    query.bindValue(":type", type);
+
+    if (!query.exec()) {
+        showError(query);
+        QSqlDatabase::database().rollback();
+        return 0;
+    }
+
+    if (!query.first()) {
+        QSqlQuery createQuery;
+        createQuery.prepare("insert into tagTypes (type) values (:type) returning id;");
+        createQuery.bindValue(":type", type);
+        if (!createQuery.exec()) {
+            showError(createQuery);
+            QSqlDatabase::database().rollback();
+            return 0;
+        }
+
+        if (!createQuery.first()) {
+            QSqlDatabase::database().rollback();
+            return 0;
+        }
+
+        QVariant res = createQuery.value(0);
+        return res.toInt();
+    }
+
     QVariant res = query.value(0);
     return res.toInt();
 }
 
-int Database::channelQuery(const QString &channel,
-                           int parentId) const
+int Database::channelId(const QString &channel, const QString &description, int parentId)
 {
     QSqlQuery query;
     QString queryText =
         QString::fromLatin1("select id from channels where "
-                            "name=:name and partner=:partnerId");
+                            "name = :name and partner = :partnerId");
 
     if (parentId) {
-        queryText += QLatin1String(" and parent=:parentId;");
+        queryText += QLatin1String(" and parent = :parentId;");
         query.prepare(queryText);
         query.bindValue(":parentId", parentId);
     } else {
@@ -197,58 +280,13 @@ int Database::channelQuery(const QString &channel,
         showError(query);
         return 0;
     }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    //qDebug()<<"channel = "<<channel<<" is "<<res;
-    return res.toInt();
-}
 
-int Database::categoryQuery(const QString &name) const
-{
-    QSqlQuery query;
-
-    query.prepare("select id from tags where partner=:partnerId and "
-                  "type=:typeId and title=:title;");
-
-    query.bindValue(":partnerId", m_partnerId);
-    query.bindValue(":typeId", m_categoryTagId);
-    query.bindValue(":title", name);
-
-    if (!query.exec()) {
-        showError(query);
-        return 0;
-    }
-    if (!query.first()) {
-        return 0;
-    }
-    QVariant res = query.value(0);
-    //qDebug()<<"chennel = "<<channel<<" is "<<res;
-    return res.toInt();
-}
-
-int Database::tagTypeCreate(const QString &type)
-{
-    QSqlQuery query;
-    query.prepare("insert into tagTypes "
-                  "(type) "
-                  "values (:type);");
-    query.bindValue(":type", type);
-    if (!query.exec()) {
-        showError(query);
-        QSqlDatabase::database().rollback();
-        return 0;
+    if (query.first()) {
+        QVariant res = query.value(0);
+        //qDebug()<<"channel = "<<channel<<" is "<<res;
+        return res.toInt();
     }
 
-    return tagTypeQuery(type);
-}
-
-int Database::channelCreate(const QString &name,
-                            const QString &description,
-                            int parentId)
-{
-    QSqlQuery query;
     if (parentId) {
         query.prepare("insert into channels "
                       "(partner, store, active, parent, name, description) "
@@ -267,145 +305,64 @@ int Database::channelCreate(const QString &name,
     query.bindValue(":partner", m_partnerId);
     query.bindValue(":store", m_store);
     query.bindValue(":active", true);
-    query.bindValue(":name", name);
+    query.bindValue(":name", channel);
     query.bindValue(":description", description);
 
     if (!query.exec()) {
         showError(query);
         return 0;
     }
+
     if (!query.first()) {
         return 0;
     }
+
     QVariant res = query.value(0);
     return res.toInt();
 }
 
-int Database::categoryCreate(const QString &name)
+int Database::categoryId(const QString &name) const
 {
     QSqlQuery query;
+    query.prepare("select id from tags where partner = :partnerId and type = :typeId and title = :title;");
 
-    query.prepare("insert into tags "
-                  "(partner, type, title) "
-                  "values "
-                  "(:partner, :type, :title) "
-                  "returning id;");
-
-    query.bindValue(":partner", m_partnerId);
-    query.bindValue(":type", m_categoryTagId);
+    query.bindValue(":partnerId", m_partnerId);
+    query.bindValue(":typeId", m_categoryTagId);
     query.bindValue(":title", name);
 
     if (!query.exec()) {
         showError(query);
+        QSqlDatabase::database().rollback();
         return 0;
     }
+
+    if (query.first()) {
+        QVariant res = query.value(0);
+        //qDebug()<<"chennel = "<<channel<<" is "<<res;
+        return res.toInt();
+    }
+
+    query.prepare("insert into tags (partner, type, title) values (:partner, :type, :title) returning id;");
+    query.bindValue(":partner", m_partnerId);
+    query.bindValue(":title", name);
+    query.bindValue(":type", m_categoryTagId);
+    if (!query.exec()) {
+        showError(query);
+        QSqlDatabase::database().rollback();
+        return 0;
+    }
+
     if (!query.first()) {
         return 0;
     }
+
     QVariant res = query.value(0);
     return res.toInt();
-}
-
-int Database::authorTagId()
-{
-    int tagId= tagTypeQuery(QLatin1String("author"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("author"));
-    }
-    return tagId;
-}
-
-int Database::categoryTagTypeId()
-{
-    int tagId= tagTypeQuery(QLatin1String("category"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("category"));
-    }
-    return tagId;
-}
-
-int Database::contributorTagId()
-{
-    int tagId= tagTypeQuery(QLatin1String("contributor"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("contributor"));
-    }
-    return tagId;
-}
-
-int Database::createdTagId()
-{
-    int tagId= tagTypeQuery(QLatin1String("created"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("created"));
-    }
-    return tagId;
-}
-
-int Database::mimetypeTagId()
-{
-    int tagId= tagTypeQuery(QLatin1String("mimetype"));
-    if (!tagId) {
-        tagId = tagTypeCreate(QLatin1String("mimetype"));
-    }
-    return tagId;
-}
-
-int Database::channelId(const QString &name,
-                        const QString &description,
-                        int parentId)
-{
-    if (name.isEmpty()) {
-        return 0;
-    }
-
-    int channelId = channelQuery(name, parentId);
-
-    if (!channelId) {
-        channelId = channelCreate(name, description, parentId);
-    }
-    return channelId;
 }
 
 int Database::authorId(const QString &author)
 {
     return tagId(m_authorTagId, author, &m_authorIds);
-}
-
-int Database::tagId(int tagTypeId, const QString &text,
-                    QHash<QString, int> *cache)
-{
-    Q_ASSERT(cache);
-
-    if (cache->contains(text)) {
-        return (*cache)[text];
-    }
-
-    int tagId = tagQuery(tagTypeId, text);
-    if (!tagId) {
-        QSqlQuery query;
-        query.prepare("insert into tags "
-                      "(partner, type, title) "
-                      "values (:partner, :type, :title) "
-                      "returning id;");
-        query.bindValue(":partner", m_partnerId);
-        query.bindValue(":type", tagTypeId);
-        query.bindValue(":title", text);
-
-        if (!query.exec()) {
-            showError(query);
-            return 0;
-        }
-        if (!query.first()) {
-            return 0;
-        }
-        QVariant res = query.value(0);
-        (*cache)[text] = res.toInt();
-    } else {
-        (*cache)[text] = tagId;
-    }
-
-    return (*cache)[text];
 }
 
 int Database::writeAsset(QSqlQuery query, const QString &name, const QString &description,
