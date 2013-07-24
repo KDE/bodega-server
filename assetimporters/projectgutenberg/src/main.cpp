@@ -23,6 +23,7 @@
 #include <QtCore>
 
 QStringList paths;
+Gutenberg::Catalog catalog;
 
 #define TESTING 1
 
@@ -63,20 +64,17 @@ void addEbook(const Gutenberg::Ebook &book)
 
 int main(int argc, char **argv)
 {
-    /*
     if (argc < 2) {
         qWarning() << "Usage:";
-        qWarning() << "\t" << argv[0] << "catalog.rdf [imageCacheDir]";
+        qWarning() << "\t" << argv[0] << "path/to/epub/files [imageCacheDir]";
         return 0;
     }
-    */
 
-    QCoreApplication app(argc, argv);
+    Gutenberg::Catalog catalog;
     descend(argv[1]);
     qDebug() << "we have" << paths.size() << "files to process now";
     paths <<
         "/home/aseigo/kdesrc/extragear/network/bodega-server/assetimporters/projectgutenberg/rdf/cache/epub/10040/pg10040.rdf";
-    QList<Gutenberg::Ebook> files;
 
     foreach (const QString &path, paths) { qDebug() << path; }
 #if 0
@@ -84,13 +82,14 @@ int main(int argc, char **argv)
     qDebug() << "we have" << files.size() << "books to process now";
     foreach (const Gutenberg::Ebook &book, files) { addEbook(book); }
 #else
-    files = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Gutenberg::Reader::parseRdf);
-    qDebug() << "we have" << files.size() << "books to process now";
-    QtConcurrent::blockingMap(files, addEbook);
+    catalog.m_ebooks = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Gutenberg::Reader::parseRdf);
+    catalog.compile(argc > 2 ? argv[2] : QString());
+    qDebug() << "we have" << catalog.m_ebooks.size() << "books to process now";
 #endif
 
     exit(1);
-    //Gutenberg::Catalog catalog = Gutenberg::Parser::parse(QString::fromLatin1(argv[1]));
+    QCoreApplication app(argc, argv);
+
     //catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
 
     //Gutenberg::GutenbergDatabase::write(catalog, argv[2], false);

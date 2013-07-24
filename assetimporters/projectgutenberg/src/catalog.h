@@ -36,12 +36,7 @@ class Catalog
 public:
     Catalog();
 
-    void addFile(const File &file);
     void addBook(const Ebook &book);
-    Gutenberg::Ebook bookWithId(const QString &bookId) const;
-
-    QHash<QString, Gutenberg::Ebook> ebooks() const;
-
 
     bool isCompiled() const;
     void compile(const QString &imageCachePath);
@@ -50,12 +45,13 @@ public:
     QStringList authors() const;
     QHash<QUrl, QString> covers() const;
 
+    QList<Gutenberg::Ebook> m_ebooks;
+
 private:
     void removeNonEpubBooks();
     void dumpDebugInfo();
 
 private:
-    QHash<QString, Gutenberg::Ebook> m_ebooks;
     bool m_dirty;
     QStringList m_languages;
     QStringList m_authors;

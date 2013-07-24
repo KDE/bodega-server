@@ -31,37 +31,6 @@ Catalog::Catalog()
 {
 }
 
-QHash<QString, Gutenberg::Ebook> Catalog::ebooks() const
-{
-    return m_ebooks;
-}
-
-void Catalog::addBook(const Ebook &book)
-{
-    QString bookId = book.bookId();
-    Q_ASSERT(!bookId.isEmpty());
-    m_ebooks[bookId] = book;
-    m_dirty = true;
-}
-
-Gutenberg::Ebook Catalog::bookWithId(const QString &bookId) const
-{
-    return m_ebooks[bookId];
-}
-
-void Catalog::addFile(const File &file)
-{
-    QString bookId = file.bookId;
-    Q_ASSERT(!bookId.isEmpty());
-    if (!m_ebooks.contains(bookId)) {
-        return;
-    }
-    Ebook book = m_ebooks[bookId];
-    book.addFile(file);
-    m_ebooks[bookId] = book;
-    m_dirty = true;
-}
-
 bool Catalog::isCompiled() const
 {
     return m_dirty;
@@ -71,7 +40,8 @@ void Catalog::compile(const QString &imageCachePath)
 {
     QSet<QString> languages;
     QSet<QString> formats;
-    QSet<QString> lccs;
+    QSet<QString> topLccs;
+    QSet<QString> subLccs;
     QSet<QString> authors;
 
     const QFileInfo imageCacheInfo(imageCachePath);
@@ -81,17 +51,16 @@ void Catalog::compile(const QString &imageCachePath)
 
     removeNonEpubBooks();
 
-    QHash<QString, Ebook> books = ebooks();
-    QHash<QString, Ebook>::const_iterator itr;
+    QListIterator<Ebook> itr(m_ebooks);
 
-    for (itr = books.constBegin(); itr != books.constEnd(); ++itr) {
-        const Ebook &book = *itr;
+    while (itr.hasNext()) {
+        const Ebook &book = itr.next();
         QStringList langs = book.languages();
         foreach (QString lang, langs) {
             languages.insert(lang);
         }
         if (fetchImages) {
-            const QUrl image = book.coverImage().url;
+            const QUrl image = book.coverImage();
             if (!image.isEmpty()) {
                 const QString path = imageCachePath + '/' + QFileInfo(image.path()).fileName();
                 if (!QFile::exists(path)) {
@@ -105,28 +74,38 @@ void Catalog::compile(const QString &imageCachePath)
             Q_ASSERT(!lst.isEmpty());
             formats.insert(lst[0]);
         }
-        Gutenberg::LCC xl = book.lcc();
-        QStringList l = xl.topCategories();
-        foreach (QString lcc, l) {
-            lccs.insert(lcc);
+        Gutenberg::LCC lcc = book.lcc();
+        QHash<QString, QStringList> cats = lcc.categories();
+        QHashIterator<QString, QStringList> catIt(cats);
+        while (catIt.hasNext()) {
+            catIt.next();
+            topLccs.insert(catIt.key());
+
+            foreach (const QString lcc, catIt.value()) {
+                subLccs.insert(lcc);
+            }
         }
-        l = book.lcsh();
-        foreach (QString lcsh, l) {
+
+        QStringList l = lcc.subjects();
+        foreach (const QString &lcsh, l) {
             if (m_lcshs[lcsh]) {
                 m_lcshs[lcsh] = m_lcshs[lcsh] + 1;
             } else {
                 m_lcshs.insert(lcsh, 1);
             }
         }
-        l = book.creators();
-        foreach (QString creator, l) {
-            authors.insert(creator);
+
+        l = book.authors();
+        foreach (const QString &author, l) {
+            authors.insert(author);
         }
     }
+
     m_languages = languages.values();
-    m_authors = authors.values();
     m_formats = formats.values();
-    m_lccs = lccs.values();
+    m_lccs = topLccs.values();
+    m_authors = authors.values();
+    //FIXME: sublccs
     dumpDebugInfo();
 }
 
@@ -147,18 +126,15 @@ QHash<QUrl, QString> Catalog::covers() const
 
 void Catalog::removeNonEpubBooks()
 {
-    QHash<QString, Gutenberg::Ebook>::iterator itr;
+    QMutableListIterator<Gutenberg::Ebook> itr(m_ebooks);
     int numRemoved = 0;
 
-    itr = m_ebooks.begin();
-    while (itr != m_ebooks.end()) {
-        Ebook book = *itr;
+    while (itr.hasNext()) {
+        const Ebook &book = itr.next();
         if (!book.hasEpubFile() || book.rights() != Ebook::Rights_Gutenberg) {
             //qDebug()<<"Erasing "<<book;
-            itr = m_ebooks.erase(itr);
+            itr.remove();
             ++numRemoved;
-        } else {
-            ++itr;
         }
     }
     qDebug() << "Number of non epub and copyrighted ebooks = " << numRemoved;
@@ -166,10 +142,8 @@ void Catalog::removeNonEpubBooks()
 
 void Catalog::dumpDebugInfo()
 {
-    QHash<QString, Ebook> books = ebooks();
-
     qDebug() << "========== Parse Results ==========";
-    qDebug() << "Number of books:" << books.count();
+    qDebug() << "Number of books:" << m_ebooks.count();
     qDebug() << "Number of authors:" << m_authors.count();
     qDebug() << "===================================";
 
