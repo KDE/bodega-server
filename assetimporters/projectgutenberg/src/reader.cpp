@@ -173,14 +173,13 @@ void parseEbookBlock(ReaderState &state)
     }
     state.book.setBookId(id);
 
-    QStringList langs;
-
     static const QString titleTag(QLatin1String("title"));
     static const QString issuedTag(QLatin1String("issued"));
     static const QString subjectTag(QLatin1String("subject"));
     static const QString coverImageTag(QLatin1String("marc901")); // don't ask
     static const QString typeTag(QLatin1String("type"));
     static const QString langTag(QLatin1String("language"));
+    static const QString descriptionTag(QLatin1String("description"));
     while (!state.xml.atEnd()) {
         switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement: {
@@ -209,7 +208,11 @@ void parseEbookBlock(ReaderState &state)
                     parseType(state);
                 } else if (langTag == elem) {
                     state.xml.readNext();
-                    langs.append(state.xml.text().toString());
+                    state.book.setLanguage(state.xml.text().toString());
+                    state.xml.readNext();
+                } else if (descriptionTag == elem) {
+                    state.xml.readNext();
+                    state.book.setDescription(state.xml.text().toString());
                     state.xml.readNext();
                 } else {
                     ignoreBlock(state);
@@ -219,9 +222,6 @@ void parseEbookBlock(ReaderState &state)
 
             case QXmlStreamReader::EndElement:
                 //qDebug() << "END!" << state.xml.name();
-                if (langs.size() != 1) {
-                    qDebug() << "**************************************** langs:" << langs.size();
-                }
                 return;
                 break;
 

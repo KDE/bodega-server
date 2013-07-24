@@ -76,8 +76,8 @@ public:
     QStringList alternativeNames() const;
     void setAlternativeNames(const QStringList &lst);
 
-    QStringList languages() const;
-    void setLanguages(const QStringList &langs);
+    QString language() const;
+    void setLanguage(const QString &lang);
 
     QString issued() const;
     void setIssued(const QString &date);
@@ -86,8 +86,8 @@ public:
     Ebook::Rights rights() const;
     void setRights(Ebook::Rights rights);
 
-    QStringList descriptions() const;
-    void setDescriptions(const QStringList &lst);
+    QString description() const;
+    void setDescription(const QString &lst);
 
     QString typeString() const;
     Ebook::Type type() const;
@@ -112,11 +112,11 @@ public:
 private:
     QString m_id;
     QString m_title;
-    QStringList m_languages;
+    QString m_language;
     QString m_issued;
     QString m_coverUrl;
+    QString m_description;
     Ebook::Rights m_rights;
-    QStringList m_descriptions;
     Ebook::Type m_type;
     QStringList m_alternativeNames;
     QString m_toc;

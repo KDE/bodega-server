@@ -35,9 +35,9 @@ QString Ebook::title() const
     return m_title;
 }
 
-QStringList Ebook::languages() const
+QString Ebook::language() const
 {
-    return m_languages;
+    return m_language;
 }
 
 void Ebook::setBookId(const QString &bookId)
@@ -51,10 +51,10 @@ void Ebook::setTitle(const QString &title)
     m_title = title;
 }
 
-void Ebook::setLanguages(const QStringList &langs)
+void Ebook::setLanguage(const QString &lang)
 {
-    Q_ASSERT(m_languages.isEmpty());
-    m_languages = langs;
+    Q_ASSERT(m_language.isEmpty());
+    m_language = lang;
 }
 
 QString Ebook::issued() const
@@ -77,15 +77,15 @@ void Ebook::setRights(Ebook::Rights rights)
     m_rights = rights;
 }
 
-QStringList Ebook::descriptions() const
+QString Ebook::description() const
 {
-    return m_descriptions;
+    return m_description;
 }
 
-void Ebook::setDescriptions(const QStringList &lst)
+void Ebook::setDescription(const QString &desc)
 {
-    Q_ASSERT(m_descriptions.isEmpty());
-    m_descriptions = lst;
+    Q_ASSERT(m_description.isEmpty());
+    m_description = desc;
 }
 
 Ebook::Type Ebook::type() const
@@ -245,6 +245,11 @@ QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
                 << "type = " << book.type() << ", "
                 << "title = " << book.title() << ", issued: " << book.issued() << ")\n";
     s << "\tEPub " << book.epubFile().url << "\n";
+
+    if (!book.description().isEmpty()) {
+        s.nospace() << "\tDescription: " << book.description();
+    }
+
     QList<Gutenberg::File> files = book.files();
     foreach (const Gutenberg::File &file, book.files()) {
         s.nospace() << "\t" << file.format << ": " << file.url << '\n';
