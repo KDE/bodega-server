@@ -17,6 +17,6 @@ qt4_automoc(${gutimport_SRCS})
 
 add_definitions(${QT_DEFINITIONS})
 
-add_executable(gutimport ${gutimport_SRCS})
-target_link_libraries(gutimport ${QT_QTCORE_LIBRARIES} ${QT_QTSQL_LIBRARIES} ${QT_QTNETWORK_LIBRARIES})
-install(TARGETS gutimport RUNTIME DESTINATION bin)
+add_executable(bodega_gutimport ${gutimport_SRCS})
+target_link_libraries(bodega_gutimport ${QT_QTCORE_LIBRARIES} ${QT_QTSQL_LIBRARIES} ${QT_QTNETWORK_LIBRARIES})
+install(TARGETS bodega_gutimport RUNTIME DESTINATION bin)
