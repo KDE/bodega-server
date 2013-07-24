@@ -105,8 +105,18 @@ void Catalog::compile(const QString &imageCachePath)
     m_formats = formats.values();
     m_lccs = topLccs.values();
     m_authors = authors.values();
-    //FIXME: sublccs
+    m_sublccs = subLccs.values();
     dumpDebugInfo();
+}
+
+QStringList Catalog::topLevelCategories() const
+{
+    return m_lccs;
+}
+
+QStringList Catalog::subCategories() const
+{
+    return m_subLccs;
 }
 
 QStringList Catalog::languages() const

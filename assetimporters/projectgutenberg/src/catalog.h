@@ -44,6 +44,8 @@ public:
     QStringList languages() const;
     QStringList authors() const;
     QHash<QUrl, QString> covers() const;
+    QStringList topLevelCategories() const;
+    QStringList subCategories() const;
 
     QList<Gutenberg::Ebook> m_ebooks;
 
@@ -57,6 +59,7 @@ private:
     QStringList m_authors;
     QStringList m_formats;
     QStringList m_lccs;
+    QStringList m_subLccs;
     QHash<QString, int> m_lcshs;
     QHash<QUrl, QString> m_coversToDownload;
 };

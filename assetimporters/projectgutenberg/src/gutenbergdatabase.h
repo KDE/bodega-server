@@ -41,7 +41,6 @@ private:
     int m_categoryTagId;
     int m_licenseId;
     int m_contributorTagId;
-    int m_createdTagId;
     int m_mimetypeTagId;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;

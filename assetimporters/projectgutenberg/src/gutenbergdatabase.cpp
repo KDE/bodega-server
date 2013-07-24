@@ -38,7 +38,6 @@ GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
       m_categoryTagId(0),
       m_licenseId(0),
       m_contributorTagId(0),
-      m_createdTagId(0),
       m_mimetypeTagId(0)
 {
 }
@@ -69,7 +68,6 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
 
 
     m_mimetypeTagId = mimetypeTagId();
-    m_createdTagId = createdTagId();
     m_partnerId = partnerId();
 
     m_contributorTagId = contributorTagId();
@@ -224,7 +222,8 @@ int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
     query.prepare("select id from assets where "
                   "name=:name and externid=:externid;");
 
-    query.bindValue(":name", book.titles().first());
+    //FIXME: alternatives
+    query.bindValue(":name", book.title());
     query.bindValue(":externid", book.bookId());
 
     if (!query.exec()) {
@@ -251,7 +250,7 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 
     cover.prepend("gutenberg/");
 
-    int foo = writeAsset(query, book.titles().first(), QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), epubFile.url.toString(), fi.fileName(), book.bookId(), cover);
+    int foo = writeAsset(query, book.title(), QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), epubFile.url.toString(), fi.fileName(), book.bookId(), cover);
     return foo;
 }
 
@@ -271,22 +270,28 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
         writeAssetTags(assetId, contributorId);
     }
 
+    //qDebug()<<"Book = "<< book.title();
     Gutenberg::File epubFile = book.epubFile();
     int mimetypeId = tagId(m_mimetypeTagId,
                            epubFile.format,  &m_mimetypeIds);
     writeAssetTags(assetId, mimetypeId);
-    int createdId = tagId(m_createdTagId,
-                          book.created(), &m_createdIds);
-    writeAssetTags(assetId, createdId);
+
     Gutenberg::LCC lcc = book.lcc();
-    QStringList lccNames = lcc.topCategories();
-    //qDebug()<<"Book = "<< book.titles();
-    foreach (QString lccName, lccNames) {
+    const QHash<QString, QStringList> lccs = lcc.categories();
+    QHashIterator<QString, QStringList> it(lccs);
+    while (it.hasNext()) {
+        it.next();
+
         //qDebug()<<"\tchannelName = "<<lccName;
-        Q_ASSERT(m_categoryTagIds.contains(lccName));
-        int categoryTagId = m_categoryTagIds[lccName];
+        Q_ASSERT(m_categoryTagIds.contains(it.key()));
+        const int categoryTagId = m_categoryTagIds[it.key()];
         Q_ASSERT(categoryTagId);
         writeAssetTags(assetId, categoryTagId);
+
+        foreach (const QString &subCat, it.value()) {
+            const int subCategoryTagId = m_subCategoryTagIds[subCat];
+            writeAssetTags(assetId, subCategoryTagId);
+        }
     }
 }
 
