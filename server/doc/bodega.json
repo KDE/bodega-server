@@ -1660,7 +1660,7 @@
                 "MethodName": "Attributes",
                 "Synopsis": "The possible rating attributes for the specific asset",
                 "HTTPMethod": "GET",
-                "URI": "/asset/ratingAttributes/:assetId",
+                "URI": "/asset/ratings/attributes/:assetId",
                 "parameters": [
                     {
                         "Name": "assetId",
