@@ -77,8 +77,8 @@ int Database::writeChannel(const QString &name, const QString &description, cons
 {
     int id = channelId(name, description, parentId);
 
-    if (!id) {
-        return 0;
+    if (!id || image.isEmpty()) {
+        return id;
     }
 
     QSqlQuery query;
