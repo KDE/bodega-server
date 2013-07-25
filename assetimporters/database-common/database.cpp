@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Coherent Theory LLC
+    Copyright 2012-2013 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
