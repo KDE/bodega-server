@@ -77,23 +77,15 @@ int main(int argc, char **argv)
         "/home/aseigo/kdesrc/extragear/network/bodega-server/assetimporters/projectgutenberg/rdf/cache/epub/10040/pg10040.rdf";
 
     foreach (const QString &path, paths) { qDebug() << path; }
-#if 0
-    foreach (const QString &path, paths) { files << Gutenberg::Reader::parseRdf(path); }
-    qDebug() << "we have" << files.size() << "books to process now";
-    foreach (const Gutenberg::Ebook &book, files) { addEbook(book); }
-#else
+    Gutenberg::Reader::init();
     catalog.m_ebooks = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Gutenberg::Reader::parseRdf);
-    catalog.compile(argc > 2 ? argv[2] : QString());
+    catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
     qDebug() << "we have" << catalog.m_ebooks.size() << "books to process now";
-#endif
 
-    exit(1);
+    Gutenberg::GutenbergDatabase::write(catalog, argv[2], true);
+    return 1;
+
     QCoreApplication app(argc, argv);
-
-    //catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
-
-    //Gutenberg::GutenbergDatabase::write(catalog, argv[2], false);
-
     /*
     if (argc > 2) {
         // only fetch if we were given a cache dir
