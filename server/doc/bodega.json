@@ -1553,7 +1553,8 @@
             "MethodName": "Types",
             "Synopsis": "list all types for the tags",
             "HTTPMethod": "GET",
-            "URI": "/tag/types"
+            "URI": "/tag/types",
+            "parameters": []
         },
         {
             "MethodName": "List",
@@ -1683,6 +1684,20 @@
                         "Description": "The id of asset",
                         "Required": "Y",
                         "Type": "Number"
+                    },
+                    {
+                        "Name": "pageSize",
+                        "Location": "query",
+                        "Description": "The number of results to return at a time",
+                        "Required": "N",
+                        "Type": "number"
+                    },
+                    {
+                        "Name": "offset",
+                        "Location": "query",
+                        "Description": "The search result offset to start listing from",
+                        "Required": "N",
+                        "Type": "number"
                     }
                 ]
             },
@@ -1691,7 +1706,22 @@
                 "Synopsis": "The ratings of the participant",
                 "HTTPMethod": "GET",
                 "URI": "/participant/ratings",
-                "parameters": []
+                "parameters": [
+                    {
+                        "Name": "pageSize",
+                        "Location": "query",
+                        "Description": "The number of results to return at a time",
+                        "Required": "N",
+                        "Type": "number"
+                    },
+                    {
+                        "Name": "offset",
+                        "Location": "query",
+                        "Description": "The search result offset to start listing from",
+                        "Required": "N",
+                        "Type": "number"
+                    }
+                ]
             },
             {
                 "MethodName": "Rate Asset",
