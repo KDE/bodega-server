@@ -115,7 +115,7 @@ module.exports.participant = function(db, req, res) {
     });
 };
 
-module.exports.addAsset = function(db, req, res) {
+module.exports.addAssetRatings = function(db, req, res) {
     /*jshint multistr:true */
     var assetInsertQuery =
         'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);';
