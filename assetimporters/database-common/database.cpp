@@ -82,7 +82,7 @@ int Database::writeChannel(const QString &name, const QString &description, cons
     }
 
     QSqlQuery query;
-    query.prepare("update channels set image = :image where id = :channelId;");
+    query.prepare("update channels set image = :image where id = :channelId");
     query.bindValue(":image", image);
     query.bindValue(":channelid", id);
 
@@ -122,7 +122,7 @@ int Database::partnerId(const QString &partner)
     if (!query.first()) {
         QSqlQuery createQuery;
         createQuery.prepare("insert into partners (name, publisher, distributor) "
-                            "values (:partner, false, false) returning id;");
+                            "values (:partner, false, false) returning id");
         createQuery.bindValue(":partner", partner);
         if (!createQuery.exec()) {
             showError(createQuery);
@@ -158,7 +158,7 @@ int Database::licenseId(const QString &license, const QString &licenseText)
     query.prepare("insert into licenses "
                   "(name, text) "
                   "values "
-                  "(:licenseName, :licenseText) returning id;");
+                  "(:licenseName, :licenseText) returning id");
 
     query.bindValue(":licenseName", license);
     query.bindValue(":licenseText", licenseText);
@@ -184,7 +184,7 @@ int Database::tagId(int tagTypeId, const QString &text, QHash<QString, int> *cac
 
     QSqlQuery query;
     query.prepare("select id from tags where partner = :partner "
-                  "and type =: type and title =: text;");
+                  "and type = :type and title = :text");
 
     query.bindValue(":partner", m_partnerId);
     query.bindValue(":type", tagTypeId);
@@ -206,7 +206,7 @@ int Database::tagId(int tagTypeId, const QString &text, QHash<QString, int> *cac
 
     query.prepare("insert into tags (partner, type, title) "
                   "values (:partner, :type, :title) "
-                  "returning id;");
+                  "returning id");
     query.bindValue(":partner", m_partnerId);
     query.bindValue(":type", tagTypeId);
     query.bindValue(":title", text);
@@ -231,7 +231,7 @@ int Database::tagId(int tagTypeId, const QString &text, QHash<QString, int> *cac
 int Database::tagTypeId(const QString &type) const
 {
     QSqlQuery query;
-    query.prepare("select id from tagTypes where type = :type;");
+    query.prepare("select id from tagTypes where type = :type");
     query.bindValue(":type", type);
 
     if (!query.exec()) {
@@ -241,7 +241,7 @@ int Database::tagTypeId(const QString &type) const
 
     if (!query.first()) {
         QSqlQuery createQuery;
-        createQuery.prepare("insert into tagTypes (type) values (:type) returning id;");
+        createQuery.prepare("insert into tagTypes (type) values (:type) returning id");
         createQuery.bindValue(":type", type);
         if (!createQuery.exec()) {
             showError(createQuery);
@@ -267,11 +267,10 @@ int Database::channelId(const QString &channel, const QString &description, int 
         QString::fromLatin1("select id from channels where name = :name and store = :store");
 
     if (parentId) {
-        queryText += QLatin1String(" and parent = :parentId;");
+        queryText += QLatin1String(" and parent = :parentId");
         query.prepare(queryText);
         query.bindValue(":parentId", parentId);
     } else {
-        queryText += QLatin1String(";");
         query.prepare(queryText);
     }
     query.bindValue(":name", channel);
@@ -293,13 +292,13 @@ int Database::channelId(const QString &channel, const QString &description, int 
                       "(store, store, active, parent, name, description) "
                       "values "
                       "(:store, :store, :active, :parent, :name, :description) "
-                      "returning id;");
+                      "returning id");
     } else {
         query.prepare("insert into channels "
                       "(store, active, name, description) "
                       "values "
                       "(:partner, :store, :active, :name, :description) "
-                      "returning id;");
+                      "returning id");
     }
 
     query.bindValue(":store", m_store);
@@ -323,7 +322,7 @@ int Database::channelId(const QString &channel, const QString &description, int 
 int Database::categoryId(const QString &name) const
 {
     QSqlQuery query;
-    query.prepare("select id from tags where partner = :partnerId and type = :typeId and title = :title;");
+    query.prepare("select id from tags where partner = :partnerId and type = :typeId and title = :title");
 
     query.bindValue(":partnerId", m_partnerId);
     query.bindValue(":typeId", m_categoryTagId);
@@ -340,7 +339,7 @@ int Database::categoryId(const QString &name) const
         return res.toInt();
     }
 
-    query.prepare("insert into tags (partner, type, title) values (:partner, :type, :title) returning id;");
+    query.prepare("insert into tags (partner, type, title) values (:partner, :type, :title) returning id");
     query.bindValue(":partner", m_partnerId);
     query.bindValue(":title", name);
     query.bindValue(":type", m_categoryTagId);
@@ -397,7 +396,7 @@ void Database::writeAssetTags(int assetId, int tagId)
     query.prepare("insert into assetTags "
                   "(asset, tag) "
                   "values "
-                  "(:assetId, :tagId);");
+                  "(:assetId, :tagId)");
 
     query.bindValue(":assetId", assetId);
     query.bindValue(":tagId", tagId);
@@ -415,7 +414,7 @@ void Database::writeAssetTags(int assetId, QVariant &tagId)
 void Database::writeChannelTags(int channelId, int tagId)
 {
     QSqlQuery checkQuery;
-    checkQuery.prepare("select * from channelTags where channel = :channel and tag = :tagId;");
+    checkQuery.prepare("select * from channelTags where channel = :channel and tag = :tagId");
     checkQuery.bindValue(":channelId", channelId);
     checkQuery.bindValue(":tagId", tagId);
 
@@ -427,7 +426,7 @@ void Database::writeChannelTags(int channelId, int tagId)
     query.prepare("insert into channelTags "
                   "(channel, tag) "
                   "values "
-                  "(:channelId, :tagId);");
+                  "(:channelId, :tagId)");
 
     query.bindValue(":channelId", channelId);
     query.bindValue(":tagId", tagId);
