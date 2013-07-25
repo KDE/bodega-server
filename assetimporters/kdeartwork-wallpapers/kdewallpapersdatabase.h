@@ -23,7 +23,6 @@ private:
 private:
     int m_assetTypeTagId;
     int m_wallpapersChannelId;
-    int m_partnerId;
     int m_licenseId;
     QHash<QString, int> m_mimetypeIds;
 };

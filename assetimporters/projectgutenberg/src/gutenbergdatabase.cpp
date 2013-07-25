@@ -49,8 +49,7 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
 }
 
 GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
-    : Database(contentPath, "VIVALDI-1"),
-      m_partnerId(0),
+    : Database(contentPath, "Project Gutenberg", "VIVALDI-1"),
       m_categoryTagId(0),
       m_licenseId(0),
       m_mimetypeTagId(0)
@@ -61,7 +60,6 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
 {
     QSqlDatabase::database().transaction();
 
-    m_partnerId = partnerId("Project Gutenberg");
     //qDebug()<<"partner id = "<<m_partnerId;
 
     m_licenseId = licenseId("Project Gutenberg License",

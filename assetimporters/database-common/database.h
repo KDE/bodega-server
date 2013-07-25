@@ -10,7 +10,7 @@ class Database
 {
 
 public:
-    Database(const QString &contentPath, const QString &store);
+    Database(const QString &contentPath, const QString &partner, const QString &store);
 
 protected:
     int writeAsset(QSqlQuery query, const QString &name, const QString &description,
@@ -27,6 +27,7 @@ protected:
     //FIXME: get rid of writeChannel; it is basically channelId + default image name
     int writeChannel(const QString &name, const QString &description, const QString& image, int parentId = 0);
 
+    int partnerId();
     int partnerId(const QString &partner);
     int licenseId(const QString &license, const QString &licenseText = QString());
 

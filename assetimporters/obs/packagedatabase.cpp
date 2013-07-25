@@ -25,7 +25,7 @@
 PackageDatabase::PackageDatabase(const QString &channelsCatalogPath,
                                  const QString &packageCatalogPath,
                                  const QString &packageDescPath)
-    : Database(packageDescPath, "VIVALDI-1"),
+    : Database(packageDescPath, "KDE", "VIVALDI-1"),
       m_channelsCatalog(channelsCatalogPath),
       m_catalog(PackageCatalog(packageCatalogPath)),
       m_packageDescPath(packageDescPath)

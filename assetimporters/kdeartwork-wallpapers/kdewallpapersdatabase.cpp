@@ -37,10 +37,9 @@ void WallpapersDatabase::write(const QString &catalogPath)
 }
 
 WallpapersDatabase::WallpapersDatabase(const QString &contentPath)
-    : Database(contentPath, "VIVALDI-1")
+    : Database(contentPath, "KDE", "VIVALDI-1")
 {
     m_licenseId = licenseId("LGPL");
-    m_partnerId = partnerId("KDE");
     m_wallpapersChannelId = writeChannel(QLatin1String("Wallpapers"),
                                        QLatin1String("Wallpaper images"),
                                        "default/wallpaper.png");

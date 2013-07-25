@@ -28,7 +28,7 @@
 
 #include <QDebug>
 
-Database::Database(const QString &contentPath, const QString &store)
+Database::Database(const QString &contentPath, const QString &partner, const QString &store)
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
       m_authorTagId(0),
@@ -36,12 +36,21 @@ Database::Database(const QString &contentPath, const QString &store)
       m_contentPath(contentPath),
       m_store(store)
 {
+
     //db.setHostName("localhost");
     m_db.setDatabaseName("bodega");
     m_db.setUserName("bodega");
     m_db.setPassword("bodega");
     bool ok = m_db.open();
     qDebug()<<"db opened = "<<ok;
+
+    m_partnerId = partnerId(partner);
+    if (!m_partnerId) {
+        QSqlDatabase::database().rollback();
+        Q_ASSERT(!"couldn't create partner");
+        return;
+    }
+
 
     m_mimetypeTagId = tagTypeId(QLatin1String("mimetype"));
     if (!m_mimetypeTagId) {
@@ -101,6 +110,11 @@ int Database::mimetypeTagId()
 int Database::authorId(const QString &author) const
 {
     return tagId(m_authorTagId, author);
+}
+
+int Database::partnerId()
+{
+    return m_partnerId;
 }
 
 int Database::partnerId(const QString &partner)

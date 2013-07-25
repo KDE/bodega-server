@@ -49,7 +49,6 @@ private:
 
 private:
     QSqlDatabase m_db;
-    int m_partnerId;
     int m_authorTagId;
     int m_categoryTagId;
     int m_licenseId;
