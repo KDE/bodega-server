@@ -20,9 +20,8 @@ namespace Gutenberg
 
 namespace Reader
 {
-
+    void init();
     Gutenberg::Ebook parseRdf(const QString &path);
-
 } //namespace Reader
 
 } // namespace Gutenberg

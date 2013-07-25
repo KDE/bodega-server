@@ -103,17 +103,6 @@ void parseSubject(ReaderState &state)
 QHash<QString, Ebook::Type> ebookTypes;
 Ebook::Type parseEbookType(ReaderState &state)
 {
-    if (ebookTypes.isEmpty()) {
-        ebookTypes.insert(QString(), Ebook::Type_Book);
-        ebookTypes.insert(QString::fromLatin1("Text"), Ebook::Type_Book);
-        ebookTypes.insert(QString::fromLatin1("Sound"), Ebook::Type_AudioBook);
-        ebookTypes.insert(QString::fromLatin1("Collection"), Ebook::Type_Compilations);
-        ebookTypes.insert(QString::fromLatin1("Image"), Ebook::Type_PicturesStill);
-        ebookTypes.insert(QString::fromLatin1("StillImage"), Ebook::Type_PicturesStill);
-        ebookTypes.insert(QString::fromLatin1("MovingImage"), Ebook::Type_PicturesMoving);
-        ebookTypes.insert(QString::fromLatin1("Dataset"), Ebook::Type_Data);
-    }
-
     Ebook::Type t = ebookTypes.value(state.xml.text().toString());
     if (t == Ebook::Type_Unknown) {
         qDebug() << "Unknown ebook type =" << state.xml.text() << "in file" << state.file.fileName();
@@ -374,6 +363,18 @@ void parseFileBlock(ReaderState &state)
                 break;
         }
     }
+}
+
+void init()
+{
+    ebookTypes.insert(QString(), Ebook::Type_Book);
+    ebookTypes.insert(QString::fromLatin1("Text"), Ebook::Type_Book);
+    ebookTypes.insert(QString::fromLatin1("Sound"), Ebook::Type_AudioBook);
+    ebookTypes.insert(QString::fromLatin1("Collection"), Ebook::Type_Compilations);
+    ebookTypes.insert(QString::fromLatin1("Image"), Ebook::Type_PicturesStill);
+    ebookTypes.insert(QString::fromLatin1("StillImage"), Ebook::Type_PicturesStill);
+    ebookTypes.insert(QString::fromLatin1("MovingImage"), Ebook::Type_PicturesMoving);
+    ebookTypes.insert(QString::fromLatin1("Dataset"), Ebook::Type_Data);
 }
 
 Gutenberg::Ebook parseRdf(const QString &path)
