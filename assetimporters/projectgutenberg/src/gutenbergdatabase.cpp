@@ -55,7 +55,7 @@ GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
       m_categoryTagId(0),
       m_licenseId(0),
       m_mimetypeTagId(0),
-      m_topLevelChannelName(QLatin1String("Free Books"))
+      m_topLevelChannelName(QLatin1String("Books"))
 {
 }
 
@@ -228,24 +228,26 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
 void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 {
-    const int booksChannel = writeChannel(m_topLevelChannelName, QLatin1String("Free Books"), "default/book.png");
+    const int booksChannelId = writeChannel(m_topLevelChannelName, QString(), "default/book.png");
+    const int authorChannelId = writeChannel(QString("By Author"), QString(),
+                                             "default/book.png", booksChannelId);
+    const int subjectChannelId = writeChannel(QString("By Subject"), QString(),
+                                              "default/book.png", booksChannelId);
+    const int titleChannelId = writeChannel(QString("By Title"), QString(),
+                                            "default/book.png", booksChannelId);
 
-    /*
-FIXME:
-    const QHash<LCC::Category, QString> map = LCC::categoryMap();
-    QHash<LCC::Category, QString>::const_iterator itr;
-    for (itr = map.constBegin(); itr != map.constEnd(); ++itr) {
+    const QHash<QString, QStringList> lccs = catalog.categoryHierarchy();
+    QHashIterator<QString, QStringList> it(lccs);
+    while (it.hasNext()) {
+        it.next();
+        const int channelId = writeChannel(it.key(), QString(), "default/book.png", subjectChannelId);
 
-        const int channel = writeChannel(itr.value(), itr.value(), "default/book.png", booksChannel);
-
-        if (!channel) {
-            return;
+        foreach (const QString &subChannel, it.value()) {
+            const int subChannelId = writeChannel(subChannel, QString(), "default/book.png", channelId);
+            writeChannelTags(subChannelId, m_categoryTagIds.value(it.key()));
+            writeChannelTags(subChannelId, m_subCategoryTagIds.value(subChannel));
         }
-
-        m_channelIds[itr.value()] = channel;
     }
-    writeBookChannelTags();
-    */
 }
 
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
@@ -316,19 +318,6 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
             const int subCategoryTagId = m_subCategoryTagIds[subCat];
             writeAssetTags(assetId, subCategoryTagId);
         }
-    }
-}
-
-void GutenbergDatabase::writeBookChannelTags()
-{
-    QHash<QString, int>::const_iterator itr;
-    for (itr = m_channelIds.constBegin(); itr != m_channelIds.constEnd();
-        ++itr) {
-        Q_ASSERT(m_categoryTagIds.contains(itr.key()));
-        int categoryTagId = m_categoryTagIds[itr.key()];
-        Q_ASSERT(categoryTagId);
-
-        writeChannelTags(itr.value(), categoryTagId);
     }
 }
 
