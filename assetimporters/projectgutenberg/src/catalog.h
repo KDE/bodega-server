@@ -54,7 +54,7 @@ private:
     void dumpDebugInfo();
 
 private:
-    bool m_dirty;
+    bool m_clean;
     QStringList m_languages;
     QStringList m_authors;
     QStringList m_formats;

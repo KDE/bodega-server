@@ -27,13 +27,13 @@
 using namespace Gutenberg;
 
 Catalog::Catalog()
-    : m_dirty(false)
+    : m_clean(false)
 {
 }
 
 bool Catalog::isCompiled() const
 {
-    return m_dirty;
+    return m_clean;
 }
 
 void Catalog::compile(const QString &imageCachePath)
@@ -107,6 +107,7 @@ void Catalog::compile(const QString &imageCachePath)
     m_subLccs = subLccs.values();
     m_authors = authors.values();
     dumpDebugInfo();
+    m_clean = true;
 }
 
 QStringList Catalog::topLevelCategories() const
