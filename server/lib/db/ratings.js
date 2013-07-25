@@ -119,7 +119,7 @@ module.exports.addAsset = function(db, req, res) {
     /*jshint multistr:true */
     var assetInsertQuery =
         'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);';
-    var ratingsDeleteQuery = 'DELETE FROM ratings WHERE asset = $1 AND person $2 AND attribute $3';
+    var ratingsDeleteQuery = 'DELETE FROM ratings WHERE asset = $1 AND person = $2 AND attribute = $3';
 
     // we don't have to check if the tag has assetType as tagtype, trg_ct_checkTagForRating
     // does the job for as.
@@ -138,46 +138,42 @@ module.exports.addAsset = function(db, req, res) {
 
     json.ratings = [];
 
-    for (var i in ratings) {
-        var rate = ratings[i];
-        rate.rating = utils.parseNumber(rate.rating);
-        rate.attribute= utils.parseNumber(rate.attribute);
-
+    var queue = async.queue(function(rating, cb) {
+        rating.rating = utils.parseNumber(rating.rating);
+        rating.attribute= utils.parseNumber(rating.attribute);
         db.query (
-            checkAttributeQuery, [assetId, rate.attribute],
+            checkAttributeQuery, [assetId, rating.attribute],
             function(err, result) {
                 if (err) {
                     errors.report('Database', req, res);
-                    return;
-                }
-
-                if (json.ratings.indexOf(rate) === -1 && result.rows[0].ok) {
-                    json.ratings.push(rate);
-                }
-        });
-    }
-
-    var queue = async.queue(function(rating, cb) {
-        db.query(
-            ratingsDeleteQuery, [assetId, userId, rating.attribute],
-            function(err, result) {
-                if (err) {
-                    errors.report('Database', req, res, err);
                     cb();
                     return;
                 }
 
+                if (json.ratings.indexOf(rating) === -1 && result.rows[0].ok) {
+                    json.ratings.push(rating);
 
-            db.query(
-                assetInsertQuery, [assetId, rating.attribute, userId, rating.rating],
-                function(err, result) {
-                    if (err) {
-                        errors.report('Database', req, res, err);
-                        cb();
-                        return;
-                    }
-                    cb();
-            });
+                    db.query(
+                        ratingsDeleteQuery, [assetId, userId, rating.attribute],
+                        function(err, result) {
+                            if (err) {
+                                errors.report('Database', req, res, err);
+                                cb();
+                                return;
+                            }
+
+                            db.query(
+                                assetInsertQuery, [assetId, rating.attribute, userId, rating.rating],
+                                function(err, result) {
+                                if (err) {
+                                    errors.report('Database', req, res, err);
+                                    cb();
+                                    return;
+                                }
+                                cb();
+                        });
+                });
+            }
         });
     });
 
@@ -185,7 +181,7 @@ module.exports.addAsset = function(db, req, res) {
         res.json(json);
     }
 
-    queue.push(json.ratings);
+    queue.push(ratings);
 };
 
 module.exports.removeAsset = function(db, req, res) {
