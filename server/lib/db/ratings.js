@@ -129,13 +129,13 @@ module.exports.addAssetRatings = function(db, req, res) {
     var assetId = req.params.assetId;
     var ratings = req.body.ratings;
 
-    var json = utils.standardJson(req);
 
     if (!assetId || !ratings) {
         errors.report('MissingParameters', req, res);
         return;
     }
 
+    var json = utils.standardJson(req);
     json.ratings = [];
 
     var queue = async.queue(function(rating, cb) {
