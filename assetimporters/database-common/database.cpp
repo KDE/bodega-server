@@ -288,10 +288,11 @@ int Database::channelId(const QString &channel, const QString &description, int 
 
     if (parentId) {
         query.prepare("insert into channels "
-                      "(store, store, active, parent, name, description) "
+                      "(store, active, parent, name, description) "
                       "values "
-                      "(:store, :store, :active, :parent, :name, :description) "
+                      "(:store, :active, :parent, :name, :description) "
                       "returning id");
+        query.bindValue(":parent", parentId);
     } else {
         query.prepare("insert into channels "
                       "(store, active, name, description) "
