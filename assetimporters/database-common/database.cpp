@@ -457,12 +457,8 @@ void Database::writeChannelTags(int channelId, int tagId)
     }
 }
 
-void Database::showError(const QSqlQuery &query) const
+QString Database::store() const
 {
-    QSqlError error = query.lastError();
-    qDebug() << Q_FUNC_INFO << "QPSQL Error: " << error.databaseText() << error.driverText();
-    qDebug() << "Query was "<< query.executedQuery();
-    qDebug() << "last was "<< query.lastQuery();
-    qDebug() << "bound = "<<query.boundValues();
+    return m_store;
 }
 

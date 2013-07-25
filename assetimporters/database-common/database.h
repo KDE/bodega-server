@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QSqlDatabase>
+#include <QSqlError>
 
 //#include "channelscatalog.h"
 
@@ -22,6 +23,7 @@ protected:
 
     void writeAssetTags(int assetId, QVariant &tagId);
 
+    QString store() const;
     void showError(const QSqlQuery &query) const;
     int channelId(const QString &name, const QString &description = QString(), int parentId = 0);
     //FIXME: get rid of writeChannel; it is basically channelId + default image name
@@ -56,5 +58,14 @@ private:
     QString m_store;
 };
 
+#define showError(query) \
+    QSqlError error = query.lastError(); \
+    qDebug() << "------------------------ DB ERROR ----------------------"; \
+    qDebug() << "at:" << Q_FUNC_INFO; \
+    qDebug() << "QPSQL Error: " << error.databaseText() << error.driverText(); \
+    qDebug() << "Query was "<< query.executedQuery(); \
+    qDebug() << "last was "<< query.lastQuery(); \
+    qDebug() << "bound = "<<query.boundValues(); \
+    qDebug() << "--------------------------------------------------------";
 
 #endif
