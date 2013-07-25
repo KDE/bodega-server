@@ -38,29 +38,16 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
 
     Q_ASSERT(catalog.isCompiled());
     if (!catalog.isCompiled()) {
-        qDebug()<<"Catalog must be compiled";
+        qDebug() << "Catalog must be compiled";
         return;
     }
+
     db.writeBookInit(clearOldData);
     db.writeLanguages(catalog);
     db.writeCategoryTags(catalog);
     db.writeBooks(catalog);
     db.writeBookChannels(catalog);
 }
-
-class ScopedTransaction
-{
-public:
-    ScopedTransaction()
-    {
-        QSqlDatabase::database().transaction();
-    }
-
-    ~ScopedTransaction()
-    {
-        QSqlDatabase::database().commit();
-    }
-};
 
 GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
     : Database(contentPath, "Project Gutenberg", "VIVALDI-1"),
@@ -170,11 +157,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
     QTime time;
     time.start();
 
-    bool transaction = QSqlDatabase::database().transaction();
-
-    if (!transaction) {
-        qWarning()<<"Couldn't initiate transaction!";
-    }
+    //ScopedTransaction s;
 
     int numSkipped = 0;
     int numBooksWritten = 0;
@@ -187,6 +170,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
     registerJobQuery.bindValue(":working", true);
     if (!registerJobQuery.exec()) {
         showError(registerJobQuery);
+        Q_ASSERT(!"something bad happened with the batchJobsInProgress setting");
     }
 
     QSqlQuery query;
@@ -200,6 +184,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
     recordExternalIdQuery.prepare("INSERT INTO gutenberg (id, asset) VALUES (:id, :asset)");
 
     foreach (const Ebook &book, catalog.m_ebooks) {
+        qDebug() << "Ok, let's put in this book" << book.bookId() << book.title();
         if (bookAssetQuery(book)) {
             // already in the database
             ++numSkipped;
@@ -230,10 +215,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
     registerJobQuery.bindValue(":working", false);
     if (!registerJobQuery.exec()) {
         showError(registerJobQuery);
-    }
-
-    if (!QSqlDatabase::database().commit()) {
-        qWarning() << "Couldn't commit db data!";
+        Q_ASSERT(!"something bad happened with the batchJobsInProgress setting");
     }
 
     int elapsed = time.elapsed();
@@ -268,12 +250,12 @@ FIXME:
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
 {
     QSqlQuery query;
-    query.prepare("SELECT id FROM gutenberg where id = :externid");
-
-    query.bindValue(":externid", book.bookId());
+    query.prepare("SELECT id FROM gutenberg where id = :id");
+    query.bindValue(":id", book.bookId());
 
     if (!query.exec()) {
         showError(query);
+        Q_ASSERT(false);
         return 0;
     }
 
@@ -281,8 +263,7 @@ int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
         return 0;
     }
 
-    QVariant res = query.value(0);
-    return res.toInt();
+    return query.value(0).toInt();
 }
 
 int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)

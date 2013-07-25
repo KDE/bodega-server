@@ -1,11 +1,38 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#include <QDebug>
 #include <QHash>
 #include <QSqlDatabase>
 #include <QSqlError>
 
 //#include "channelscatalog.h"
+
+class ScopedTransaction
+{
+public:
+    ScopedTransaction()
+    {
+        m_ourTransaction = !s_inTransaction;
+        if (!s_inTransaction) {
+            s_inTransaction = true;
+            QSqlDatabase::database().transaction();
+        } else {
+            qDebug() << "ALREADY IN TRANSACTION!";
+        }
+    }
+
+    ~ScopedTransaction()
+    {
+        if (m_ourTransaction) {
+            QSqlDatabase::database().commit();
+            s_inTransaction = false;
+        }
+    }
+
+    bool m_ourTransaction;
+    static bool s_inTransaction;
+};
 
 class Database
 {

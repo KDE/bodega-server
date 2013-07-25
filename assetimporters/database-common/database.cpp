@@ -28,6 +28,8 @@
 
 #include <QDebug>
 
+bool ScopedTransaction::s_inTransaction = false;
+
 Database::Database(const QString &contentPath, const QString &partner, const QString &store)
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
@@ -46,7 +48,6 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
 
     m_partnerId = partnerId(partner);
     if (!m_partnerId) {
-        QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create partner");
         return;
     }
@@ -54,7 +55,6 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
 
     m_mimetypeTagId = tagTypeId(QLatin1String("mimetype"));
     if (!m_mimetypeTagId) {
-        QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
@@ -62,14 +62,12 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
 
     m_authorTagId = tagTypeId(QLatin1String("author"));
     if (!m_authorTagId) {
-        QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
 
     m_categoryTagId = tagTypeId(QLatin1String("category"));
     if (!m_categoryTagId) {
-        QSqlDatabase::database().rollback();
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
@@ -77,12 +75,9 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
 
 int Database::writeChannel(const QString &name, const QString &description, const QString& image, int parentId)
 {
-    QSqlDatabase::database().transaction();
-
     int id = channelId(name, description, parentId);
 
     if (!id) {
-        QSqlDatabase::database().rollback();
         return 0;
     }
 
@@ -93,11 +88,8 @@ int Database::writeChannel(const QString &name, const QString &description, cons
 
     if (!query.exec()) {
         showError(query);
-        QSqlDatabase::database().rollback();
         return 0;
     }
-
-    QSqlDatabase::database().commit();
 
     return id;
 }
@@ -134,12 +126,10 @@ int Database::partnerId(const QString &partner)
         createQuery.bindValue(":partner", partner);
         if (!createQuery.exec()) {
             showError(createQuery);
-            QSqlDatabase::database().rollback();
             return 0;
         }
 
         if (!createQuery.first()) {
-            QSqlDatabase::database().rollback();
             return 0;
         }
 
@@ -246,7 +236,6 @@ int Database::tagTypeId(const QString &type) const
 
     if (!query.exec()) {
         showError(query);
-        QSqlDatabase::database().rollback();
         return 0;
     }
 
@@ -256,12 +245,10 @@ int Database::tagTypeId(const QString &type) const
         createQuery.bindValue(":type", type);
         if (!createQuery.exec()) {
             showError(createQuery);
-            QSqlDatabase::database().rollback();
             return 0;
         }
 
         if (!createQuery.first()) {
-            QSqlDatabase::database().rollback();
             return 0;
         }
 
@@ -344,7 +331,6 @@ int Database::categoryId(const QString &name) const
 
     if (!query.exec()) {
         showError(query);
-        QSqlDatabase::database().rollback();
         return 0;
     }
 
@@ -360,7 +346,6 @@ int Database::categoryId(const QString &name) const
     query.bindValue(":type", m_categoryTagId);
     if (!query.exec()) {
         showError(query);
-        QSqlDatabase::database().rollback();
         return 0;
     }
 
