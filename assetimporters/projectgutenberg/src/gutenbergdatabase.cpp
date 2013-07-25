@@ -42,6 +42,7 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
         return;
     }
 
+    ScopedTransaction s;
     db.writeBookInit(clearOldData);
     db.writeLanguages(catalog);
     db.writeCategoryTags(catalog);
@@ -60,8 +61,6 @@ GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
 
 void GutenbergDatabase::writeBookInit(bool clearOldData)
 {
-    ScopedTransaction s;
-
     if (clearOldData) {
         QSqlQuery query;
         query.prepare("DELETE FROM channels WHERE store = :store AND "
@@ -105,7 +104,6 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
 {
-    ScopedTransaction s;
     QStringList langs = catalog.languages();
 
     foreach(QString lang, langs) {
@@ -141,6 +139,7 @@ void GutenbergDatabase::writeCategoryTags(const Catalog &catalog)
 {
     foreach (const QString &category, catalog.topLevelCategories()) {
         const int id = categoryId(category);
+        qDebug() << "looking for" << category << id;
         Q_ASSERT(id);
         m_categoryTagIds[category] = id;
     }
@@ -156,8 +155,6 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 {
     QTime time;
     time.start();
-
-    //ScopedTransaction s;
 
     int numSkipped = 0;
     int numBooksWritten = 0;
@@ -175,7 +172,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, license, partner, version, path, file, image, size) "
+                  "(name, license, partner, version, externpath, file, image, size) "
                   "values "
                   "(:name, :license, :partner, :version, :path, :file, :image, :size) "
                   "returning id");
@@ -198,6 +195,10 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
             recordExternalIdQuery.bindValue(":id", book.bookId());
             recordExternalIdQuery.bindValue(":asset", assetId);
+            if (!recordExternalIdQuery.exec()) {
+                showError(query);
+                Q_ASSERT("Normal insert into gutenberg table failed.");
+            }
 
             writeBookAssetTags(book, assetId);
             ++numBooksWritten;
@@ -268,6 +269,7 @@ int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
 
 int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 {
+    static const QString filePrefix("gutenberg/");
     Gutenberg::File epubFile = book.epubFile();
     QFileInfo fi(epubFile.url.path());
 
@@ -281,16 +283,15 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
     //FIXME: alternatives
     const int id = writeAsset(query, book.title(), QString(),
                               m_licenseId, partnerId(), QLatin1String("1.0"),
-                              epubFile.url.toString(), fi.fileName(), cover);
+                              epubFile.url.toString(), filePrefix + fi.fileName(), cover);
     return id;
 }
 
 void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
 {
     const QStringList authors = book.authors();
-    foreach (QString author, authors) {
-        int authorId = this->authorId(author);
-        writeAssetTags(assetId, authorId);
+    foreach (const QString &author, authors) {
+        writeAssetTags(assetId, authorId(author));
     }
 
     //qDebug()<<"Book = "<< book.title();
