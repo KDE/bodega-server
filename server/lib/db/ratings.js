@@ -179,7 +179,7 @@ module.exports.addAsset = function(db, req, res) {
 
     queue.drain = function() {
         res.json(json);
-    }
+    };
 
     queue.push(ratings);
 };
