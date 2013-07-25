@@ -209,10 +209,12 @@ QStringList parseEbookBlock(ReaderState &state)
     Q_ASSERT(attrs.hasAttribute("rdf:about"));
 
     QString id = attrs.value("rdf:about").toString();
+    /*
     int slash = id.indexOf('/');
     if (slash != -1) {
         id = id.right(id.count() - slash - 1);
     }
+    */
     state.book.setBookId(id);
 
     QStringList creatorRefs;
