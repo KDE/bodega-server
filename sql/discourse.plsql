@@ -112,27 +112,17 @@ BEGIN
         --    RETURN NEW;
         --END IF;
 
-        PERFORM dblink_exec('INSERT INTO categories (name, created_at, updated_at, description, user_id, slug)
+        SELECT INTO categoryId id FROM dblink('INSERT INTO categories (name, created_at, updated_at, description, user_id, slug)
                             VALUES ('''||ct_generateCategoryName(NEW.name)||''', '''||currentTime||''',
                             '''||currentTime||''', '''||ct_generateCategoryDescription(NEW.name)||''',
-                            '''||userId||''', '''||ct_generateCategoryName(NEW.name)||''');' );
+                            '''||userId||''', '''||ct_generateCategoryName(NEW.name)||''') RETURNING id;' )
+                            AS f(id int);
 
-
-        SELECT INTO categoryId id FROM dblink('SELECT id FROM categories
-                                              WHERE name = '''||ct_generateCategoryName(NEW.name)||'''
-                                              AND description = '''||ct_generateCategoryDescription(NEW.name)||''';')
-                                    AS f(id int);
-
-
-
-        PERFORM dblink_exec('INSERT INTO topics (title, created_at, updated_at,
+        SELECT INTO topicId id FROM dblink('INSERT INTO topics (title, created_at, updated_at,
                             user_id, last_post_user_id, bumped_at, category_id)
                             VALUES('''||ct_generateTopicTitle(NEW.name)||''', '''||currentTime||''', '''||currentTime||''',
                             '''||userId||''', '''||userId||''', '''||currentTime||''',
-                            '''||categoryId||''');');
-
-        SELECT INTO topicId id FROM dblink('SELECT id FROM topics
-                                            WHERE title = '''||ct_generateTopicTitle(NEW.name)||''';') AS f(id int);
+                            '''||categoryId||''') RETURNING id;') AS f(id int);
 
         PERFORM dblink_exec('INSERT INTO category_featured_topics (category_id, topic_id, created_at, updated_at, rank)
                             VALUES ('''||categoryId||''', '''||topicId||''', '''||currentTime||''', '''||currentTime||''', 0);');
