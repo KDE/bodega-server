@@ -121,14 +121,9 @@ module.exports.addAssetRatings = function(db, req, res) {
         'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);';
     var ratingsDeleteQuery = 'DELETE FROM ratings WHERE asset = $1 AND person = $2 AND attribute = $3';
 
-    // we don't have to check if the tag has assetType as tagtype, trg_ct_checkTagForRating
-    // does the job for as.
-    var checkAttributeQuery = 'SELECT ct_checkAssociationOfRatingAttributeWithAsset($1, $2) AS ok';
-
     var userId = req.session.user.id;
     var assetId = req.params.assetId;
     var ratings = req.body.ratings;
-
 
     if (!assetId || !ratings) {
         errors.report('MissingParameters', req, res);
@@ -141,40 +136,31 @@ module.exports.addAssetRatings = function(db, req, res) {
     var queue = async.queue(function(rating, cb) {
         rating.rating = utils.parseNumber(rating.rating);
         rating.attribute= utils.parseNumber(rating.attribute);
-        db.query (
-            checkAttributeQuery, [assetId, rating.attribute],
-            function(err, result) {
-                if (err) {
-                    errors.report('Database', req, res);
-                    cb();
-                    return;
-                }
 
-                if (json.ratings.indexOf(rating) === -1 && result.rows[0].ok) {
-                    json.ratings.push(rating);
+        if (json.ratings.indexOf(rating) === -1) {
+            json.ratings.push(rating);
+
+            db.query(
+                ratingsDeleteQuery, [assetId, userId, rating.attribute],
+                function(err, result) {
+                    if (err) {
+                        errors.report('Database', req, res, err);
+                        cb();
+                        return;
+                    }
 
                     db.query(
-                        ratingsDeleteQuery, [assetId, userId, rating.attribute],
+                        assetInsertQuery, [assetId, rating.attribute, userId, rating.rating],
                         function(err, result) {
-                            if (err) {
-                                errors.report('Database', req, res, err);
-                                cb();
-                                return;
-                            }
-
-                            db.query(
-                                assetInsertQuery, [assetId, rating.attribute, userId, rating.rating],
-                                function(err, result) {
-                                if (err) {
-                                    errors.report('Database', req, res, err);
-                                    cb();
-                                    return;
-                                }
-                                cb();
-                        });
+                        if (err) {
+                            errors.report('Database', req, res, err);
+                            cb();
+                            return;
+                        }
+                        cb();
+                    });
                 });
             }
-        });
     });
 
     queue.drain = function() {

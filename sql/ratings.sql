@@ -45,25 +45,14 @@ DROP TRIGGER IF EXISTS trg_ct_checkTagForRating ON ratingAttributes;
 CREATE TRIGGER trg_ct_checkTagForRating BEFORE INSERT OR UPDATE ON ratingAttributes
 FOR EACH ROW EXECUTE PROCEDURE ct_checkTagForRating();
 
-CREATE OR REPLACE FUNCTION ct_checkAssociationOfRatingAttributeWithAsset(int, int) RETURNS BOOL AS $$
+CREATE OR REPLACE FUNCTION ct_checkAssociationOfRatingAttributeWithAsset() RETURNS TRIGGER AS $$
 DECLARE
     assetId INT;
 BEGIN
 
-    SELECT INTO assetId asset FROM assettags at INNER JOIN tags t ON (t.id = at.tag) INNER JOIN ratingattributes ra ON (ra.assettype = t.id) WHERE at.asset = $1 and ra.id = $2;
+    SELECT INTO assetId asset FROM assettags at INNER JOIN tags t ON (t.id = at.tag) INNER JOIN ratingattributes ra ON (ra.assettype = t.id) WHERE at.asset = NEW.asset and ra.id = NEW.attribute;
 
     IF NOT FOUND THEN
-        RETURN FALSE;
-    END IF;
-
-    RETURN TRUE;
-END;
-$$ LANGUAGE 'plpgsql';
-
-CREATE OR REPLACE FUNCTION ct_checkAssociationOfRatingAttributeWithAsset2() RETURNS TRIGGER AS $$
-DECLARE
-BEGIN
-    IF NOT ct_checkAssociationOfRatingAttributeWithAsset(NEW.asset, NEW.attribute) THEN
         RAISE EXCEPTION 'The asset can''t be associated with the rating attribute ';
     END IF;
 
@@ -73,7 +62,7 @@ $$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_checkAssociationOfRatingAttributeWithAsset ON ratings;
 CREATE TRIGGER trg_ct_checkAssociationOfRatingAttributeWithAsset BEFORE INSERT ON ratings
-FOR EACH ROW EXECUTE PROCEDURE ct_checkAssociationOfRatingAttributeWithAsset2();
+FOR EACH ROW EXECUTE PROCEDURE ct_checkAssociationOfRatingAttributeWithAsset();
 
 CREATE OR REPLACE FUNCTION ct_sumForAssetRatings() RETURNS TRIGGER AS $$
 DECLARE
