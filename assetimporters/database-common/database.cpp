@@ -263,8 +263,7 @@ int Database::tagTypeId(const QString &type) const
 int Database::channelId(const QString &channel, const QString &description, int parentId)
 {
     QSqlQuery query;
-    QString queryText =
-        QString::fromLatin1("select id from channels where name = :name and store = :store");
+    QString queryText = QString::fromLatin1("select id from channels where name = :name and store = :store");
 
     if (parentId) {
         queryText += QLatin1String(" and parent = :parentId");
@@ -297,7 +296,7 @@ int Database::channelId(const QString &channel, const QString &description, int 
         query.prepare("insert into channels "
                       "(store, active, name, description) "
                       "values "
-                      "(:partner, :store, :active, :name, :description) "
+                      "(:store, :active, :name, :description) "
                       "returning id");
     }
 
