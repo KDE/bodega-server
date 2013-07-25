@@ -169,7 +169,10 @@ void parseLangauges(ReaderState &state)
                     hasBag = true;
                 } else if (itemTag == elem) {
                     state.xml.readNext();
-                    langs << state.xml.text().toString();
+                    QString l = state.xml.text().toString().simplified();
+                    if (!l.isEmpty()) {
+                        langs << l;
+                    }
                     state.xml.readNext();
                 } else {
                     ignoreBlock(state);
@@ -178,7 +181,10 @@ void parseLangauges(ReaderState &state)
 
             case QXmlStreamReader::Characters:
                 if (!hasBag) {
-                    langs << state.xml.text().toString();
+                    QString l = state.xml.text().toString().simplified();
+                    if (!l.isEmpty()) {
+                        langs << l;
+                    }
                 }
                 break;
 
