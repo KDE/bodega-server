@@ -42,37 +42,84 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
         return;
     }
     db.writeBookInit(clearOldData);
-    //db.writeLanguages(catalog);
+    db.writeLanguages(catalog);
     db.writeCategoryTags(catalog);
     db.writeBooks(catalog);
     db.writeBookChannels(catalog);
 }
 
+class ScopedTransaction
+{
+public:
+    ScopedTransaction()
+    {
+        QSqlDatabase::database().transaction();
+    }
+
+    ~ScopedTransaction()
+    {
+        QSqlDatabase::database().commit();
+    }
+};
+
 GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
     : Database(contentPath, "Project Gutenberg", "VIVALDI-1"),
       m_categoryTagId(0),
       m_licenseId(0),
-      m_mimetypeTagId(0)
+      m_mimetypeTagId(0),
+      m_topLevelChannelName(QLatin1String("Free Books"))
 {
 }
 
 void GutenbergDatabase::writeBookInit(bool clearOldData)
 {
-    QSqlDatabase::database().transaction();
+    ScopedTransaction s;
+
+    if (clearOldData) {
+        QSqlQuery query;
+        query.prepare("DELETE FROM channels WHERE store = :store AND "
+                      "(name = :name OR parent IN "
+                      "(SELECT id FROM channels WHERE store = :subStore AND name = :subName))");
+        query.bindValue(":store", store());
+        query.bindValue(":name", m_topLevelChannelName);
+        query.bindValue(":subStore", store());
+        query.bindValue(":subName", m_topLevelChannelName);
+        if (!query.exec()) {
+            showError(query);
+            Q_ASSERT(false);
+        }
+
+        query.prepare("DELETE FROM assets WHERE partner = :partner");
+        query.bindValue(":partner", partnerId());
+        if (!query.exec()) {
+            showError(query);
+            Q_ASSERT(false);
+        }
+    }
 
     //qDebug()<<"partner id = "<<m_partnerId;
 
+    // create a table to store the external ids
+    QSqlQuery query;
+    if (!query.exec("CREATE TABLE IF NOT EXISTS gutenberg "
+                    "(id text primary key, asset int references assets(id) on delete cascade)")) {
+        showError(query);
+        Q_ASSERT(false);
+    }
+
     m_licenseId = licenseId("Project Gutenberg License",
                             "http://www.gutenberg.org/wiki/Gutenberg:The_Project_Gutenberg_License");
+    if (!m_licenseId) {
+        Q_ASSERT(!"failed to get a license id");
+    }
 
     m_mimetypeTagId = mimetypeTagId();
 }
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
 {
+    ScopedTransaction s;
     QStringList langs = catalog.languages();
-
-    QSqlDatabase::database().transaction();
 
     foreach(QString lang, langs) {
         QLocale locale(lang);
@@ -83,12 +130,11 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
                         <<" already in the database";
                 continue;
             } else {
-                //XXX: locale.nativeLanguageName() in Qt 4.8
                 QString langName = QLocale::languageToString(locale.language());
                 QSqlQuery query;
                 query.prepare("insert into languages "
                               "(code, name) "
-                              "values (:code, :name);");
+                              "values (:code, :name)");
                 query.bindValue(":code", locale.name());
                 query.bindValue(":name", langName);
                 if (!query.exec()) {
@@ -101,7 +147,6 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
             qDebug()<<"Unrecognized language = "<<lang;
         }
     }
-    QSqlDatabase::database().commit();
 }
 
 
@@ -146,10 +191,13 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, license, partner, version, path, file, externid, image, size) "
+                  "(name, license, partner, version, path, file, image, size) "
                   "values "
-                  "(:name, :license, :partner, :version, :path, :file, :externid, :image, :size) "
-                  "returning id;");
+                  "(:name, :license, :partner, :version, :path, :file, :image, :size) "
+                  "returning id");
+
+    QSqlQuery recordExternalIdQuery;
+    recordExternalIdQuery.prepare("INSERT INTO gutenberg (id, asset) VALUES (:id, :asset)");
 
     foreach (const Ebook &book, catalog.m_ebooks) {
         if (bookAssetQuery(book)) {
@@ -162,6 +210,10 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
                 QSqlDatabase::database().rollback();
                 return;
             }
+
+            recordExternalIdQuery.bindValue(":id", book.bookId());
+            recordExternalIdQuery.bindValue(":asset", assetId);
+
             writeBookAssetTags(book, assetId);
             ++numBooksWritten;
         }
@@ -193,7 +245,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
 void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 {
-    const int booksChannel = writeChannel(QLatin1String("Books"), QLatin1String("Books"), "default/book.png");
+    const int booksChannel = writeChannel(m_topLevelChannelName, QLatin1String("Free Books"), "default/book.png");
 
     /*
 FIXME:
@@ -216,9 +268,8 @@ FIXME:
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
 {
     QSqlQuery query;
-    query.prepare("select id from assets where name = :name and externid = :externid;");
+    query.prepare("SELECT id FROM gutenberg where id = :externid");
 
-    query.bindValue(":name", book.title());
     query.bindValue(":externid", book.bookId());
 
     if (!query.exec()) {
@@ -248,8 +299,8 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 
     //FIXME: alternatives
     const int id = writeAsset(query, book.title(), QString(),
-                              m_licenseId, m_partnerId, QLatin1String("1.0"),
-                              epubFile.url.toString(), fi.fileName(), book.bookId(), cover);
+                              m_licenseId, partnerId(), QLatin1String("1.0"),
+                              epubFile.url.toString(), fi.fileName(), cover);
     return id;
 }
 
@@ -305,7 +356,7 @@ int GutenbergDatabase::languageId(const QString &lang)
 
     if (id < 1) {
          QSqlQuery query;
-        query.prepare("select id from languages where code=:lang;");
+        query.prepare("select id from languages where code=:lang");
         query.bindValue(":lang", lang);
 
         if (!query.exec()) {
