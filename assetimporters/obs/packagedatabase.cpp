@@ -68,9 +68,9 @@ void PackageDatabase::writePackages()
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, description, license, author, version, path, file, externid, image, size) "
+                  "(name, description, license, author, version, path, file, image, size) "
                   "values "
-                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image, :size) "
+                  "(:name, :description, :license, :author, :version, :path, :file, :image, :size) "
                   "returning id;");
     QHash<QString, int> mimetypeIds;
 
@@ -95,7 +95,8 @@ void PackageDatabase::writePackages()
         //TODO: check if the image exists
         //FIXME: license and partner should BOTH be fetch from the package info!
         int assetId = writeAsset(query, package.name, package.description, licenseId("LGPL"),
-                partnerId("KDE"), package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
+                                 partnerId(), package.version, packagePath, packagePath,
+                                 QLatin1String("images/")+package.name+QLatin1String(".png"));
         if (!assetId) {
             showError(query);
             QSqlDatabase::database().rollback();

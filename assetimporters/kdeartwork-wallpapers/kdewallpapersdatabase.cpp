@@ -153,7 +153,8 @@ int WallpapersDatabase::findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery
 int WallpapersDatabase::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, int assetId)
 {
     QString image = "kdeartwork/" + wallpaper.path + ".jpg";
-    return writeAsset(query, wallpaper.name, QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), wallpaper.installPath(), QString(), wallpaper.pluginName, image);
+    return writeAsset(query, wallpaper.name, QString(), m_licenseId, partnerId(),
+                      QLatin1String("1.0"), wallpaper.installPath(), wallpaper.pluginName, image);
 }
 
 void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
