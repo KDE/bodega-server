@@ -40,7 +40,6 @@ void Catalog::compile(const QString &imageCachePath)
 {
     QSet<QString> languages;
     QSet<QString> formats;
-    QSet<QString> topLccs;
     QSet<QString> subLccs;
     QSet<QString> authors;
 
@@ -79,9 +78,12 @@ void Catalog::compile(const QString &imageCachePath)
         QHashIterator<QString, QStringList> catIt(cats);
         while (catIt.hasNext()) {
             catIt.next();
-            topLccs.insert(catIt.key());
+            m_lccsHierarchy.insert(catIt.key(), QStringList());
 
             foreach (const QString lcc, catIt.value()) {
+                if (!m_lccsHierarchy[catIt.key()].contains(lcc)) {
+                    m_lccsHierarchy[catIt.key()].append(lcc);
+                }
                 subLccs.insert(lcc);
             }
         }
@@ -103,7 +105,7 @@ void Catalog::compile(const QString &imageCachePath)
 
     m_languages = languages.values();
     m_formats = formats.values();
-    m_lccs = topLccs.values();
+    m_lccs = m_lccsHierarchy.keys();
     m_subLccs = subLccs.values();
     m_authors = authors.values();
     dumpDebugInfo();
@@ -120,6 +122,10 @@ QStringList Catalog::subCategories() const
     return m_subLccs;
 }
 
+QHash<QString, QStringList> Catalog::categoryHierarchy() const
+{
+    return m_lccsHierarchy;
+}
 QStringList Catalog::languages() const
 {
     return m_languages;

@@ -46,6 +46,7 @@ public:
     QHash<QUrl, QString> covers() const;
     QStringList topLevelCategories() const;
     QStringList subCategories() const;
+    QHash<QString, QStringList> categoryHierarchy() const;
 
     QList<Gutenberg::Ebook> m_ebooks;
 
@@ -61,6 +62,7 @@ private:
     QStringList m_lccs;
     QStringList m_subLccs;
     QHash<QString, int> m_lcshs;
+    QHash<QString, QStringList> m_lccsHierarchy;
     QHash<QUrl, QString> m_coversToDownload;
 };
 
