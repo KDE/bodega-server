@@ -174,6 +174,7 @@ int Database::licenseId(const QString &license, const QString &licenseText)
     query.bindValue(":licenseText", licenseText);
 
     if (!query.exec()) {
+        qDebug() << "uhoh!";
         showError(query);
         return 0;
     }
@@ -276,8 +277,7 @@ int Database::channelId(const QString &channel, const QString &description, int 
 {
     QSqlQuery query;
     QString queryText =
-        QString::fromLatin1("select id from channels where "
-                            "name = :name and partner = :partnerId");
+        QString::fromLatin1("select id from channels where name = :name and store = :store");
 
     if (parentId) {
         queryText += QLatin1String(" and parent = :parentId;");
@@ -288,7 +288,7 @@ int Database::channelId(const QString &channel, const QString &description, int 
         query.prepare(queryText);
     }
     query.bindValue(":name", channel);
-    query.bindValue(":partnerId", m_partnerId);
+    query.bindValue(":store", m_store);
 
     if (!query.exec()) {
         showError(query);
@@ -303,20 +303,18 @@ int Database::channelId(const QString &channel, const QString &description, int 
 
     if (parentId) {
         query.prepare("insert into channels "
-                      "(partner, store, active, parent, name, description) "
+                      "(store, store, active, parent, name, description) "
                       "values "
-                      "(:partner, :store, :active, :parent, :name, :description) "
+                      "(:store, :store, :active, :parent, :name, :description) "
                       "returning id;");
-        query.bindValue(":parent", parentId);
     } else {
         query.prepare("insert into channels "
-                      "(partner, store, active, name, description) "
+                      "(store, active, name, description) "
                       "values "
                       "(:partner, :store, :active, :name, :description) "
                       "returning id;");
     }
 
-    query.bindValue(":partner", m_partnerId);
     query.bindValue(":store", m_store);
     query.bindValue(":active", true);
     query.bindValue(":name", channel);
@@ -382,7 +380,7 @@ int Database::authorId(const QString &author)
 int Database::writeAsset(QSqlQuery query, const QString &name, const QString &description,
                          int licenseId, int partnerId,
                          const QString &version, const QString &path, const QString &file,
-                         const QString &externid, const QString &imagePath)
+                         const QString &imagePath)
 {
     query.bindValue(":name", name);
     query.bindValue(":description", description);
@@ -391,10 +389,7 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
     query.bindValue(":version", version);
     query.bindValue(":path", path);
     query.bindValue(":file", file);
-    query.bindValue(":externid", externid);
     query.bindValue(":image", imagePath);
-    // XXX figure out what to do about descriptions
-    //query.bindValue(":description",);
 
     query.bindValue(":size", QFile(m_contentPath + '/' + file).size());
 

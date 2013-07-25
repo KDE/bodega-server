@@ -18,7 +18,7 @@ protected:
                    int licenseId, int partnerId,
                    const QString &version,
                    const QString &path, const QString &file,
-                   const QString &externid, const QString &imagePath);
+                   const QString &imagePath);
     void writeAssetTags(int assetId, int tagId);
 
     void writeAssetTags(int assetId, QVariant &tagId);
