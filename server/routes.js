@@ -332,7 +332,7 @@ app.get(serverPath('asset/:assetId'), anonBrowsing, isAuthorized,
             app.db.assetInfo(req, res);
         });
 
-app.post(serverPath('asset/ratings/list/:assetId'), isAuthorized,
+app.post(serverPath('asset/ratings/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.ratingAddAsset(req, res);

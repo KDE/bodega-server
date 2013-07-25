@@ -209,7 +209,7 @@ describe('Ratings', function() {
         it('it should fail because the asset is invalid', function(done) {
             utils.postUrl(
                 server,
-                '/bodega/v1/json/asset/ratings/list/1000', {},
+                '/bodega/v1/json/asset/ratings/1000', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -238,7 +238,7 @@ describe('Ratings', function() {
             };
             utils.postUrl(
                 server,
-                '/bodega/v1/json/asset/ratings/list/10', query,
+                '/bodega/v1/json/asset/ratings/10', query,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
