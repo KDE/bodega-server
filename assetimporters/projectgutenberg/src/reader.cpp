@@ -456,7 +456,6 @@ Gutenberg::Ebook parseRdf(const QString &path)
         }
     }
     state.book.setAuthors(authors);
-    qDebug() << "authors:" << state.book.authors() << authors;
 
     return state.book;
 }

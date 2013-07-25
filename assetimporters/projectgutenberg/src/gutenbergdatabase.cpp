@@ -139,7 +139,7 @@ void GutenbergDatabase::writeCategoryTags(const Catalog &catalog)
 {
     foreach (const QString &category, catalog.topLevelCategories()) {
         const int id = categoryId(category);
-        qDebug() << "looking for" << category << id;
+        //qDebug() << "looking for" << category << id;
         Q_ASSERT(id);
         m_categoryTagIds[category] = id;
     }
@@ -181,7 +181,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
     recordExternalIdQuery.prepare("INSERT INTO gutenberg (id, asset) VALUES (:id, :asset)");
 
     foreach (const Ebook &book, catalog.m_ebooks) {
-        qDebug() << "Ok, let's put in this book" << book.bookId() << book.title();
+        //qDebug() << "Ok, let's put in this book" << book.bookId() << book.title();
         if (bookAssetQuery(book)) {
             // already in the database
             ++numSkipped;
