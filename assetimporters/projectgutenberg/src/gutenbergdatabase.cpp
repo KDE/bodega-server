@@ -197,7 +197,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
     QTime time;
     time.start();
 
-    ScopedTransaction s;
+    //ScopedTransaction s;
     ScopedBatchJob j;
 
     int numSkipped = 0;
@@ -274,10 +274,19 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         it.next();
         const int channelId = writeChannel(it.key(), QString(), "default/book.png", subjectChannelId);
 
-        foreach (const QString &subChannel, it.value()) {
-            const int subChannelId = writeChannel(subChannel, QString(), "default/book.png", channelId);
-            writeChannelTags(subChannelId, m_categoryTagIds.value(it.key()));
-            writeChannelTags(subChannelId, m_subCategoryTagIds.value(subChannel));
+        if (it.value().isEmpty()) {
+            // this guy has no subcategories, so we'll put tags on it
+            writeChannelTags(channelId, m_categoryTagIds.value(it.key()));
+        } else {
+            foreach (const QString &subChannel, it.value()) {
+                const int subChannelId = writeChannel(subChannel, QString(), "default/book.png", channelId);
+                /*
+                qDebug() << "CHANNEL" << channelId << it.key() << subChannelId << subChannel
+                         << m_categoryTagIds.value(it.key()) << m_subCategoryTagIds.value(subChannel);
+                */
+                writeChannelTags(subChannelId, m_categoryTagIds.value(it.key()));
+                writeChannelTags(subChannelId, m_subCategoryTagIds.value(subChannel));
+            }
         }
     }
 }
@@ -335,6 +344,7 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
     Gutenberg::LCC lcc = book.lcc();
     const QHash<QString, QStringList> lccs = lcc.categories();
     QHashIterator<QString, QStringList> it(lccs);
+    //qDebug() << "==========> " << book.title() << assetId;
     while (it.hasNext()) {
         it.next();
 
@@ -342,10 +352,12 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
         Q_ASSERT(m_categoryTagIds.contains(it.key()));
         const int categoryTagId = m_categoryTagIds[it.key()];
         Q_ASSERT(categoryTagId);
+        //qDebug() << "main cat:" << it.key() << categoryTagId;
         writeAssetTags(assetId, categoryTagId);
 
         foreach (const QString &subCat, it.value()) {
             const int subCategoryTagId = m_subCategoryTagIds[subCat];
+            //qDebug() << "\tsub cat:" << subCat << subCategoryTagId;
             writeAssetTags(assetId, subCategoryTagId);
         }
     }
