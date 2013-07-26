@@ -113,6 +113,8 @@ public:
     QString coverImage() const;
     void setCoverImage(const QString &coverUrl);
 
+    static QString epubMimetype();
+
 private:
     QString m_id;
     QString m_title;
@@ -130,6 +132,8 @@ private:
     Gutenberg::LCC m_lcc;
 
     QList<Gutenberg::File> m_files;
+
+    static const QString s_epubMimetype;
 };
 
 }

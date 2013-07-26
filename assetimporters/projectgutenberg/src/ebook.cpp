@@ -19,6 +19,8 @@
 
 using namespace Gutenberg;
 
+const QString Ebook::s_epubMimetype(QLatin1String("application/epub"));
+
 Ebook::Ebook()
     : m_rights(Ebook::Rights_Gutenberg),
       m_type(Ebook::Type_Unknown)
@@ -170,11 +172,15 @@ void Ebook::addFile(const Gutenberg::File &file)
     m_files.append(file);
 }
 
+QString Ebook::epubMimetype ()
+{
+    return s_epubMimetype;
+}
+
 bool Ebook::hasEpubFile() const
 {
-    QLatin1String epubFormat("application/epub");
     foreach(const Gutenberg::File &file, m_files) {
-        if (file.format.contains(epubFormat)) {
+        if (file.format.contains(s_epubMimetype)) {
             return true;
         }
     }
@@ -183,11 +189,10 @@ bool Ebook::hasEpubFile() const
 
 File Ebook::epubFile() const
 {
-    QLatin1String epubFormat("application/epub");
     QList<Gutenberg::File> epubFiles;
 
     foreach(const Gutenberg::File &file, m_files) {
-        if (file.format.contains(epubFormat)) {
+        if (file.format.contains(s_epubMimetype)) {
             epubFiles.append(file);
         }
     }
