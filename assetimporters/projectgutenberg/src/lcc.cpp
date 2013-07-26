@@ -249,24 +249,24 @@ QString LCC::fSubCats(const QString &code)
     }
 
     bool ok;
-    int number = code.right(code.size() - 1).toInt(&ok);
+    double number = code.right(code.size() - 1).toDouble(&ok);
     if (!ok || number < 1) {
         return QString();
     }
 
-    if (number <= 975) {
+    if (number < 976) {
         return QString::fromLatin1("United States");
     }
 
-    if (number <= 1145) {
+    if (number < 1146) {
         return QString::fromLatin1("Canada");
     }
 
-    if (number <= 1170) {
+    if (number < 1171) {
         return QString::fromLatin1("French America");
     }
 
-    if (number <= 3799) {
+    if (number < 3800) {
         return QString::fromLatin1("Latin America");
     }
 
