@@ -229,7 +229,7 @@ create table channels
 (
     id          int         primary key default nextval('seq_channelIds'),
     store       text        not null references stores(id) on delete cascade,
-    parent      int         references channels(id) on delete set null,
+    parent      int         references channels(id) on delete cascade,
     topLevel    int         references channels(id) on delete set null,
     image       text,
     name        text        not null,
