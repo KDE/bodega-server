@@ -11,6 +11,9 @@ delete from assets;
 delete from partners;
 delete from affiliations;
 delete from languages;
+delete from ratings;
+delete from ratingAttributes;
+delete from assetRatingAverages;
 
 select setval('seq_assetsids', 1);
 select setval('seq_languageids', 1);
