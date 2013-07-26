@@ -25,7 +25,7 @@
 QStringList paths;
 Gutenberg::Catalog catalog;
 
-#define TESTING 1
+//#define TESTING 1
 
 void descend(const QString &path)
 {
@@ -73,17 +73,19 @@ int main(int argc, char **argv)
     Gutenberg::Catalog catalog;
     descend(argv[1]);
     qDebug() << "we have" << paths.size() << "files to process now";
-    paths <<
-        "/home/aseigo/kdesrc/extragear/network/bodega-server/assetimporters/projectgutenberg/rdf/cache/epub/10040/pg10040.rdf";
 
+#ifdef TESTING
     foreach (const QString &path, paths) { qDebug() << path; }
+#endif
+
     Gutenberg::Reader::init();
     catalog.m_ebooks = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Gutenberg::Reader::parseRdf);
+    qDebug() << "Parsed" << catalog.m_ebooks.size() << "books, now compiling collection";
     catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
-    qDebug() << "we have" << catalog.m_ebooks.size() << "books to process now";
+    qDebug() << "Processing" << catalog.m_ebooks.size() << "books";
 
     Gutenberg::GutenbergDatabase::write(catalog, argv[2], true);
-    return 1;
+    return 0;
 
     QCoreApplication app(argc, argv);
     /*

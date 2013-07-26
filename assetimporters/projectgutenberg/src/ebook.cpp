@@ -96,13 +96,12 @@ void Ebook::setRights(Ebook::Rights rights)
 
 QString Ebook::description() const
 {
-    return m_description;
+    return m_descriptions.join("\n");
 }
 
-void Ebook::setDescription(const QString &desc)
+void Ebook::addDescription(const QString &desc)
 {
-    Q_ASSERT(m_description.isEmpty());
-    m_description = desc;
+    m_descriptions << desc;
 }
 
 Ebook::Type Ebook::type() const
@@ -282,8 +281,9 @@ QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
         }
     }
 
-    if (!book.description().isEmpty()) {
-        s.nospace() << "\tDescription: " << book.description();
+    const QString desc = book.description();
+    if (!desc.isEmpty()) {
+        s.nospace() << "\tDescription: " << desc;
     }
 
     QList<Gutenberg::File> files = book.files();

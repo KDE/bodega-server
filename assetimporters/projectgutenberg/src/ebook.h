@@ -91,7 +91,7 @@ public:
     void setRights(Ebook::Rights rights);
 
     QString description() const;
-    void setDescription(const QString &lst);
+    void addDescription(const QString &lst);
 
     QString typeString() const;
     Ebook::Type type() const;
@@ -118,7 +118,7 @@ private:
     QString m_title;
     QString m_issued;
     QString m_coverUrl;
-    QString m_description;
+    QStringList m_descriptions;
     QStringList m_languages;
     Ebook::Rights m_rights;
     Ebook::Type m_type;

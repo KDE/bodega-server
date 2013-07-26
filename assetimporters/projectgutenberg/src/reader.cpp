@@ -264,7 +264,7 @@ QStringList parseEbookBlock(ReaderState &state)
                     parseLangauges(state);
                 } else if (descriptionTag == elem) {
                     state.xml.readNext();
-                    state.book.setDescription(state.xml.text().toString());
+                    state.book.addDescription(state.xml.text().toString());
                     state.xml.readNext();
                 } else if (alternativeTag == elem) {
                     state.xml.readNext();
