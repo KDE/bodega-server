@@ -32,6 +32,30 @@
 
 using namespace Gutenberg;
 
+class ScopedBatchJob
+{
+public:
+    ScopedBatchJob()
+    {
+        registerJobQuery.prepare("update batchJobsInProgress set doWork = :working where job = 'gutenberg'");
+        registerJobQuery.bindValue(":working", true);
+        if (!registerJobQuery.exec()) {
+            showError(registerJobQuery);
+            Q_ASSERT(!"something bad happened with the batchJobsInProgress setting");
+        }
+    }
+
+    ~ScopedBatchJob()
+    {
+        registerJobQuery.bindValue(":working", false);
+        if (!registerJobQuery.exec()) {
+            showError(registerJobQuery);
+            Q_ASSERT(!"something bad happened with the batchJobsInProgress setting");
+        }
+    }
+
+    QSqlQuery registerJobQuery;
+};
 
 void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath, bool clearOldData)
 {
@@ -67,6 +91,7 @@ GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
 void GutenbergDatabase::clearData()
 {
     ScopedTransaction s;
+    ScopedBatchJob j;
 
     QTime time;
     time.start();
@@ -173,20 +198,13 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
     time.start();
 
     ScopedTransaction s;
+    ScopedBatchJob j;
 
     int numSkipped = 0;
     int numBooksWritten = 0;
     // report progress every 5%
     const int reportIncrement = catalog.m_ebooks.count() / 20.;
     int lastReport = 0;
-
-    QSqlQuery registerJobQuery;
-    registerJobQuery.prepare("update batchJobsInProgress set doWork = :working where job = 'gutenberg'");
-    registerJobQuery.bindValue(":working", true);
-    if (!registerJobQuery.exec()) {
-        showError(registerJobQuery);
-        Q_ASSERT(!"something bad happened with the batchJobsInProgress setting");
-    }
 
     QSqlQuery query;
     query.prepare("insert into assets "
@@ -229,12 +247,6 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
             qDebug() << "Written "<< percent << "%...";
             lastReport = booksProcessed;
         }
-    }
-
-    registerJobQuery.bindValue(":working", false);
-    if (!registerJobQuery.exec()) {
-        showError(registerJobQuery);
-        Q_ASSERT(!"something bad happened with the batchJobsInProgress setting");
     }
 
     int elapsed = time.elapsed();
