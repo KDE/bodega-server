@@ -3,7 +3,7 @@ ALTER TABLE tags ADD COLUMN en_index tsvector;
 -- Trigger to update indices for the full text search
 CREATE OR REPLACE FUNCTION ct_tagsIndexTrigger() RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.title != OLD.title THEN
+  IF TG_OP = 'INSERT' OR NEW.title != OLD.title THEN
     NEW.en_index := setweight(to_tsvector('pg_catalog.english', coalesce(NEW.title)), 'A');
   END IF;
   return NEW;
@@ -20,7 +20,7 @@ ALTER TABLE assets ADD COLUMN en_index tsvector;
 -- Trigger to update indices for the full text search
 CREATE FUNCTION ct_assetsIndexTrigger() RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.title != OLD.title OR NEW.description != OLD.description THEN
+    IF TG_OP = 'INSERT' OR NEW.title != OLD.title OR NEW.description != OLD.description THEN
         NEW.en_index :=
             setweight(to_tsvector('pg_catalog.english', coalesce(NEW.name,'')), 'A') ||
             setweight(to_tsvector('pg_catalog.english', coalesce(NEW.description,'')), 'C');
@@ -38,7 +38,7 @@ ALTER TABLE channels ADD COLUMN en_index tsvector;
 -- Trigger to update indices for the full text search
 CREATE FUNCTION ct_channelsIndexTrigger() RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.title != OLD.title OR NEW.description != OLD.description THEN
+    IF TG_OP = 'INSERT' OR NEW.title != OLD.title OR NEW.description != OLD.description THEN
         NEW.en_index :=
             setweight(to_tsvector('pg_catalog.english', coalesce(NEW.name,'')), 'A') ||
             setweight(to_tsvector('pg_catalog.english', coalesce(NEW.description,'')), 'C');
@@ -57,7 +57,7 @@ ALTER TABLE partners ADD COLUMN en_index tsvector;
 -- Trigger to update indices for the full text search
 CREATE FUNCTION ct_partnersIndexTrigger() RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.name != OLD.name THEN
+    IF TG_OP = 'INSERT' OR NEW.name != OLD.name THEN
         NEW.en_index := setweight(to_tsvector('pg_catalog.english', coalesce(NEW.name,'')), 'B');
     END IF;
     return NEW;
