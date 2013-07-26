@@ -78,9 +78,11 @@ void Catalog::compile(const QString &imageCachePath)
         QHashIterator<QString, QStringList> catIt(cats);
         while (catIt.hasNext()) {
             catIt.next();
-            m_lccsHierarchy.insert(catIt.key(), QStringList());
+            if (!m_lccsHierarchy.contains(catIt.key())) {
+                m_lccsHierarchy.insert(catIt.key(), QStringList());
+            }
 
-            foreach (const QString lcc, catIt.value()) {
+            foreach (const QString &lcc, catIt.value()) {
                 if (!m_lccsHierarchy[catIt.key()].contains(lcc)) {
                     m_lccsHierarchy[catIt.key()].append(lcc);
                 }
