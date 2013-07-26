@@ -55,13 +55,13 @@ private:
     int m_licenseId;
     int m_contributorTagId;
     int m_mimetypeTagId;
+    int m_ebookMimetypeTag;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;
     QHash<QString, int> m_categoryTagIds;
     QHash<QString, int> m_subCategoryTagIds;
     QHash<QString, int> m_contributorIds;
     QHash<QString, int> m_extraChannelIds;
-    QHash<QString, int> m_mimetypeIds;
     QHash<QString, int> m_createdIds;
     QHash<QString, int> m_languageIds;
     QString m_topLevelChannelName;

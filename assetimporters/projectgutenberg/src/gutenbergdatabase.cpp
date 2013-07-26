@@ -59,6 +59,7 @@ GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
       m_categoryTagId(0),
       m_licenseId(0),
       m_mimetypeTagId(0),
+      m_ebookMimetypeTag(0),
       m_topLevelChannelName(QLatin1String("Books"))
 {
 }
@@ -115,6 +116,7 @@ void GutenbergDatabase::writeBookInit()
     }
 
     m_mimetypeTagId = mimetypeTagId();
+    m_ebookMimetypeTag = tagId(m_mimetypeTagId, Ebook::epubMimetype());
 }
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
@@ -316,9 +318,7 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
 
     //qDebug()<<"Book = "<< book.title();
     Gutenberg::File epubFile = book.epubFile();
-    int mimetypeId = tagId(m_mimetypeTagId,
-                           epubFile.format,  &m_mimetypeIds);
-    writeAssetTags(assetId, mimetypeId);
+    writeAssetTags(assetId, m_ebookMimetypeTag);
 
     Gutenberg::LCC lcc = book.lcc();
     const QHash<QString, QStringList> lccs = lcc.categories();
