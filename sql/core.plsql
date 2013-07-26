@@ -14,24 +14,29 @@ CREATE TRIGGER trg_ct_generateFullName BEFORE UPDATE OR INSERT ON people
 FOR EACH ROW EXECUTE PROCEDURE ct_generateFullname();
 
 -- TRIGGER function for checking that a parent channel and this channel are owned by the same partner
-CREATE OR REPLACE FUNCTION ct_checkChannelParent() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION ct_checkChannelUpdate() RETURNS TRIGGER AS $$
 DECLARE
-    parent RECORD;
 BEGIN
     -- RAISE NOTICE 'checking parent % %', NEW.id, TG_OP;
     -- disallow changing the parent of existing channels
-    IF TG_OP = 'UPDATE' THEN
-        IF NEW.parent = OLD.parent AND
-           NEW.topLevel = OLD.topLevel AND
-           NEW.store = OLD.store
-        THEN
-            RETURN NEW;
-        END IF;
-
-        RETURN NULL;
+    IF NEW.parent = OLD.parent AND
+       NEW.topLevel = OLD.topLevel AND
+       NEW.store = OLD.store
+    THEN
+        RETURN NEW;
     END IF;
 
-    -- everything below here is for INSERTs
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_checkChannelUpdate ON channels;
+CREATE TRIGGER trg_ct_checkChannelUpdate BEFORE UPDATE ON channels
+FOR EACH ROW EXECUTE PROCEDURE ct_checkChannelUpdate();
+
+CREATE OR REPLACE FUNCTION ct_setTopLevelOnChannel() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
     IF NEW.parent IS NULL THEN
         NEW.topLevel = NEW.id;
         RETURN NEW;
@@ -42,10 +47,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-DROP TRIGGER IF EXISTS trg_ct_checkChannelParent ON channels;
-CREATE TRIGGER trg_ct_checkChannelParent BEFORE UPDATE OR INSERT ON channels
-FOR EACH ROW EXECUTE PROCEDURE ct_checkChannelParent();
+DROP TRIGGER IF EXISTS trg_ct_setTopLevelOnChannel ON channels;
+CREATE TRIGGER trg_ct_setTopLevelOnChannel BEFORE INSERT ON channels
+FOR EACH ROW EXECUTE PROCEDURE ct_setTopLevelOnChannel();
 
 -- recursively called from ct_associateAssetWithChannels to populate the subChannelAssets table
 CREATE OR REPLACE FUNCTION ct_associateAssetWithParentChannel(int, int, int) RETURNS BOOL AS '
@@ -151,13 +155,11 @@ BEGIN
 
     DELETE FROM channelAssets c WHERE c.asset = alteredAsset;
     DELETE FROM subChannelAssets c WHERE c.asset = alteredAsset;
-    FOR parentChannel IN SELECT c.channel AS channel, count(c.tag) = count(a.tag) as matches
+    FOR parentChannel IN SELECT * FROM (SELECT c.channel AS channel, count(c.tag) = count(a.tag) as matches
             FROM channelTags c LEFT JOIN assetTags a ON (c.tag = a.tag and a.asset = alteredAsset)
-            GROUP BY c.channel LOOP
-        IF (parentChannel.matches) THEN
-            INSERT INTO channelAssets (channel, asset) VALUES (parentChannel.channel, alteredAsset);
-            PERFORM ct_associateAssetWithParentChannel(parentChannel.channel, parentChannel.channel, alteredAsset);
-        END IF;
+            GROUP BY c.channel) as tmp WHERE matches LOOP
+        INSERT INTO channelAssets (channel, asset) VALUES (parentChannel.channel, alteredAsset);
+        PERFORM ct_associateAssetWithParentChannel(parentChannel.channel, parentChannel.channel, alteredAsset);
     END LOOP;
 
     select into noJobsInProgress NOT bool_or(dowork) from batchjobsinprogress;
@@ -204,22 +206,20 @@ BEGIN
     DELETE FROM channelAssets c WHERE c.channel = alteredChannel;
     DELETE FROM subChannelAssets sc WHERE sc.channel = alteredChannel OR sc.leafChannel = alteredChannel;
 
-    FOR assetRow IN SELECT a.asset as id, count(a.tag) = tagCount as matches
+    FOR assetRow IN SELECT * FROM (SELECT a.asset as id, count(a.tag) = tagCount as matches
             FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
-            WHERE a.asset IS NOT NULL GROUP BY a.asset LOOP
-        IF (assetRow.matches) THEN
-            INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
-            PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
-            PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
-            IF NOT FOUND THEN
-                SELECT INTO pricesRow
-                        (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
-                                      warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
-                        FROM assets WHERE id = assetRow.id;
-                IF pricesRow.retailpoints > 0 THEN
+        WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp WHERE matches LOOP
+        INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
+        PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
+        PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
+        IF NOT FOUND THEN
+            SELECT INTO pricesRow
+                (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
+                 warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
+                FROM assets WHERE id = assetRow.id;
+            IF pricesRow.retailpoints > 0 THEN
                 INSERT INTO assetPrices (asset, store, points, toStore)
                        VALUES (assetRow.id, markupRow.store, pricesRow.retailpoints, pricesRow.tostorepoints);
-                END IF;
             END IF;
         END IF;
     END LOOP;
