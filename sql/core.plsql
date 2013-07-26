@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION ct_checkChannelParent() RETURNS TRIGGER AS $$
 DECLARE
     parent RECORD;
 BEGIN
-    RAISE NOTICE 'checking parent % %', NEW.id, TG_OP;
+    -- RAISE NOTICE 'checking parent % %', NEW.id, TG_OP;
     -- disallow changing the parent of existing channels
     IF TG_OP = 'UPDATE' THEN
         IF NEW.parent = OLD.parent AND
