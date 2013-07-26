@@ -193,6 +193,7 @@ create table assetTags
 
 create index idx_assetTags_byAsset on assettags(asset);
 create index idx_assetTags_byTag on assettags(tag);
+create index idx_assetTags_bySource on assettags(sourceTag);
 
 create table assetText
 (
