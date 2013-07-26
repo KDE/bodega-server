@@ -111,3 +111,24 @@ $$ LANGUAGE 'plpgsql';
 DROP TRIGGER IF EXISTS trg_ct_blockSumForAssetRatings ON ratings;
 CREATE TRIGGER trg_ct_blockSumForAssetRatings BEFORE UPDATE ON ratings
 FOR EACH ROW EXECUTE PROCEDURE ct_blockSumForAssetRatings();
+
+CREATE OR REPLACE FUNCTION ct_addAssetRating(personId int, assetId int, ratings int[][]) RETURNS VOID AS $$
+DECLARE
+    rating  int[];
+BEGIN
+   -- FOREACH rating SLICE 1 IN ARRAY ratings LOOP
+   --     RAISE NOTICE 'rating is % and attribute is %', rating[1], rating[2];
+        -- its safe to delete from the ratings without checking.
+        -- Best case scenario the attribute id can be associated with the asset and
+        -- it deletes it from the ratings, worst case scenario it doesn't delete anything
+        -- because there is nothing in the table to delete, we can't have invalid entries
+        -- in the ratings due to trg_ct_checkAssociationOfRatingAttributeWithAsset
+  --      DELETE FROM ratings WHERE asset = assetId AND person = personId AND attribute = rating[2];
+
+        -- no check again. If the values are ok we are done, and if they don't trg_ct_checkAssociationOfRatingAttributeWithAsset
+        -- will fix it for us.
+    --    INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);
+    --END LOOP;
+END;
+$$ LANGUAGE 'plpgsql';
+

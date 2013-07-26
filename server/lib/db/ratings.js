@@ -118,8 +118,7 @@ module.exports.participant = function(db, req, res) {
 module.exports.addAssetRatings = function(db, req, res) {
     /*jshint multistr:true */
     var assetInsertQuery =
-        'INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);';
-    var ratingsDeleteQuery = 'DELETE FROM ratings WHERE asset = $1 AND person = $2 AND attribute = $3';
+        'SELECT ct_AddAssetRating($1, $2, $3)';
 
     var userId = req.session.user.id;
     var assetId = req.params.assetId;
@@ -133,41 +132,39 @@ module.exports.addAssetRatings = function(db, req, res) {
     var json = utils.standardJson(req);
     json.ratings = [];
 
-    var queue = async.queue(function(rating, cb) {
+    // pg doesn't understand javascript object,
+    // so we have to make it a pg array
+    // a correct array in pg should be something
+    // like { {1, 2 }, {2 ,3 } }
+    var jsToPgArray = '';
+    for (var i in ratings) {
+        var rating = ratings[i];
         rating.rating = utils.parseNumber(rating.rating);
-        rating.attribute= utils.parseNumber(rating.attribute);
+        rating.attribute = utils.parseNumber(rating.attribute);
 
         if (json.ratings.indexOf(rating) === -1) {
             json.ratings.push(rating);
-
-            db.query(
-                ratingsDeleteQuery, [assetId, userId, rating.attribute],
-                function(err, result) {
-                    if (err) {
-                        errors.report('Database', req, res, err);
-                        cb();
-                        return;
-                    }
-
-                    db.query(
-                        assetInsertQuery, [assetId, rating.attribute, userId, rating.rating],
-                        function(err, result) {
-                        if (err) {
-                            errors.report('Database', req, res, err);
-                            cb();
-                            return;
-                        }
-                        cb();
-                    });
-                });
+            if (jsToPgArray === '') {
+                jsToPgArray = '{ ';
+            } else {
+                jsToPgArray = jsToPgArray.concat(', ');
             }
+            jsToPgArray = jsToPgArray.concat('{', rating.rating, ', ', rating.attribute, '}');
+        }
+    }
+    console.log(jsToPgArray)
+    //close the array
+    jsToPgArray = jsToPgArray.concat(' }');
+
+    db.query(
+        assetInsertQuery, [userId, assetId, jsToPgArray],
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+            res.json(json);
     });
-
-    queue.drain = function() {
-        res.json(json);
-    };
-
-    queue.push(ratings);
 };
 
 module.exports.removeAsset = function(db, req, res) {
