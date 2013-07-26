@@ -42,7 +42,9 @@ QStringList Ebook::languages() const
 
 void Ebook::setBookId(const QString &bookId)
 {
-    Q_ASSERT(m_id.isEmpty());
+    if (!m_id.isEmpty()) {
+        throw QLatin1String("Book id already set");
+    }
     m_id = bookId;
 }
 
@@ -56,7 +58,9 @@ void Ebook::setTitle(const QString &title)
 
 void Ebook::setLanguages(const QStringList &lang)
 {
-    Q_ASSERT(m_languages.isEmpty());
+    if (!m_languages.isEmpty()) {
+        throw QLatin1String("Languages already set");
+    }
     m_languages = lang;
 }
 
@@ -118,7 +122,9 @@ QStringList Ebook::alternativeNames() const
 
 void Ebook::setAlternativeNames(const QStringList &lst)
 {
-    Q_ASSERT(m_alternativeNames.isEmpty());
+    if (!m_alternativeNames.isEmpty()) {
+        throw QLatin1String("Alternative names already set");
+    }
     m_alternativeNames = lst;
 }
 
@@ -134,7 +140,9 @@ QString Ebook::tableOfContents() const
 
 void Ebook::setTableOfContents(const QString &toc)
 {
-    Q_ASSERT(m_toc.isEmpty());
+    if (!m_toc.isEmpty()) {
+        throw QLatin1String("Table of contents already set");
+    }
     m_toc = toc;
 }
 
@@ -184,9 +192,11 @@ File Ebook::epubFile() const
             epubFiles.append(file);
         }
     }
+
     if (epubFiles.isEmpty()){
         return Gutenberg::File();
     }
+
     /*
      * If possible we want to return the version with images
      */

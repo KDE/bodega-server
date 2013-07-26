@@ -205,8 +205,14 @@ void parseLangauges(ReaderState &state)
 // returns the list of creator references
 QStringList parseEbookBlock(ReaderState &state)
 {
+    QStringList creatorRefs;
+
+    try {
+
     QXmlStreamAttributes attrs = state.xml.attributes();
-    Q_ASSERT(attrs.hasAttribute("rdf:about"));
+    if (!attrs.hasAttribute("rdf:about")) {
+        throw QString::fromLatin1("EBook block lacking an rdf:about attribute");
+    }
 
     QString id = attrs.value("rdf:about").toString();
     /*
@@ -216,8 +222,6 @@ QStringList parseEbookBlock(ReaderState &state)
     }
     */
     state.book.setBookId(id);
-
-    QStringList creatorRefs;
 
     static const QString titleTag(QLatin1String("title"));
     static const QString issuedTag(QLatin1String("issued"));
@@ -300,6 +304,13 @@ QStringList parseEbookBlock(ReaderState &state)
             default:
                 break;
         }
+    }
+
+    } catch (QString msg) {
+        qDebug() << "******** EBook parsing error *********";
+        qDebug() << state.file.fileName();
+        qDebug() << msg;
+        Q_ASSERT(false);
     }
 
     return creatorRefs;
