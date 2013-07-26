@@ -247,6 +247,9 @@ create table channelTags
     tag         int         not null references tags(id) on delete cascade
 );
 
+create index idx_channelTagsByChannel on channelTags(channel);
+create index idx_channelTagsByTag on channelTags(tag);
+
 create table channelAssets
 (
     channel     int         not null references channels(id) on delete cascade,
