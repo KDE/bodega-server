@@ -1711,6 +1711,107 @@
             ]
         }
         ]
+    },
+    {
+        "name": "Ratings",
+        "methods": [
+            {
+                "MethodName": "Remove rating",
+                "Synopsis": "Remove the rating for the specific asset",
+                "HTTPMethod": "GET",
+                "URI": "asset/ratings/delete/:assetId",
+                "parameters": [
+                    {
+                        "Name": "assetId",
+                        "Location": "URL",
+                        "Description": "The id of asset from which we want to remove its rating",
+                        "Required": "Y",
+                        "Type": "Number"
+                    }
+                ]
+            },
+            {
+                "MethodName": "Attributes",
+                "Synopsis": "The possible rating attributes for the specific asset",
+                "HTTPMethod": "GET",
+                "URI": "/asset/ratings/attributes/:assetId",
+                "parameters": [
+                    {
+                        "Name": "assetId",
+                        "Location": "URL",
+                        "Description": "The id of asset",
+                        "Required": "Y",
+                        "Type": "Number"
+                    }
+                ]
+            },
+            {
+                "MethodName": "Asset Rates",
+                "Synopsis": "The ratings of the asset",
+                "HTTPMethod": "GET",
+                "URI": "/asset/ratings/list/:assetId",
+                "parameters": [
+                    {
+                        "Name": "assetId",
+                        "Location": "URL",
+                        "Description": "The id of asset",
+                        "Required": "Y",
+                        "Type": "Number"
+                    },
+                    {
+                        "Name": "pageSize",
+                        "Location": "query",
+                        "Description": "The number of results to return at a time",
+                        "Required": "N",
+                        "Type": "number"
+                    },
+                    {
+                        "Name": "offset",
+                        "Location": "query",
+                        "Description": "The search result offset to start listing from",
+                        "Required": "N",
+                        "Type": "number"
+                    }
+                ]
+            },
+            {
+                "MethodName": "Participant Ratings",
+                "Synopsis": "The ratings of the participant",
+                "HTTPMethod": "GET",
+                "URI": "/participant/ratings",
+                "parameters": [
+                    {
+                        "Name": "pageSize",
+                        "Location": "query",
+                        "Description": "The number of results to return at a time",
+                        "Required": "N",
+                        "Type": "number"
+                    },
+                    {
+                        "Name": "offset",
+                        "Location": "query",
+                        "Description": "The search result offset to start listing from",
+                        "Required": "N",
+                        "Type": "number"
+                    }
+                ]
+            },
+            {
+                "MethodName": "Rate Asset",
+                "Synopsis": "Add ratings in the asset",
+                "HTTPMethod": "POST",
+                "URI": "/asset/ratings/:assetId",
+                "parameters": [
+                    {
+                        "Name": "ratings",
+                        "Location": "BODY",
+                        "Description": "A list of the ratings. Each element in the list is a rating e.g. {attribute: 1, rating:1}",
+                        "Required": "Y",
+                        "Type": "List"
+                    }
+                ]
+            }
+        ]
     }
 ]
 }

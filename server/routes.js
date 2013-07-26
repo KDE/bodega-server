@@ -167,7 +167,6 @@ app.get(serverPath('collection/:collectionId/remove/:assetId'), isAuthorized,
             app.db.collectionRemoveAsset(req, res);
         });
 
-
 //********************************
 // Account info and management
 app.get(serverPath('participant/info'), isAuthorized,
@@ -246,6 +245,13 @@ app.get(serverPath('participant/deletePaymentMethod'),
     function(req, res) {
         app.db.deletePaymentMethod(req, res);
     }
+);
+
+app.get(serverPath('participant/ratings'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.participantRatings(req, res);
+        }
 );
 
 
@@ -330,6 +336,31 @@ app.get(serverPath('asset/:assetId'), anonBrowsing, isAuthorized,
             //console.log(req.query);
             app.db.assetInfo(req, res);
         });
+
+app.post(serverPath('asset/ratings/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.ratingAddAsset(req, res);
+        });
+
+app.get(serverPath('asset/ratings/delete/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.ratingRemoveAsset(req, res);
+        });
+
+app.get(serverPath('asset/ratings/attributes/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.listRatingAttributtes(req, res);
+        });
+
+app.get(serverPath('asset/ratings/list/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.assetRatings(req, res);
+        }
+);
 
 //*******************************
 // Stats

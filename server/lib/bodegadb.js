@@ -48,6 +48,7 @@ var dbPartners = require('./db/partners.js');
 var dbBanking = require('./db/banking.js');
 var dbParticipantInfo = require('./db/participantInfo.js');
 var dbUpdates = require('./db/updates.js');
+var dbRatings = require('./db/ratings.js');
 
 var BodegaDb = (function() {
     var connectionString;
@@ -224,6 +225,26 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.deleteStoreChannel = function(req, res) {
         this.dbQuery(dbStores.deleteChannel, req, res);
+    };
+
+    BodegaDb.prototype.listRatingAttributtes = function(req, res) {
+        this.dbQuery(dbRatings.listAttributes, req, res);
+    };
+
+    BodegaDb.prototype.assetRatings = function(req, res) {
+        this.dbQuery(dbRatings.asset, req, res);
+    };
+
+    BodegaDb.prototype.participantRatings = function(req, res) {
+        this.dbQuery(dbRatings.participant, req, res);
+    };
+
+    BodegaDb.prototype.ratingAddAsset = function(req, res) {
+        this.dbQuery(dbRatings.addAssetRatings, req, res);
+    };
+
+    BodegaDb.prototype.ratingRemoveAsset = function(req, res) {
+        this.dbQuery(dbRatings.removeAsset, req, res);
     };
 
     BodegaDb.prototype.listTagTypes = function(req, res) {
