@@ -17,6 +17,7 @@
 
 #include "gutenbergdatabase.h"
 
+#include "languages.h"
 #include "lcc.h"
 
 #include <QFileInfo>
@@ -42,8 +43,11 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
         return;
     }
 
-    ScopedTransaction s;
-    db.writeBookInit(clearOldData);
+    if (clearOldData) {
+        db.clearData();
+    }
+
+    db.writeBookInit();
     db.writeLanguages(catalog);
     db.writeCategoryTags(catalog);
     db.writeBooks(catalog);
@@ -59,29 +63,40 @@ GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
 {
 }
 
-void GutenbergDatabase::writeBookInit(bool clearOldData)
+void GutenbergDatabase::clearData()
 {
-    if (clearOldData) {
-        QSqlQuery query;
-        query.prepare("DELETE FROM channels WHERE store = :store AND "
-                      "(name = :name OR parent IN "
-                      "(SELECT id FROM channels WHERE store = :subStore AND name = :subName))");
-        query.bindValue(":store", store());
-        query.bindValue(":name", m_topLevelChannelName);
-        query.bindValue(":subStore", store());
-        query.bindValue(":subName", m_topLevelChannelName);
-        if (!query.exec()) {
-            showError(query);
-            Q_ASSERT(false);
-        }
+    ScopedTransaction s;
 
-        query.prepare("DELETE FROM assets WHERE partner = :partner");
-        query.bindValue(":partner", partnerId());
-        if (!query.exec()) {
-            showError(query);
-            Q_ASSERT(false);
-        }
+    QTime time;
+    time.start();
+    qDebug() << "Removing existing gutenberg data from the database";
+
+    QSqlQuery query;
+    query.prepare("DELETE FROM channels WHERE store = :store AND "
+                  "(name = :name OR parent IN "
+                  "(SELECT id FROM channels WHERE store = :subStore AND name = :subName))");
+    query.bindValue(":store", store());
+    query.bindValue(":name", m_topLevelChannelName);
+    query.bindValue(":subStore", store());
+    query.bindValue(":subName", m_topLevelChannelName);
+    if (!query.exec()) {
+        showError(query);
+        Q_ASSERT(false);
     }
+
+    query.prepare("DELETE FROM assets WHERE partner = :partner");
+    query.bindValue(":partner", partnerId());
+    if (!query.exec()) {
+        showError(query);
+        Q_ASSERT(false);
+    }
+
+    qDebug() << "\tremoval took" << time.elapsed() << "ms";
+}
+
+void GutenbergDatabase::writeBookInit()
+{
+    ScopedTransaction s;
 
     //qDebug()<<"partner id = "<<m_partnerId;
 
@@ -104,32 +119,29 @@ void GutenbergDatabase::writeBookInit(bool clearOldData)
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
 {
-    QStringList langs = catalog.languages();
+    QStringList assetLanguages = catalog.languages();
+    Languages languages;
 
-    foreach(QString lang, langs) {
-        QLocale locale(lang);
+    foreach (const QString &code, assetLanguages) {
+        if (languageId(code)) {
+            //qDebug()<< "Language " << code << "already in the database as;
+            continue;
+        }
 
-        if (locale != QLocale::c()) {
-            if (languageId(lang) || languageId(locale.name())) {
-                qDebug()<<"Language = "<<lang
-                        <<" already in the database";
-                continue;
-            } else {
-                QString langName = QLocale::languageToString(locale.language());
-                QSqlQuery query;
-                query.prepare("insert into languages "
-                              "(code, name) "
-                              "values (:code, :name)");
-                query.bindValue(":code", locale.name());
-                query.bindValue(":name", langName);
-                if (!query.exec()) {
-                    showError(query);
-                    QSqlDatabase::database().rollback();
-                    return;
-                }
-            }
-        } else {
-            qDebug()<<"Unrecognized language = "<<lang;
+        const QString name = languages.name(code);
+        if (name.isEmpty()) {
+            qDebug() << "Unrecognized language code:" << code;
+            continue;
+        }
+
+        qDebug() << "got the lang" << name;
+        QSqlQuery query;
+        query.prepare("insert into languages (code, name) values (:code, :name)");
+        query.bindValue(":code", code);
+        query.bindValue(":name", name);
+        if (!query.exec()) {
+            showError(query);
+            return;
         }
     }
 }
@@ -137,6 +149,8 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
 
 void GutenbergDatabase::writeCategoryTags(const Catalog &catalog)
 {
+    ScopedTransaction s;
+
     foreach (const QString &category, catalog.topLevelCategories()) {
         const int id = categoryId(category);
         //qDebug() << "looking for" << category << id;
@@ -155,6 +169,8 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 {
     QTime time;
     time.start();
+
+    ScopedTransaction s;
 
     int numSkipped = 0;
     int numBooksWritten = 0;
@@ -228,6 +244,8 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
 void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 {
+    ScopedTransaction s;
+
     const int booksChannelId = writeChannel(m_topLevelChannelName, QString(), "default/book.png");
     const int authorChannelId = writeChannel(QString("By Author"), QString(),
                                              "default/book.png", booksChannelId);

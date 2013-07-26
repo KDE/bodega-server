@@ -7,8 +7,9 @@ set(gutimport_SRCS
     catalog.cpp
     gutenbergdatabase.cpp
     ebook.cpp
-    reader.cpp
+    languages.cpp
     lcc.cpp
+    reader.cpp
     main.cpp
     ../../database-common/database.cpp
 )

@@ -36,7 +36,8 @@ public:
 private:
     GutenbergDatabase(const QString &contentPath);
 
-    void writeBookInit(bool clearOldData);
+    void clearData();
+    void writeBookInit();
     void writeLanguages(const Catalog &catalog);
     void writeCategoryTags(const Catalog &catalog);
     void writeBooks(const Catalog &catalog);
