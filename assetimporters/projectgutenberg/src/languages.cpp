@@ -44,11 +44,6 @@ Languages::Languages()
     }
 
     QHashIterator<QString, QString> it(m_languages);
-    qDebug() << "number of languages" << m_languages.count();
-    while (it.hasNext()) {
-        it.next();
-        qDebug() << it.key() << it.value();
-    }
 }
 
 QString Languages::name(const QString &code)
