@@ -14,73 +14,38 @@ CREATE TRIGGER trg_ct_generateFullName BEFORE UPDATE OR INSERT ON people
 FOR EACH ROW EXECUTE PROCEDURE ct_generateFullname();
 
 -- TRIGGER function for checking that a parent channel and this channel are owned by the same partner
-CREATE OR REPLACE FUNCTION ct_checkChannelParent() RETURNS TRIGGER AS '
+CREATE OR REPLACE FUNCTION ct_checkChannelParent() RETURNS TRIGGER AS $$
 DECLARE
     parent RECORD;
 BEGIN
+    RAISE NOTICE 'checking parent % %', NEW.id, TG_OP;
+    -- disallow changing the parent of existing channels
+    IF TG_OP = 'UPDATE' THEN
+        IF NEW.parent = OLD.parent AND
+           NEW.topLevel = OLD.topLevel AND
+           NEW.store = OLD.store
+        THEN
+            RETURN NEW;
+        END IF;
+
+        RETURN NULL;
+    END IF;
+
+    -- everything below here is for INSERTs
     IF NEW.parent IS NULL THEN
         NEW.topLevel = NEW.id;
         RETURN NEW;
     END IF;
 
-    SELECT INTO parent * from channels where id = NEW.parent;
-    IF NOT FOUND THEN
-        RETURN OLD;
-    END IF;
-
-    IF parent.partner != NEW.partner THEN
-        RETURN OLD;
-    END IF;
-
-    WHILE parent.topLevel IS NULL LOOP
-        IF parent.parent IS NULL THEN
-            NEW.topLevel = parent.id;
-            RETURN NEW;
-        END IF;
-        SELECT * INTO parent FROM channels WHERE id = parent.parent;
-        IF NOT FOUND THEN
-            RETURN OLD;
-        END IF;
-    END LOOP;
-
-    NEW.topLevel = parent.topLevel;
+    SELECT INTO NEW.topLevel topLevel from channels where id = NEW.parent;
     RETURN NEW;
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE plpgsql;
 
-
--- TRIGGER function to ensure channel parents remain coherent due to parent-child relationships between channels
-CREATE OR REPLACE FUNCTION ct_propagateChannelParent() RETURNS TRIGGER AS $$
-DECLARE
-    storeName text;
-BEGIN
-    SELECT INTO storeName store FROM channels WHERE id = NEW.parent;
-    IF TG_OP = 'UPDATE' THEN
-        IF NEW.parent != OLD.parent THEN
-            RETURN OLD;
-        END IF;
-
-        -- enforce that we are not crossing channels between stores
-        IF storeName != NEW.store THEN
-            NEW.parent = OLD.parent;
-        END IF;
-    ELSIF NEW.parent THEN -- inserting, sync store name with parent
-        NEW.store = storeName;
-    END IF;
-
-    UPDATE channels SET partner = NEW.partner, topLevel = NEW.topLevel WHERE parent = NEW.id;
-    RETURN NEW;
-END;
-$$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_checkChannelParent ON channels;
 CREATE TRIGGER trg_ct_checkChannelParent BEFORE UPDATE OR INSERT ON channels
 FOR EACH ROW EXECUTE PROCEDURE ct_checkChannelParent();
-
-DROP TRIGGER IF EXISTS trg_ct_propogateChannelParent ON channels;
-CREATE TRIGGER trg_ct_propogateChannelParent AFTER UPDATE ON channels
-FOR EACH ROW EXECUTE PROCEDURE ct_propagateChannelParent();
-
 
 -- recursively called from ct_associateAssetWithChannels to populate the subChannelAssets table
 CREATE OR REPLACE FUNCTION ct_associateAssetWithParentChannel(int, int, int) RETURNS BOOL AS '
