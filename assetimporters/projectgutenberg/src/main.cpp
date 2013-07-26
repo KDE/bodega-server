@@ -17,7 +17,6 @@
 
 #include "catalog.h"
 #include "gutenbergdatabase.h"
-
 #include "reader.h"
 
 #include <QtCore>
@@ -25,7 +24,7 @@
 QStringList paths;
 Gutenberg::Catalog catalog;
 
-//#define TESTING 1
+#define TESTING 1
 
 void descend(const QString &path)
 {
@@ -75,7 +74,7 @@ int main(int argc, char **argv)
     qDebug() << "we have" << paths.size() << "files to process now";
 
 #ifdef TESTING
-    foreach (const QString &path, paths) { qDebug() << path; }
+    //foreach (const QString &path, paths) { qDebug() << path; }
 #endif
 
     Gutenberg::Reader::init();
