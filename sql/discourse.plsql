@@ -5,7 +5,7 @@ CREATE EXTENSION dblink;
 CREATE OR REPLACE FUNCTION ct_connectToDiscourse() RETURNS VOID AS $$
 DECLARE
 BEGIN
-     PERFORM dblink_connect('dbname=discourse_development2');
+     PERFORM dblink_connect('dbname=discourse_development');
 EXCEPTION WHEN OTHERS THEN
     RAISE EXCEPTION 'Something is wrong with your discourse database, check if the database exists';
 END;
@@ -143,6 +143,9 @@ BEGIN
                             VALUES ('''||userId||''', '''||topicId||''', 0, '''||someText||''', '''||someText||''',
                                     '''||currentTime||''', '''||currentTime||''', '''||currentTime||'''); ');
 
+        PERFORM dblink_exec('INSERT INTO bodegaAssets (asset, topic, category)
+                            VALUES ('''||NEW.id||''', '''||topicId||''', '''||categoryId||''');');
+
     ELSIF (TG_OP = 'UPDATE') THEN
         IF NEW.name IS NULL THEN
             PERFORM dblink_disconnect();
@@ -151,10 +154,11 @@ BEGIN
 
         PERFORM dblink_exec('UPDATE categories SET name = '''||ct_generateCategoryName(NEW.name)||''',
                             updated_at = '''||currentTime||''', description = '''||ct_generateCategoryDescription(NEW.name)||''',
-                            slug = '''||ct_generateCategoryName(NEW.name)||''' WHERE name = '''||ct_generateCategoryName(OLD.name)||''';');
+                            slug = '''||ct_generateCategoryName(NEW.name)||''' FROM bodegaAssets ba WHERE ba.asset = '''||NEW.id||'''
+                            AND ba.category = id;');
 
         PERFORM dblink_exec('UPDATE topics SET title = '''||ct_generateTopicTitle(NEW.name)||''', updated_at = '''||currentTime||'''
-                        WHERE title = '''||ct_generateTopicTitle(OLD.NAME)||''';');
+                        FROM bodegaAssets ba WHERE ba.asset = '''||NEW.id||''' AND ba.topic = id;');
 
     END IF;
     PERFORM dblink_disconnect();
