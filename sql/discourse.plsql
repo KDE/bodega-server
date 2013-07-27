@@ -118,9 +118,9 @@ BEGIN
     PERFORM ct_connectToDiscourse();
     IF (TG_OP = 'INSERT') THEN
         -- we will create forums only for the partners who have id >= 1000
-        --IF (NEW.partner < 1000) THEN
-        --    RETURN NEW;
-        --END IF;
+        IF (NEW.partner < 1000) THEN
+            RETURN NEW;
+        END IF;
 
         SELECT INTO categoryId id FROM dblink('INSERT INTO categories (name, created_at, updated_at, description, user_id, slug)
                             VALUES ('''||ct_generateCategoryName(NEW.name)||''', '''||currentTime||''',
