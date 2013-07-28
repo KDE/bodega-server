@@ -1746,7 +1746,7 @@
                 ]
             },
             {
-                "MethodName": "Asset Rates",
+                "MethodName": "Asset Ratings",
                 "Synopsis": "The ratings of the asset",
                 "HTTPMethod": "GET",
                 "URI": "/asset/ratings/list/:assetId",
@@ -1775,7 +1775,7 @@
                 ]
             },
             {
-                "MethodName": "Participant Ratings",
+                "MethodName": "Ratings by participant",
                 "Synopsis": "The ratings of the participant",
                 "HTTPMethod": "GET",
                 "URI": "/participant/ratings",
@@ -1798,9 +1798,9 @@
             },
             {
                 "MethodName": "Rate Asset",
-                "Synopsis": "Add ratings in the asset",
+                "Synopsis": "Add ratings for an asset",
                 "HTTPMethod": "POST",
-                "URI": "/asset/ratings/:assetId",
+                "URI": "/asset/ratings/create/:assetId",
                 "parameters": [
                     {
                         "Name": "ratings",

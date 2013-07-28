@@ -152,6 +152,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION ct_testing_ratingAttributeByName(text) RETURNS INT AS $$
+DECLARE
+    ratingAttributeId int := -1;
+BEGIN
+    select into ratingAttributeId id from ratingAttributes where name = $1 limit 1;
+    return ratingAttributeId;
+END;
+$$ LANGUAGE 'plpgsql';
 
 -- reset the database
 delete from pointtransactions;
@@ -173,15 +181,6 @@ select setval('seq_peopleids', 1);
 select setval('seq_partnerids', 1005);
 select setval('seq_channelids', 1);
 select setval('seq_purchaseids', 1);
-
-CREATE OR REPLACE FUNCTION ct_testing_ratingAttributeByName(text) RETURNS INT AS $$
-DECLARE
-    ratingAttributeId int := -1;
-BEGIN
-    select into ratingAttributeId id from ratingAttributes where name = $1 limit 1;
-    return ratingAttributeId;
-END;
-$$ LANGUAGE 'plpgsql';
 
 -- now start setting up the data
 insert into people (lastname, firstname, email, points, password, active)

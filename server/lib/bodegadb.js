@@ -231,7 +231,7 @@ var BodegaDb = (function() {
         this.dbQuery(dbRatings.listAttributes, req, res);
     };
 
-    BodegaDb.prototype.assetRatings = function(req, res) {
+    BodegaDb.prototype.listAssetRatings = function(req, res) {
         this.dbQuery(dbRatings.asset, req, res);
     };
 
@@ -239,11 +239,11 @@ var BodegaDb = (function() {
         this.dbQuery(dbRatings.participant, req, res);
     };
 
-    BodegaDb.prototype.ratingAddAsset = function(req, res) {
-        this.dbQuery(dbRatings.addAssetRatings, req, res);
+    BodegaDb.prototype.createAssetRating = function(req, res) {
+        this.dbQuery(dbRatings.addAssetRating, req, res);
     };
 
-    BodegaDb.prototype.ratingRemoveAsset = function(req, res) {
+    BodegaDb.prototype.deleteAssetRating = function(req, res) {
         this.dbQuery(dbRatings.removeAsset, req, res);
     };
 

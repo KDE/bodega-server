@@ -337,16 +337,16 @@ app.get(serverPath('asset/:assetId'), anonBrowsing, isAuthorized,
             app.db.assetInfo(req, res);
         });
 
-app.post(serverPath('asset/ratings/:assetId'), isAuthorized,
+app.post(serverPath('asset/ratings/create/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
-            app.db.ratingAddAsset(req, res);
+            app.db.createAssetRating(req, res);
         });
 
 app.get(serverPath('asset/ratings/delete/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
-            app.db.ratingRemoveAsset(req, res);
+            app.db.deleteAssetRating(req, res);
         });
 
 app.get(serverPath('asset/ratings/attributes/:assetId'), isAuthorized,
@@ -358,7 +358,7 @@ app.get(serverPath('asset/ratings/attributes/:assetId'), isAuthorized,
 app.get(serverPath('asset/ratings/list/:assetId'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
-            app.db.assetRatings(req, res);
+            app.db.listAssetRatings(req, res);
         }
 );
 

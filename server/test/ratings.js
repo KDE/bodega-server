@@ -21,8 +21,8 @@ var utils = require('./support/utils');
 describe('Ratings', function() {
     utils.auth();
 
-    describe('List Attributes', function() {
-        it('it should fail because the asset is invalid', function(done) {
+    describe('List attributes', function() {
+        it('should fail because the asset is invalid', function(done) {
             utils.getUrl('asset/ratings/attributes/1000',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -36,7 +36,7 @@ describe('Ratings', function() {
                     done();
                 });
         });
-        it('it should succeed', function(done) {
+        it('should succeed', function(done) {
             utils.getUrl('asset/ratings/attributes/2',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -54,34 +54,8 @@ describe('Ratings', function() {
         });
     });
 
-    describe('Remove asset ratings', function() {
-        it('it should fail because the asset is invalid', function(done) {
-            utils.getUrl('asset/ratings/delete/1000',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.body.should.have.property('authStatus', true);
-                    done();
-                });
-        });
-        it('it should succeed', function(done) {
-            utils.getUrl('asset/ratings/delete/2',
-                function(res) {
-                    res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('success', true);
-                    done();
-                });
-        });
-    });
-
-    describe('Asset Ratings', function() {
-        it('it should fail because the asset is invalid', function(done) {
+    describe('List asset ratings', function() {
+        it('should fail because the asset is invalid', function(done) {
             utils.getUrl('asset/ratings/list/1000',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -93,7 +67,7 @@ describe('Ratings', function() {
                     done();
                 });
         });
-        it('it should succeed', function(done) {
+        it('should succeed', function(done) {
             utils.getUrl('asset/ratings/list/8',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -108,7 +82,7 @@ describe('Ratings', function() {
                     done();
                 });
         });
-        it('it should be empty because there are no ratings for the asset', function(done) {
+        it('should be empty because there are no ratings for the asset', function(done) {
             utils.getUrl('asset/ratings/list/10',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -125,8 +99,8 @@ describe('Ratings', function() {
         });
     });
 
-    describe('Participant', function() {
-        it('it should succeed', function(done) {
+    describe('Ratings by participant', function() {
+        it('should succeed', function(done) {
             utils.getUrl('asset/ratings/list/8',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -141,7 +115,7 @@ describe('Ratings', function() {
                     done();
                 });
         });
-        it('it should have no ratings', function(done) {
+        it('should have no ratings', function(done) {
             //remove the ratings from Zack
             utils.getUrl('asset/ratings/delete/8',
                 function(res) {
@@ -166,8 +140,8 @@ describe('Ratings', function() {
     });
 
     describe('Add asset ratings', function() {
-        it('it should fail because the asset is invalid', function(done) {
-            utils.postUrl('asset/ratings/1000', {},
+        it('should fail because the asset is invalid', function(done) {
+            utils.postUrl('asset/ratings/create/1000', {},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -180,7 +154,7 @@ describe('Ratings', function() {
                     done();
                 });
         });
-        it('it should succeed', function(done) {
+        it('should succeed', function(done) {
             var query = {
                 ratings: [
                     {
@@ -193,7 +167,7 @@ describe('Ratings', function() {
                     }
                 ]
             };
-            utils.postUrl('asset/ratings/10', query,
+            utils.postUrl('asset/ratings/create/10', query,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -207,5 +181,30 @@ describe('Ratings', function() {
         });
     });
 
+    describe('Remove asset ratings', function() {
+        it('should fail because the asset is invalid', function(done) {
+            utils.getUrl('asset/ratings/delete/1000',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    done();
+                });
+        });
+        it('should succeed', function(done) {
+            utils.getUrl('asset/ratings/delete/10',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    done();
+                });
+        });
+    });
 });
 
