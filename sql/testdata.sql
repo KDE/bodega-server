@@ -231,7 +231,7 @@ INSERT INTO stores (id, partner, name, description) VALUES ('DD-1', ct_testing_p
 INSERT INTO stores (id, partner, name, description) VALUES ('DD-2', ct_testing_partnerId('Diamond Devices'), 'Affordaphone', 'Finally a phone even you can afford');
 
 INSERT INTO channels (image, store, active, name, description)
-    VALUES ('games.png', 'KDE-1', true, 'Games', 'Fun AND amusements');
+    VALUES ('games.png', 'KDE-1', true, 'Games', 'Fun and amusements');
 INSERT INTO channelTags (channel, tag)
     VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma'));
 INSERT INTO channelTags (channel, tag)
