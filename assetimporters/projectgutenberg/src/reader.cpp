@@ -234,6 +234,7 @@ QStringList parseEbookBlock(ReaderState &state)
     static const QString tocTag(QLatin1String("tableOfContents"));
     static const QString rightsTag(QLatin1String("rights"));
     static const QString creatorTag(QLatin1String("creator"));
+    static const QString contribTag(QLatin1String("ctb"));
     while (!state.xml.atEnd()) {
         switch (state.xml.readNext()) {
             case QXmlStreamReader::StartElement: {
@@ -285,7 +286,7 @@ QStringList parseEbookBlock(ReaderState &state)
                                              Ebook::Rights_Copyrighted :
                                              Ebook::Rights_Gutenberg);
                     state.xml.readNext();
-                } else if (creatorTag == elem) {
+                } else if (creatorTag == elem || contribTag == elem) {
                     creatorRefs << state.xml.attributes().value("rdf:resource").toString();
                     state.xml.readNext();
                 } else {
