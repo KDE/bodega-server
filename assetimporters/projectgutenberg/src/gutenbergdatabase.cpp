@@ -167,7 +167,7 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
             continue;
         }
 
-        qDebug() << "got the lang" << name;
+        qDebug() << "\tFound language:" << name;
         QSqlQuery query;
         query.prepare("insert into languages (code, name) values (:code, :name)");
         query.bindValue(":code", code);
@@ -264,7 +264,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
     int elapsed = time.elapsed();
 
-    qDebug()<< "Writing took "<< elapsed / 1000. << " secs. Inserted"
+    qDebug()<< "\tWriting took "<< elapsed / 1000. << " secs. Inserted"
             << numBooksWritten << "and skipped" << numSkipped;
 }
 
