@@ -21,7 +21,6 @@
 #include <QHash>
 #include <QLocale>
 #include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QSqlError>
 #include <QTime>
 #include <QVariant>
@@ -70,6 +69,23 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
     if (!m_categoryTagTypeId) {
         Q_ASSERT(!"couldn't create author tag id");
         return;
+    }
+}
+
+Database::~Database()
+{
+    if (!m_assetTagInsertQuery.isEmpty()) {
+        QSqlQuery query;
+        if (!query.exec(m_assetTagInsertQuery)) {
+            showError(query);
+        }
+    }
+
+    if (!m_channelTagInsertQuery.isEmpty()) {
+        QSqlQuery query;
+        if (!query.exec(m_channelTagInsertQuery)) {
+            showError(query);
+        }
     }
 }
 
@@ -389,22 +405,27 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
     return res.toInt();
 }
 
-//TODO: more tag types?
 void Database::writeAssetTags(int assetId, int tagId)
 {
-    QSqlQuery query;
-    query.prepare("insert into assetTags "
-                  "(asset, tag) "
-                  "values "
-                  "(:assetId, :tagId)");
+    static int count = 0;
+    ++count;
+    if (m_assetTagInsertQuery.isEmpty()) {
+        m_assetTagInsertQuery = "INSERT INTO assetTags (asset, tag) VALUES ";
+    } else {
+        m_assetTagInsertQuery.append(", ");
+    }
 
-    query.bindValue(":assetId", assetId);
-    query.bindValue(":tagId", tagId);
-    if (!query.exec()) {
-        showError(query);
+    m_assetTagInsertQuery.append("(" + QString::number(assetId) + ", " + QString::number(tagId) + ")");
+
+    if (count >= 500) {
+        QSqlQuery query;
+        if (!query.exec(m_assetTagInsertQuery)) {
+            showError(query);
+        }
+        m_assetTagInsertQuery.clear();
+        count = 0;
     }
 }
-
 
 void Database::writeAssetTags(int assetId, QVariant &tagId)
 {
@@ -413,26 +434,23 @@ void Database::writeAssetTags(int assetId, QVariant &tagId)
 
 void Database::writeChannelTags(int channelId, int tagId)
 {
-    QSqlQuery checkQuery;
-    checkQuery.prepare("select * from channelTags where channel = :channel and tag = :tagId");
-    checkQuery.bindValue(":channelId", channelId);
-    checkQuery.bindValue(":tagId", tagId);
-
-    if (checkQuery.exec() && checkQuery.first()) {
-        // tag already exists, don't make it again
-        return;
+    static int count = 0;
+    ++count;
+    if (m_channelTagInsertQuery.isEmpty()) {
+        m_channelTagInsertQuery = "INSERT INTO channelTags (channel, tag) VALUES ";
+    } else {
+        m_channelTagInsertQuery.append(", ");
     }
-    QSqlQuery query;
-    query.prepare("insert into channelTags "
-                  "(channel, tag) "
-                  "values "
-                  "(:channelId, :tagId)");
 
-    query.bindValue(":channelId", channelId);
-    query.bindValue(":tagId", tagId);
+    m_channelTagInsertQuery.append("(" + QString::number(channelId) + ", " + QString::number(tagId) + ")");
 
-    if (!query.exec()) {
-        showError(query);
+    if (count >= 500) {
+        QSqlQuery query;
+        if (!query.exec(m_channelTagInsertQuery)) {
+            showError(query);
+        }
+        m_channelTagInsertQuery.clear();
+        count = 0;
     }
 }
 

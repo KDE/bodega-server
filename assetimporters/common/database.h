@@ -22,6 +22,7 @@
 #include <QHash>
 #include <QSqlDatabase>
 #include <QSqlError>
+#include <QSqlQuery>
 
 //#include "channelscatalog.h"
 
@@ -56,6 +57,7 @@ class Database
 
 public:
     Database(const QString &contentPath, const QString &partner, const QString &store);
+    virtual ~Database();
 
 protected:
     int writeAsset(QSqlQuery query, const QString &name, const QString &description,
@@ -100,6 +102,8 @@ private:
     QHash<QString, int> m_authorIds;
     QString m_contentPath;
     QString m_store;
+    QString m_assetTagInsertQuery;
+    QString m_channelTagInsertQuery;
 };
 
 #define showError(query) \
