@@ -19,6 +19,7 @@ var server = require('../app.js');
 var utils = require('./support/utils');
 var fs = require('fs');
 var path = require('path');
+var pg = require('pg');
 
 describe('Purchase Asset', function() {
     var cookie;
@@ -78,9 +79,7 @@ describe('Purchase Asset', function() {
     });
 
     describe('Download the purchased asset', function() {
-
         it('should download the asset', function(done) {
-
             utils.getStream('download/25',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -128,5 +127,25 @@ describe('Purchase Asset', function() {
                     done();
                 });
         });
+    });
+
+    after(function(done) {
+        pg.connect(utils.dbConnectionString,
+            function(err, client, finis) {
+                   client.query("delete from purchases where asset in (25, 14) and email = 'zack@kde.org'", [],
+                   function() {
+                        client.query("delete from downloads where address = '127.0.0.1';", [],
+                        function(err, result) {
+                            client.query("update people set points = 10000 where email ='zack@kde.org'", [],
+                                function() {
+                                    client.query("update partners set earnedPoints = 0, owedPoints = 0 where name = 'KDE'", [],
+                                        function() {
+                                            finis();
+                                            done();
+                                        });
+                                });
+                        });
+                   });
+            });
     });
 });
