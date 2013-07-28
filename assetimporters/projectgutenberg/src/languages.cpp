@@ -43,7 +43,10 @@ Languages::Languages()
         }
     }
 
-    QHashIterator<QString, QString> it(m_languages);
+    // now hack around some errors/quirks in the Gutenberg data set
+    m_languages.insert("la", "Latin");
+    m_languages.insert("eo", "Esperanto");
+    m_languages.insert("kld", "Gamilaraay");
 }
 
 QString Languages::name(const QString &code)
