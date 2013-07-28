@@ -100,8 +100,9 @@ describe('Ratings', function() {
     });
 
     describe('Ratings by participant', function() {
-        it('should succeed', function(done) {
-            utils.getUrl('asset/ratings/list/8',
+        it('should show Zack having 3 ratings', function(done) {
+            //remove the ratings from Zack
+            utils.getUrl('participant/ratings',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property(
@@ -111,30 +112,8 @@ describe('Ratings', function() {
                     res.body.should.have.property('success', true);
                     var ratings = res.body.ratings;
                     ratings.should.be.an.instanceOf(Array);
-                    ratings.should.have.length(2);
+                    ratings.should.have.length(3);
                     done();
-                });
-        });
-        it('should have no ratings', function(done) {
-            //remove the ratings from Zack
-            utils.getUrl('asset/ratings/delete/8',
-                function(res) {
-                    utils.getUrl('asset/ratings/delete/9',
-                    function(res) {
-                        utils.getUrl('participant/ratings',
-                        function(res) {
-                            res.statusCode.should.equal(200);
-                            res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
-                            res.body.should.have.property('authStatus', true);
-                            res.body.should.have.property('success', true);
-                            var ratings = res.body.ratings;
-                            ratings.should.be.an.instanceOf(Array);
-                            ratings.should.have.length(0);
-                            done();
-                        });
-                    });
                 });
         });
     });
