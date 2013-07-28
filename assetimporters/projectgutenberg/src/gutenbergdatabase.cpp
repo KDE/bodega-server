@@ -95,7 +95,7 @@ void GutenbergDatabase::clearData()
 
     QTime time;
     time.start();
-    qDebug() << "Removing existing gutenberg data from the database";
+    qDebug() << "=======> Removing existing gutenberg data from the database";
 
     QSqlQuery query;
     query.prepare("DELETE FROM channels WHERE store = :store AND "
@@ -122,6 +122,7 @@ void GutenbergDatabase::clearData()
 
 void GutenbergDatabase::writeBookInit()
 {
+    qDebug() << "=======> Setting up database";
     ScopedTransaction s;
 
     //qDebug()<<"partner id = "<<m_partnerId;
@@ -146,6 +147,11 @@ void GutenbergDatabase::writeBookInit()
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
 {
+    qDebug() << "=======> Writing languages";
+    QTime t;
+    t.start();
+
+    const int languageTagType = tagTypeId("language");
     QStringList assetLanguages = catalog.languages();
     Languages languages;
 
@@ -168,12 +174,14 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
         query.bindValue(":name", name);
         if (!query.exec()) {
             showError(query);
-            return;
+            break;
         }
 
         // now we insert the tag if needed and record its value for later use
         tagId(languageTagType, code, &m_languageTagIds);
     }
+
+    qDebug() << "Language creation took" << t.elapsed() << "ms";
 }
 
 
@@ -197,6 +205,8 @@ void GutenbergDatabase::writeCategoryTags(const Catalog &catalog)
 
 void GutenbergDatabase::writeBooks(const Catalog &catalog)
 {
+    qDebug() << "=======> Writing books";
+
     QTime time;
     time.start();
 
@@ -261,7 +271,9 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
 void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 {
-    ScopedTransaction s;
+    qDebug() << "=======> Channel tagging";
+    QTime t;
+    t.start();
 
     const int booksChannelId = writeChannel(m_topLevelChannelName, QString(), "default/book.png");
     const int authorChannelId = writeChannel(QString("By Author"), QString(),
@@ -273,12 +285,15 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
 
     const QHash<QString, QStringList> lccs = catalog.categoryHierarchy();
     QHashIterator<QString, QStringList> it(lccs);
+    QTime channelTagTime;
+    channelTagTime.start();
     while (it.hasNext()) {
         it.next();
         const int channelId = writeChannel(it.key(), QString(), "default/book.png", subjectChannelId);
 
         if (it.value().isEmpty()) {
             // this guy has no subcategories, so we'll put tags on it
+            qDebug() << "Tagging channel" << channelId << it.key();
             writeChannelTags(channelId, m_categoryTagIds.value(it.key()));
         } else {
             foreach (const QString &subChannel, it.value()) {
@@ -289,9 +304,13 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
                 */
                 writeChannelTags(subChannelId, m_categoryTagIds.value(it.key()));
                 writeChannelTags(subChannelId, m_subCategoryTagIds.value(subChannel));
+                qDebug() << "\tTagged channel" << subChannelId << it.key() << "/" << subChannel
+                         << "in" << channelTagTime.restart() << "ms";
             }
         }
     }
+
+    qDebug() << "Writing all channel tags took" << t.elapsed();
 }
 
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
@@ -371,8 +390,8 @@ int GutenbergDatabase::languageId(const QString &lang)
     int id = m_languageIds.value(lang);
 
     if (id < 1) {
-         QSqlQuery query;
-        query.prepare("select id from languages where code=:lang");
+        QSqlQuery query;
+        query.prepare("select id from languages where code =: lang");
         query.bindValue(":lang", lang);
 
         if (!query.exec()) {
