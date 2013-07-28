@@ -138,16 +138,16 @@ BEGIN
 END
 $$ LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE function ct_testing_getRidOfPriorTestingTags() RETURNS VOID
+CREATE OR REPLACE function ct_testing_removePriorTestingTags() RETURNS VOID
 AS
 $$
 DECLARE
     tagId int;
 BEGIN
-    SELECT INTO tagId ct_testing_tagByName('Approved by KDE');
+    SELECT INTO tagId ct_testing_tagByName('wallpaper');
     IF tagId > -1 THEN
-        DELETE FROM tags WHERE id >= tagId;
-        PERFORM setval('seq_tagids', tagId - 1);
+        DELETE FROM tags WHERE id > tagId;
+        PERFORM setval('seq_tagids', tagId);
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -165,7 +165,7 @@ delete from partners;
 delete from affiliations;
 delete from languages;
 delete from assetprices where ending is not null;
-select ct_testing_getRidOfPriorTestingTags();
+select ct_testing_removePriorTestingTags();
 
 select setval('seq_assetsids', 1);
 select setval('seq_languageids', 1);
@@ -644,6 +644,6 @@ drop function ct_testing_licenseByName(text);
 drop function ct_testing_assetByName(text);
 drop function ct_testing_personByEmail(text);
 drop function ct_testing_partnerId(text);
-drop function ct_testing_getRidOfPriorTestingTags();
+drop function ct_testing_removePriorTestingTags();
 drop function ct_testing_ratingAttributeByName(text);
 commit;
