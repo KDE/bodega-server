@@ -38,6 +38,7 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
       m_store(store),
       m_tagBatchCount(0)
 {
+    m_totalTime.start();
 
     //db.setHostName("localhost");
     m_db.setDatabaseName("bodega");
@@ -75,19 +76,29 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
 
 Database::~Database()
 {
+    QTime t;
+    t.start();
+
+    QSqlQuery query;
+
     if (!m_assetTagInsertQuery.isEmpty()) {
-        QSqlQuery query;
         if (!query.exec(m_assetTagInsertQuery)) {
             showError(query);
         }
     }
 
     if (!m_channelTagInsertQuery.isEmpty()) {
-        QSqlQuery query;
         if (!query.exec(m_channelTagInsertQuery)) {
             showError(query);
         }
     }
+
+    if (!query.exec("select ct_associateDirtyAssetsWithChannels(), ct_refreshChannels()")) {
+        showError(query);
+    }
+
+    qDebug() << "=======> Final clean up queries took" << t.elapsed() / 1000. << "seconds";
+    qDebug() << "Database object life time:" << m_totalTime.elapsed() / 1000. << "seconds";
 }
 
 int Database::writeChannel(const QString &name, const QString &description, const QString& image, int parentId)

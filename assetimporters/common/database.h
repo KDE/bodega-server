@@ -23,6 +23,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QTime>
 
 //#include "channelscatalog.h"
 
@@ -105,6 +106,7 @@ private:
     QString m_assetTagInsertQuery;
     QString m_channelTagInsertQuery;
     int m_tagBatchCount;
+    QTime m_totalTime;
 };
 
 #define showError(query) \
