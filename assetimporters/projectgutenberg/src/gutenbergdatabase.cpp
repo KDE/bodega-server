@@ -261,7 +261,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
     int elapsed = time.elapsed();
 
-    qDebug()<< "\tWriting all books took"<< elapsed / 1000. << "secs. Inserted"
+    qDebug()<< "\tWriting all books took"<< elapsed / 1000. << "seconds. Inserted"
             << numBooksWritten << "and skipped" << numSkipped;
 }
 
@@ -343,7 +343,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         }
     }
 
-    qDebug() << "\tWriting all channel tags took" << t.elapsed() / 1000. << "secs";
+    qDebug() << "\tWriting all channel tags took" << t.elapsed() / 1000. << "seconds";
 }
 
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
