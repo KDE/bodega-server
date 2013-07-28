@@ -47,6 +47,12 @@ Languages::Languages()
     m_languages.insert("la", "Latin");
     m_languages.insert("eo", "Esperanto");
     m_languages.insert("kld", "Gamilaraay");
+    m_languages.insert("fy", "Frisian");
+    m_languages.insert("rmr", "Caló");
+    m_languages.insert("mi", "Maori");
+    m_languages.insert("bgi", "Giangan");
+    m_languages.insert("iu", "Inuktitut");
+    m_languages.insert("sa", "Sanskrit");
 }
 
 QString Languages::name(const QString &code)
