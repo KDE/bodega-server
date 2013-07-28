@@ -184,6 +184,11 @@ create table assets
 create index idx_asset_names on assets (name);
 create index idx_asset_partners on assets (partner);
 
+create table assetsNeedingRefresh
+(
+    asset int primary key references assets(id) on delete cascade
+);
+
 create table assetTags
 (
     asset       int         not null references assets(id) on delete cascade,

@@ -140,46 +140,68 @@ DROP TRIGGER IF EXISTS trg_ct_validateAssetTag ON assetTags;
 CREATE TRIGGER trg_ct_validateAssetTag BEFORE INSERT OR UPDATE OR DELETE ON assetTags
 FOR EACH ROW EXECUTE PROCEDURE ct_validateAssetTag();
 
--- TRIGGER functions to associate channels and assets when the tags change
-CREATE OR REPLACE FUNCTION ct_associateAssetWithChannels() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION ct_markAssetDirty() RETURNS TRIGGER AS $$
 DECLARE
-    alteredAsset   int;
-    parentChannel  RECORD;
-    noJobsInProgress bool;
 BEGIN
-    IF TG_OP = 'DELETE' THEN
-        alteredAsset := OLD.asset;
-    ELSE
-        alteredAsset := NEW.asset;
-    END IF;
-
-    DELETE FROM channelAssets c WHERE c.asset = alteredAsset;
-    DELETE FROM subChannelAssets c WHERE c.asset = alteredAsset;
-     FOR parentChannel IN SELECT * FROM (SELECT c.channel AS channel, count(c.tag) = count(a.tag) as matches
-            FROM channelTags c LEFT JOIN assetTags a ON (c.tag = a.tag and a.asset = alteredAsset)
-            GROUP BY c.channel) as tmp WHERE matches LOOP
-        INSERT INTO channelAssets (channel, asset) VALUES (parentChannel.channel, alteredAsset);
-        PERFORM ct_associateAssetWithParentChannel(parentChannel.channel, parentChannel.channel, alteredAsset);
-    END LOOP;
-
-    select into noJobsInProgress NOT bool_or(dowork) from batchjobsinprogress;
-    IF (noJobsInProgress) THEN
-        UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(channel) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
-    END IF;
-
-    PERFORM ct_updateAssetPrices(alteredAsset, basePrice) FROM assets WHERE id = alteredAsset;
-    PERFORM ct_markNonExtantPricesDone();
-    IF (TG_OP = 'DELETE') THEN
-        RETURN OLD;
-    ELSE
-        RETURN NEW;
-    END IF;
+    BEGIN
+        INSERT INTO assetsNeedingRefresh VALUES (NEW.asset);
+    EXCEPTION WHEN unique_violation THEN
+        -- do nothing
+    END;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trg_ct_associateAssetWithChannels ON assetTags;
-CREATE TRIGGER trg_ct_associateAssetWithChannels AFTER INSERT OR UPDATE OR DELETE ON assetTags
-FOR EACH ROW EXECUTE PROCEDURE ct_associateAssetWithChannels();
+DROP TRIGGER IF EXISTS trg_ct_markAssetDirty ON assetTags;
+CREATE TRIGGER trg_ct_markAssetDirty AFTER INSERT OR UPDATE ON assetTags
+FOR EACH ROW EXECUTE PROCEDURE ct_markAssetDirty();
+
+CREATE OR REPLACE FUNCTION ct_markAssetDeleted() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    PERFORM id FROM assets WHERE id = OLD.asset;
+    IF FOUND THEN
+        BEGIN
+            INSERT INTO assetsNeedingRefresh VALUES (OLD.asset);
+        EXCEPTION WHEN unique_violation THEN
+            -- do nothing
+        END;
+    END IF;
+
+    RETURN OLD;
+    END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_markAssetDeleted ON assetTags;
+CREATE TRIGGER trg_ct_markAssetDeleted AFTER DELETE ON assetTags
+FOR EACH ROW EXECUTE PROCEDURE ct_markAssetDeleted();
+
+-- TRIGGER functions to associate channels and assets when the tags change
+CREATE OR REPLACE FUNCTION ct_associateDirtyAssetsWithChannels() RETURNS VOID AS $$
+DECLARE
+    alteredAsset   int;
+    basePrice int;
+    parentChannel  RECORD;
+    noJobsInProgress bool;
+BEGIN
+    FOR alteredAsset, baseprice IN SELECT a.id, a.baseprice FROM assetsNeedingRefresh r JOIN assets a ON (r.asset = a.id) LOOP
+        DELETE FROM channelAssets c WHERE c.asset = alteredAsset;
+        DELETE FROM subChannelAssets c WHERE c.asset = alteredAsset;
+        FOR parentChannel IN SELECT * FROM (SELECT c.channel AS channel, count(c.tag) = count(a.tag) as matches
+                FROM channelTags c LEFT JOIN assetTags a ON (c.tag = a.tag and a.asset = alteredAsset)
+                GROUP BY c.channel) as tmp WHERE matches LOOP
+            INSERT INTO channelAssets (channel, asset) VALUES (parentChannel.channel, alteredAsset);
+            PERFORM ct_associateAssetWithParentChannel(parentChannel.channel, parentChannel.channel, alteredAsset);
+        END LOOP;
+
+        PERFORM ct_updateAssetPrices(alteredAsset, basePrice);
+    END LOOP;
+
+    PERFORM ct_markNonExtantPricesDone();
+    UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(distinct asset) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
+    DELETE FROM assetsNeedingRefresh;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION ct_markChannelDirty() RETURNS TRIGGER AS $$
 DECLARE
@@ -229,38 +251,38 @@ DECLARE
 BEGIN
     FOR alteredChannel IN SELECT channel FROM channelsNeedingRefresh
     LOOP
-    SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
-    SELECT INTO tagCount count(tag) FROM channelTags c WHERE c.channel = alteredChannel;
-    SELECT INTO markupRow s.minMarkup as minMarkup, s.maxMarkup as  maxMarkup,
-                        s.markup as markup, s.id as store
-                        FROM stores s LEFT JOIN channels c ON (s.id = c.store)
-                        WHERE c.id = alteredChannel;
+        SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
+        SELECT INTO tagCount count(tag) FROM channelTags c WHERE c.channel = alteredChannel;
+        SELECT INTO markupRow s.minMarkup as minMarkup, s.maxMarkup as  maxMarkup,
+                            s.markup as markup, s.id as store
+                            FROM stores s LEFT JOIN channels c ON (s.id = c.store)
+                            WHERE c.id = alteredChannel;
 
-    DELETE FROM channelAssets c WHERE c.channel = alteredChannel;
-    DELETE FROM subChannelAssets sc WHERE sc.channel = alteredChannel OR sc.leafChannel = alteredChannel;
+        DELETE FROM channelAssets c WHERE c.channel = alteredChannel;
+        DELETE FROM subChannelAssets sc WHERE sc.channel = alteredChannel OR sc.leafChannel = alteredChannel;
 
-    FOR assetRow IN SELECT * FROM (SELECT a.asset as id, count(a.tag) = tagCount as matches
-            FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
-        WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp WHERE matches LOOP
-        INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
-        PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
-        PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
-        IF NOT FOUND THEN
-            SELECT INTO pricesRow
-                (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
-                 warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
-                FROM assets WHERE id = assetRow.id;
-            IF pricesRow.retailpoints > 0 THEN
-                INSERT INTO assetPrices (asset, store, points, toStore)
-                       VALUES (assetRow.id, markupRow.store, pricesRow.retailpoints, pricesRow.tostorepoints);
+        FOR assetRow IN SELECT * FROM (SELECT a.asset as id, count(a.tag) = tagCount as matches
+                FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
+            WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp WHERE matches LOOP
+            INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
+            PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
+            PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
+            IF NOT FOUND THEN
+                SELECT INTO pricesRow
+                    (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
+                     warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
+                    FROM assets WHERE id = assetRow.id;
+                IF pricesRow.retailpoints > 0 THEN
+                    INSERT INTO assetPrices (asset, store, points, toStore)
+                           VALUES (assetRow.id, markupRow.store, pricesRow.retailpoints, pricesRow.tostorepoints);
+                END IF;
             END IF;
-        END IF;
+        END LOOP;
     END LOOP;
 
     PERFORM ct_markNonExtantPricesDone();
 
-    UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(channel) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
-    END LOOP;
+    UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(distinct asset) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
     DELETE FROM channelsNeedingRefresh;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -374,7 +396,7 @@ DECLARE
     price int := 0;
 BEGIN
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
-    WHERE asset = assetId AND ending IS NULL;
+        WHERE asset = assetId AND ending IS NULL;
 
     IF (basePrice <= 0) THEN
         RETURN;
@@ -444,6 +466,10 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+DROP TRIGGER IF EXISTS trg_ct_processUpdatedAsset ON assets;
+CREATE TRIGGER trg_ct_processUpdatedAsset AFTER UPDATE ON assets
+FOR EACH ROW EXECUTE PROCEDURE ct_processUpdatedAsset();
+
 CREATE OR REPLACE FUNCTION ct_processNewAsset() RETURNS TRIGGER AS $$
 DECLARE
 BEGIN
@@ -452,10 +478,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
-
-DROP TRIGGER IF EXISTS trg_ct_processUpdatedAsset ON assets;
-CREATE TRIGGER trg_ct_processUpdatedAsset AFTER UPDATE ON assets
-FOR EACH ROW EXECUTE PROCEDURE ct_processUpdatedAsset();
 
 DROP TRIGGER IF EXISTS trg_ct_processNewAsset ON assets;
 CREATE TRIGGER trg_ct_processNewAsset AFTER INSERT ON assets
