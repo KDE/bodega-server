@@ -31,7 +31,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS trg_ct_checkChannelUpdate ON channels;
-CREATE TRIGGER trg_ct_checkChannelUpdate BEFORE UPDATE ON channels
+CREATE TRIGGER trg_ct_checkChannelUpdate BEFORE UPDATE OF parent, topLevel, store ON channels
 FOR EACH ROW EXECUTE PROCEDURE ct_checkChannelUpdate();
 
 CREATE OR REPLACE FUNCTION ct_setTopLevelOnChannel() RETURNS TRIGGER AS $$
@@ -155,7 +155,7 @@ BEGIN
 
     DELETE FROM channelAssets c WHERE c.asset = alteredAsset;
     DELETE FROM subChannelAssets c WHERE c.asset = alteredAsset;
-    FOR parentChannel IN SELECT * FROM (SELECT c.channel AS channel, count(c.tag) = count(a.tag) as matches
+     FOR parentChannel IN SELECT * FROM (SELECT c.channel AS channel, count(c.tag) = count(a.tag) as matches
             FROM channelTags c LEFT JOIN assetTags a ON (c.tag = a.tag and a.asset = alteredAsset)
             GROUP BY c.channel) as tmp WHERE matches LOOP
         INSERT INTO channelAssets (channel, asset) VALUES (parentChannel.channel, alteredAsset);
@@ -164,7 +164,7 @@ BEGIN
 
     select into noJobsInProgress NOT bool_or(dowork) from batchjobsinprogress;
     IF (noJobsInProgress) THEN
-        UPDATE channels SET assetCount = (SELECT count(channel) FROM subChannelAssets WHERE channel = channels.id);
+        UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(channel) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
     END IF;
 
     PERFORM ct_updateAssetPrices(alteredAsset, basePrice) FROM assets WHERE id = alteredAsset;
@@ -224,10 +224,11 @@ BEGIN
         END IF;
     END LOOP;
 
+    PERFORM ct_markNonExtantPricesDone();
+
     select into noJobsInProgress NOT bool_or(dowork) from batchjobsinprogress;
     IF (noJobsInProgress) THEN
-        PERFORM ct_markNonExtantPricesDone();
-        UPDATE channels SET assetCount = (SELECT count(channel) FROM subChannelAssets WHERE channel = channels.id);
+        UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(channel) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
     END IF;
 
     IF (TG_OP = 'DELETE') THEN
@@ -303,14 +304,6 @@ CREATE OR REPLACE FUNCTION ct_updateStorePrices() RETURNS TRIGGER AS $$
 DECLARE
     warehouse record;
 BEGIN
-    IF (TG_OP = 'UPDATE' AND
-        NEW.markup = OLD.markup AND
-        NEW.minMarkup = OLD.minMarkup AND
-        NEW.maxMarkup = OLD.maxMarkup)
-    THEN
-        RETURN NEW;
-    END IF;
-
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
            WHERE store = NEW.id AND ending IS NULL;
 
@@ -326,21 +319,13 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_updateStorePricesOnStoreUpdate ON stores;
-CREATE TRIGGER trg_ct_updateStorePricesOnStoreUpdate AFTER INSERT OR UPDATE ON stores
+CREATE TRIGGER trg_ct_updateStorePricesOnStoreUpdate AFTER INSERT OR UPDATE OF markup, minMarkup, maxMarkup ON stores
 FOR EACH ROW EXECUTE PROCEDURE ct_updateStorePrices();
 
 -- updates prices in stores when the warehouse markup changes
 CREATE OR REPLACE FUNCTION ct_updateWarehousePrices() RETURNS TRIGGER AS $$
 DECLARE
 BEGIN
-    IF (TG_OP = 'UPDATE' AND
-        NEW.markup = OLD.markup AND
-        NEW.minMarkup = OLD.minMarkup AND
-        NEW.maxMarkup = OLD.maxMarkup)
-    THEN
-        RETURN NEW;
-    END IF;
-
     UPDATE assetPrices SET ending = (current_timestamp AT TIME ZONE 'UTC')
            WHERE ending IS NULL;
 
@@ -356,7 +341,7 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 DROP TRIGGER IF EXISTS trg_ct_updateWarehousePricesOnStoreUpdate ON warehouses;
-CREATE TRIGGER trg_ct_updateWarehousePricesOnStoreUpdate AFTER INSERT OR UPDATE ON warehouses
+CREATE TRIGGER trg_ct_updateWarehousePricesOnStoreUpdate AFTER INSERT OR UPDATE OF markup, minMarkup, maxMarkup ON warehouses
 FOR EACH ROW EXECUTE PROCEDURE ct_updateWarehousePrices();
 
 -- sets prices in stores for a given asset
