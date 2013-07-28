@@ -268,7 +268,7 @@ QStringList parseEbookBlock(ReaderState &state)
                     state.xml.readNext();
                 } else if (alternativeTag == elem) {
                     state.xml.readNext();
-                    state.book.addAlternativeName(state.xml.text().toString());
+                    state.book.addAlternativeTitle(state.xml.text().toString());
                     state.xml.readNext();
                 } else if (tocTag == elem) {
                     state.xml.readNext();

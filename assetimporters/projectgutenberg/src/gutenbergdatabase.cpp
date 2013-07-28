@@ -82,7 +82,7 @@ GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
     : Database(contentPath, "Project Gutenberg", "VIVALDI-1"),
       m_categoryTagId(0),
       m_licenseId(0),
-      m_mimetypeTagId(0),
+      m_mimetypeTagTypeId(0),
       m_ebookMimetypeTag(0),
       m_topLevelChannelName(QLatin1String("Books"))
 {
@@ -141,8 +141,10 @@ void GutenbergDatabase::writeBookInit()
         Q_ASSERT(!"failed to get a license id");
     }
 
-    m_mimetypeTagId = mimetypeTagId();
-    m_ebookMimetypeTag = tagId(m_mimetypeTagId, Ebook::epubMimetype());
+    m_mimetypeTagTypeId = mimetypeTagTypeId();
+    m_descriptionTagTypeId = tagTypeId("description");
+
+    m_ebookMimetypeTag = tagId(m_mimetypeTagTypeId, Ebook::epubMimetype());
 }
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
@@ -355,6 +357,10 @@ void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
 
     foreach (const QString &code, book.languages()) {
         writeAssetTags(assetId, m_languageTagIds.value(code));
+    }
+
+    foreach (const QString &altTitle, book.alternativeTitles()) {
+        writeAssetTags(assetId, tagId(m_descriptionTagTypeId, altTitle));
     }
 
     //qDebug()<<"Book = "<< book.title();

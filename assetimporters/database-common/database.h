@@ -83,7 +83,7 @@ protected:
     int tagTypeId(const QString &type) const;
     int categoryId(const QString &name) const;
 
-    int mimetypeTagId();
+    int mimetypeTagTypeId();
 
     int authorId(const QString &author);
     int contributorId(const QString &contributor);
@@ -93,9 +93,9 @@ protected:
 private:
     QSqlDatabase m_db;
     int m_partnerId;
-    int m_authorTagId;
-    int m_categoryTagId;
-    int m_mimetypeTagId;
+    int m_authorTagTypeId;
+    int m_categoryTagTypeId;
+    int m_mimetypeTagTypeId;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;
     QString m_contentPath;

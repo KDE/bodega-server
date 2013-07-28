@@ -33,8 +33,8 @@ bool ScopedTransaction::s_inTransaction = false;
 Database::Database(const QString &contentPath, const QString &partner, const QString &store)
     : m_db(QSqlDatabase::addDatabase("QPSQL")),
       m_partnerId(0),
-      m_authorTagId(0),
-      m_categoryTagId(0),
+      m_authorTagTypeId(0),
+      m_categoryTagTypeId(0),
       m_contentPath(contentPath),
       m_store(store)
 {
@@ -53,21 +53,21 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
     }
 
 
-    m_mimetypeTagId = tagTypeId(QLatin1String("mimetype"));
-    if (!m_mimetypeTagId) {
+    m_mimetypeTagTypeId = tagTypeId(QLatin1String("mimetype"));
+    if (!m_mimetypeTagTypeId) {
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
 
 
-    m_authorTagId = tagTypeId(QLatin1String("author"));
-    if (!m_authorTagId) {
+    m_authorTagTypeId = tagTypeId(QLatin1String("author"));
+    if (!m_authorTagTypeId) {
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
 
-    m_categoryTagId = tagTypeId(QLatin1String("category"));
-    if (!m_categoryTagId) {
+    m_categoryTagTypeId = tagTypeId(QLatin1String("category"));
+    if (!m_categoryTagTypeId) {
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
@@ -94,14 +94,14 @@ int Database::writeChannel(const QString &name, const QString &description, cons
     return id;
 }
 
-int Database::mimetypeTagId()
+int Database::mimetypeTagTypeId()
 {
-    return m_mimetypeTagId;
+    return m_mimetypeTagTypeId;
 }
 
 int Database::authorId(const QString &author) const
 {
-    return tagId(m_authorTagId, author);
+    return tagId(m_authorTagTypeId, author);
 }
 
 int Database::partnerId()
@@ -325,7 +325,7 @@ int Database::categoryId(const QString &name) const
     query.prepare("select id from tags where partner = :partnerId and type = :typeId and title = :title");
 
     query.bindValue(":partnerId", m_partnerId);
-    query.bindValue(":typeId", m_categoryTagId);
+    query.bindValue(":typeId", m_categoryTagTypeId);
     query.bindValue(":title", name);
 
     if (!query.exec()) {
@@ -342,7 +342,7 @@ int Database::categoryId(const QString &name) const
     query.prepare("insert into tags (partner, type, title) values (:partner, :type, :title) returning id");
     query.bindValue(":partner", m_partnerId);
     query.bindValue(":title", name);
-    query.bindValue(":type", m_categoryTagId);
+    query.bindValue(":type", m_categoryTagTypeId);
     if (!query.exec()) {
         showError(query);
         return 0;
@@ -358,7 +358,7 @@ int Database::categoryId(const QString &name) const
 
 int Database::authorId(const QString &author)
 {
-    return tagId(m_authorTagId, author, &m_authorIds);
+    return tagId(m_authorTagTypeId, author, &m_authorIds);
 }
 
 int Database::writeAsset(QSqlQuery query, const QString &name, const QString &description,

@@ -53,8 +53,8 @@ private:
     int m_authorTagId;
     int m_categoryTagId;
     int m_licenseId;
-    int m_contributorTagId;
-    int m_mimetypeTagId;
+    int m_mimetypeTagTypeId;
+    int m_descriptionTagTypeId;
     int m_ebookMimetypeTag;
     QHash<QString, int> m_channelIds;
     QHash<QString, int> m_authorIds;

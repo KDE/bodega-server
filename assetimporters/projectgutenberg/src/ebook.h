@@ -76,9 +76,9 @@ public:
     QString title() const;
     void setTitle(const QString &title);
 
-    QStringList alternativeNames() const;
-    void setAlternativeNames(const QStringList &lst);
-    void addAlternativeName(const QString &name);
+    QStringList alternativeTitles() const;
+    void setAlternativeTitles(const QStringList &lst);
+    void addAlternativeTitle(const QString &name);
 
     QStringList languages() const;
     void setLanguages(const QStringList &lang);
@@ -124,7 +124,7 @@ private:
     QStringList m_languages;
     Ebook::Rights m_rights;
     Ebook::Type m_type;
-    QStringList m_alternativeNames;
+    QStringList m_alternativeTitles;
     QStringList m_authors;
     QString m_toc;
 

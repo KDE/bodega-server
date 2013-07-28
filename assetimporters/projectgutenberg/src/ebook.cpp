@@ -116,22 +116,22 @@ void Ebook::setType(Ebook::Type type)
     m_type = type;
 }
 
-QStringList Ebook::alternativeNames() const
+QStringList Ebook::alternativeTitles() const
 {
-    return m_alternativeNames;
+    return m_alternativeTitles;
 }
 
-void Ebook::setAlternativeNames(const QStringList &lst)
+void Ebook::setAlternativeTitles(const QStringList &lst)
 {
-    if (!m_alternativeNames.isEmpty()) {
+    if (!m_alternativeTitles.isEmpty()) {
         throw QLatin1String("Alternative names already set");
     }
-    m_alternativeNames = lst;
+    m_alternativeTitles = lst;
 }
 
-void Ebook::addAlternativeName(const QString &name)
+void Ebook::addAlternativeTitle(const QString &name)
 {
-    m_alternativeNames.append(name);
+    m_alternativeTitles.append(name);
 }
 
 QString Ebook::tableOfContents() const
@@ -279,9 +279,9 @@ QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
                 << ", issued: " << book.issued() << ")\n"
                 << "\ttitle = " << QString(book.title()) << '\n';
     s << "\tEPub " << book.epubFile().url << "\n";
-    if (!book.alternativeNames().isEmpty()) {
+    if (!book.alternativeTitles().isEmpty()) {
         s << "\tAlso known as:" << "\n";
-        foreach (const QString &alt, book.alternativeNames()) {
+        foreach (const QString &alt, book.alternativeTitles()) {
             s << "\t\t" << alt << "\n";
         }
     }
