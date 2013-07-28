@@ -19,14 +19,14 @@ DECLARE
 BEGIN
     -- RAISE NOTICE 'checking parent % %', NEW.id, TG_OP;
     -- disallow changing the parent of existing channels
-    IF NEW.parent = OLD.parent AND
-       NEW.topLevel = OLD.topLevel AND
-       NEW.store = OLD.store
+    IF NEW.parent IS DISTINCT FROM OLD.parent OR
+       NEW.topLevel IS DISTINCT FROM OLD.topLevel OR
+       NEW.store IS DISTINCT FROM OLD.store
     THEN
-        RETURN NEW;
+        RETURN OLD;
     END IF;
 
-    RETURN NULL;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
