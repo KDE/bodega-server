@@ -156,25 +156,20 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
     Languages languages;
 
     foreach (const QString &code, assetLanguages) {
-        if (languageId(code)) {
-            //qDebug()<< "Language " << code << "already in the database as;
-            continue;
-        }
-
-        const QString name = languages.name(code);
-        if (name.isEmpty()) {
-            qDebug() << "Unrecognized language code:" << code;
-            continue;
-        }
-
-        qDebug() << "\tFound language:" << name;
-        QSqlQuery query;
-        query.prepare("insert into languages (code, name) values (:code, :name)");
-        query.bindValue(":code", code);
-        query.bindValue(":name", name);
-        if (!query.exec()) {
-            showError(query);
-            break;
+        if (!languageId(code)) {
+            const QString name = languages.name(code);
+            if (name.isEmpty()) {
+                qDebug() << "Unrecognized language code:" << code;
+            } else {
+                qDebug() << "\tFound language:" << name;
+                QSqlQuery query;
+                query.prepare("insert into languages (code, name) values (:code, :name)");
+                query.bindValue(":code", code);
+                query.bindValue(":name", name);
+                if (!query.exec()) {
+                    showError(query);
+                }
+            }
         }
 
         // now we insert the tag if needed and record its value for later use
@@ -354,9 +349,12 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 
 void GutenbergDatabase::writeBookAssetTags(const Ebook &book, int assetId)
 {
-    const QStringList authors = book.authors();
-    foreach (const QString &author, authors) {
+    foreach (const QString &author, book.authors()) {
         writeAssetTags(assetId, authorId(author));
+    }
+
+    foreach (const QString &code, book.languages()) {
+        writeAssetTags(assetId, m_languageTagIds.value(code));
     }
 
     //qDebug()<<"Book = "<< book.title();
@@ -391,7 +389,7 @@ int GutenbergDatabase::languageId(const QString &lang)
 
     if (id < 1) {
         QSqlQuery query;
-        query.prepare("select id from languages where code =: lang");
+        query.prepare("select id from languages where code = :lang");
         query.bindValue(":lang", lang);
 
         if (!query.exec()) {
