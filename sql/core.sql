@@ -241,6 +241,11 @@ create table channels
 
 create index idx_channelParents on channels(parent);
 
+create table channelsNeedingRefresh
+(
+    channel int primary key references channels(id) on delete cascade
+);
+
 create table channelTags
 (
     channel     int         not null references channels(id) on delete cascade,

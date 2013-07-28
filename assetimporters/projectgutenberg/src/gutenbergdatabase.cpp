@@ -271,6 +271,8 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
     qDebug() << "=======> Channel tagging";
     QTime t;
     t.start();
+    QTime channelTagTime;
+    channelTagTime.start();
 
     const int booksChannelId = writeChannel(m_topLevelChannelName, QString(), "default/book.png");
 
@@ -279,7 +281,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
                                              "default/book.png", booksChannelId);
     const int groupingTagTypeId = tagTypeId("grouping");
     QSqlQuery query;
-    query.prepare("select t.id, upper(substring(t.title from '.$')) from assettags at join tags t on (at.tag = t.id) "
+    query.prepare("select distinct t.id, upper(substring(t.title from '.$')) from assettags at join tags t on (at.tag = t.id) "
                   "join assets a on (at.asset = a.id) "
                   "where a.partner = :partner and t.type = :groupingTagType and t.title ~ :pattern");
     query.bindValue(":partner", partnerId());
@@ -291,6 +293,8 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         const QString name = query.value(1).toString();
         const int subChannelId = writeChannel(name, QString(), "default/book.png", authorChannelId);
         writeChannelTags(subChannelId, tagId);
+        qDebug() << "\t\tTagged channel" << subChannelId << "By Author /" << name
+                 << "in" << channelTagTime.restart() << "ms";
     }
 
     qDebug() << "\tTitle channels";
@@ -303,6 +307,8 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         const QString name = query.value(1).toString();
         const int subChannelId = writeChannel(name, QString(), "default/book.png", titleChannelId);
         writeChannelTags(subChannelId, tagId);
+        qDebug() << "\t\tTagged channel" << subChannelId << "By Title /" << name
+                << "in" << channelTagTime.restart() << "ms";
     }
 
 
@@ -311,16 +317,15 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
                                               "default/book.png", booksChannelId);
     const QHash<QString, QStringList> lccs = catalog.categoryHierarchy();
     QHashIterator<QString, QStringList> it(lccs);
-    QTime channelTagTime;
-    channelTagTime.start();
     while (it.hasNext()) {
         it.next();
         const int channelId = writeChannel(it.key(), QString(), "default/book.png", subjectChannelId);
 
         if (it.value().isEmpty()) {
             // this guy has no subcategories, so we'll put tags on it
-            qDebug() << "Tagging channel" << channelId << it.key();
             writeChannelTags(channelId, m_categoryTagIds.value(it.key()));
+            qDebug() << "\t\tTagged channel" << channelId << it.key()
+                     << "in" << channelTagTime.restart() << "ms";
         } else {
             foreach (const QString &subChannel, it.value()) {
                 const int subChannelId = writeChannel(subChannel, QString(), "default/book.png", channelId);
@@ -330,7 +335,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
                 */
                 writeChannelTags(subChannelId, m_categoryTagIds.value(it.key()));
                 writeChannelTags(subChannelId, m_subCategoryTagIds.value(subChannel));
-                qDebug() << "\tTagged channel" << subChannelId << it.key() << "/" << subChannel
+                qDebug() << "\t\tTagged channel" << subChannelId << it.key() << "/" << subChannel
                          << "in" << channelTagTime.restart() << "ms";
             }
         }

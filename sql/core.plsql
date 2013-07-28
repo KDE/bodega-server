@@ -181,7 +181,43 @@ DROP TRIGGER IF EXISTS trg_ct_associateAssetWithChannels ON assetTags;
 CREATE TRIGGER trg_ct_associateAssetWithChannels AFTER INSERT OR UPDATE OR DELETE ON assetTags
 FOR EACH ROW EXECUTE PROCEDURE ct_associateAssetWithChannels();
 
-CREATE OR REPLACE FUNCTION ct_associateChannelWithAssets() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION ct_markChannelDirty() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    BEGIN
+        INSERT INTO channelsNeedingRefresh VALUES (NEW.channel);
+    EXCEPTION WHEN unique_violation THEN
+        -- do nothing
+    END;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_markChannelDirty ON channelTags;
+CREATE TRIGGER trg_ct_markChannelDirty AFTER INSERT OR UPDATE ON channelTags
+FOR EACH ROW EXECUTE PROCEDURE ct_markChannelDirty();
+
+CREATE OR REPLACE FUNCTION ct_markChannelDeleted() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    PERFORM id FROM channels WHERE id = OLD.channel;
+    IF FOUND THEN
+        BEGIN
+            INSERT INTO channelsNeedingRefresh VALUES (OLD.channel);
+        EXCEPTION WHEN unique_violation THEN
+            -- do nothing
+        END;
+    END IF;
+
+    RETURN OLD;
+    END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_markChannelDeleted ON channelTags;
+CREATE TRIGGER trg_ct_markChannelDeleted AFTER DELETE ON channelTags
+FOR EACH ROW EXECUTE PROCEDURE ct_markChannelDeleted();
+
+CREATE OR REPLACE FUNCTION ct_refreshChannels() RETURNS VOID AS $$
 DECLARE
     alteredChannel   int;
     tagCount         int;
@@ -191,11 +227,8 @@ DECLARE
     pricesRow        RECORD;
     noJobsInProgress bool;
 BEGIN
-    IF (TG_OP = 'DELETE') THEN
-        alteredChannel := OLD.channel;
-    ELSE
-        alteredChannel := NEW.channel;
-    END IF;
+    FOR alteredChannel IN SELECT channel FROM channelsNeedingRefresh
+    LOOP
     SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
     SELECT INTO tagCount count(tag) FROM channelTags c WHERE c.channel = alteredChannel;
     SELECT INTO markupRow s.minMarkup as minMarkup, s.maxMarkup as  maxMarkup,
@@ -226,22 +259,11 @@ BEGIN
 
     PERFORM ct_markNonExtantPricesDone();
 
-    select into noJobsInProgress NOT bool_or(dowork) from batchjobsinprogress;
-    IF (noJobsInProgress) THEN
-        UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(channel) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
-    END IF;
-
-    IF (TG_OP = 'DELETE') THEN
-        RETURN OLD;
-    ELSE
-        RETURN NEW;
-    END IF;
+    UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(channel) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
+    END LOOP;
+    DELETE FROM channelsNeedingRefresh;
 END;
 $$ LANGUAGE 'plpgsql';
-
-DROP TRIGGER IF EXISTS trg_ct_associateChannelWithAssets ON channelTags;
-CREATE TRIGGER trg_ct_associateChannelWithAssets AFTER INSERT OR UPDATE OR DELETE ON channelTags
-FOR EACH ROW EXECUTE PROCEDURE ct_associateChannelWithAssets();
 
 CREATE OR REPLACE FUNCTION ct_calcPoints(points int,
                                          storeMarkup int, storeMinMarkup int, storeMaxMarkup int,

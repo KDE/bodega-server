@@ -37,7 +37,7 @@ void descend(const QString &path)
         descend(absPath + subdir);
 #ifdef TESTING
         ++count;
-        if (count > 10) {
+        if (count > 500) {
             break;
         }
 #endif
