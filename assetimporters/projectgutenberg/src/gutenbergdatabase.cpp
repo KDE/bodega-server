@@ -125,7 +125,7 @@ void GutenbergDatabase::writeBookInit()
     qDebug() << "=======> Setting up database";
     ScopedTransaction s;
 
-    //qDebug()<<"partner id = "<<m_partnerId;
+    //qDebug()<<"partner id = " << partnerId();
 
     // create a table to store the external ids
     QSqlQuery query;
@@ -273,13 +273,42 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
     t.start();
 
     const int booksChannelId = writeChannel(m_topLevelChannelName, QString(), "default/book.png");
+
+    qDebug() << "\tAuthor channels";
     const int authorChannelId = writeChannel(QString("By Author"), QString(),
                                              "default/book.png", booksChannelId);
-    const int subjectChannelId = writeChannel(QString("By Subject"), QString(),
-                                              "default/book.png", booksChannelId);
+    const int groupingTagTypeId = tagTypeId("grouping");
+    QSqlQuery query;
+    query.prepare("select t.id, upper(substring(t.title from '.$')) from assettags at join tags t on (at.tag = t.id) "
+                  "join assets a on (at.asset = a.id) "
+                  "where a.partner = :partner and t.type = :groupingTagType and t.title ~ :pattern");
+    query.bindValue(":partner", partnerId());
+    query.bindValue(":groupingTagType", groupingTagTypeId);
+    query.bindValue(":pattern", "author_");
+    query.exec();
+    while (query.next()) {
+        const int tagId = query.value(0).toInt();
+        const QString name = query.value(1).toString();
+        const int subChannelId = writeChannel(name, QString(), "default/book.png", authorChannelId);
+        writeChannelTags(subChannelId, tagId);
+    }
+
+    qDebug() << "\tTitle channels";
     const int titleChannelId = writeChannel(QString("By Title"), QString(),
                                             "default/book.png", booksChannelId);
+    query.bindValue(":pattern", "name_");
+    query.exec();
+    while (query.next()) {
+        const int tagId = query.value(0).toInt();
+        const QString name = query.value(1).toString();
+        const int subChannelId = writeChannel(name, QString(), "default/book.png", titleChannelId);
+        writeChannelTags(subChannelId, tagId);
+    }
 
+
+    qDebug() << "\tSubject channels";
+    const int subjectChannelId = writeChannel(QString("By Subject"), QString(),
+                                              "default/book.png", booksChannelId);
     const QHash<QString, QStringList> lccs = catalog.categoryHierarchy();
     QHashIterator<QString, QStringList> it(lccs);
     QTime channelTagTime;
