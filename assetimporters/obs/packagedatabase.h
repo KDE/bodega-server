@@ -1,7 +1,7 @@
 #ifndef PACKAGEDATABASE_H
 #define PACKAGEDATABASE_H
 
-#include "../database-common/database.h"
+#include "../common/database.h"
 #include "packagecatalog.h"
 #include "channelscatalog.h"
 

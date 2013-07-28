@@ -7,7 +7,7 @@ set(wallpapersimport_SRCS
     catalog.cpp
     kdewallpapersdatabase.cpp
     main.cpp
-    ../database-common/database.cpp
+    ../common/database.cpp
    )
 
 qt4_automoc(${wallpapersimport_SRCS})

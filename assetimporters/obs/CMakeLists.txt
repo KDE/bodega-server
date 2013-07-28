@@ -7,7 +7,7 @@ set(packagesimport_SRCS
     packagecatalog.cpp
     packagedatabase.cpp
     channelscatalog.cpp
-    ../database-common/database.cpp
+    ../common/database.cpp
     main.cpp
    )
 

@@ -11,7 +11,7 @@ set(gutimport_SRCS
     lcc.cpp
     reader.cpp
     main.cpp
-    ../../database-common/database.cpp
+    ../../common/database.cpp
 )
 
 qt4_automoc(${gutimport_SRCS})

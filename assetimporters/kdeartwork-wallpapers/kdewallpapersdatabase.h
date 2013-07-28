@@ -2,7 +2,7 @@
 #define WALLPAPERSDATABASE_H
 
 #include "catalog.h"
-#include "../database-common/database.h"
+#include "../common/database.h"
 #include <QSqlDatabase>
 
 class WallpapersDatabase : public Database

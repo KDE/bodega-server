@@ -20,7 +20,7 @@
 
 #include "catalog.h"
 #include "lcc.h"
-#include "../../database-common/database.h"
+#include "../../common/database.h"
 
 #include <QSqlDatabase>
 

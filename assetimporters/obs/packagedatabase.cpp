@@ -106,7 +106,7 @@ void PackageDatabase::writePackages()
         int author = authorId(package.author);
         writeAssetTags(assetId, author);
 
-        int mimetypeId = tagId(mimetypeTagId(), package.mimeType, &mimetypeIds);
+        int mimetypeId = tagId(mimetypeTagTypeId(), package.mimeType, &mimetypeIds);
         writeAssetTags(assetId, mimetypeId);
 
         foreach (const QString &channel, package.channels) {
@@ -173,7 +173,7 @@ void PackageDatabase::writePackageChannels()
         writeChannel(c.name, c.description, c.image, c.parent.toInt());
 
         const int chanId = channelId(c.name, c.description, c.parent.toInt());
-        const int mime = mimetypeTagId();
+        const int mime = mimetypeTagTypeId();
         QHash<QString, int> mimetypeIds;
         const int mimetypeId = tagId(mime, c.mimeType, &mimetypeIds);
 

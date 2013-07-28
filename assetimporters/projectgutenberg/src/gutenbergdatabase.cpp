@@ -376,7 +376,6 @@ int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
         cover.prepend("gutenberg/");
     }
 
-    //FIXME: alternatives
     const int id = writeAsset(query, book.title(), QString(),
                               m_licenseId, partnerId(), QLatin1String("1.0"),
                               epubFile.url.toString(), filePrefix + fi.fileName(), cover);
