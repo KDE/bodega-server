@@ -178,7 +178,7 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
         tagId(languageTagType, code, &m_languageTagIds);
     }
 
-    qDebug() << "Language creation took" << t.elapsed() << "ms";
+    qDebug() << "\tLanguage creation took" << t.elapsed() << "ms";
 }
 
 
@@ -254,7 +254,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
         if (booksProcessed - lastReport > reportIncrement) {
             double written = booksProcessed;
             int percent = (written/catalog.m_ebooks.count()) * 100;
-            qDebug() << "Written "<< percent << "%...";
+            qDebug() << "\tWritten "<< percent << "%...";
             lastReport = booksProcessed;
         }
     }
@@ -336,7 +336,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         }
     }
 
-    qDebug() << "Writing all channel tags took" << t.elapsed();
+    qDebug() << "\tWriting all channel tags took" << t.elapsed();
 }
 
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
