@@ -117,7 +117,7 @@ void GutenbergDatabase::clearData()
         Q_ASSERT(false);
     }
 
-    qDebug() << "\tremoval took" << time.elapsed() << "ms";
+    qDebug() << "\tremoval took" << time.elapsed() / 1000. << "seconds";
 }
 
 void GutenbergDatabase::writeBookInit()
@@ -178,7 +178,7 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
         tagId(languageTagType, code, &m_languageTagIds);
     }
 
-    qDebug() << "\tLanguage creation took" << t.elapsed() << "ms";
+    qDebug() << "\tLanguage creation took" << t.elapsed() / 1000. << "seconds";
 }
 
 
@@ -212,6 +212,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
     int numSkipped = 0;
     int numBooksWritten = 0;
+    int numErrors = 0;
     // report progress every 5%
     const int reportIncrement = catalog.m_ebooks.count() / 20.;
     int lastReport = 0;
@@ -223,8 +224,7 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
                   "(:name, :license, :partner, :version, :path, :file, :image, :size) "
                   "returning id");
 
-    QSqlQuery recordExternalIdQuery;
-    recordExternalIdQuery.prepare("INSERT INTO gutenberg (id, asset) VALUES (:id, :asset)");
+    QString recordExternalIdQuery;
 
     foreach (const Ebook &book, catalog.m_ebooks) {
         //qDebug() << "Ok, let's put in this book" << book.bookId() << book.title();
@@ -235,34 +235,48 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
             // not yet in the db, so put it there now
             int assetId = writeBookAsset(book, query);
             if (!assetId) {
-                QSqlDatabase::database().rollback();
-                return;
+                ++numErrors;
+                continue;
             }
 
-            recordExternalIdQuery.bindValue(":id", book.bookId());
-            recordExternalIdQuery.bindValue(":asset", assetId);
-            if (!recordExternalIdQuery.exec()) {
-                showError(query);
-                Q_ASSERT("Normal insert into gutenberg table failed.");
+            if (recordExternalIdQuery.isEmpty()) {
+                recordExternalIdQuery = QString::fromLatin1("INSERT INTO gutenberg (id, asset) VALUES ");
+            } else {
+                recordExternalIdQuery.append(", ");
             }
 
+            recordExternalIdQuery += "('" + book.bookId() + "', " + QString::number(assetId) + ")";
             writeBookAssetTags(book, assetId);
             ++numBooksWritten;
         }
 
-        int booksProcessed = numBooksWritten + numSkipped;
+        if (numBooksWritten > 0 && (numBooksWritten % 500) == 0) {
+            QSqlQuery query;
+            query.exec(recordExternalIdQuery);
+            recordExternalIdQuery.clear();
+        }
+
+        const int booksProcessed = numBooksWritten + numSkipped;
         if (booksProcessed - lastReport > reportIncrement) {
             double written = booksProcessed;
             int percent = (written/catalog.m_ebooks.count()) * 100;
-            qDebug() << "\tWritten" << percent << "% after" << time.elapsed() << "ms";
+            qDebug() << "\tWritten" << percent << "% after" << time.elapsed() / 1000. << "seconds";
             lastReport = booksProcessed;
-        }
+        };
+    }
+
+    if (!recordExternalIdQuery.isEmpty()) {
+        QSqlQuery query;
+        query.exec(recordExternalIdQuery);
+        recordExternalIdQuery.clear();
     }
 
     int elapsed = time.elapsed();
 
-    qDebug()<< "\tWriting all books took"<< elapsed / 1000. << "seconds. Inserted"
-            << numBooksWritten << "and skipped" << numSkipped;
+    qDebug() << "\tWriting all books took" << elapsed / 1000. << "seconds";
+    qDebug() << "\t\tInserted:" << numBooksWritten;
+    qDebug() << "\t\t Skipped:" << numSkipped;
+    qDebug() << "\t\t Errored:" << numErrors;
 }
 
 
@@ -295,7 +309,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         writeChannelTags(subChannelId, tagId);
         writeChannelTags(subChannelId, m_ebookMimetypeTag);
         qDebug() << "\t\tTagged channel" << subChannelId << "By Author /" << name
-                 << "in" << channelTagTime.restart() << "ms";
+                 << "in" << channelTagTime.restart() / 1000. << "seconds";
     }
 
     qDebug() << "\tTitle channels";
@@ -310,7 +324,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         writeChannelTags(subChannelId, tagId);
         writeChannelTags(subChannelId, m_ebookMimetypeTag);
         qDebug() << "\t\tTagged channel" << subChannelId << "By Title /" << name
-                << "in" << channelTagTime.restart() << "ms";
+                << "in" << channelTagTime.restart() / 1000.0 << "seconds";
     }
 
 
@@ -327,7 +341,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
             // this guy has no subcategories, so we'll put tags on it
             writeChannelTags(channelId, m_categoryTagIds.value(it.key()));
             qDebug() << "\t\tTagged channel" << channelId << it.key()
-                     << "in" << channelTagTime.restart() << "ms";
+                     << "in" << channelTagTime.restart() / 1000. << "seconds";
         } else {
             foreach (const QString &subChannel, it.value()) {
                 const int subChannelId = writeChannel(subChannel, QString(), "default/book.png", channelId);
@@ -338,7 +352,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
                 writeChannelTags(subChannelId, m_categoryTagIds.value(it.key()));
                 writeChannelTags(subChannelId, m_subCategoryTagIds.value(subChannel));
                 qDebug() << "\t\tTagged channel" << subChannelId << it.key() << "/" << subChannel
-                         << "in" << channelTagTime.restart() << "ms";
+                         << "in" << channelTagTime.restart() / 1000. << "seconds";
             }
         }
     }

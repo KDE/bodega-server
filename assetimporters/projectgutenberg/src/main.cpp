@@ -24,7 +24,7 @@
 QStringList paths;
 Gutenberg::Catalog catalog;
 
-#define TESTING 1
+//#define TESTING 1
 
 void descend(const QString &path)
 {
@@ -37,7 +37,7 @@ void descend(const QString &path)
         descend(absPath + subdir);
 #ifdef TESTING
         ++count;
-        if (count > 1000) {
+        if (count > 10000) {
             break;
         }
 #endif
@@ -69,9 +69,12 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    QTime t;
+    t.start();
+
     Gutenberg::Catalog catalog;
     descend(argv[1]);
-    qDebug() << "we have" << paths.size() << "files to process now";
+    qDebug() << "Found" << paths.size() << "RDF files to process in" << t.restart() / 1000. << "seconds";
 
 #ifdef TESTING
     //foreach (const QString &path, paths) { qDebug() << path; }
@@ -79,11 +82,17 @@ int main(int argc, char **argv)
 
     Gutenberg::Reader::init();
     catalog.m_ebooks = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Gutenberg::Reader::parseRdf);
-    qDebug() << "Parsed" << catalog.m_ebooks.size() << "books, now compiling collection";
+    qDebug() << "Parsed" << catalog.m_ebooks.size() << "books in" << t.restart() / 1000. << "seconds";
     catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
-    qDebug() << "Processing" << catalog.m_ebooks.size() << "books";
+    qDebug() << "Compiled" << catalog.m_ebooks.size() << "books in" << t.restart() / 1000. << "seconds";
 
-    Gutenberg::GutenbergDatabase::write(catalog, argv[2], true);
+    Gutenberg::GutenbergDatabase::write(catalog, argv[2],
+#ifdef TESTING
+            true
+#else
+            false
+#endif
+            );
     return 0;
 
     QCoreApplication app(argc, argv);

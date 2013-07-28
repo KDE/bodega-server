@@ -437,7 +437,7 @@ void Database::writeAssetTags(int assetId, int tagId)
         m_assetTagInsertQuery.clear();
         count = 0;
 
-        if (++m_tagBatchCount % 5) {
+        if ((++m_tagBatchCount % 5) == 0) {
             //qDebug() << "checking out what's up with dirties";
             if (!query.exec("select ct_associateDirtyAssetsWithChannels(), ct_refreshChannels()")) {
                 showError(query);
@@ -471,7 +471,7 @@ void Database::writeChannelTags(int channelId, int tagId)
         m_channelTagInsertQuery.clear();
         count = 0;
 
-        if (++m_tagBatchCount % 5) {
+        if ((++m_tagBatchCount % 5) == 0) {
             //qDebug() << "checking out what's up with dirties";
             if (!query.exec("select ct_associateDirtyAssetsWithChannels(), ct_refreshChannels()")) {
                 showError(query);
