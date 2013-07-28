@@ -115,7 +115,7 @@ module.exports.participant = function(db, req, res) {
     });
 };
 
-module.exports.addAssetRatings = function(db, req, res) {
+module.exports.addAssetRating = function(db, req, res) {
     /*jshint multistr:true */
     var assetInsertQuery =
         'SELECT ct_AddAssetRating($1, $2, $3)';
@@ -152,7 +152,7 @@ module.exports.addAssetRatings = function(db, req, res) {
             jsToPgArray = jsToPgArray.concat('{', rating.rating, ', ', rating.attribute, '}');
         }
     }
-    console.log(jsToPgArray)
+    //console.log(jsToPgArray)
     //close the array
     jsToPgArray = jsToPgArray.concat(' }');
 
