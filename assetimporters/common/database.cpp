@@ -35,7 +35,8 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
       m_authorTagTypeId(0),
       m_categoryTagTypeId(0),
       m_contentPath(contentPath),
-      m_store(store)
+      m_store(store),
+      m_tagBatchCount(0)
 {
 
     //db.setHostName("localhost");
@@ -424,6 +425,13 @@ void Database::writeAssetTags(int assetId, int tagId)
         }
         m_assetTagInsertQuery.clear();
         count = 0;
+
+        if (++m_tagBatchCount % 5) {
+            //qDebug() << "checking out what's up with dirties";
+            if (!query.exec("select ct_associateDirtyAssetsWithChannels(), ct_refreshChannels()")) {
+                showError(query);
+            }
+        }
     }
 }
 
@@ -451,6 +459,13 @@ void Database::writeChannelTags(int channelId, int tagId)
         }
         m_channelTagInsertQuery.clear();
         count = 0;
+
+        if (++m_tagBatchCount % 5) {
+            //qDebug() << "checking out what's up with dirties";
+            if (!query.exec("select ct_associateDirtyAssetsWithChannels(), ct_refreshChannels()")) {
+                showError(query);
+            }
+        }
     }
 }
 

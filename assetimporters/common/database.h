@@ -104,6 +104,7 @@ private:
     QString m_store;
     QString m_assetTagInsertQuery;
     QString m_channelTagInsertQuery;
+    int m_tagBatchCount;
 };
 
 #define showError(query) \
