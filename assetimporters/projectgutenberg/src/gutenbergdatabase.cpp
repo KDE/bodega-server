@@ -254,14 +254,14 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
         if (booksProcessed - lastReport > reportIncrement) {
             double written = booksProcessed;
             int percent = (written/catalog.m_ebooks.count()) * 100;
-            qDebug() << "\tWritten "<< percent << "%...";
+            qDebug() << "\tWritten" << percent << "% after" << time.elapsed() << "ms";
             lastReport = booksProcessed;
         }
     }
 
     int elapsed = time.elapsed();
 
-    qDebug()<< "\tWriting took "<< elapsed / 1000. << " secs. Inserted"
+    qDebug()<< "\tWriting all books took"<< elapsed / 1000. << "secs. Inserted"
             << numBooksWritten << "and skipped" << numSkipped;
 }
 
@@ -336,7 +336,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         }
     }
 
-    qDebug() << "\tWriting all channel tags took" << t.elapsed();
+    qDebug() << "\tWriting all channel tags took" << t.elapsed() / 1000. << "secs";
 }
 
 int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
