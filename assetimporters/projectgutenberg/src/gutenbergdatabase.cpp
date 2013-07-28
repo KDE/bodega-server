@@ -170,6 +170,9 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
             showError(query);
             return;
         }
+
+        // now we insert the tag if needed and record its value for later use
+        tagId(languageTagType, code, &m_languageTagIds);
     }
 }
 

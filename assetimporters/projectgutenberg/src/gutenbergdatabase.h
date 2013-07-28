@@ -64,6 +64,7 @@ private:
     QHash<QString, int> m_extraChannelIds;
     QHash<QString, int> m_createdIds;
     QHash<QString, int> m_languageIds;
+    QHash<QString, int> m_languageTagIds;
     QString m_topLevelChannelName;
 };
 }
