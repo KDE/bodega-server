@@ -2,15 +2,6 @@
 
 CREATE EXTENSION dblink;
 
-CREATE OR REPLACE FUNCTION ct_connectToDiscourse() RETURNS VOID AS $$
-DECLARE
-BEGIN
-     PERFORM dblink_connect('dbname=discourse_development');
-EXCEPTION WHEN OTHERS THEN
-    RAISE EXCEPTION 'Something is wrong with your discourse database, check if the database exists';
-END;
-$$ LANGUAGE 'plpgsql';
-
 CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
     customUsername TEXT;
@@ -27,7 +18,8 @@ BEGIN
         -- NOTE: the ''' are 3 single quotes
         --trust_level := 0;
         currentTime := current_timestamp AT TIME ZONE 'UTC';
-        PERFORM ct_connectToDiscourse();
+
+        PERFORM dblink_connect('dbname=discourse_development');
 
         IF (TG_OP = 'INSERT') THEN
             customUsername := split_part(NEW.email, '@', 1);
@@ -76,6 +68,9 @@ BEGIN
 
     PERFORM dblink_disconnect();
     RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+    RAISE WARNING 'Something is wrong with your discourse database, check if the database exists';
+    RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -115,7 +110,8 @@ BEGIN
     currentTime := current_timestamp AT TIME ZONE 'UTC';
     userId := 1; -- this is the root of discourse
 
-    PERFORM ct_connectToDiscourse();
+    PERFORM dblink_connect('dbname=discourse_development');
+
     IF (TG_OP = 'INSERT') THEN
         -- we will create forums only for the partners who have id >= 1000
         IF (NEW.partner < 1000) THEN
@@ -163,6 +159,9 @@ BEGIN
     END IF;
     PERFORM dblink_disconnect();
 
+    RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+    RAISE WARNING 'Something is wrong with your discourse database, check if the database exists';
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
