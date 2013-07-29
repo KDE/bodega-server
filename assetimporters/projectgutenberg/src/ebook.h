@@ -67,6 +67,8 @@ public:
 public:
     Ebook();
 
+    bool isValid() const;
+
     QString bookId() const;
     void setBookId(const QString &bookId);
 
@@ -116,6 +118,9 @@ public:
     static QString epubMimetype();
 
 private:
+    bool isSuitableTitle(const QString &title) const;
+    void checkForBestTitle();
+
     QString m_id;
     QString m_title;
     QString m_issued;

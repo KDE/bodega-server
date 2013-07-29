@@ -24,7 +24,7 @@
 QStringList paths;
 Gutenberg::Catalog catalog;
 
-//#define TESTING 1
+#define TESTING 1
 
 void descend(const QString &path)
 {
@@ -38,7 +38,7 @@ void descend(const QString &path)
 #ifdef TESTING
         ++count;
         if (count > 10000) {
-            break;
+            //break;
         }
 #endif
     }
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     qDebug() << "Parsed" << catalog.m_ebooks.size() << "books in" << t.restart() / 1000. << "seconds";
     catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
     qDebug() << "Compiled" << catalog.m_ebooks.size() << "books in" << t.restart() / 1000. << "seconds";
-
+/*
     Gutenberg::GutenbergDatabase::write(catalog, argv[2],
 #ifdef TESTING
             true
@@ -93,6 +93,7 @@ int main(int argc, char **argv)
             false
 #endif
             );
+            */
     return 0;
 
     QCoreApplication app(argc, argv);

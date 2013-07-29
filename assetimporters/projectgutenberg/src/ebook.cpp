@@ -27,6 +27,11 @@ Ebook::Ebook()
 {
 }
 
+bool Ebook::isValid() const
+{
+    return !m_id.isEmpty() && !m_title.isEmpty();
+}
+
 QString Ebook::bookId() const
 {
     return m_id;
@@ -56,6 +61,7 @@ void Ebook::setTitle(const QString &title)
 
     m_title = title;
     m_title = m_title.replace(newlines, ": ").simplified();
+    checkForBestTitle();
 }
 
 void Ebook::setLanguages(const QStringList &lang)
@@ -127,6 +133,7 @@ void Ebook::setAlternativeTitles(const QStringList &lst)
         throw QLatin1String("Alternative names already set");
     }
     m_alternativeTitles = lst;
+    checkForBestTitle();
 }
 
 void Ebook::addAlternativeTitle(const QString &name)
@@ -270,6 +277,33 @@ QString Ebook::typeString() const
     return QString();
 }
 
+bool Ebook::isSuitableTitle(const QString &title) const
+{
+    int index = 0;
+    QChar c = title.at(index);
+    while ((c.isPunct() || c.isSpace() || c.isSymbol()) && index < title.length()) {
+        c = title.at(++index);
+    }
+
+    return index != title.length() && c.toAscii();
+}
+
+void Ebook::checkForBestTitle()
+{
+    if (m_alternativeTitles.isEmpty() || m_title.isEmpty()) {
+        return;
+    }
+
+    if (!isSuitableTitle(m_title)) {
+        foreach (const QString &alt, m_alternativeTitles) {
+            if (isSuitableTitle(alt)) {
+                m_alternativeTitles.push_front(m_title);
+                m_title = alt;
+                m_alternativeTitles.removeAll(m_title);
+            }
+        }
+    }
+}
 
 QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
 {
