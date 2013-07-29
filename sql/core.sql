@@ -366,12 +366,6 @@ create table pointCodes
     expires     timestamp
 );
 
-create table batchJobsInProgress
-(
-    job         text    not null,
-    dowork      bool    not null default false
-);
-
 -- drop table easterEggs;
 create table easterEggs
 (
