@@ -9,7 +9,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION ct_dailyMaintenance() RETURNS VOID AS $$
 BEGIN
     -- delete accounts that are not activated within one week
-    DELETE FROM people WHERE NOT activated AND created < current_timestamp - '1 week'::interval;
+    DELETE FROM people WHERE activated IS NULL AND created < current_timestamp - '1 week'::interval;
 END;
 $$ LANGUAGE plpgsql;
 

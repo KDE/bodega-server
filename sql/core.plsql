@@ -16,7 +16,7 @@ FOR EACH ROW EXECUTE PROCEDURE ct_generateFullname();
 CREATE OR REPLACE FUNCTION ct_recordAccountActivated() RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.active THEN
-        NEW.activated = true;
+        NEW.activated = current_timestamp;
     END IF;
     RETURN NEW;
 END;
