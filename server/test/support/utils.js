@@ -160,10 +160,18 @@ function auth(params, cb)
 
 function snapshotTable(db, table, res, cb)
 {
+    var where = '';
+
+    if (table === 'tags') {
+        where = " where type not in (select id from tagTypes where type = 'grouping')";
+    }
+
     var query = 'select md5(array_to_string(array(select ' +
-        table + '::text from ' + table + ' order by '+ table +
-        '), \', \')) as md5, (select count(*) from ' + table +
-        ') as count';
+                table + '::text from ' + table + where +
+                ' order by ' + table +
+                '), \', \')) as md5, (select count(*) from ' + table +
+                where + ') as count';
+
     db.query(query, [], function(err, result) {
         if (err) {
             console.log("Snapshot: database error:");
