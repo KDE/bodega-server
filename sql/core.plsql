@@ -419,10 +419,19 @@ $$ LANGUAGE 'plpgsql';
 
 CREATE OR REPLACE FUNCTION ct_setNameGroupingTag(assetId int, name text) RETURNS VOID AS $$
 DECLARE
-    groupTagTitle text;
+    groupTagTitle text := 'name_';
     groupingId int;
 BEGIN
-    groupTagTitle := 'name_' || lower(substr(name, 1, 1));
+    IF name ~* '^the' THEN
+        groupTagTitle := groupTagTitle || lower(substring(name from 'The[^\w](\w)'));
+    ELSIF name ~* 'a ' OR name ~* 'an ' THEN
+        groupTagTitle := groupTagTitle || lower(substring(name from 'An?[^\w](\w)'));
+    ELSIF name ~ '^[^\w]*\d' THEN
+        groupTagTitle := groupTagTitle || '0-9';
+    ELSE
+        groupTagTitle := groupTagTitle || lower(substring(name from '[\w]'));
+    END IF;
+
     SELECT INTO groupingId id FROM tagTypes WHERE type = 'grouping';
     DELETE from assetTags WHERE asset = assetId AND tag IN
         (SELECT id FROM tags WHERE type = groupingId AND title LIKE 'name_%');
@@ -440,35 +449,45 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- TRIGGER function to create changelog entries automatically and update prices
-CREATE OR REPLACE FUNCTION ct_processUpdatedAsset() RETURNS TRIGGER AS $$
-DECLARE
-    dummy int;
+CREATE OR REPLACE FUNCTION ct_processUpdatedAssetName() RETURNS TRIGGER AS $$
 BEGIN
-    IF OLD.name != NEW.name THEN
-        PERFORM ct_setNameGroupingTag(NEW.id, NEW.name);
+    PERFORM ct_setNameGroupingTag(NEW.id, NEW.name);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_processUpdatedAssetName ON assets;
+CREATE TRIGGER trg_ct_processUpdatedAssetName AFTER UPDATE OF name ON assets
+FOR EACH ROW EXECUTE PROCEDURE ct_processUpdatedAssetName();
+
+CREATE OR REPLACE FUNCTION ct_processUpdatedAssetPrice() RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM ct_updateAssetPrices(NEW.id, NEW.basePrice);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_processUpdatedAssetPrice ON assets;
+CREATE TRIGGER trg_ct_processUpdatedAssetPrice AFTER UPDATE OF basePrice ON assets
+FOR EACH ROW EXECUTE PROCEDURE ct_processUpdatedAssetPrice();
+
+CREATE OR REPLACE FUNCTION ct_processUpdatedAssetVersion() RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM asset FROM assetChangelogs a where a.asset = OLD.id and a.version = OLD.version;
+    IF NOT FOUND THEN
+        INSERT INTO assetChangeLogs (asset, version, versionTs) VALUES (OLD.id, OLD.version, OLD.versionTs);
     END IF;
 
-    IF OLD.basePrice != NEW.basePrice THEN
-        PERFORM ct_updateAssetPrices(NEW.id, NEW.basePrice);
-    END IF;
-
-    IF OLD.version != NEW.version THEN
-        SELECT INTO dummy asset FROM assetChangelogs a where a.asset = OLD.id and a.version = OLD.version;
-        IF NOT FOUND THEN
-            INSERT INTO assetChangeLogs (asset, version, versionTs) VALUES (OLD.id, OLD.version, OLD.versionTs);
-        END IF;
-
-        INSERT INTO assetChangeLogs (asset, version, versionTs) VALUES (NEW.id, NEW.version, NEW.versionTs);
-        NEW.versionTs = CURRENT_TIMESTAMP;
-    END IF;
+    INSERT INTO assetChangeLogs (asset, version, versionTs) VALUES (NEW.id, NEW.version, NEW.versionTs);
+    NEW.versionTs = CURRENT_TIMESTAMP;
 
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
 
-DROP TRIGGER IF EXISTS trg_ct_processUpdatedAsset ON assets;
-CREATE TRIGGER trg_ct_processUpdatedAsset AFTER UPDATE ON assets
-FOR EACH ROW EXECUTE PROCEDURE ct_processUpdatedAsset();
+DROP TRIGGER IF EXISTS trg_ct_processUpdatedAssetVersion ON assets;
+CREATE TRIGGER trg_ct_processUpdatedAssetVersion AFTER UPDATE OF version ON assets
+FOR EACH ROW EXECUTE PROCEDURE ct_processUpdatedAssetVersion();
 
 CREATE OR REPLACE FUNCTION ct_processNewAsset() RETURNS TRIGGER AS $$
 DECLARE
