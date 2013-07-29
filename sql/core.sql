@@ -71,6 +71,7 @@ create table people
     password     text,
     points       int         not null default 0 constraint ct_personPoints check (points > -1),
     active       bool        not null default false,
+    activated    bool        not null default false,
     created      timestamp   default(current_timestamp)
 );
 
@@ -184,6 +185,11 @@ create table assets
 create index idx_asset_names on assets (name);
 create index idx_asset_partners on assets (partner);
 
+create table assetsNeedingRefresh
+(
+    asset int primary key references assets(id) on delete cascade
+);
+
 create table assetTags
 (
     asset       int         not null references assets(id) on delete cascade,
@@ -193,6 +199,7 @@ create table assetTags
 
 create index idx_assetTags_byAsset on assettags(asset);
 create index idx_assetTags_byTag on assettags(tag);
+create index idx_assetTags_bySource on assettags(sourceTag);
 
 create table assetText
 (
@@ -228,8 +235,7 @@ create table channels
 (
     id          int         primary key default nextval('seq_channelIds'),
     store       text        not null references stores(id) on delete cascade,
-    partner     int         references partners(id),
-    parent      int         references channels(id) on delete set null,
+    parent      int         references channels(id) on delete cascade,
     topLevel    int         references channels(id) on delete set null,
     image       text,
     name        text        not null,
@@ -241,11 +247,19 @@ create table channels
 
 create index idx_channelParents on channels(parent);
 
+create table channelsNeedingRefresh
+(
+    channel int primary key references channels(id) on delete cascade
+);
+
 create table channelTags
 (
     channel     int         not null references channels(id) on delete cascade,
     tag         int         not null references tags(id) on delete cascade
 );
+
+create index idx_channelTagsByChannel on channelTags(channel);
+create index idx_channelTagsByTag on channelTags(tag);
 
 create table channelAssets
 (
@@ -351,12 +365,6 @@ create table pointCodes
     created     timestamp   not null default (current_timestamp AT TIME ZONE 'UTC'),
     claimed     bool        not null default false,
     expires     timestamp
-);
-
-create table batchJobsInProgress
-(
-    job         text    not null,
-    dowork      bool    not null default false
 );
 
 -- drop table easterEggs;

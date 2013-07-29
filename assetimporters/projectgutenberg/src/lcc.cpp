@@ -22,235 +22,1032 @@
 
 using namespace Gutenberg;
 
-LCC::LCC(const QString &lcc)
-    : m_categories(LCC_Miscellaneous)
+LCC::LCC()
+    : m_refinementPending(false)
 {
-    m_original += lcc;
-    m_categories = parse(lcc);
 }
 
-LCC::LCC(const QStringList &lccs)
-    : m_categories(LCC_Miscellaneous),
-      m_original(lccs)
-{
-    foreach(const QString &lcc, lccs) {
-        m_categories |= parse(lcc);
-    }
-}
-
-LCC::Categories LCC::categories() const
+QHash<QString, QStringList> LCC::categories() const
 {
     return m_categories;
 }
 
-QStringList LCC::topCategories() const
+QString LCC::aSubCats(const QString &code)
 {
-    QStringList c;
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
 
-    if (m_categories == LCC_Miscellaneous) {
-        return QStringList() << QObject::tr("Miscellaneous");
+    switch (sub) {
+        case 'c':
+            return QString::fromLatin1("Collections");
+            break;
+        case 'e':
+            return QString::fromLatin1("Encyclopedias");
+            break;
+        case 'g':
+            return QString::fromLatin1("Dictionaries");
+            break;
+        case 'i':
+            return QString::fromLatin1("Indexes");
+            break;
+        case 'm':
+            return QString::fromLatin1("Museums and collecting");
+            break;
+        case 'n':
+            return QString::fromLatin1("Newspapers");
+            break;
+        case 'p':
+            return QString::fromLatin1("Periodicals");
+            break;
+        case 's':
+            return QString::fromLatin1("Academies");
+            break;
+        case 'y':
+            return QString::fromLatin1("Yearbooks and almanacs");
+            break;
+        case 'z':
+            return QString::fromLatin1("History of scholarship");
+            break;
+        default:
+            break;
     }
 
-    if ((m_categories & LCC_A_GeneralWorks)) {
-        c += QObject::tr("General Works");
-    }
-    if ((m_categories & LCC_B_PhilosophyPsychologyReligion)) {
-        c += QObject::tr("Philosophy, Psychology, Religion");
-    }
-    if ((m_categories & LCC_C_AuxiliarySciencesOfHistory)) {
-        c += QObject::tr("Auxiliary Sciences of History (General)");
-    }
-    if ((m_categories & LCC_D_WorldHistory)) {
-        c += QObject::tr("World History (except American History)");
-    }
-    if ((m_categories & LCC_E_HistoryOfTheAmericas) ||
-        (m_categories & LCC_F_HistoryOfTheAmericas)) {
-        c += QObject::tr("American History");
-    }
-    if ((m_categories & LCC_G_GeographyAnthropologyRecreation)) {
-        c += QObject::tr("Geography, Anthropology, Recreation");
-    }
-    if ((m_categories & LCC_H_SocialSciences)) {
-        c += QObject::tr("Social Sciences");
-    }
-    if ((m_categories & LCC_J_PoliticalScience)) {
-        c += QObject::tr("Political Science");
-    }
-    if ((m_categories & LCC_K_Law)) {
-        c += QObject::tr("Law");
-    }
-    if ((m_categories & LCC_L_Education)) {
-        c += QObject::tr("Education");
-    }
-    if ((m_categories & LCC_M_MusicAndBooksOnMusic)) {
-        c += QObject::tr("Music");
-    }
-    if ((m_categories & LCC_N_FineArts)) {
-        c += QObject::tr("Fine Arts");
-    }
-    if ((m_categories & LCC_P_LanguageAndLiterature)) {
-        c += QObject::tr("Language and Literature");
-    }
-    if ((m_categories & LCC_Q_Science)) {
-        c += QObject::tr("Science");
-    }
-    if ((m_categories & LCC_R_Medicine)) {
-        c += QObject::tr("Medicine");
-    }
-    if ((m_categories & LCC_S_Agriculture)) {
-        c += QObject::tr("Agriculture");
-    }
-    if ((m_categories & LCC_T_Technology)) {
-        c += QObject::tr("Technology");
-    }
-    if ((m_categories & LCC_U_MilitaryScience)) {
-        c += QObject::tr("Military Science");
-    }
-    if ((m_categories & LCC_V_NavalScience)) {
-        c += QObject::tr("Naval Science");
-    }
-    if ((m_categories & LCC_Z_BibliographyLibraryScienceInformationResources)) {
-        c += QObject::tr("Bibliography, Library Science");
-    }
-    return c;
+    return QString::fromLatin1("General");
 }
 
-LCC::Category LCC::parse(const QString &lcc)
+QString LCC::bSubCats(const QString &code, QString &cat)
 {
-    if (lcc.isEmpty()) {
-        return LCC_Miscellaneous;
+    cat = QString::fromLatin1("Religion");
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'c':
+            cat = QString::fromLatin1("Philosophy");
+            return QString::fromLatin1("Logic");
+            break;
+        case 'd':
+            cat = QString::fromLatin1("Philosophy");
+            return QString::fromLatin1("Speculative");
+            break;
+        case 'f':
+            cat = QString::fromLatin1("Psychology");
+            break;
+        case 'h':
+            cat = QString::fromLatin1("Philosophy");
+            return QString::fromLatin1("Aesthetics");
+            break;
+        case 'j':
+            cat = QString::fromLatin1("Philosophy");
+            return QString::fromLatin1("Ethics");
+            break;
+        case 'l':
+            m_refinementPending = true;
+            return QString::fromLatin1("General");
+            break;
+        case 'm':
+            return QString::fromLatin1("Judaism");
+            break;
+        case 'p':
+            m_refinementPending = true;
+            return QString::fromLatin1("Islam");
+            break;
+        case 'q':
+            return QString::fromLatin1("Buddhism");
+            break;
+        case 'r':
+        case 'x':
+            return QString::fromLatin1("Christianity");
+            break;
+        case 's':
+            return QString::fromLatin1("The Bible");
+            break;
+        case 't':
+        case 'v':
+            return QString::fromLatin1("Theology");
+            break;
+        default:
+            cat = QString::fromLatin1("Philosophy");
+            break;
     }
 
-    char firstCharacter = lcc[0].toLower().toAscii();
+    return QString::fromLatin1("General");
+}
+
+QString LCC::cSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'b':
+            return QString::fromLatin1("Civilization");
+            break;
+        case 'c':
+            return QString::fromLatin1("Archeology");
+            break;
+        case 'd':
+            return QString::fromLatin1("Diplomatics");
+            break;
+        case 'e':
+            return QString::fromLatin1("Chronology");
+            break;
+        case 'j':
+            return QString::fromLatin1("Numismatics");
+            break;
+        case 'n':
+            return QString::fromLatin1("Inscriptions");
+            break;
+        case 'r':
+            return QString::fromLatin1("Heraldry");
+            break;
+        case 's':
+            return QString::fromLatin1("Geneology");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::dSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'a':
+            if (code.size() > 2) {
+                //DAW
+                return QString::fromLatin1("Central Europe");
+            }
+
+            return QString::fromLatin1("Great Britain");
+            break;
+        case 'b':
+            return QString::fromLatin1("Central Europe");
+            break;
+        case 'c':
+            return QString::fromLatin1("France");
+            break;
+        case 'd':
+            return QString::fromLatin1("Germany");
+            break;
+        case 'e':
+            return QString::fromLatin1("Greco-Roman World");
+            break;
+        case 'f':
+            return QString::fromLatin1("Greece");
+            break;
+        case 'g':
+            return QString::fromLatin1("Italy");
+            break;
+        case 'h':
+        case 'j':
+            if (code.size() > 2) {
+                // DJK
+                return QString::fromLatin1("Eastern Europe");
+            }
+
+            return QString::fromLatin1("Benelux");
+            break;
+        case 'k':
+            return QString::fromLatin1("Russia");
+            break;
+        case 'l':
+            return QString::fromLatin1("Scandanavia");
+            break;
+        case 'p':
+            return QString::fromLatin1("Spain and Portugal");
+            break;
+        case 'q':
+            return QString::fromLatin1("Switzerland");
+            break;
+        case 'r':
+            return QString::fromLatin1("Balkans");
+            break;
+        case 's':
+            return QString::fromLatin1("Asia");
+            break;
+        case 't':
+            return QString::fromLatin1("Africa");
+            break;
+        case 'u':
+            return QString::fromLatin1("Oceania");
+            break;
+        case 'x':
+            return QString::fromLatin1("Romanies");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::fSubCats(const QString &code)
+{
+    if (code.size() < 2) {
+        return QString();
+    }
+
+    bool ok;
+    double number = code.right(code.size() - 1).toDouble(&ok);
+    if (!ok || number < 1) {
+        return QString();
+    }
+
+    if (number < 976) {
+        return QString::fromLatin1("United States");
+    }
+
+    if (number < 1146) {
+        return QString::fromLatin1("Canada");
+    }
+
+    if (number < 1171) {
+        return QString::fromLatin1("French America");
+    }
+
+    if (number < 3800) {
+        return QString::fromLatin1("Latin America");
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::gSubCats(const QString &code, QString &cat)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+    cat = QString::fromLatin1("Geography");
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("Cartography");
+            break;
+        case 'b':
+            return QString::fromLatin1("Geology and Hydrology");
+            break;
+        case 'c':
+            return QString::fromLatin1("Oceanography");
+            break;
+        case 'e':
+            cat = QString::fromLatin1("Science");
+            return QString::fromLatin1("Environmental");
+            break;
+        case 'f':
+        case 'n':
+        case 't':
+            cat = QString::fromLatin1("Anthropology");
+            break;
+        case 'r':
+            cat = QString::fromLatin1("Folklore");
+            break;
+        case 'v':
+            cat = QString::fromLatin1("Recreation and Leisure");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::hSubCats(const QString &code, QString &cat)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+    cat = QString::fromLatin1("Social Sciences");
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("Statistics");
+            break;
+        case 'b':
+            cat = QString::fromLatin1("Economics");
+            return QString::fromLatin1("Theory");
+            break;
+        case 'c':
+            cat = QString::fromLatin1("Economics");
+            return QString::fromLatin1("History");
+            break;
+        case 'd':
+            return QString::fromLatin1("Industry and Labor");
+            break;
+        case 'e':
+            return QString::fromLatin1("Transportation and Communication");
+            break;
+        case 'f':
+            cat = QString::fromLatin1("Economics");
+            return QString::fromLatin1("Commerce");
+            break;
+        case 'g':
+            cat = QString::fromLatin1("Economics");
+            return QString::fromLatin1("Finance (Private)");
+            break;
+        case 'j':
+            cat = QString::fromLatin1("Economics");
+            return QString::fromLatin1("Finance (Public)");
+            break;
+        case 'm':
+            return QString::fromLatin1("Sociology");
+            break;
+        case 'n':
+            return QString::fromLatin1("Social history");
+            break;
+        case 'q':
+            return QString::fromLatin1("Family and Marriage");
+            break;
+        case 's':
+            return QString::fromLatin1("Societies");
+            break;
+        case 't':
+            return QString::fromLatin1("Communities");
+            break;
+        case 'v':
+            return QString::fromLatin1("Pathology and Criminology");
+            break;
+        case 'x':
+            return QString::fromLatin1("Socialism and Communism");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::jSubCats(const QString &code, QString &cat)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+    cat = QString::fromLatin1("Political Science");
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("General");
+            break;
+        case 'c':
+            return QString::fromLatin1("Theory");
+            break;
+        case 'f':
+        case 'j':
+        case 'k':
+        case 'l':
+        case 'n':
+        case 'q':
+            return QString::fromLatin1("Government (National)");
+            break;
+        case 's':
+            return QString::fromLatin1("Government (Local)");
+            break;
+        case 'v':
+            return QString::fromLatin1("Immigration");
+            break;
+        case 'x':
+            cat = QString::fromLatin1("Law");
+            return QString::fromLatin1("International");
+            break;
+        case 'z':
+            return QString::fromLatin1("International Relations");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("Legislative and executive papers");
+}
+
+QString LCC::kSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'b':
+            return QString::fromLatin1("Religious");
+            break;
+        case 'd':
+            if (code.size() > 2 && code[2].toLower().toAscii() == 'z') {
+                return QString::fromLatin1("Americas");
+            }
+            return QString::fromLatin1("United Kingdom and Ireland");
+            break;
+        case 'e':
+            return QString::fromLatin1("Canada");
+            break;
+        case 'f':
+            return QString::fromLatin1("United States");
+            break;
+        case 'g':
+            return QString::fromLatin1("Central America");
+            break;
+        case 'h':
+            return QString::fromLatin1("South America");
+            break;
+        case 'j':
+            return QString::fromLatin1("Europe");
+            break;
+        case 'l':
+            return QString::fromLatin1("Asia and Africa");
+            break;
+        case 'z':
+            return QString::fromLatin1("National");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::lSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("History");
+            break;
+        case 'b':
+            return QString::fromLatin1("Theory and Practice");
+            break;
+        case 'c':
+            return QString::fromLatin1("General");
+            break;
+        case 'd':
+        case 'e':
+        case 'f':
+        case 'g':
+            return QString::fromLatin1("Individual Institutions");
+            break;
+        case 'h':
+            return QString::fromLatin1("School Periodicals");
+            break;
+        case 'j':
+            return QString::fromLatin1("Fraternities and Societies");
+            break;
+        case 't':
+            return QString::fromLatin1("Textbooks");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::mSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'l':
+            return QString::fromLatin1("Literature");
+            break;
+        case 't':
+            return QString::fromLatin1("Instruction");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::nSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("Architecture");
+            break;
+        case 'b':
+            return QString::fromLatin1("Sculpture");
+            break;
+        case 'c':
+            return QString::fromLatin1("Drawing and Illustration");
+            break;
+        case 'd':
+            return QString::fromLatin1("Painting");
+            break;
+        case 'e':
+            return QString::fromLatin1("Print");
+            break;
+        case 'k':
+            return QString::fromLatin1("Decorative");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::pSubCats(const QString &code, QString &cat)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+    cat = QString::fromLatin1("Linguistics");
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("Greek");
+            break;
+        case 'b':
+            return QString::fromLatin1("Modern");
+            break;
+        case 'c':
+            return QString::fromLatin1("Romance");
+            break;
+        case 'd':
+        case 'f':
+            return QString::fromLatin1("Germanic");
+            break;
+        case 'e':
+            return QString::fromLatin1("English");
+            break;
+        case 'g':
+            return QString::fromLatin1("Slavic");
+            break;
+        case 'h':
+            return QString::fromLatin1("Uralic and Basque");
+            break;
+        case 'j':
+            return QString::fromLatin1("Oriental");
+            break;
+        case 'k':
+            return QString::fromLatin1("Indo-Iranian");
+            break;
+        case 'l':
+            return QString::fromLatin1("African and Oceania");
+            break;
+        case 'm':
+            return QString::fromLatin1("Indian");
+            break;
+        case 'n':
+            cat = QString::fromLatin1("Literature");
+            return QString::fromLatin1("General");
+            break;
+        case 'q':
+            cat = QString::fromLatin1("Literature");
+            return QString::fromLatin1("Romance Languages");
+            break;
+        case 'r':
+            cat = QString::fromLatin1("Literature");
+            return QString::fromLatin1("English");
+            break;
+        case 's':
+            cat = QString::fromLatin1("Literature");
+            return QString::fromLatin1("American");
+            break;
+        case 't':
+            cat = QString::fromLatin1("Literature");
+            return QString::fromLatin1("Germanic");
+            break;
+        case 'z':
+            cat = QString::fromLatin1("Literature");
+            return QString::fromLatin1("Fiction");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::qSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("Mathematics");
+            break;
+        case 'b':
+            return QString::fromLatin1("Astronomy");
+            break;
+        case 'c':
+            return QString::fromLatin1("Physics");
+            break;
+        case 'd':
+            return QString::fromLatin1("Chemistry");
+            break;
+        case 'e':
+            return QString::fromLatin1("Geology");
+            break;
+        case 'h':
+            return QString::fromLatin1("Biology");
+            break;
+        case 'k':
+            return QString::fromLatin1("Botany");
+            break;
+        case 'l':
+            return QString::fromLatin1("Zoology");
+            break;
+        case 'm':
+            return QString::fromLatin1("Human Anatomy");
+            break;
+        case 'p':
+            return QString::fromLatin1("Physiology");
+            break;
+        case 'r':
+            return QString::fromLatin1("Microbiology");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::rSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("Public Medicine");
+            break;
+        case 'b':
+            return QString::fromLatin1("Pathology");
+            break;
+        case 'c':
+            return QString::fromLatin1("Internal Medicine");
+            break;
+        case 'd':
+            return QString::fromLatin1("Surgery");
+            break;
+        case 'e':
+            return QString::fromLatin1("Opthalmology");
+            break;
+        case 'f':
+            return QString::fromLatin1("Otorhinolaryngology");
+            break;
+        case 'g':
+            return QString::fromLatin1("Genycology and Obstetrics");
+            break;
+        case 'j':
+            return QString::fromLatin1("Pediatrics");
+            break;
+        case 'k':
+            return QString::fromLatin1("Dentistry");
+            break;
+        case 'l':
+            return QString::fromLatin1("Dermatology");
+            break;
+        case 'm':
+        case 's':
+            return QString::fromLatin1("Pharmacology");
+            break;
+        case 't':
+            return QString::fromLatin1("Nursing");
+            break;
+        case 'v':
+        case 'x':
+        case 'z':
+            return QString::fromLatin1("Alternative Medicine");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::sSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'b':
+            return QString::fromLatin1("Plant Culture");
+            break;
+        case 'd':
+            return QString::fromLatin1("Forestry");
+            break;
+        case 'f':
+            return QString::fromLatin1("Animal Culture");
+            break;
+        case 'h':
+            return QString::fromLatin1("Aquaculture and Fishing");
+            break;
+        case 'k':
+            return QString::fromLatin1("Hunting");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::tSubCats(const QString &code, QString &cat)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+    cat = QString::fromLatin1("Engineering");
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("General");
+            break;
+        case 'c':
+            return QString::fromLatin1("Hydraulic and Ocean");
+            break;
+        case 'd':
+            return QString::fromLatin1("Environmental and Sanitary");
+            break;
+        case 'e':
+            return QString::fromLatin1("Roads and Highways");
+            break;
+        case 'f':
+            return QString::fromLatin1("Railroads");
+            break;
+        case 'g':
+            return QString::fromLatin1("Bridges");
+            break;
+        case 'h':
+            return QString::fromLatin1("Construction");
+            break;
+        case 'j':
+            return QString::fromLatin1("Mechanical");
+            break;
+        case 'k':
+            return QString::fromLatin1("Electrical");
+            break;
+        case 'l':
+            return QString::fromLatin1("Transportation");
+            break;
+        case 'n':
+            return QString::fromLatin1("Mining and Metallurgy");
+            break;
+        case 'p':
+            cat = QString::fromLatin1("Science");
+            return QString::fromLatin1("Chemistry");
+            break;
+        case 'r':
+            cat = QString::fromLatin1("Fine Arts");
+            return QString::fromLatin1("Photography");
+            break;
+        case 's':
+            return QString::fromLatin1("Manufacturing");
+            break;
+        case 't':
+            cat = QString::fromLatin1("Fine Arts");
+            return QString::fromLatin1("Crafts");
+            break;
+        case 'x':
+            return QString::fromLatin1("Hospitality");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::uSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("Armies");
+            break;
+        case 'b':
+            return QString::fromLatin1("Administration");
+            break;
+        case 'c':
+            return QString::fromLatin1("Maintenance and Transportation");
+            break;
+        case 'd':
+            return QString::fromLatin1("Infantry");
+            break;
+        case 'e':
+            return QString::fromLatin1("Cavalry and Armor");
+            break;
+        case 'f':
+            return QString::fromLatin1("Artillery");
+            break;
+        case 'g':
+            return QString::fromLatin1("Engineering and Air Forces");
+            break;
+        case 'h':
+            return QString::fromLatin1("Medical and Services");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+QString LCC::vSubCats(const QString &code)
+{
+    char sub = code.size() > 1 ? code[1].toLower().toAscii() : 0;
+
+    switch (sub) {
+        case 'a':
+            return QString::fromLatin1("Navies");
+            break;
+        case 'b':
+            return QString::fromLatin1("Administration");
+            break;
+        case 'c':
+            return QString::fromLatin1("Maintenance");
+            break;
+        case 'd':
+            return QString::fromLatin1("Seamen");
+            break;
+        case 'e':
+            return QString::fromLatin1("Marines");
+            break;
+        case 'f':
+            return QString::fromLatin1("Ordnance");
+            break;
+        case 'g':
+            return QString::fromLatin1("Misc. Services");
+            break;
+        case 'k':
+            return QString::fromLatin1("Navigation");
+            break;
+        case 'm':
+            return QString::fromLatin1("Shipbuilding and Engineering");
+            break;
+        default:
+            break;
+    }
+
+    return QString::fromLatin1("General");
+}
+
+void LCC::setCategories(const QStringList &lccCodes)
+{
+    m_categories.clear();
+
+    foreach (const QString &code, lccCodes) {
+        addCategory(code);
+    }
+}
+
+void LCC::addCategory(const QString &code)
+{
+    if (code.isEmpty()) {
+        return;
+    }
+
+    char firstCharacter = code[0].toLower().toAscii();
+    QString sub;
+    QString cat;
 
     switch (firstCharacter) {
     case 'a':
-        return LCC_A_GeneralWorks;
+        cat = QLatin1String("General");
+        sub = aSubCats(code);
         break;
     case 'b':
-        return LCC_B_PhilosophyPsychologyReligion;
+        sub = bSubCats(code, cat);
         break;
     case 'c':
-        return LCC_C_AuxiliarySciencesOfHistory;
+        if (code.toLower() == QLatin1String("ct")) {
+            cat = QString::fromLatin1("Biographies");
+        } else {
+            cat = QString::fromLatin1("History");
+            sub = cSubCats(code);
+        }
         break;
     case 'd':
-        return LCC_D_WorldHistory;
+        cat = QString::fromLatin1("History");
+        sub = dSubCats(code);
         break;
     case 'e':
-        return LCC_E_HistoryOfTheAmericas;
+        cat = QString::fromLatin1("History");
+        sub = QString::fromLatin1("United States");
         break;
     case 'f':
-        return LCC_F_HistoryOfTheAmericas;
+        cat = QString::fromLatin1("History");
+        sub = fSubCats(code);
         break;
     case 'g':
-        return LCC_G_GeographyAnthropologyRecreation;
+        cat = gSubCats(code, sub);
         break;
     case 'h':
-        return LCC_H_SocialSciences;
+        sub = hSubCats(code, cat);
         break;
     case 'j':
-        return LCC_J_PoliticalScience;
+        sub = jSubCats(code, cat);
         break;
     case 'k':
-        return LCC_K_Law;
+        cat = QString::fromLatin1("Law");
+        sub = kSubCats(code);
         break;
     case 'l':
-        return LCC_L_Education;
+        cat = QString::fromLatin1("Education");
+        sub = lSubCats(code);
         break;
     case 'm':
-        return LCC_M_MusicAndBooksOnMusic;
+        cat = QString::fromLatin1("Music");
+        sub = mSubCats(code);
         break;
     case 'n':
-        return LCC_N_FineArts;
+        cat = QString::fromLatin1("Fine Arts");
+        sub = nSubCats(code);
         break;
     case 'p':
-        return LCC_P_LanguageAndLiterature;
+        sub = pSubCats(code, cat);
         break;
     case 'q':
-        return LCC_Q_Science;
+        cat = QString::fromLatin1("Science and Math");
+        sub = qSubCats(code);
         break;
     case 'r':
-        return LCC_R_Medicine;
+        cat = QString::fromLatin1("Medicine");
+        sub = rSubCats(code);
         break;
     case 's':
-        return LCC_S_Agriculture;
+        cat = QString::fromLatin1("Agriculture");
+        sub = sSubCats(code);
         break;
     case 't':
-        return LCC_T_Technology;
+        sub = tSubCats(code, cat);
         break;
     case 'u':
-        return LCC_U_MilitaryScience;
+        cat = QString::fromLatin1("Military Science");
+        sub = uSubCats(code);
         break;
     case 'v':
-        return LCC_V_NavalScience;
+        cat = QString::fromLatin1("Naval Science");
+        sub = vSubCats(code);
         break;
     case 'z':
-        return LCC_Z_BibliographyLibraryScienceInformationResources;
+        cat = QString::fromLatin1("Library Science");
         break;
     default:
-        qDebug()<<"Unrecognized lcc class = "<<lcc;
+        qDebug() << "Unrecognized lcc class = " << code;
         break;
     }
-    return LCC_Miscellaneous;
+
+    if (!cat.isEmpty()) {
+        refineUsingSubjects();
+        if (sub.isEmpty()) {
+            if (!m_categories.contains(cat)) {
+                m_categories[cat] = QStringList();
+            }
+        } else {
+            m_categories[cat].append(sub);
+        }
+    }
 }
 
-QStringList LCC::originalText() const
+void LCC::setSubjects(const QStringList &subjects)
 {
-    return m_original;
+    m_subjects = subjects;
+    refineUsingSubjects();
 }
 
-QHash<LCC::Category, QString> LCC::categoryMap()
+QStringList LCC::subjects() const
 {
-    static QHash<LCC::Category, QString> cat;
+    return m_subjects;
+}
 
-    if (cat.isEmpty()) {
-        cat.insert(LCC_Miscellaneous,
-                   QObject::tr("Miscellaneous"));
-        cat.insert(LCC_A_GeneralWorks,
-                   QString::fromLatin1("General Works"));
-        cat.insert(LCC_B_PhilosophyPsychologyReligion,
-                   QString::fromLatin1("Philosophy, Psychology, Religion"));
-        cat.insert(
-            LCC_C_AuxiliarySciencesOfHistory,
-            QString::fromLatin1("Auxiliary Sciences of History (General)"));
-        cat.insert(
-            LCC_D_WorldHistory,
-            QString::fromLatin1("World History (except American History)"));
-        cat.insert(LCC_E_HistoryOfTheAmericas,
-                   QString::fromLatin1("American History"));
-        cat.insert(LCC_F_HistoryOfTheAmericas,
-                   QString::fromLatin1("American History"));
-        cat.insert(LCC_G_GeographyAnthropologyRecreation,
-                   QString::fromLatin1("Geography, Anthropology, Recreation"));
-        cat.insert(LCC_H_SocialSciences,
-                   QString::fromLatin1("Social Sciences"));
-        cat.insert(LCC_J_PoliticalScience,
-                   QString::fromLatin1("Political Science"));
-        cat.insert(LCC_K_Law,
-                   QString::fromLatin1("Law"));
-        cat.insert(LCC_L_Education,
-                   QString::fromLatin1("Education"));
-        cat.insert(LCC_M_MusicAndBooksOnMusic,
-                   QString::fromLatin1("Music"));
-        cat.insert(LCC_N_FineArts,
-                   QString::fromLatin1("Fine Arts"));
-        cat.insert(LCC_P_LanguageAndLiterature,
-                   QString::fromLatin1("Language and Literature"));
-        cat.insert(LCC_Q_Science,
-                   QString::fromLatin1("Science"));
-        cat.insert(LCC_R_Medicine,
-                   QString::fromLatin1("Medicine"));
-        cat.insert(LCC_S_Agriculture,
-                   QString::fromLatin1("Agriculture"));
-        cat.insert(LCC_T_Technology,
-                   QString::fromLatin1("Technology"));
-        cat.insert(LCC_U_MilitaryScience,
-                   QString::fromLatin1("Military Science"));
-        cat.insert(LCC_V_NavalScience,
-                   QString::fromLatin1("Naval Science"));
-        cat.insert(LCC_Z_BibliographyLibraryScienceInformationResources,
-                   QString::fromLatin1("Bibliography, Library Science"));
+void LCC::refineUsingSubjects()
+{
+    if (!m_refinementPending || m_subjects.isEmpty() || m_categories.isEmpty()) {
+        return;
     }
 
-    return cat;
+    m_refinementPending = false;
+
+    const QString religion(QLatin1String("Religion"));
+    const QString history(QLatin1String("History"));
+    if (m_categories.contains(religion)) {
+        const QString islam(QLatin1String("Islam"));
+        const QRegExp bahaiRE(QLatin1String("Baha[']?i"));
+        const QString bahai(QLatin1String("Baha'i"));
+        const QString theosophyStem(QLatin1String("Theoso"));
+        const QString theosophy(QLatin1String("Theosophy"));
+        const QString general(QLatin1String("General"));
+        const QString taoismStem(QLatin1String("Tao"));
+        const QString taoism(QLatin1String("Taoism"));
+
+        QStringList subs = m_categories.value(religion);
+        if (subs.contains(islam)) {
+            foreach (const QString &subject, m_subjects) {
+                if (subject.contains(bahaiRE)) {
+                    subs.removeAll(islam);
+                    subs.append(bahai);
+                    break;
+                } else if (subs.contains(theosophyStem)) {
+                    subs.removeAll(islam);
+                    subs.append(theosophy);
+                    break;
+                }
+            }
+        } else if (subs.contains(general)) {
+            foreach (const QString &subject, m_subjects) {
+                if (subject.contains(taoismStem)) {
+                    subs.removeAll(general);
+                    subs.append(taoism);
+                    break;
+                }
+            }
+        }
+
+        m_categories[religion] = subs;
+    }
 }
+

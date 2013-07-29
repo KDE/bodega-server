@@ -1,7 +1,7 @@
 #ifndef PACKAGEDATABASE_H
 #define PACKAGEDATABASE_H
 
-#include "../database-common/database.h"
+#include "../common/database.h"
 #include "packagecatalog.h"
 #include "channelscatalog.h"
 
@@ -11,7 +11,7 @@ public:
     PackageDatabase(const QString &channelsCatalogPath,
                     const QString &packageCatalogPath,
                     const QString &packageDescPath);
-    void write(bool clearOldData);
+    void write();
 
 private:
     void writePackageChannels();

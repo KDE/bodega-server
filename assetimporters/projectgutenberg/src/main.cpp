@@ -16,32 +16,94 @@
 */
 
 #include "catalog.h"
+#include "filefetcher.h"
 #include "gutenbergdatabase.h"
-#include "parser.h"
+#include "reader.h"
 
 #include <QtCore>
 
+QStringList paths;
+Gutenberg::Catalog catalog;
+
+//#define TESTING 1
+
+void descend(const QString &path)
+{
+    QDir dir(path);
+    const QString absPath = dir.absolutePath() + '/';
+    //qDebug() << "dir:" << path;
+    int count = 0;
+    foreach (const QString subdir, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
+        //qDebug() << "dirs are" << absPath << subdir;
+        descend(absPath + subdir);
+#ifdef TESTING
+        ++count;
+        if (count > 10000) {
+            break;
+        }
+#endif
+    }
+
+    foreach (const QString file, dir.entryList(QStringList() << "*.rdf", QDir::Files)) {
+        //qDebug() << absPath + file;
+        paths.append(absPath + file);
+    }
+}
+
+void addEbook(const Gutenberg::Ebook &book)
+{
+    if (book.title().isEmpty()) {
+        qDebug() << "no title on book" << book.bookId();
+        return;
+    }
+
+#ifdef TESTING
+    qDebug() << book;
+#endif
+}
 
 int main(int argc, char **argv)
 {
     if (argc < 2) {
         qWarning() << "Usage:";
-        qWarning() << "\t" << argv[0] << "catalog.rdf [imageCacheDir]";
+        qWarning() << "\t" << argv[0] << "path/to/epub/files [imageCacheDir]";
         return 0;
     }
 
-    QCoreApplication app(argc, argv);
-    Gutenberg::Catalog catalog = Gutenberg::Parser::parse(QString::fromLatin1(argv[1]));
-    catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
+    QTime t;
+    t.start();
 
-    Gutenberg::GutenbergDatabase::write(catalog, argv[2], false);
+    Gutenberg::Catalog catalog;
+    descend(argv[1]);
+    qDebug() << "Found" << paths.size() << "RDF files to process in" << t.restart() / 1000. << "seconds";
+
+#ifdef TESTING
+    //foreach (const QString &path, paths) { qDebug() << path; }
+#endif
+
+    Gutenberg::Reader::init();
+    catalog.m_ebooks = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Gutenberg::Reader::parseRdf);
+    qDebug() << "Parsed" << catalog.m_ebooks.size() << "books in" << t.restart() / 1000. << "seconds";
+    catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
+    qDebug() << "Compiled" << catalog.m_ebooks.size() << "books in" << t.restart() / 1000. << "seconds";
+
+    Gutenberg::GutenbergDatabase::write(catalog, argv[2],
+#ifdef TESTING
+            true
+#else
+            false
+#endif
+            );
+    return 0;
 
     if (argc > 2) {
         // only fetch if we were given a cache dir
+        QCoreApplication app(argc, argv);
         Gutenberg::FileFetcher *fetcher = new Gutenberg::FileFetcher(catalog);
         QObject::connect(fetcher, SIGNAL(coversFetched()), &app, SLOT(quit()));
         QTimer::singleShot(0, fetcher, SLOT(fetchCovers()));
-
         return app.exec();
+    } else {
+        return 0;
     }
 }

@@ -28,36 +28,23 @@
 
 #include <QDebug>
 
-void WallpapersDatabase::write(const QString &catalogPath, bool clearOldData)
+void WallpapersDatabase::write(const QString &catalogPath)
 {
     WallpapersDatabase db(catalogPath);
 
     Catalog catalog(catalogPath);
-    db.writeInit(clearOldData);
     db.writeWallpapers(catalog);
-    db.writeWallpaperChannels();
 }
 
 WallpapersDatabase::WallpapersDatabase(const QString &contentPath)
-    : Database(contentPath, "VIVALDI-1"),
-    m_partnerId(0),
-    m_authorTagId(0),
-    m_categoryTagId(0),
-    m_licenseId(0),
-    m_contributorTagId(0),
-    m_createdTagId(0),
-    m_mimetypeTagId(0)
+    : Database(contentPath, "KDE", "VIVALDI-1")
 {
-    //FIXME: fix to LGPL
-    m_licenseId = licenseId();
-    //Fix to KDE
-    m_partnerId = partnerId();
-}
-
-void WallpapersDatabase::writeWallpaperChannels()
-{
-    const int chanId = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
-    writeWallpapersChannelTags();
+    m_licenseId = licenseId("LGPL");
+    m_wallpapersChannelId = writeChannel(QLatin1String("Wallpapers"),
+                                       QLatin1String("Wallpaper images"),
+                                       "default/wallpaper.png");
+    m_assetTypeTagId = tagId(tagTypeId("assetType"), "wallpaper", &m_mimetypeIds);
+    writeChannelTags(m_wallpapersChannelId, m_assetTypeTagId);
 }
 
 void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
@@ -87,14 +74,10 @@ void WallpapersDatabase::writeWallpapers(const Catalog &catalog)
         showError(registerJobQuery);
     }
 
-    int wallpapersChannel = writeChannel(QLatin1String("Wallpapers"),
-                                         QLatin1String("Wallpaper images"),
-                                         "default/wallpaper.png");
-
     QSqlQuery checkIfExists;
     checkIfExists.prepare("select id from assets where (path = :path and "
                           "id in (select asset from channelassets where channel = " +
-                          QString::number(wallpapersChannel) + "));");
+                          QString::number(m_wallpapersChannelId) + "));");
 
     QSqlQuery updateQuery;
     updateQuery.prepare("update assets "
@@ -170,25 +153,14 @@ int WallpapersDatabase::findWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery
 int WallpapersDatabase::writeWallpaperAsset(const Wallpaper &wallpaper, QSqlQuery &query, int assetId)
 {
     QString image = "kdeartwork/" + wallpaper.path + ".jpg";
-    return writeAsset(query, wallpaper.name, QString(), m_licenseId, m_partnerId, QLatin1String("1.0"), wallpaper.installPath(), QString(), wallpaper.pluginName, image);
+    return writeAsset(query, wallpaper.name, QString(), m_licenseId, partnerId(),
+                      QLatin1String("1.0"), wallpaper.installPath(), wallpaper.pluginName, image);
 }
 
 void WallpapersDatabase::writeWallpaperAssetTags(const Wallpaper &wallpaper, int assetId)
 {
     int author = authorId(wallpaper.author);
     writeAssetTags(assetId, author);
-    int mime = mimetypeTagId();
-    int mimeTypeId = tagId(mime, wallpaper.mimeType, &m_mimetypeIds);
-    writeAssetTags(assetId, mimeTypeId);
-}
-
-void WallpapersDatabase::writeWallpapersChannelTags()
-{
-    const int chanId = channelId(QLatin1String("Wallpapers"), QLatin1String("Wallpapers"));
-    const int mime = mimetypeTagId();
-
-    QHash<QString, int> mimetype;
-    const int tag = tagId(mime, Catalog::c_mimeType, &m_mimetypeIds);
-    writeChannelTags(chanId, tag);
+    writeAssetTags(assetId, m_assetTypeTagId);
 }
 

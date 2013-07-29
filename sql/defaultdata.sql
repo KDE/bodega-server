@@ -23,6 +23,7 @@ INSERT INTO tagTypes (type) VALUES ('isbn');
 INSERT INTO tagTypes (type) VALUES ('platform');
 INSERT INTO tagTypes (type) VALUES ('grouping');
 INSERT INTO tagTypes (type) VALUES ('easter eggs');
+INSERT INTO tagTypes (type) VALUES ('language');
 
 INSERT INTO tags (type, title) SELECT id, 'Early Childhood' FROM tagtypes WHERE type = 'contentrating';
 INSERT INTO tags (type, title) SELECT id, 'Everyone' FROM tagtypes WHERE type = 'contentrating';
@@ -76,6 +77,4 @@ INSERT INTO personRoles (description) VALUES ('Content Creator');
 INSERT INTO personRoles (description) VALUES ('Validator');
 INSERT INTO personRoles (description) VALUES ('Accounts');
 INSERT INTO personRoles (description) VALUES ('Partner Manager');
-
-INSERT INTO batchJobsInProgress (job, dowork) VALUES ('gutenberg', false);
 

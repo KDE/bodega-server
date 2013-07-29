@@ -127,6 +127,16 @@ module.exports.create = function(name, msg)
     return e;
 };
 
+module.exports.log = function(err)
+{
+    if (app.config.printErrors && err && err.message) {
+        console.warn('-- Error:');
+        console.warn(err);
+        console.trace();
+        console.warn('-- end --');
+    }
+}
+
 module.exports.report = function(type, req, res, err)
 {
     if (!ErrorType[type] || ErrorType[type] < 0) {
@@ -139,12 +149,6 @@ module.exports.report = function(type, req, res, err)
         'type' : type
     };
 
-    if (app.config.printErrors && err && err.message) {
-        console.warn('-- Error:');
-        console.trace();
-        console.warn(err);
-        console.warn('-- end --');
-    }
-
+    module.exports.log(err);
     res.json(json);
 };

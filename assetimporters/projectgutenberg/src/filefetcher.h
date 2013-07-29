@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -15,24 +15,46 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "packagedatabase.h"
+#ifndef FILEFETCHER_H
+#define FILEFETCHER_H
 
 #include <QtCore>
 
+class Catalog;
+class QFile;
+class QNetworkAccessManager;
+class QNetworkReply;
 
-int main(int argc, char **argv)
+#include "catalog.h"
+
+namespace Gutenberg
 {
-    QCoreApplication app(argc, argv);
 
-    if (argc < 4) {
-        qWarning() << "Usage:";
-        qWarning() << "\t"<< argv[0] << "<Channels descriptor ini file> <packages ini file> <server asset path>";
-        exit(1);
-    }
+class FileFetcher : public QObject
+{
+    Q_OBJECT
 
+public:
+    FileFetcher(const Catalog &catalog, QObject *parent = 0);
 
-    PackageDatabase db(argv[1], argv[2], argv[3]);
-    db.write();
+public Q_SLOTS:
+    void fetchCovers();
 
-    return app.exec();
+Q_SIGNALS:
+    void coversFetched();
+
+private Q_SLOTS:
+    void coverFetchFinished();
+    void coverDataRecvd();
+
+private:
+    QHash<QUrl, QString> m_coversToDownload;
+    QHashIterator<QUrl, QString> m_coversIt;
+    QHash<QNetworkReply *, QFile *> m_coversBeingFetched;
+    QNetworkAccessManager *m_network;
+    int m_progress;
+};
+
 }
+
+#endif

@@ -19,10 +19,17 @@
 
 using namespace Gutenberg;
 
+const QString Ebook::s_epubMimetype(QLatin1String("application/epub"));
+
 Ebook::Ebook()
     : m_rights(Ebook::Rights_Gutenberg),
-      m_type(Ebook::Type_Book)
+      m_type(Ebook::Type_Unknown)
 {
+}
+
+bool Ebook::isValid() const
+{
+    return !m_id.isEmpty() && !m_title.isEmpty();
 }
 
 QString Ebook::bookId() const
@@ -30,29 +37,9 @@ QString Ebook::bookId() const
     return m_id;
 }
 
-QString Ebook::publisher() const
+QString Ebook::title() const
 {
-    return m_publisher;
-}
-
-QStringList Ebook::creators() const
-{
-    return m_creators;
-}
-
-QStringList Ebook::contributors() const
-{
-    return m_contributors;
-}
-
-QStringList Ebook::titles() const
-{
-    return m_titles;
-}
-
-QString Ebook::friendlyTitle() const
-{
-    return m_friendlyTitle;
+    return m_title;
 }
 
 QStringList Ebook::languages() const
@@ -62,54 +49,47 @@ QStringList Ebook::languages() const
 
 void Ebook::setBookId(const QString &bookId)
 {
-    Q_ASSERT(m_id.isEmpty());
+    if (!m_id.isEmpty()) {
+        throw QLatin1String("Book id already set");
+    }
     m_id = bookId;
 }
 
-void Gutenberg::Ebook::setPublisher(const QString &publisher)
+void Ebook::setTitle(const QString &title)
 {
-    Q_ASSERT(m_publisher.isEmpty());
-    m_publisher = publisher;
+    static const QRegExp newlines("[\n\r]+");
+
+    m_title = title;
+    m_title = m_title.replace(newlines, ": ").simplified();
+    checkForBestTitle();
 }
 
-void Ebook::addTitle(const QString &title)
+void Ebook::setLanguages(const QStringList &lang)
 {
-    m_titles += title;
+    if (!m_languages.isEmpty()) {
+        throw QLatin1String("Languages already set");
+    }
+    m_languages = lang;
 }
 
-void Gutenberg::Ebook::setCreators(const QStringList &creators)
+QStringList Ebook::authors() const
 {
-    Q_ASSERT(m_creators.isEmpty());
-    m_creators = creators;
+    return m_authors;
 }
 
-void Ebook::setContributors(const QStringList &lst)
+void Ebook::setAuthors(const QStringList &authors)
 {
-    Q_ASSERT(m_contributors.isEmpty());
-    m_contributors.append(lst);
+    m_authors = authors;
 }
 
-void Ebook::setFriendlyTitle(const QString &ft)
+QString Ebook::issued() const
 {
-    Q_ASSERT(m_friendlyTitle.isEmpty());
-    m_friendlyTitle = ft;
+    return m_issued;
 }
 
-void Ebook::setLanguages(const QStringList &langs)
+void Ebook::setIssued(const QString &date)
 {
-    Q_ASSERT(m_languages.isEmpty());
-    m_languages = langs;
-}
-
-QString Ebook::created() const
-{
-    return m_created;
-}
-
-void Ebook::setCreated(const QString &date)
-{
-    Q_ASSERT(m_created.isEmpty());
-    m_created = date;
+    m_issued = date;
 }
 
 Ebook::Rights Ebook::rights() const
@@ -122,15 +102,14 @@ void Ebook::setRights(Ebook::Rights rights)
     m_rights = rights;
 }
 
-QStringList Ebook::descriptions() const
+QString Ebook::description() const
 {
-    return m_descriptions;
+    return m_descriptions.join("\n");
 }
 
-void Ebook::setDescriptions(const QStringList &lst)
+void Ebook::addDescription(const QString &desc)
 {
-    Q_ASSERT(m_descriptions.isEmpty());
-    m_descriptions = lst;
+    m_descriptions << desc;
 }
 
 Ebook::Type Ebook::type() const
@@ -143,15 +122,23 @@ void Ebook::setType(Ebook::Type type)
     m_type = type;
 }
 
-QStringList Ebook::alternatives() const
+QStringList Ebook::alternativeTitles() const
 {
-    return m_alternatives;
+    return m_alternativeTitles;
 }
 
-void Ebook::setAlternatives(const QStringList &lst)
+void Ebook::setAlternativeTitles(const QStringList &lst)
 {
-    Q_ASSERT(m_alternatives.isEmpty());
-    m_alternatives = lst;
+    if (!m_alternativeTitles.isEmpty()) {
+        throw QLatin1String("Alternative names already set");
+    }
+    m_alternativeTitles = lst;
+    checkForBestTitle();
+}
+
+void Ebook::addAlternativeTitle(const QString &name)
+{
+    m_alternativeTitles.append(name);
 }
 
 QString Ebook::tableOfContents() const
@@ -161,29 +148,25 @@ QString Ebook::tableOfContents() const
 
 void Ebook::setTableOfContents(const QString &toc)
 {
-    Q_ASSERT(m_toc.isEmpty());
+    if (!m_toc.isEmpty()) {
+        throw QLatin1String("Table of contents already set");
+    }
     m_toc = toc;
 }
 
-QStringList Ebook::lcsh() const
+void Gutenberg::Ebook::setSubjects(const QStringList &lst)
 {
-    return m_lcsh;
+    m_lcc.setSubjects(lst);
 }
 
-void Gutenberg::Ebook::setLcsh(const QStringList &lst)
-{
-    Q_ASSERT(m_lcsh.isEmpty());
-    m_lcsh = lst;
-}
-
-Gutenberg::LCC Ebook::lcc() const
+const Gutenberg::LCC &Ebook::lcc() const
 {
     return m_lcc;
 }
 
-void Ebook::setLCC(const Gutenberg::LCC &lcc)
+void Ebook::setCategories(const QStringList &lcc)
 {
-    m_lcc = lcc;
+    m_lcc.setCategories(lcc);
 }
 
 QList<Gutenberg::File> Ebook::files() const
@@ -196,11 +179,15 @@ void Ebook::addFile(const Gutenberg::File &file)
     m_files.append(file);
 }
 
+QString Ebook::epubMimetype ()
+{
+    return s_epubMimetype;
+}
+
 bool Ebook::hasEpubFile() const
 {
-    QLatin1String epubFormat("application/epub");
     foreach(const Gutenberg::File &file, m_files) {
-        if (file.format.contains(epubFormat)) {
+        if (file.format.contains(s_epubMimetype)) {
             return true;
         }
     }
@@ -209,17 +196,18 @@ bool Ebook::hasEpubFile() const
 
 File Ebook::epubFile() const
 {
-    QLatin1String epubFormat("application/epub");
     QList<Gutenberg::File> epubFiles;
 
     foreach(const Gutenberg::File &file, m_files) {
-        if (file.format.contains(epubFormat)) {
+        if (file.format.contains(s_epubMimetype)) {
             epubFiles.append(file);
         }
     }
+
     if (epubFiles.isEmpty()){
         return Gutenberg::File();
     }
+
     /*
      * If possible we want to return the version with images
      */
@@ -232,26 +220,14 @@ File Ebook::epubFile() const
     return epubFiles[0];
 }
 
-bool Ebook::hasCoverImage() const
+QString Ebook::coverImage() const
 {
-    QLatin1String coverFile("cover.medium.jpg");
-    foreach(const Gutenberg::File &file, m_files) {
-        if (file.url.toString().contains(coverFile)) {
-            return true;
-        }
-    }
-    return false;
+    return m_coverUrl;
 }
 
-File Ebook::coverImage() const
+void Ebook::setCoverImage(const QString &coverUrl)
 {
-    QLatin1String coverFile("cover.medium.jpg");
-    foreach(const Gutenberg::File &file, m_files) {
-        if (file.url.toString().contains(coverFile)) {
-            return file;
-        }
-    }
-    return Gutenberg::File();
+    m_coverUrl = coverUrl;
 }
 
 QString Ebook::rightsString() const
@@ -273,11 +249,8 @@ QString Ebook::typeString() const
     case Type_Book:
         return QString();
         break;
-    case Type_AudioBookHumanRead:
-        return QLatin1String("Audio Book, human-read");
-        break;
-    case Type_AudioBookComputerGenerated:
-        return QLatin1String("Audio Book, computer-generated");
+    case Type_AudioBook:
+        return QLatin1String("Audio Book");
         break;
     case Type_PicturesStill:
         return QLatin1String("Pictures, still");
@@ -304,13 +277,74 @@ QString Ebook::typeString() const
     return QString();
 }
 
+bool Ebook::isSuitableTitle(const QString &title) const
+{
+    int index = 0;
+    QChar c = title.at(index);
+    while ((c.isPunct() || c.isSpace() || c.isSymbol()) && index < title.length()) {
+        c = title.at(++index);
+    }
+
+    return index != title.length() && c.toAscii();
+}
+
+void Ebook::checkForBestTitle()
+{
+    if (m_alternativeTitles.isEmpty() || m_title.isEmpty()) {
+        return;
+    }
+
+    if (!isSuitableTitle(m_title)) {
+        foreach (const QString &alt, m_alternativeTitles) {
+            if (isSuitableTitle(alt)) {
+                m_alternativeTitles.push_front(m_title);
+                m_title = alt;
+                m_alternativeTitles.removeAll(m_title);
+            }
+        }
+    }
+}
 
 QDebug operator<<(QDebug s, const Gutenberg::Ebook &book)
 {
+    s.nospace() << "---------------------------------------------------------\n";
     s.nospace() << "Ebook(id=" << book.bookId() << ", "
-                << "titles = " << book.titles() << ")\n";
+                << "type = " << book.type() << ", "
+                << ", issued: " << book.issued() << ")\n"
+                << "\ttitle = " << QString(book.title()) << '\n';
+    s << "\tEPub " << book.epubFile().url << "\n";
+    if (!book.alternativeTitles().isEmpty()) {
+        s << "\tAlso known as:" << "\n";
+        foreach (const QString &alt, book.alternativeTitles()) {
+            s << "\t\t" << alt << "\n";
+        }
+    }
+
+    const QString desc = book.description();
+    if (!desc.isEmpty()) {
+        s.nospace() << "\tDescription: " << desc;
+    }
+
     QList<Gutenberg::File> files = book.files();
-    for (int i=0; i<files.size(); ++i)
-        s << "\tFile " << i << files.at(i).url << '\n';
+    foreach (const Gutenberg::File &file, book.files()) {
+        s.nospace() << "\t" << file.format << ": " << file.url << '\n';
+    }
+
+    QHash<QString, QStringList> lccCats = book.lcc().categories();
+    QHashIterator<QString, QStringList> it(lccCats);
+    while (it.hasNext()) {
+        it.next();
+        s.nospace() << "\tLCC " << it.key() << '\n';
+        foreach (const QString &subCat, it.value()) {
+            s.nospace() << "\t\t" << subCat << '\n';
+        }
+    }
+
+    s.nospace() << "\tLCCH" << book.lcc().subjects() << '\n';
+    if (!book.tableOfContents().isEmpty()) {
+        s.nospace() << "\n\tTable of contents:" << "\n\t\t" << book.tableOfContents().replace('\n', "\n\t\t");
+    }
+
+    s.nospace() << "\n---------------------------------------------------------\n";
     return s;
 }

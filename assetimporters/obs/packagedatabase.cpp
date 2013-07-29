@@ -25,16 +25,15 @@
 PackageDatabase::PackageDatabase(const QString &channelsCatalogPath,
                                  const QString &packageCatalogPath,
                                  const QString &packageDescPath)
-    : Database(packageDescPath, "VIVALDI-1"),
+    : Database(packageDescPath, "KDE", "VIVALDI-1"),
       m_channelsCatalog(channelsCatalogPath),
       m_catalog(PackageCatalog(packageCatalogPath)),
       m_packageDescPath(packageDescPath)
 {
 }
 
-void PackageDatabase::write(bool clearOldData)
+void PackageDatabase::write()
 {
-    writeInit(clearOldData);
     writePackageChannels();
     writePackages();
 }
@@ -69,9 +68,9 @@ void PackageDatabase::writePackages()
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, description, license, author, version, path, file, externid, image, size) "
+                  "(name, description, license, author, version, path, file, image, size) "
                   "values "
-                  "(:name, :description, :license, :author, :version, :path, :file, :externid, :image, :size) "
+                  "(:name, :description, :license, :author, :version, :path, :file, :image, :size) "
                   "returning id;");
     QHash<QString, int> mimetypeIds;
 
@@ -94,7 +93,10 @@ void PackageDatabase::writePackages()
         file.close();
 
         //TODO: check if the image exists
-        int assetId = writeAsset(query, package.name, package.description, licenseId(), partnerId(), package.version, packagePath, packagePath, packageId, QLatin1String("images/")+package.name+QLatin1String(".png"));
+        //FIXME: license and partner should BOTH be fetch from the package info!
+        int assetId = writeAsset(query, package.name, package.description, licenseId("LGPL"),
+                                 partnerId(), package.version, packagePath, packagePath,
+                                 QLatin1String("images/")+package.name+QLatin1String(".png"));
         if (!assetId) {
             showError(query);
             QSqlDatabase::database().rollback();
@@ -104,12 +106,12 @@ void PackageDatabase::writePackages()
         int author = authorId(package.author);
         writeAssetTags(assetId, author);
 
-        int mimetypeId = tagId(mimetypeTagId(), package.mimeType, &mimetypeIds);
+        int mimetypeId = tagId(mimetypeTagTypeId(), package.mimeType, &mimetypeIds);
         writeAssetTags(assetId, mimetypeId);
 
         foreach (const QString &channel, package.channels) {
             //FIXME: assumes the channel already exists
-            int packagesChannel = channelId(channel, QString());
+            int packagesChannel = channelId(channel);
             QSqlQuery subchannelassetQuery;
             subchannelassetQuery.prepare("insert into subchannelassets "
                             "(channel, leafchannel, asset) "
@@ -171,7 +173,7 @@ void PackageDatabase::writePackageChannels()
         writeChannel(c.name, c.description, c.image, c.parent.toInt());
 
         const int chanId = channelId(c.name, c.description, c.parent.toInt());
-        const int mime = mimetypeTagId();
+        const int mime = mimetypeTagTypeId();
         QHash<QString, int> mimetypeIds;
         const int mimetypeId = tagId(mime, c.mimeType, &mimetypeIds);
 

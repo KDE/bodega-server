@@ -7,12 +7,12 @@ set(wallpapersimport_SRCS
     catalog.cpp
     kdewallpapersdatabase.cpp
     main.cpp
-    ../database-common/database.cpp
+    ../common/database.cpp
    )
 
 qt4_automoc(${wallpapersimport_SRCS})
 
 add_definitions(${QT_DEFINITIONS})
 
-add_executable(wallpapersimport ${wallpapersimport_SRCS})
-target_link_libraries(wallpapersimport ${QT_QTCORE_LIBRARIES} ${QT_QTSQL_LIBRARIES} ${QT_QTNETWORK_LIBRARIES})
+add_executable(bodega_wallpapersimport ${wallpapersimport_SRCS})
+target_link_libraries(bodega_wallpapersimport ${QT_QTCORE_LIBRARIES} ${QT_QTSQL_LIBRARIES} ${QT_QTNETWORK_LIBRARIES})

@@ -1,5 +1,5 @@
-/* 
-    Copyright 2012 Coherent Theory LLC
+/*
+    Copyright 2013 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -15,24 +15,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-#include "packagedatabase.h"
-
-#include <QtCore>
-
-
-int main(int argc, char **argv)
+namespace Gutenberg
 {
-    QCoreApplication app(argc, argv);
 
-    if (argc < 4) {
-        qWarning() << "Usage:";
-        qWarning() << "\t"<< argv[0] << "<Channels descriptor ini file> <packages ini file> <server asset path>";
-        exit(1);
-    }
+namespace Reader
+{
+    void init();
+    Gutenberg::Ebook parseRdf(const QString &path);
+} //namespace Reader
 
+} // namespace Gutenberg
 
-    PackageDatabase db(argv[1], argv[2], argv[3]);
-    db.write();
-
-    return app.exec();
-}

@@ -7,7 +7,7 @@ set(packagesimport_SRCS
     packagecatalog.cpp
     packagedatabase.cpp
     channelscatalog.cpp
-    ../database-common/database.cpp
+    ../common/database.cpp
     main.cpp
    )
 
@@ -15,5 +15,5 @@ qt4_automoc(${packagesimport_SRCS})
 
 add_definitions(${QT_DEFINITIONS})
 
-add_executable(packagesimport ${packagesimport_SRCS})
-target_link_libraries(packagesimport ${QT_QTCORE_LIBRARIES} ${QT_QTSQL_LIBRARIES} ${QT_QTNETWORK_LIBRARIES})
+add_executable(bodega_packagesimport ${packagesimport_SRCS})
+target_link_libraries(bodega_packagesimport ${QT_QTCORE_LIBRARIES} ${QT_QTSQL_LIBRARIES} ${QT_QTNETWORK_LIBRARIES})

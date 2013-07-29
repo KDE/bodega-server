@@ -64,7 +64,7 @@ var BodegaDb = (function() {
         pg.connect(connectionString, function(err, client, done) {
             if (err === null) {
                 func(client, req, res);
-            } else {
+            } else if (req) {
                 errors.report('Database', req, res, err);
             }
             done();

@@ -27,51 +27,20 @@
 using namespace Gutenberg;
 
 Catalog::Catalog()
-    : m_dirty(false)
+    : m_clean(false)
 {
-}
-
-QHash<QString, Gutenberg::Ebook> Catalog::ebooks() const
-{
-    return m_ebooks;
-}
-
-void Catalog::addBook(const Ebook &book)
-{
-    QString bookId = book.bookId();
-    Q_ASSERT(!bookId.isEmpty());
-    m_ebooks[bookId] = book;
-    m_dirty = true;
-}
-
-Gutenberg::Ebook Catalog::bookWithId(const QString &bookId) const
-{
-    return m_ebooks[bookId];
-}
-
-void Catalog::addFile(const File &file)
-{
-    QString bookId = file.bookId;
-    Q_ASSERT(!bookId.isEmpty());
-    if (!m_ebooks.contains(bookId)) {
-        return;
-    }
-    Ebook book = m_ebooks[bookId];
-    book.addFile(file);
-    m_ebooks[bookId] = book;
-    m_dirty = true;
 }
 
 bool Catalog::isCompiled() const
 {
-    return m_dirty;
+    return m_clean;
 }
 
 void Catalog::compile(const QString &imageCachePath)
 {
     QSet<QString> languages;
     QSet<QString> formats;
-    QSet<QString> lccs;
+    QSet<QString> subLccs;
     QSet<QString> authors;
 
     const QFileInfo imageCacheInfo(imageCachePath);
@@ -81,17 +50,16 @@ void Catalog::compile(const QString &imageCachePath)
 
     removeNonEpubBooks();
 
-    QHash<QString, Ebook> books = ebooks();
-    QHash<QString, Ebook>::const_iterator itr;
+    QListIterator<Ebook> itr(m_ebooks);
 
-    for (itr = books.constBegin(); itr != books.constEnd(); ++itr) {
-        const Ebook &book = *itr;
+    while (itr.hasNext()) {
+        const Ebook &book = itr.next();
         QStringList langs = book.languages();
         foreach (QString lang, langs) {
             languages.insert(lang);
         }
         if (fetchImages) {
-            const QUrl image = book.coverImage().url;
+            const QUrl image = book.coverImage();
             if (!image.isEmpty()) {
                 const QString path = imageCachePath + '/' + QFileInfo(image.path()).fileName();
                 if (!QFile::exists(path)) {
@@ -105,31 +73,61 @@ void Catalog::compile(const QString &imageCachePath)
             Q_ASSERT(!lst.isEmpty());
             formats.insert(lst[0]);
         }
-        Gutenberg::LCC xl = book.lcc();
-        QStringList l = xl.topCategories();
-        foreach (QString lcc, l) {
-            lccs.insert(lcc);
+        Gutenberg::LCC lcc = book.lcc();
+        QHash<QString, QStringList> cats = lcc.categories();
+        QHashIterator<QString, QStringList> catIt(cats);
+        while (catIt.hasNext()) {
+            catIt.next();
+            if (!m_lccsHierarchy.contains(catIt.key())) {
+                m_lccsHierarchy.insert(catIt.key(), QStringList());
+            }
+
+            foreach (const QString &lcc, catIt.value()) {
+                if (!m_lccsHierarchy[catIt.key()].contains(lcc)) {
+                    m_lccsHierarchy[catIt.key()].append(lcc);
+                }
+                subLccs.insert(lcc);
+            }
         }
-        l = book.lcsh();
-        foreach (QString lcsh, l) {
+
+        QStringList l = lcc.subjects();
+        foreach (const QString &lcsh, l) {
             if (m_lcshs[lcsh]) {
                 m_lcshs[lcsh] = m_lcshs[lcsh] + 1;
             } else {
                 m_lcshs.insert(lcsh, 1);
             }
         }
-        l = book.creators();
-        foreach (QString creator, l) {
-            authors.insert(creator);
+
+        l = book.authors();
+        foreach (const QString &author, l) {
+            authors.insert(author);
         }
     }
+
     m_languages = languages.values();
-    m_authors = authors.values();
     m_formats = formats.values();
-    m_lccs = lccs.values();
+    m_lccs = m_lccsHierarchy.keys();
+    m_subLccs = subLccs.values();
+    m_authors = authors.values();
     dumpDebugInfo();
+    m_clean = true;
 }
 
+QStringList Catalog::topLevelCategories() const
+{
+    return m_lccs;
+}
+
+QStringList Catalog::subCategories() const
+{
+    return m_subLccs;
+}
+
+QHash<QString, QStringList> Catalog::categoryHierarchy() const
+{
+    return m_lccsHierarchy;
+}
 QStringList Catalog::languages() const
 {
     return m_languages;
@@ -147,18 +145,15 @@ QHash<QUrl, QString> Catalog::covers() const
 
 void Catalog::removeNonEpubBooks()
 {
-    QHash<QString, Gutenberg::Ebook>::iterator itr;
+    QMutableListIterator<Gutenberg::Ebook> itr(m_ebooks);
     int numRemoved = 0;
 
-    itr = m_ebooks.begin();
-    while (itr != m_ebooks.end()) {
-        Ebook book = *itr;
+    while (itr.hasNext()) {
+        const Ebook &book = itr.next();
         if (!book.hasEpubFile() || book.rights() != Ebook::Rights_Gutenberg) {
             //qDebug()<<"Erasing "<<book;
-            itr = m_ebooks.erase(itr);
+            itr.remove();
             ++numRemoved;
-        } else {
-            ++itr;
         }
     }
     qDebug() << "Number of non epub and copyrighted ebooks = " << numRemoved;
@@ -166,10 +161,8 @@ void Catalog::removeNonEpubBooks()
 
 void Catalog::dumpDebugInfo()
 {
-    QHash<QString, Ebook> books = ebooks();
-
     qDebug() << "========== Parse Results ==========";
-    qDebug() << "Number of books:" << books.count();
+    qDebug() << "Number of books:" << m_ebooks.count();
     qDebug() << "Number of authors:" << m_authors.count();
     qDebug() << "===================================";
 
@@ -238,97 +231,4 @@ void Catalog::dumpDebugInfo()
     }
 #endif
 }
-
-FileFetcher::FileFetcher(const Catalog &catalog, QObject *parent)
-    : QObject(parent),
-      m_network(new QNetworkAccessManager(this)),
-      m_coversToDownload(catalog.covers()),
-      m_coversIt(m_coversToDownload),
-      m_progress(m_coversToDownload.count())
-{
-    if (m_progress > 0) {
-        qDebug() << "About to download" << m_progress << "covers .. this could take a while";
-    }
-}
-
-void FileFetcher::fetchCovers()
-{
-    //qDebug() << "fetching covers...";
-    if (!m_coversIt.hasNext()) {
-        //qDebug() << "we are DONE!";
-        emit coversFetched();
-        return;
-    }
-
-    int i = 0;
-    while (i < 4 && m_coversIt.hasNext()) {
-        m_coversIt.next();
-        QFile *cover = new QFile(m_coversIt.value());
-        if (!cover->open(QIODevice::Truncate | QIODevice::WriteOnly)) {
-            qDebug() << "failed to open" << m_coversIt.value();
-            delete cover;
-            continue;
-        }
-
-        ++i;
-        --m_progress;
-        if (m_progress % 50 == 0) {
-            qDebug() << "..." << m_progress << "more covers to go!";
-        }
-
-        //qDebug() << "downloading" << m_coversIt.key() << "to" << m_coversIt.value();
-        QNetworkReply *reply = m_network->get(QNetworkRequest(m_coversIt.key()));
-        connect(reply, SIGNAL(finished()), this, SLOT(coverFetchFinished()));
-        connect(reply, SIGNAL(readyRead()), this, SLOT(coverDataRecvd()));
-        m_coversBeingFetched.insert(reply, cover);
-    }
-
-    if (i == 0) {
-        emit coversFetched();
-    }
-}
-
-void FileFetcher::coverFetchFinished()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-    //qDebug() << "CfF" << reply << sender();
-    if (!reply) {
-        return;
-    }
-
-    QFile *cover = m_coversBeingFetched.value(reply);
-    if (!cover) {
-        return;
-    }
-
-    delete cover;
-    m_coversBeingFetched.remove(reply);
-    reply->deleteLater();
-
-    if (m_coversBeingFetched.isEmpty()) {
-        fetchCovers();
-    }
-}
-
-void FileFetcher::coverDataRecvd()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-    //qDebug() << "CRD" << reply << sender();
-    if (!reply) {
-        return;
-    }
-
-    QFile *cover = m_coversBeingFetched.value(reply);
-    if (!cover) {
-        // shouldn't happen though
-        coverFetchFinished();
-        return;
-    }
-
-    //qDebug() << "writing! ";
-    cover->write(reply->readAll());
-}
-
-#include <catalog.moc>
-
 

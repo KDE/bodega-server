@@ -46,9 +46,9 @@ class Ebook
 {
 public:
     enum Type {
+        Type_Unknown = 0,
         Type_Book,
-        Type_AudioBookHumanRead,
-        Type_AudioBookComputerGenerated,
+        Type_AudioBook,
         Type_PicturesStill,
         Type_PicturesMoving,
         Type_Compilations,
@@ -57,89 +57,88 @@ public:
         Type_OtherRecordings,
         Type_Data
     };
+    Q_ENUMS(Type)
+
     enum Rights {
         Rights_Gutenberg,
         Rights_Copyrighted
     };
+
 public:
     Ebook();
+
+    bool isValid() const;
 
     QString bookId() const;
     void setBookId(const QString &bookId);
 
-    QString publisher() const;
-    void setPublisher(const QString &publisher);
+    QStringList authors() const;
+    void setAuthors(const QStringList &authors);
 
-    QStringList titles() const;
-    void addTitle(const QString &title);
+    QString title() const;
+    void setTitle(const QString &title);
 
-    QStringList creators() const;
-    void setCreators(const QStringList &creators);
-
-    QStringList contributors() const;
-    void setContributors(const QStringList &lst);
-
-    QString friendlyTitle() const;
-    void setFriendlyTitle(const QString &ft);
+    QStringList alternativeTitles() const;
+    void setAlternativeTitles(const QStringList &lst);
+    void addAlternativeTitle(const QString &name);
 
     QStringList languages() const;
-    void setLanguages(const QStringList &langs);
+    void setLanguages(const QStringList &lang);
 
-    QString created() const;
-    void setCreated(const QString &date);
+    QString issued() const;
+    void setIssued(const QString &date);
 
     QString rightsString() const;
     Ebook::Rights rights() const;
     void setRights(Ebook::Rights rights);
 
-    QStringList descriptions() const;
-    void setDescriptions(const QStringList &lst);
+    QString description() const;
+    void addDescription(const QString &lst);
 
     QString typeString() const;
     Ebook::Type type() const;
     void setType(Ebook::Type type);
 
-    QStringList alternatives() const;
-    void setAlternatives(const QStringList &lst);
-
     QString tableOfContents() const;
     void setTableOfContents(const QString &toc);
 
-    QStringList lcsh() const;
-    void setLcsh(const QStringList &lst);
-
-    void setLCC(const Gutenberg::LCC &lcc);
-    Gutenberg::LCC lcc() const;
+    void setCategories(const QStringList &lst);
+    void setSubjects(const QStringList &subjects);
+    const Gutenberg::LCC &lcc() const;
 
     QList<Gutenberg::File> files() const;
     void addFile(const Gutenberg::File &file);
 
-
     bool hasEpubFile() const;
     Gutenberg::File epubFile() const;
 
-    bool hasCoverImage() const;
-    Gutenberg::File coverImage() const;
+    QString coverImage() const;
+    void setCoverImage(const QString &coverUrl);
+
+    static QString epubMimetype();
 
 private:
+    bool isSuitableTitle(const QString &title) const;
+    void checkForBestTitle();
+
     QString m_id;
-    QString m_publisher;
-    QStringList m_creators;
-    QStringList m_contributors;
-    QStringList m_titles;
-    QString m_friendlyTitle;
-    QStringList m_languages;
-    QString m_created;
-    Ebook::Rights m_rights;
+    QString m_title;
+    QString m_issued;
+    QString m_coverUrl;
     QStringList m_descriptions;
+    QStringList m_languages;
+    Ebook::Rights m_rights;
     Ebook::Type m_type;
-    QStringList m_alternatives;
+    QStringList m_alternativeTitles;
+    QStringList m_authors;
     QString m_toc;
 
     QStringList m_lcsh;
     Gutenberg::LCC m_lcc;
 
     QList<Gutenberg::File> m_files;
+
+    static const QString s_epubMimetype;
 };
 
 }

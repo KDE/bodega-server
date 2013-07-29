@@ -15,7 +15,6 @@ struct Wallpaper
     QString name;
     QString author;
     QString path;
-    QString mimeType;
 };
 
 class Catalog
@@ -26,8 +25,6 @@ public:
     void addMetadata(const QString &path);
 
     QHash<QString, Wallpaper> wallpapers() const;
-
-    static const QString c_mimeType;
 
 private:
     QHash<QString, Wallpaper> m_wallpapers;
