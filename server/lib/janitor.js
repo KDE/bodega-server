@@ -32,7 +32,6 @@ var Janitor = (function() {
         }
 
         frequentRunning = true;
-        console.log("FREQUENT");
 
         app.db.dbQuery(function(client) {
             client.query("select ct_frequentMaintenance()", [],
@@ -42,7 +41,6 @@ var Janitor = (function() {
                     }
 
                     frequentRunning = false;
-                    console.log("boo yeah");
                     setTimeout(frequent, frequentPeriod);
                 });
         });
@@ -55,7 +53,6 @@ var Janitor = (function() {
         }
 
         dailyRunning = true;
-        console.log("DAILY");
 
         app.db.dbQuery(function(client) {
             client.query("select ct_dailyMaintenance()", [],
@@ -65,7 +62,6 @@ var Janitor = (function() {
                     }
 
                     frequentRunning = false;
-                    console.log("going to run again at .. " + dailyRunning);
                     setTimeout(daily, dailyPeriod);
                 });
         });
