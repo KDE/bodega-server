@@ -13,6 +13,19 @@ DROP TRIGGER IF EXISTS trg_ct_generateFullName ON people;
 CREATE TRIGGER trg_ct_generateFullName BEFORE UPDATE OR INSERT ON people
 FOR EACH ROW EXECUTE PROCEDURE ct_generateFullname();
 
+CREATE OR REPLACE FUNCTION ct_recordAccountActivated() RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.active THEN
+        NEW.activated = true;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_ct_markAccountedActivated ON people;
+CREATE TRIGGER trg_ct_markAccountedActivated BEFORE UPDATE OF active ON people
+FOR EACH ROW EXECUTE PROCEDURE ct_recordAccountActivated();
+
 -- TRIGGER function for checking that a parent channel and this channel are owned by the same partner
 CREATE OR REPLACE FUNCTION ct_checkChannelUpdate() RETURNS TRIGGER AS $$
 DECLARE

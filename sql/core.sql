@@ -71,6 +71,7 @@ create table people
     password     text,
     points       int         not null default 0 constraint ct_personPoints check (points > -1),
     active       bool        not null default false,
+    activated    bool        not null default false,
     created      timestamp   default(current_timestamp)
 );
 
