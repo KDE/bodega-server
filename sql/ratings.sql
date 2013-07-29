@@ -88,7 +88,6 @@ BEGIN
         RETURN OLD;
     END IF;
 
-    --INSERT INTO assetRatingAverages (asset, attribute, rating) SELECT assetId, attributeId, round(avg(rating), 1) from ratings WHERE asset = assetId AND attribute = attributeId;
     INSERT INTO assetRatingAverages (asset, attribute, rating) VALUES (assetId, attributeId, average);
     RETURN NEW;
 END;
@@ -114,21 +113,20 @@ FOR EACH ROW EXECUTE PROCEDURE ct_blockSumForAssetRatings();
 
 CREATE OR REPLACE FUNCTION ct_addAssetRating(personId int, assetId int, ratings int[][]) RETURNS VOID AS $$
 DECLARE
-    rating  int[];
+    ratingElement  int[];
 BEGIN
-   -- FOREACH rating SLICE 1 IN ARRAY ratings LOOP
-   --     RAISE NOTICE 'rating is % and attribute is %', rating[1], rating[2];
+    FOREACH ratingElement SLICE 1 IN ARRAY ratings LOOP
         -- its safe to delete from the ratings without checking.
         -- Best case scenario the attribute id can be associated with the asset and
         -- it deletes it from the ratings, worst case scenario it doesn't delete anything
         -- because there is nothing in the table to delete, we can't have invalid entries
         -- in the ratings due to trg_ct_checkAssociationOfRatingAttributeWithAsset
-  --      DELETE FROM ratings WHERE asset = assetId AND person = personId AND attribute = rating[2];
+        DELETE FROM ratings WHERE asset = assetId AND person = personId AND attribute = ratingElement[2];
 
         -- no check again. If the values are ok we are done, and if they don't trg_ct_checkAssociationOfRatingAttributeWithAsset
         -- will fix it for us.
-    --    INSERT INTO ratings (asset, attribute, person, rating) VALUES ($1, $2, $3, $4);
-    --END LOOP;
+        INSERT INTO ratings (asset, attribute, person, rating) VALUES (assetId, ratingElement[2], personId, ratingElement[1]);
+    END LOOP;
 END;
 $$ LANGUAGE 'plpgsql';
 
