@@ -82,12 +82,11 @@ END;
 
 CREATE OR REPLACE FUNCTION ct_markNonExtantPricesDone() RETURNS VOID AS $$
 BEGIN
-    update assetprices set ending = (current_timestamp AT TIME ZONE 'UTC')
-        where ending is null and
-              asset || '_' || store not in
-                (select distinct sca.asset || '_' || ca.store from subchannelassets sca
-                 left join channels ca on (sca.channel = ca.id)
-                 left join stores s on (ca.store = s.id));
+    UPDATE assetprices SET ending = current_timestamp AT TIME ZONE 'UTC' FROM
+        (SELECT asset FROM assetprices EXCEPT SELECT DISTINCT a.asset
+         FROM assetprices a join channels c ON (a.store = c.store)
+              join subchannelassets sc on (a.asset = sc.asset and c.id = sc.channel)) as tmp
+        WHERE assetprices.asset = tmp.asset AND ending IS NULL;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -195,9 +194,12 @@ DECLARE
     alteredAsset   int;
     basePrice int;
     parentChannel  RECORD;
-    noJobsInProgress bool;
+    processed bool := false;
 BEGIN
-    FOR alteredAsset, baseprice IN SELECT a.id, a.baseprice FROM assetsNeedingRefresh r JOIN assets a ON (r.asset = a.id) LOOP
+    FOR alteredAsset, baseprice IN
+        SELECT a.id, a.baseprice FROM assetsNeedingRefresh r JOIN assets a ON (r.asset = a.id)
+    LOOP
+        processed := true;
         DELETE FROM channelAssets c WHERE c.asset = alteredAsset;
         DELETE FROM subChannelAssets c WHERE c.asset = alteredAsset;
         FOR parentChannel IN SELECT * FROM (SELECT c.channel AS channel, count(c.tag) = count(a.tag) as matches
@@ -210,8 +212,13 @@ BEGIN
         PERFORM ct_updateAssetPrices(alteredAsset, basePrice);
     END LOOP;
 
-    PERFORM ct_markNonExtantPricesDone();
-    UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(distinct asset) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
+    IF processed THEN
+        PERFORM ct_markNonExtantPricesDone();
+        UPDATE channels SET assetCount = tmp.assets
+            from (SELECT channel, count(distinct asset) as assets FROM subChannelAssets group by channel) as tmp
+            where tmp.channel = channels.id;
+    END IF;
+
     DELETE FROM assetsNeedingRefresh;
 END;
 $$ LANGUAGE plpgsql;
@@ -260,10 +267,11 @@ DECLARE
     markupRow        RECORD;
     warehouse        RECORD;
     pricesRow        RECORD;
-    noJobsInProgress bool;
+    processed        bool := false;
 BEGIN
     FOR alteredChannel IN SELECT channel FROM channelsNeedingRefresh
     LOOP
+        processed := true;
         SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
         SELECT INTO tagCount count(tag) FROM channelTags c WHERE c.channel = alteredChannel;
         SELECT INTO markupRow s.minMarkup as minMarkup, s.maxMarkup as  maxMarkup,
@@ -293,9 +301,14 @@ BEGIN
         END LOOP;
     END LOOP;
 
-    PERFORM ct_markNonExtantPricesDone();
+    IF  processed THEN
+        PERFORM ct_markNonExtantPricesDone();
 
-    UPDATE channels SET assetCount = tmp.assets from (SELECT channel, count(distinct asset) as assets FROM subChannelAssets group by channel) as tmp where tmp.channel = channels.id;
+        UPDATE channels SET assetCount = tmp.assets from
+            (SELECT channel, count(distinct asset) as assets FROM subChannelAssets group by channel) as tmp
+            where tmp.channel = channels.id;
+    END IF;
+
     DELETE FROM channelsNeedingRefresh;
 END;
 $$ LANGUAGE 'plpgsql';
