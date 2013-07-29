@@ -1,16 +1,16 @@
 -- CREATE LANGUAGE plpgsql;
 
 -- TRIGGER function for creating full name
-CREATE OR REPLACE FUNCTION ct_generateFullname() RETURNS TRIGGER AS '
+CREATE OR REPLACE FUNCTION ct_generateFullname() RETURNS TRIGGER AS $$
 DECLARE
 BEGIN
-    NEW.fullName = NEW.firstName || '' '' || NEW.lastName;
+    NEW.fullName = NEW.firstName || ' ' || NEW.lastName;
     RETURN NEW;
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS trg_ct_generateFullName ON people;
-CREATE TRIGGER trg_ct_generateFullName BEFORE UPDATE OR INSERT ON people
+CREATE TRIGGER trg_ct_generateFullName BEFORE UPDATE OF firstName, lastName OR INSERT ON people
 FOR EACH ROW EXECUTE PROCEDURE ct_generateFullname();
 
 CREATE OR REPLACE FUNCTION ct_recordAccountActivated() RETURNS TRIGGER AS $$
