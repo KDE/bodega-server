@@ -16,10 +16,14 @@
 */
 
 var db = require('../app.js');
+var errors = require('./errors.js');
 
 var Janitor = (function() {
-    var frequentPeriod = 60000;
+    var frequentPeriod = 60 * 1000;
     var frequentRunning = false;
+
+    var dailyPeriod = 24 * 60 * 60 * 1000;
+    var dailyRunning = false;
 
     function frequent()
     {
@@ -28,19 +32,41 @@ var Janitor = (function() {
         }
 
         frequentRunning = true;
+        console.log("FREQUENT");
 
         app.db.dbQuery(function(client) {
             client.query("select ct_frequentMaintenance()", [],
                 function(err) {
                     if (err) {
-                        console.warn('-- Error:');
-                        console.trace();
-                        console.warn(err);
-                        console.warn('-- end --');
+                        errors.log(err);
                     }
 
                     frequentRunning = false;
+                    console.log("boo yeah");
                     setTimeout(frequent, frequentPeriod);
+                });
+        });
+    }
+
+    function daily()
+    {
+        if (dailyRunning) {
+            return;
+        }
+
+        dailyRunning = true;
+        console.log("DAILY");
+
+        app.db.dbQuery(function(client) {
+            client.query("select ct_dailyMaintenance()", [],
+                function(err) {
+                    if (err) {
+                        errors.log(err);
+                    }
+
+                    frequentRunning = false;
+                    console.log("going to run again at .. " + dailyRunning);
+                    setTimeout(daily, dailyPeriod);
                 });
         });
     }
@@ -48,6 +74,7 @@ var Janitor = (function() {
     function Janitor()
     {
         frequent();
+        daily();
     }
 
     return Janitor;
