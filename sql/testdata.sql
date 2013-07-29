@@ -22,6 +22,7 @@ SELECT setval('seq_partnerids', 1005);
 SELECT setval('seq_channelids', 1);
 SELECT setval('seq_purchaseids', 1);
 SELECT setval('seq_tagids', 20);
+SELECT setval('seq_ratingsIds', 1);
 
 -- create some handy functions
 

@@ -137,11 +137,11 @@ describe('Ratings', function() {
             var query = {
                 ratings: [
                     {
-                        'attribute': 1,
+                        'attribute': 2,
                         'rating': 1
                     },
                     {
-                        'attribute': 2,
+                        'attribute': 3,
                         'rating': 2
                     }
                 ]
