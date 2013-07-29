@@ -20,12 +20,8 @@
 
 #include "ebook.h"
 
-#include <QObject>
 #include <QHash>
 
-class QFile;
-class QNetworkAccessManager;
-class QNetworkReply;
 class QXmlStreamReader;
 
 namespace Gutenberg
@@ -64,31 +60,6 @@ private:
     QHash<QString, int> m_lcshs;
     QHash<QString, QStringList> m_lccsHierarchy;
     QHash<QUrl, QString> m_coversToDownload;
-};
-
-class FileFetcher : public QObject
-{
-    Q_OBJECT
-
-public:
-    FileFetcher(const Catalog &catalog, QObject *parent = 0);
-
-public Q_SLOTS:
-    void fetchCovers();
-
-Q_SIGNALS:
-    void coversFetched();
-
-private Q_SLOTS:
-    void coverFetchFinished();
-    void coverDataRecvd();
-
-private:
-    QHash<QUrl, QString> m_coversToDownload;
-    QHashIterator<QUrl, QString> m_coversIt;
-    QHash<QNetworkReply *, QFile *> m_coversBeingFetched;
-    QNetworkAccessManager *m_network;
-    int m_progress;
 };
 
 }

@@ -5,6 +5,7 @@ include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
 
 set(gutimport_SRCS
     catalog.cpp
+    filefetcher.cpp
     gutenbergdatabase.cpp
     ebook.cpp
     languages.cpp
