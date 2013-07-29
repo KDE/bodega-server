@@ -332,6 +332,20 @@
               "Description": "The id of the asset, which must exist in the store you are authenticated against",
               "Required": "Y",
               "Type": "number"
+            },
+            {
+              "Name": "previews",
+              "Location": "query",
+              "Description": "Retrieves the previews for the specific asset, defaults to false",
+              "Required": "N",
+              "Type": "boolean"
+            },
+            {
+              "Name": "changelog",
+              "Location": "query",
+              "Description": "Retrieves the changelog for the specific asset, defaults to false",
+              "Required": "N",
+              "Type": "boolean"
             }
           ]
         },
