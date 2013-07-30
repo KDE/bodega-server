@@ -51,7 +51,7 @@ module.exports.listAttributes = function(db, req, res) {
 
 module.exports.asset = function(db, req, res) {
     /*jshint multistr:true */
-    var ratingsQuery = 'SELECT attribute, person, rating \
+    var ratingsQuery = 'SELECT attribute, person, rating, extract(epoch from created) \
                         FROM ratings WHERE asset = $1 \
                         ORDER BY created desc, person LIMIT $2 OFFSET $3;';
 
@@ -86,7 +86,7 @@ module.exports.asset = function(db, req, res) {
 
 module.exports.participant = function(db, req, res) {
     /*jshint multistr:true */
-    var ratingsQuery = 'SELECT r.asset, r.attribute, r.rating \
+    var ratingsQuery = 'SELECT r.asset, r.attribute, r.rating, extract(epoch from created) \
                         FROM ratings r WHERE r.person = $1 \
                         ORDER BY r.created desc, r.asset LIMIT $2 OFFSET $3;';
 
