@@ -119,8 +119,9 @@ function findAsset(db, req, res, assetInfo, cb) {
     var table = assetInfo.incoming ? 'incomingAssets' : 'assets';
     var assetInfoQuery =
         "SELECT a.id, l.name as license, l.text as licenseText, \
-         a.partner as partnerId, a.version, a.file, a.image, a.name, \
-         a.description, ct_canDownload($3, $2, $1) AS downloadable, \
+         a.partner as partnerId, a.version, a.versionTs as created, \
+         a.file, a.image, a.name, a.description, \
+         ct_canDownload($3, $2, $1) AS downloadable, \
          ct_assetPrice($2, $1) AS price \
          FROM assets a \
          LEFT JOIN channelAssets ca ON (a.id = ca.asset)  \
@@ -163,6 +164,7 @@ function findAsset(db, req, res, assetInfo, cb) {
             licenseText: result.rows[0].licenseText,
             partnerId:   result.rows[0].partnerid,
             version:     result.rows[0].version,
+            created:     result.rows[0].created,
             filename:    result.rows[0].file,
             image:       result.rows[0].image,
             name:        result.rows[0].name,
@@ -170,6 +172,8 @@ function findAsset(db, req, res, assetInfo, cb) {
             points:      result.rows[0].price,
             canDownload: result.rows[0].downloadable
         };
+
+        //console.log(JSON.stringify(json.asset, 0, 2));
         assetInfo.json = json;
 
         cb(null, db, req, res, assetInfo);

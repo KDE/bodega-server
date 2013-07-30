@@ -34,10 +34,13 @@ describe('Asset info', function(){
                     res.body.asset.should.have.property('partnerId');
                     res.body.asset.should.have.property('license');
                     res.body.asset.should.have.property('version');
+                    res.body.asset.should.have.property('created');
                     res.body.asset.should.have.property('filename');
                     res.body.asset.should.have.property('image');
                     res.body.asset.should.have.property('name');
                     res.body.asset.should.have.property('description');
+                    res.body.asset.should.have.property('points');
+                    res.body.asset.should.have.property('canDownload');
                     done();
                 });
         });
