@@ -118,7 +118,7 @@ function findTags(db, req, res, assetInfo, cb)
 function findAsset(db, req, res, assetInfo, cb) {
     var table = assetInfo.incoming ? 'incomingAssets' : 'assets';
     var assetInfoQuery =
-        "SELECT a.id, l.name as license, l.text as licenseText, \
+        "SELECT DISTINCT a.id, l.name as license, l.text as licenseText, \
          a.partner as partnerId, a.version, a.file, a.image, a.name, \
          a.description, ct_canDownload($3, $2, $1) AS downloadable, \
          ct_assetPrice($2, $1) AS price \
@@ -205,8 +205,29 @@ function findIsValidator(db, req, res, assetInfo, cb)
             if (!err) {
                 assetInfo.validator = true;
             }
+
+            var json = utilsi.standardJson(req);
+
             cb(null, db, req, res, assetInfo);
         });
+}
+
+function findRatings(db, req, res, assetInfo, cb)
+{
+    var query = 'SELECT rating AS averageRating, ratingsCount, attribute \
+                 FROM assetRatingAverages WHERE asset = $1';
+    db.query(query, [req.params.assetId],
+            function(err, result) {
+                var e;
+                if (err) {
+                    e = errors.create('Database', err.message);
+                    cb(e, db, req, res, assetInfo);
+                    return;
+                }
+                assetInfo.json.asset.ratings = result.rows;
+
+                cb(null, db, req, res, assetInfo);
+    });
 }
 
 module.exports = function(db, req, res) {
@@ -233,6 +254,10 @@ module.exports = function(db, req, res) {
     }
     if (req.query.changelog) {
         funcs.push(findChangeLog);
+    }
+
+    if (req.query.ratings) {
+        funcs.push(findRatings);
     }
 
     async.waterfall(funcs, function(err, db, req, res, assetInfo) {
