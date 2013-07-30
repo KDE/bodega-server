@@ -69,8 +69,7 @@ CREATE OR REPLACE FUNCTION ct_sumForAssetRatings() RETURNS TRIGGER AS $$
 DECLARE
     assetId INT;
     attributeId INT;
-    average REAL;
-    ratingsCount INT;
+    average RECORD;
 BEGIN
     IF TG_OP = 'DELETE' THEN
         assetId := OLD.asset;
@@ -85,14 +84,12 @@ BEGIN
     -- we have to check if the table ratings has a rating for the specified asset and attribute.
     -- e.g. this query DELETE FROM ratings WHERE asset = 8; turns rating into NULL so if we try to
     -- to an INSERT INTO it will fail. This can happen only ON DELETE.
-    SELECT INTO average round(avg(rating), 1) FROM ratings WHERE asset = assetId AND attribute = attributeId;
+    SELECT INTO average round(avg(rating), 1) AS averageRating, count(rating) AS ratingsCount FROM ratings WHERE asset = assetId AND attribute = attributeId;
     IF average IS NULL AND TG_OP = 'DELETE' THEN
         RETURN OLD;
     END IF;
 
-    SELECT INTO ratingsCount count(rating) FROM ratings WHERE asset = assetId AND attribute = attributeId;
-
-    INSERT INTO assetRatingAverages (asset, attribute, rating, ratingsCount) VALUES (assetId, attributeId, average, ratingsCount);
+    INSERT INTO assetRatingAverages (asset, attribute, rating, ratingsCount) VALUES (assetId, attributeId, average.averageRating, average.ratingsCount);
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';

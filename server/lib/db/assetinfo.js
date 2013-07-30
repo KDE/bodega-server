@@ -206,7 +206,7 @@ function findIsValidator(db, req, res, assetInfo, cb)
                 assetInfo.validator = true;
             }
 
-            var json = utilsi.standardJson(req);
+            var json = utils.standardJson(req);
 
             cb(null, db, req, res, assetInfo);
         });
