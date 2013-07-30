@@ -118,7 +118,7 @@ function findTags(db, req, res, assetInfo, cb)
 function findAsset(db, req, res, assetInfo, cb) {
     var table = assetInfo.incoming ? 'incomingAssets' : 'assets';
     var assetInfoQuery =
-        "SELECT DISTINCT a.id, l.name as license, l.text as licenseText, \
+        "SELECT a.id, l.name as license, l.text as licenseText, \
          a.partner as partnerId, a.version, a.file, a.image, a.name, \
          a.description, ct_canDownload($3, $2, $1) AS downloadable, \
          ct_assetPrice($2, $1) AS price \
@@ -126,7 +126,7 @@ function findAsset(db, req, res, assetInfo, cb) {
          LEFT JOIN channelAssets ca ON (a.id = ca.asset)  \
          LEFT JOIN channels c ON (ca.channel = c.id)  \
          LEFT JOIN licenses l ON (a.license = l.id) \
-         WHERE a.id = $1 AND c.store = $2";
+         WHERE a.id = $1 AND c.store = $2 LIMIT 1";
     var incomingAssetInfoQuery =
         "SELECT a.id, l.name as license, l.text as licenseText, \
          a.partner as partnerId, a.version, a.file, a.image, a.name, \
