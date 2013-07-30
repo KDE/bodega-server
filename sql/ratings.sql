@@ -93,9 +93,7 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-select asset from assettags at inner join tags t on (t.id = at.tag) inner join ratingattributes ra on (ra.assettype = t.id) where at.asset = 2 and ra.id = 0;
-
-DROP TRIGGER IF EXISTS trg_ct_checkTagForRating ON ratings;
+DROP TRIGGER IF EXISTS trg_ct_sumForAsetRatings ON ratings;
 CREATE TRIGGER trg_ct_sumForAssetRatings AFTER INSERT OR DELETE ON ratings
 FOR EACH ROW EXECUTE PROCEDURE ct_sumForAssetRatings();
 
