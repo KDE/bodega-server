@@ -167,7 +167,7 @@ module.exports.addAssetRating = function(db, req, res) {
     });
 };
 
-module.exports.removeAsset = function(db, req, res) {
+module.exports.removeAssetRating = function(db, req, res) {
     /*jshint multistr:true */
     var assetDeleteQuery =
         'DELETE FROM ratings WHERE asset = $1 AND person = $2;';
