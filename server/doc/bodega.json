@@ -346,6 +346,13 @@
               "Description": "Retrieves the changelog for the specific asset, defaults to false",
               "Required": "N",
               "Type": "boolean"
+            },
+            {
+              "Name": "ratings",
+              "Location": "query",
+              "Description": "Retrieves the number of ratings and the average rating for the specific asset, defaults to false",
+              "Required": "N",
+              "Type": "boolean"
             }
           ]
         },

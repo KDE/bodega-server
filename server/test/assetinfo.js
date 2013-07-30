@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -86,6 +86,19 @@ describe('Asset info', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('previews');
+                    done();
+                });
+        });
+        it('should show ratings', function(done){
+            utils.getUrl('asset/8?ratings=1',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('asset');
+                    res.body.asset.should.have.property('ratings');
                     done();
                 });
         });

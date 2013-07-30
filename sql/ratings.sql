@@ -24,7 +24,8 @@ create table assetRatingAverages
 (
     asset     int        not null references assets(id) on delete cascade,
     attribute int        not null references ratingAttributes(id) on delete cascade,
-    rating    float      not null check (rating > 0 AND rating < 6)
+    rating    float      not null check (rating > 0 AND rating < 6),
+    ratingsCount int     not null
 );
 
 create index assetRatingAverages_asset on assetRatingAverages(asset);
@@ -69,7 +70,7 @@ CREATE OR REPLACE FUNCTION ct_sumForAssetRatings() RETURNS TRIGGER AS $$
 DECLARE
     assetId INT;
     attributeId INT;
-    average REAL;
+    average RECORD;
 BEGIN
     IF TG_OP = 'DELETE' THEN
         assetId := OLD.asset;
@@ -84,12 +85,12 @@ BEGIN
     -- we have to check if the table ratings has a rating for the specified asset and attribute.
     -- e.g. this query DELETE FROM ratings WHERE asset = 8; turns rating into NULL so if we try to
     -- to an INSERT INTO it will fail. This can happen only ON DELETE.
-    SELECT INTO average round(avg(rating), 1) FROM ratings WHERE asset = assetId AND attribute = attributeId;
+    SELECT INTO average round(avg(rating), 1) AS averageRating, count(rating) AS ratingsCount FROM ratings WHERE asset = assetId AND attribute = attributeId;
     IF average IS NULL AND TG_OP = 'DELETE' THEN
         RETURN OLD;
     END IF;
 
-    INSERT INTO assetRatingAverages (asset, attribute, rating) VALUES (assetId, attributeId, average);
+    INSERT INTO assetRatingAverages (asset, attribute, rating, ratingsCount) VALUES (assetId, attributeId, average.averageRating, average.ratingsCount);
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';

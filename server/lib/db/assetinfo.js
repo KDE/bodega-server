@@ -127,7 +127,7 @@ function findAsset(db, req, res, assetInfo, cb) {
          LEFT JOIN channelAssets ca ON (a.id = ca.asset)  \
          LEFT JOIN channels c ON (ca.channel = c.id)  \
          LEFT JOIN licenses l ON (a.license = l.id) \
-         WHERE a.id = $1 AND c.store = $2";
+         WHERE a.id = $1 AND c.store = $2 LIMIT 1";
     var incomingAssetInfoQuery =
         "SELECT a.id, l.name as license, l.text as licenseText, \
          a.partner as partnerId, a.version, a.file, a.image, a.name, \
@@ -209,8 +209,29 @@ function findIsValidator(db, req, res, assetInfo, cb)
             if (!err) {
                 assetInfo.validator = true;
             }
+
+            var json = utils.standardJson(req);
+
             cb(null, db, req, res, assetInfo);
         });
+}
+
+function findRatings(db, req, res, assetInfo, cb)
+{
+    var query = 'SELECT rating AS averageRating, ratingsCount, attribute \
+                 FROM assetRatingAverages WHERE asset = $1';
+    db.query(query, [req.params.assetId],
+            function(err, result) {
+                var e;
+                if (err) {
+                    e = errors.create('Database', err.message);
+                    cb(e, db, req, res, assetInfo);
+                    return;
+                }
+                assetInfo.json.asset.ratings = result.rows;
+
+                cb(null, db, req, res, assetInfo);
+    });
 }
 
 module.exports = function(db, req, res) {
@@ -237,6 +258,10 @@ module.exports = function(db, req, res) {
     }
     if (req.query.changelog) {
         funcs.push(findChangeLog);
+    }
+
+    if (req.query.ratings) {
+        funcs.push(findRatings);
     }
 
     async.waterfall(funcs, function(err, db, req, res, assetInfo) {
