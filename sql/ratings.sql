@@ -14,7 +14,8 @@ create table ratings
     asset     int        not null references assets(id) on delete cascade,
     attribute int        not null references ratingAttributes(id) on delete cascade,
     person    int        not null references people(id) on delete cascade,
-    rating    int        check (rating > 0 AND rating < 6)
+    rating    int        check (rating > 0 AND rating < 6),
+    created   timestamp  not null default current_timestamp
 );
 
 create index ratings_asset on ratings(asset);

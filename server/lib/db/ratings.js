@@ -53,7 +53,7 @@ module.exports.asset = function(db, req, res) {
     /*jshint multistr:true */
     var ratingsQuery = 'SELECT attribute, person, rating \
                         FROM ratings WHERE asset = $1 \
-                        ORDER BY ratings.person LIMIT $2 OFFSET $3;';
+                        ORDER BY created desc, person LIMIT $2 OFFSET $3;';
 
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
@@ -79,7 +79,6 @@ module.exports.asset = function(db, req, res) {
                 return;
             }
 
-            //TODO do we want to export the assetRatingsAverage data?????
             json.ratings = result.rows;
             res.json(json);
     });
@@ -89,7 +88,7 @@ module.exports.participant = function(db, req, res) {
     /*jshint multistr:true */
     var ratingsQuery = 'SELECT r.asset, r.attribute, r.rating \
                         FROM ratings r WHERE r.person = $1 \
-                        ORDER BY r.asset LIMIT $2 OFFSET $3;';
+                        ORDER BY r.created desc, r.asset LIMIT $2 OFFSET $3;';
 
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
