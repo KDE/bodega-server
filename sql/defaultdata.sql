@@ -71,6 +71,59 @@ INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('google+', '
 INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('blog', 'extern/blog.png', null);
 INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('website', null, null);
 
+-- default asset rating attributes
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Usability', 'Clumsy', 'Elegant', id FROM tags
+        WHERE title = 'application' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Features', 'Critical gaps', 'Everything needed', id FROM tags
+        WHERE title = 'application' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Performance', 'Slow and unstable', 'Fast and reliable', id FROM tags
+        WHERE title = 'application' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Theme', 'Critical gaps', 'Comprehensive', id FROM tags
+        WHERE (title = 'application' OR title = 'magazine') AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Writing', 'Clumsy', 'Powerful', id FROM tags
+        WHERE (title = 'application' OR title = 'magazine') AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Layout', 'Poorly arranged', 'Beautiful', id FROM tags
+        WHERE (title = 'application' OR title = 'magazine') AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Creativity', 'Uninspired', 'Highly unique', id FROM tags
+        WHERE title = 'wallpaper' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Beauty', 'Ugly', 'Gorgeous', id FROM tags
+        WHERE title = 'wallpaper' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Art', 'Poor quality', 'Amazing', id FROM tags
+        WHERE title = 'game' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Playability', 'Clumsy', 'Smooth', id FROM tags
+        WHERE title = 'game' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Performance', 'Slow and unstable', 'Smooth and reliable', id FROM tags
+        WHERE title = 'game' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
+    SELECT 'Enjoyability', 'Boring', 'Could play all day', id FROM tags
+        WHERE title = 'game' AND
+              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+
 -- default roles for the accounts
 INSERT INTO personRoles (description) VALUES ('Store Manager');
 INSERT INTO personRoles (description) VALUES ('Content Creator');
