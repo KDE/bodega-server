@@ -11,8 +11,8 @@ DELETE FROM assets;
 DELETE FROM partners;
 DELETE FROM affiliations;
 DELETE FROM languages;
-DELETE FROM ratings;
-DELETE FROM ratingAttributes;
+DELETE FROM assetRatings;
+DELETE FROM assetRatingAttributes;
 DELETE FROM assetRatingAverages;
 
 SELECT setval('seq_assetsids', 1);
@@ -22,7 +22,7 @@ SELECT setval('seq_partnerids', 1005);
 SELECT setval('seq_channelids', 1);
 SELECT setval('seq_purchaseids', 1);
 SELECT setval('seq_tagids', 20);
-SELECT setval('seq_ratingsIds', 1);
+SELECT setval('seq_assetratingsIds', 1);
 
 -- create some handy functions
 
@@ -157,7 +157,7 @@ CREATE OR REPLACE FUNCTION ct_testing_ratingAttributeByName(text) RETURNS INT AS
 DECLARE
     ratingAttributeId int := -1;
 BEGIN
-    SELECT INTO ratingAttributeId id FROM ratingAttributes WHERE name = $1 limit 1;
+    SELECT INTO ratingAttributeId id FROM assetRatingAttributes WHERE name = $1 limit 1;
     RETURN ratingAttributeId;
 END;
 $$ LANGUAGE plpgsql;
@@ -620,21 +620,21 @@ INSERT INTO downloads (asset, person, downloadedOn, store, address, title, versi
      VALUES (ct_testing_assetByName('Jewels'), ct_testing_personByEmail('mart@kde.org'), '2013-10-01 23:10:11Z', 'KDE-1', '67.68.69.70', 'Jewels', 1);
 
 --ratings
-INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('Usability', 'completely unusable', 'Wonderfully', ct_testing_tagByName('game'));
-INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('game'));
-INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('book'));
-INSERT INTO ratingAttributes (name, lowDesc, highDesc, assetType) VALUES ('perfomance', 'laggy', 'super smooth', ct_testing_tagByName('application'));
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType) VALUES ('Usability', 'completely unusable', 'Wonderfully', ct_testing_tagByName('game'));
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('game'));
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('book'));
+INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType) VALUES ('perfomance', 'laggy', 'super smooth', ct_testing_tagByName('application'));
 
-INSERT INTO ratings (asset, attribute, person, rating)
+INSERT INTO assetRatings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('aseigo@kde.org'), 1);
-INSERT INTO ratings (asset, attribute, person, rating)
+INSERT INTO assetRatings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('funny'), ct_testing_personByEmail('aseigo@kde.org'), 2);
 
-INSERT INTO ratings (asset, attribute, person, rating)
+INSERT INTO assetRatings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('zack@kde.org'), 5);
-INSERT INTO ratings (asset, attribute, person, rating)
+INSERT INTO assetRatings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Aquarium'), ct_testing_ratingAttributeByName('perfomance'), ct_testing_personByEmail('zack@kde.org'), 1);
-INSERT INTO ratings (asset, attribute, person, rating)
+INSERT INTO assetRatings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('funny'), ct_testing_personByEmail('zack@kde.org'), 3);
 
 -- cleanup
