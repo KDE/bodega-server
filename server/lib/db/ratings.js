@@ -22,7 +22,7 @@ var async = require('async');
 module.exports.listAttributes = function(db, req, res) {
     /*jshint multistr:true */
     var queryString =
-    'SELECT name, lowdesc, highdesc, assettype FROM assetRatingAttributes ra \
+    'SELECT id, name, lowdesc, highdesc, assettype FROM assetRatingAttributes ra \
     LEFT JOIN assettags at ON (ra.assettype = at.tag) WHERE at.asset = $1;';
 
     var assetId = req.params.assetId;
