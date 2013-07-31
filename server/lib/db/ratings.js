@@ -22,7 +22,7 @@ var async = require('async');
 module.exports.listAttributes = function(db, req, res) {
     /*jshint multistr:true */
     var queryString =
-    'SELECT name, lowdesc, highdesc, assettype FROM ratingattributes ra \
+    'SELECT name, lowdesc, highdesc, assettype FROM assetRatingAttributes ra \
     LEFT JOIN assettags at ON (ra.assettype = at.tag) WHERE at.asset = $1;';
 
     var assetId = req.params.assetId;
@@ -52,7 +52,7 @@ module.exports.listAttributes = function(db, req, res) {
 module.exports.asset = function(db, req, res) {
     /*jshint multistr:true */
     var ratingsQuery = 'SELECT attribute, person, rating, extract(epoch from created) \
-                        FROM ratings WHERE asset = $1 \
+                        FROM assetRatings WHERE asset = $1 \
                         ORDER BY created desc, person LIMIT $2 OFFSET $3;';
 
     var defaultPageSize = 25;
@@ -87,7 +87,7 @@ module.exports.asset = function(db, req, res) {
 module.exports.participant = function(db, req, res) {
     /*jshint multistr:true */
     var ratingsQuery = 'SELECT r.asset, r.attribute, r.rating, extract(epoch from created) \
-                        FROM ratings r WHERE r.person = $1 \
+                        FROM assetRatings r WHERE r.person = $1 \
                         ORDER BY r.created desc, r.asset LIMIT $2 OFFSET $3;';
 
     var defaultPageSize = 25;
@@ -169,7 +169,7 @@ module.exports.addAssetRating = function(db, req, res) {
 module.exports.removeAssetRating = function(db, req, res) {
     /*jshint multistr:true */
     var assetDeleteQuery =
-        'DELETE FROM ratings WHERE asset = $1 AND person = $2;';
+        'DELETE FROM assetRatings WHERE asset = $1 AND person = $2;';
     var userId = req.session.user.id;
     var assetId = utils.parseNumber(req.params.assetId);
 
