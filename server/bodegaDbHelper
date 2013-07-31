@@ -10,19 +10,20 @@ var psqlExec = "PGOPTIONS='--client-min-messages=warning' psql -q";
 var sql_commands =
 [
     'core.sql',
-    'ratings.sql',
+    'collections.sql',
     'messaging.sql',
+    'ratings.sql',
+    'upload.sql',
     'util.plsql',
-    'search_en.plsql',
     'core.plsql',
+    'ratings.plsql',
+    'search_en.plsql',
     'api.plsql',
-    'defaultdata.sql',
     'actionconf.plsql',
-    'rankings.sql',
     'purchasing.plsql',
     'payments_stripe.sql',
-    'upload.sql',
-    'maintenance.plsql'
+    'maintenance.plsql',
+    'defaultdata.sql'
 ];
 
 var test_sql_commands = ['testdata.sql'];
