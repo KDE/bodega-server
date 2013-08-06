@@ -30,6 +30,14 @@ All commands that follow are done relative to the server/ directory.
   postgres user is bodega. If you use a different user name or database name, this script will need
   to be tweaked.
 
+Note that if you are using an OS that uses systemd, you may not have init.d files. In which
+case you can start postgresql and redis like this:
+
+   $ systemctl start postgresql.service
+   $ systemctl start redis.service
+
+You can also ensure that these services are always started with `systemctl enable`
+
 ## Node setup and module Installation
 
 The npm application takes care of install all the required modules, which are listed in the
