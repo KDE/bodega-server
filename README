@@ -28,6 +28,13 @@ To adjust the type of content and rules for assets you can make adjustments to t
 server/assetRules.js as well as in the default dataset in sql/detaulData.sql. The latter must be
 done before running `make sql` or else be loaded by hand.
 
+## Node setup and module Installation
+
+The npm application takes care of install all the required modules, which are listed in the
+package.json file. Simply run:
+
+   $ npm install
+
 ## Database setup
 
 * Start the redis daemon (e.g.: /etc/init.d/redis start)
@@ -59,21 +66,10 @@ in the above command rather than the default "bodega".
 
 and follow the directions on screen. Output should inform you of each step being processed.
 
-## Node setup and module Installation
-
-The npm application takes care of install all the required modules, which are listed in the
-package.json file. Simply run:
-
-   $ npm install
-
-If you are planning on extending bodega-server, then running the test suite will be a necessity and
-you will want to install the development dependencies as well:
-
-   $ npm install
-
 ## Quick Start
 
-   $ cd server
+To start the bodega server in testing mode, run:
+
    $ ./main.sh
 
 You can also start it directly with:
@@ -85,6 +81,8 @@ though that is generally not recommended. Using the main.sh: it is a future proo
 To start it in production mode, do:
 
     $ ./main.sh production
+
+This relies on the node.js "forever" package being installed.
 
 ## Updating
 
