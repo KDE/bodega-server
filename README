@@ -16,6 +16,18 @@ the main.sh file.
 
 All commands that follow are done relative to the server/ directory.
 
+## Configuration
+
+Copy the config.json.sample file to config.json and customize the values within it. The configuration
+keys should be self-explanatory, and if you do not use a given service (e.g. S3 or Stripe) you can
+safely ignore those blocks completely.
+
+Most (often, all) of the default settings should work.
+
+To adjust the type of content and rules for assets you can make adjustments to the definitions in
+server/assetRules.js as well as in the default dataset in sql/detaulData.sql. The latter must be
+done before running `make sql` or else be loaded by hand.
+
 ## Database setup
 
 * Start the redis daemon (e.g.: /etc/init.d/redis start)
@@ -24,11 +36,6 @@ All commands that follow are done relative to the server/ directory.
 * Ensure that the hstore postgresql extension is installed; this may be part of the postgres-contrib
   package of the OS.
 * Start the postgresql daemon (e.g.: /etc/init.d/postgresql start)
-* Create a postgresql user (e.g. bodega). It does not need to be a super user or be able to create
-  databases.
-* Run the setup.sh file in the sql directory as the postgres user. Note that it assumes the name of the
-  postgres user is bodega. If you use a different user name or database name, this script will need
-  to be tweaked.
 
 Note that if you are using an OS that uses systemd, you may not have init.d files. In which
 case you can start postgresql and redis like this:
@@ -37,6 +44,20 @@ case you can start postgresql and redis like this:
    $ systemctl start redis.service
 
 You can also ensure that these services are always started with `systemctl enable`
+
+* Next, create a bodega user in postgresql:
+
+   $ su postgres -c "createuser bodega"
+
+The 'bodega' user does not need to be a super user, able to create databases or modify roles.
+If you changed the service.database.user setting in config.json from "bodega", use that name
+in the above command rather than the default "bodega".
+
+* Finally, in the server/ directory, run the following command:
+
+   $ make sql
+
+and follow the directions on screen. Output should inform you of each step being processed.
 
 ## Node setup and module Installation
 
@@ -49,18 +70,6 @@ If you are planning on extending bodega-server, then running the test suite will
 you will want to install the development dependencies as well:
 
    $ npm install
-
-## Configuration
-
-Copy the config.json.sample file to config.json and customize the values within it. The configuration
-keys should be self-explanatory, and if you do not use a given service (e.g. S3 or Stripe) you can
-safely ignore those blocks completely.
-
-Most (often, all) of the default settings should work.
-
-To adjust the type of content and rules for assets you can make adjustments to the definitions in
-server/assetRules.js as well as in the default dataset in sql/detaulData.sql. The latter must be
-done before running `make sql` or else be loaded by hand.
 
 ## Quick Start
 
