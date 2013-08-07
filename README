@@ -7,14 +7,14 @@ The Bodega server requires the following software to be installed on the system 
 * Redis (used for user session data)
 * GraphicsMagick (used to manipulate images uploaded for icons, covers, previews, etc)
 
+The following optional packages may be installed for additional functionality:
+
+* Discourse, for participant feedback and discussion
+
 Server Setup
 ============
-This directory contians the content distribution server. It is based on node.js, postgresql and redis.
-
-Node modules are installed using npm from within the server directory and the server can be started with
-the main.sh file.
-
-All commands that follow are done relative to the server/ directory.
+All commands that follow are done relative to the server/ directory and the instructions should
+be followed in the order presented.
 
 ## Configuration
 
@@ -66,7 +66,23 @@ in the above command rather than the default "bodega".
 
 and follow the directions on screen. Output should inform you of each step being processed.
 
-## Quick Start
+## Optional: Discusssion module
+
+User feedback and discussion is provided using the Discourse server, which can be found here:
+
+    http://www.discourse.org/
+
+To support integration with Bodega, we maintain a patch set on top of Discourse on github.
+Start by cloning the discourse repository that contains these patches somewhere on disk:
+
+    git clone https://github.com/terietor/discourse.git
+
+(Preferably this should be separate from the bodega-server directory.)
+
+Change into the discourse directory, set it up and start discourse. Ensure that the settings in
+config.json for the discourse database are set correctly.
+
+## Starting the server
 
 To start the bodega server in testing mode, run:
 
