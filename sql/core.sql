@@ -375,3 +375,10 @@ create table easterEggs
     egg         text
 );
 
+-- drop table settings;
+create table settings
+(
+    key         text    primary key not null,
+    value       text
+);
+
