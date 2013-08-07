@@ -162,7 +162,7 @@ BEGIN
         EXCEPTION WHEN OTHERS THEN
         END;
         BEGIN
-            CREATE TRIGGER trg_ct_createUserInDiscourse AFTER UPDATE OR INSERT ON people
+            CREATE TRIGGER trg_ct_createUserInDiscourse AFTER UPDATE OF fullname, password, email OR INSERT ON people
             FOR EACH ROW EXECUTE PROCEDURE ct_createUserInDiscourse();
         EXCEPTION WHEN OTHERS THEN
         END;
