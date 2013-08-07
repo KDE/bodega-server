@@ -68,32 +68,28 @@ EXCEPTION WHEN OTHERS THEN
     RAISE WARNING 'Something is wrong with your discourse database, check if the database exists';
     RETURN NEW;
 END;
-$$ LANGUAGE 'plpgsql';
-
-DROP TRIGGER IF EXISTS trg_ct_createUserInDiscourse ON people;
-CREATE TRIGGER trg_ct_createUserInDiscourse AFTER UPDATE OR INSERT ON people
-FOR EACH ROW EXECUTE PROCEDURE ct_createUserInDiscourse();
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION ct_generateCategoryName(text) RETURNS TEXT AS $$
 DECLARE
 BEGIN
     RETURN 'Forum for ' || $1;
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION ct_generateCategoryDescription(text) RETURNS TEXT AS $$
 DECLARE
 BEGIN
     RETURN 'In this forum you can contact the author of ' || $1;
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION ct_generateTopicTitle(text) RETURNS TEXT AS $$
 DECLARE
 BEGIN
     RETURN 'In this forum you can contact the author of ' || $1;
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION ct_createForumInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
@@ -160,9 +156,25 @@ EXCEPTION WHEN OTHERS THEN
     RAISE WARNING 'Something is wrong with your discourse database, check if the database exists';
     RETURN NEW;
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trg_ct_createForumInDiscourse ON assets;
-CREATE TRIGGER trg_ct_createForumInDiscourse AFTER UPDATE OR INSERT ON assets
-FOR EACH ROW EXECUTE PROCEDURE ct_createForumInDiscourse();
+CREATE OR REPLACE FUNCTION ct_enableDiscourseIntegration(enable bool) RETURNS VOID AS $$
+BEGIN
+    IF enable THEN
+        BEGIN
+            CREATE TRIGGER trg_ct_createForumInDiscourse AFTER UPDATE OF name OR INSERT ON assets
+            FOR EACH ROW EXECUTE PROCEDURE ct_createForumInDiscourse();
+        EXCEPTION WHEN OTHERS THEN
+        END;
+        BEGIN
+            CREATE TRIGGER trg_ct_createUserInDiscourse AFTER UPDATE OR INSERT ON people
+            FOR EACH ROW EXECUTE PROCEDURE ct_createUserInDiscourse();
+        EXCEPTION WHEN OTHERS THEN
+        END;
+    ELSE
+        DROP TRIGGER IF EXISTS trg_ct_createUserInDiscourse ON people;
+        DROP TRIGGER IF EXISTS trg_ct_createForumInDiscourse ON assets;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
 
