@@ -7,6 +7,7 @@ var exec = require('child_process').exec;
 
 var psqlExec = "PGOPTIONS='--client-min-messages=warning' psql -q";
 //those are the files that we use for the setup of the database
+
 var sql_commands =
 [
     'core.sql',
@@ -23,7 +24,8 @@ var sql_commands =
     'purchasing.plsql',
     'payments_stripe.sql',
     'maintenance.plsql',
-    'defaultdata.sql'
+    'defaultdata.sql',
+    'discourse.plsql'
 ];
 
 var test_sql_commands = ['testdata.sql'];
