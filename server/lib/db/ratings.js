@@ -123,7 +123,7 @@ module.exports.addAssetRating = function(db, req, res) {
     var assetId = req.params.assetId;
     var ratings = req.body.ratings;
 
-    if (!assetId || !ratings) {
+    if (!assetId || !ratings || ratings.length < 1) {
         errors.report('MissingParameters', req, res);
         return;
     }
@@ -151,7 +151,6 @@ module.exports.addAssetRating = function(db, req, res) {
             jsToPgArray = jsToPgArray.concat('{', rating.rating, ', ', rating.attribute, '}');
         }
     }
-    //console.log(jsToPgArray)
     //close the array
     jsToPgArray = jsToPgArray.concat(' }');
 
