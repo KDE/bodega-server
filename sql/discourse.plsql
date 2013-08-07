@@ -1,7 +1,3 @@
--- CREATE LANGUAGE plpgsql;
-
-CREATE EXTENSION dblink;
-
 CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
     customUsername TEXT;

@@ -1,2 +1,4 @@
 CREATE LANGUAGE plpgsql;
 CREATE EXTENSION hstore;
+CREATE EXTENSION dblink;
+
