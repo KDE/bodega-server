@@ -135,11 +135,6 @@ BEGIN
                             VALUES ('''||NEW.id||''', '''||topicId||''', '''||categoryId||''');');
 
     ELSIF (TG_OP = 'UPDATE') THEN
-        IF NEW.name IS NULL THEN
-            PERFORM dblink_disconnect();
-            RETURN OLD;
-        END IF;
-
         PERFORM dblink_exec('UPDATE categories SET name = '''||ct_generateCategoryName(NEW.name)||''',
                             updated_at = '''||currentTime||''', description = '''||ct_generateCategoryDescription(NEW.name)||''',
                             slug = '''||ct_generateCategoryName(NEW.name)||''' FROM bodegaAssets ba WHERE ba.asset = '''||NEW.id||'''
