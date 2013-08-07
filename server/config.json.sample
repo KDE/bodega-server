@@ -35,6 +35,12 @@
                 "pass": "sample"
             }
         },
+        "discourse": {
+            "host": "",
+            "database": "",
+            "username": "",
+            "password": ""
+        },
         "email": "Name <returnaddress@example.org>"
     },
     "addresses": {
