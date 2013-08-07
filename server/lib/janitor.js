@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var db = require('../app.js');
+require('../app.js');
 var errors = require('./errors.js');
 
 var Janitor = (function() {
@@ -24,6 +24,46 @@ var Janitor = (function() {
 
     var dailyPeriod = 24 * 60 * 60 * 1000;
     var dailyRunning = false;
+
+    function oneTime()
+    {
+        // relay the disource settings from the config to the database
+        var config = app.config.service.discourse;
+        if (config.database &&
+            config.discourse !== '') {
+            var connectString = "dbname=" + config.database;
+
+            if (config.username && config.username !== '') {
+                connectString += " user=" + config.username;
+            }
+
+            if (config.password && config.password !== '') {
+                connectString += " password=" + config.password;
+            }
+
+            if (config.host && config.host !== '') {
+                connectString += " hostaddr=" + config.host;
+            }
+
+            app.db.dbQuery(function(client) {
+                client.query("select ct_createSetting('discourseConnectString', $1);", [connectString],
+                             function(err) {
+                                 if (err) {
+                                     errors.log(err);
+                                 }
+                             });
+            });
+        } else {
+            app.db.dbQuery(function(client) {
+                client.query("select ct_removeSetting('discourseConnectString');", [],
+                             function(err) {
+                                 if (err) {
+                                     errors.log(err);
+                                 }
+                             });
+            });
+        };
+    }
 
     function frequent()
     {
@@ -69,6 +109,7 @@ var Janitor = (function() {
 
     function Janitor()
     {
+        oneTime();
         frequent();
         daily();
     }
