@@ -15,7 +15,7 @@ BEGIN
         --trust_level := 0;
         currentTime := current_timestamp AT TIME ZONE 'UTC';
 
-        PERFORM dblink_connect('dbname=discourse_development');
+        PERFORM dblink_connect(ct_setting('discourseConnectString'));
 
         IF (TG_OP = 'INSERT') THEN
             customUsername := split_part(NEW.email, '@', 1);
@@ -102,7 +102,7 @@ BEGIN
     currentTime := current_timestamp AT TIME ZONE 'UTC';
     userId := 1; -- this is the root of discourse
 
-    PERFORM dblink_connect('dbname=discourse_development');
+    PERFORM dblink_connect(ct_setting('discourseConnectString'));
 
     IF (TG_OP = 'INSERT') THEN
         -- we will create forums only for the partners who have id >= 1000
