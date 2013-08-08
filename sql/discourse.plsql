@@ -12,7 +12,6 @@ DECLARE
     updateUsernameLower TEXT;
 BEGIN
     -- NOTE: the ''' are 3 single quotes
-    --trust_level := 0;
     currentTime := current_timestamp AT TIME ZONE 'UTC';
 
     PERFORM dblink_connect(ct_setting('discourseConnectString'));
