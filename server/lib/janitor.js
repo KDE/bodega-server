@@ -29,7 +29,8 @@ var Janitor = (function() {
     {
         // relay the disource settings from the config to the database
         var config = app.config.service.discourse;
-        if (config.database &&
+        if (config &&
+            config.database &&
             config.discourse !== '') {
             var connectString = "dbname=" + config.database;
 
