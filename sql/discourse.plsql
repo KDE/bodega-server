@@ -99,17 +99,17 @@ DECLARE
     topicId INT;
     someText TEXT;
 BEGIN
+    -- we will create forums only for the partners who have id >= 1000
+    IF (NEW.partner < 1000) THEN
+        RETURN NEW;
+    END IF;
+
     currentTime := current_timestamp AT TIME ZONE 'UTC';
     userId := 1; -- this is the root of discourse
 
     PERFORM dblink_connect(ct_setting('discourseConnectString'));
 
     IF (TG_OP = 'INSERT') THEN
-        -- we will create forums only for the partners who have id >= 1000
-        IF (NEW.partner < 1000) THEN
-            RETURN NEW;
-        END IF;
-
         SELECT INTO categoryId id FROM dblink('INSERT INTO categories (name, created_at, updated_at, description, user_id, slug)
                             VALUES ('''||ct_generateCategoryName(NEW.name)||''', '''||currentTime||''',
                             '''||currentTime||''', '''||ct_generateCategoryDescription(NEW.name)||''',
