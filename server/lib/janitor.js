@@ -31,7 +31,7 @@ var Janitor = (function() {
         var config = app.config.service.discourse;
         if (config &&
             config.database &&
-            config.discourse !== '') {
+            config.database !== '') {
             var connectString = "dbname=" + config.database;
 
             if (config.username && config.username !== '') {
