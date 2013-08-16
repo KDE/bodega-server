@@ -1,9 +1,8 @@
 CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
-    customUsername TEXT;
     trust_level INT;
     currentTime TIMESTAMP;
-    userNameLower TEXT;
+    username TEXT;
 
     updateFullname TEXT;
     updateUsername TEXT;
@@ -17,16 +16,16 @@ BEGIN
     PERFORM dblink_connect(ct_setting('discourseConnectString'));
 
     IF (TG_OP = 'INSERT') THEN
-        customUsername := split_part(NEW.email, '@', 1);
-        userNameLower := lower(customUsername);
+        username := lower(NEW.fullname);
+        username := regexp_replace(username, '[^a-z0-9]', '_', 'g');
         trust_level := 1;
 
         PERFORM dblink_exec('INSERT INTO users (name, username, email, password_hash,
                             created_at, updated_at, username_lower, trust_level)
-                            VALUES ('''||NEW.fullname||''', '''||customUsername||''',
+                            VALUES ('''||NEW.fullname||''', '''||username||''',
                             '''||NEW.email||''', '''||NEW.password||''',
                             '''||currentTime||''', '''||currentTime||''',
-                            '''||userNameLower||''', '''||trust_level||''');' );
+                            '''||username||''', '''||trust_level||''');' );
     ELSIF (TG_OP = 'UPDATE') THEN
         IF NEW.fullname IS NULL THEN
             updateFullname := OLD.fullname;
