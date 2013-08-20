@@ -247,13 +247,16 @@ app.get(serverPath('participant/deletePaymentMethod'),
     }
 );
 
-app.get(serverPath('participant/ratings'), isAuthorized,
+app.get(serverPath('participant/ratings/:assetId?'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
-            app.db.participantRatings(req, res);
+            if (req.params.assetId) {
+                app.db.assetParticipantRatings(req, res);
+            } else {
+                app.db.participantRatings(req, res);
+            }
         }
 );
-
 
 /************************************************
  * Asset management

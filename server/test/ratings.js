@@ -116,6 +116,23 @@ describe('Ratings', function() {
                     done();
                 });
         });
+
+        it('should show user\'s ratings for specific asset', function(done) {
+            //remove the ratings from Zack
+            utils.getUrl('participant/ratings/2',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property(
+                        'content-type',
+                        'application/json');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', true);
+                    var ratings = res.body.ratings;
+                    ratings.should.be.an.instanceOf(Array);
+                    ratings.should.have.length(1);
+                    done();
+                });
+        });
     });
 
     describe('Add asset ratings', function() {

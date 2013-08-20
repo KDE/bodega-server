@@ -247,6 +247,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbRatings.removeAssetRating, req, res);
     };
 
+    BodegaDb.prototype.assetParticipantRatings = function(req, res) {
+        this.dbQuery(dbRatings.assetParticipantRatings, req, res);
+    };
+
     BodegaDb.prototype.listTagTypes = function(req, res) {
         this.dbQuery(dbTags.listTypes, req, res);
     };

@@ -114,6 +114,30 @@ module.exports.participant = function(db, req, res) {
     });
 };
 
+module.exports.assetParticipantRatings = function(db, req, res) {
+    /*jshint multistr:true */
+    var ratingsQuery = 'SELECT attribute, rating FROM assetratings WHERE asset = $1 AND person = $2;';
+
+    var assetId = utils.parseNumber(req.params.assetId);
+    if (assetId < 0) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    db.query(
+        ratingsQuery, [assetId, req.session.user.id],
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+
+            var json = utils.standardJson(req);
+            json.ratings = result.rows;
+            res.json(json);
+    });
+};
+
 module.exports.addAssetRating = function(db, req, res) {
     /*jshint multistr:true */
     var assetInsertQuery =

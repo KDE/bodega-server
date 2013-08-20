@@ -1797,9 +1797,9 @@
             },
             {
                 "MethodName": "Ratings by participant",
-                "Synopsis": "The ratings of the participant",
+                "Synopsis": "The ratings of the participant, if the assetId exists it will show only the ratings for the specific asset",
                 "HTTPMethod": "GET",
-                "URI": "/participant/ratings",
+                "URI": "/participant/ratings/:assetId?",
                 "parameters": [
                     {
                         "Name": "pageSize",
@@ -1812,6 +1812,13 @@
                         "Name": "offset",
                         "Location": "query",
                         "Description": "The search result offset to start listing from",
+                        "Required": "N",
+                        "Type": "number"
+                    },
+                    {
+                        "Name": "assetId",
+                        "Location": "url",
+                        "Description": "The ratings of the participant for the specific asset",
                         "Required": "N",
                         "Type": "number"
                     }
