@@ -20,8 +20,9 @@ var errors = require('../errors.js');
 
 module.exports = function(db, req, res)
 {
+    var json;
     if (!Array.isArray(req.body.assets) || req.body.assets.length < 1) {
-        var json = utils.standardJson(req);
+        json = utils.standardJson(req);
         json.assets = [];
         res.json(json);
         return;
@@ -57,7 +58,7 @@ module.exports = function(db, req, res)
     });
 
     if (rows.length < 1) {
-        var json = utils.standardJson(req);
+        json = utils.standardJson(req);
         json.assets = [];
         res.json(json);
         return;
@@ -74,7 +75,7 @@ module.exports = function(db, req, res)
             return;
         }
 
-        var json = utils.standardJson(req);
+        json = utils.standardJson(req);
         json.assets = [];
         for (var i = 0; i < result.rowCount; ++i) {
             json.assets.push(result.rows[i].id);

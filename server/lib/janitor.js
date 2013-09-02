@@ -63,7 +63,7 @@ var Janitor = (function() {
                                  }
                              });
             });
-        };
+        }
     }
 
     function frequent()

@@ -135,7 +135,7 @@ module.exports.log = function(err)
         console.trace();
         console.warn('-- end --');
     }
-}
+};
 
 module.exports.report = function(type, req, res, err)
 {
