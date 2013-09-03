@@ -36,10 +36,11 @@
             }
         },
         "discourse": {
-            "host": "",
-            "database": "",
-            "username": "",
-            "password": ""
+            "host": "localhost",
+            "database": "discourse_development",
+            "username": "bodega",
+            "password": "bodega",
+            "externalUrl": ""
         },
         "email": "Name <returnaddress@example.org>"
     },

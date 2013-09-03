@@ -1,3 +1,9 @@
+create table discourseLinks
+(
+    assetId         int    not null references assets(id) on delete cascade,
+    categoryName    text   not null
+);
+
 CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
     trust_level INT;
@@ -132,6 +138,9 @@ BEGIN
         PERFORM dblink_exec('INSERT INTO bodegaAssets (asset, topic, category)
                             VALUES ('''||NEW.id||''', '''||topicId||''', '''||categoryId||''');');
 
+
+        INSERT INTO discourseLinks (assetId, categoryName) VALUES (NEW.id, ct_generateCategoryName(NEW.name));
+
     ELSIF (TG_OP = 'UPDATE') THEN
         PERFORM dblink_exec('UPDATE categories SET name = '''||ct_generateCategoryName(NEW.name)||''',
                             updated_at = '''||currentTime||''', description = '''||ct_generateCategoryDescription(NEW.name)||''',
@@ -140,6 +149,8 @@ BEGIN
 
         PERFORM dblink_exec('UPDATE topics SET title = '''||ct_generateTopicTitle(NEW.name)||''', updated_at = '''||currentTime||'''
                         FROM bodegaAssets ba WHERE ba.asset = '''||NEW.id||''' AND ba.topic = id;');
+
+    UPDATE discourseLinks SET categoryName = ct_generateCategoryName(NEW.name) WHERE assetId = NEW.id;
 
     END IF;
     PERFORM dblink_disconnect();

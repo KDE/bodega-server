@@ -19,6 +19,24 @@ var utils = require('../utils.js');
 var errors = require('../errors.js');
 var createUtils = require('./createutils.js');
 var async = require('async');
+var url = require('url');
+
+function findForum(db, req, res, assetInfo, cb)
+{
+    var discourseQuery = 'SELECT categoryName FROM discourseLinks WHERE assetId = $1;';
+    db.query(discourseQuery, [req.params.assetId], function(err, result) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        assetInfo.json.asset.forum = '';
+        if (result && result.rows.length > 0) {
+            assetInfo.json.asset.forum =  app.config.service.discourse.externalUrl + 'category/'+ url.format(result.rows[0].categoryname);
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+}
 
 function findChangeLog(db, req, res, assetInfo, cb)
 {
@@ -253,6 +271,7 @@ module.exports = function(db, req, res) {
 
     funcs.push(findAsset);
     funcs.push(findTags);
+    funcs.push(findForum);
     if (req.query.previews) {
         funcs.push(findPreviews);
     }
