@@ -335,9 +335,102 @@ function approveAsset(db, req, res, assetInfo)
     });
 }
 
+function findPublisher(db, req, res, assetInfo, cb)
+{
+    var query = "select p.supportemail,ia.name from partners p inner join incomingassets ia on p.id=ia.partner where ia.id=$1;";
+    var e;
+
+    db.query(query, [assetInfo.id], function(err, result) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        assetInfo.name = result.rows[0].name;
+        assetInfo.supportEmail = result.rows[0].supportemail;
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+function sendRejectionEmail(db, req, res, assetInfo, cb)
+{
+    var template =
+'Make·Play·Live rejection notice.\n\
+ \n\
+ Asset: \'#{assetname}\' (id=#{assetid}).\n\
+ \n\
+ Rejection notice: \n\
+ #{reason}\n\
+ \n\
+ If you would like to dispute this rejection please email us at #{serviceemail}.\n\
+ \n\
+ Thank You,\n \
+ Make·Play·Live Team\n';
+    var opts = {
+        from: app.config.service.email,
+        to: assetInfo.supportEmail,
+        bcc: app.config.service.email,
+        subject: "Make·Play·Live rejection notice"
+    };
+
+    opts.text = template.replace('#{assetname}', assetInfo.name);
+    opts.text = opts.text.replace('#{assetid}', assetInfo.id);
+    opts.text = opts.text.replace('#{reason}', assetInfo.rejectionReason);
+    opts.text = opts.text.replace('#{serviceemail}', app.config.service.email);
+
+    utils.sendEmail(opts, function(err) {
+        cb(err, db, req, res, assetInfo);
+    });
+}
+
+function unpostAsset(db, req, res, assetInfo, cb)
+{
+    var query = 'UPDATE incomingAssets set posted=false where id=$1;';
+
+    //console.log(args);
+    //console.log("Query is : ");
+    //console.log(query);
+
+    db.query(query, [assetInfo.id], function(err, result) {
+        var e;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
 function rejectAsset(db, req, res, assetInfo)
 {
+    var funcs = [];
+    var reason = req.query.reason;
 
+    if (!reason) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    assetInfo.rejectionReason = reason;
+    funcs.push(function(cb) {
+        cb(null, db, req, res, assetInfo);
+    });
+
+    // find publishers email
+    funcs.push(findPublisher);
+    // inform other admins about rejection
+    funcs.push(sendRejectionEmail);
+    // remove the posted flag
+    funcs.push(unpostAsset);
+
+    async.waterfall(funcs, function(err, assetInfo) {
+        if (err) {
+            errors.report(err.name, req, res, err);
+            return;
+        }
+        sendResponse(db, req, res, assetInfo);
+    });
 }
 
 module.exports = function(db, req, res) {

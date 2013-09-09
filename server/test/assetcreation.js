@@ -367,13 +367,62 @@ describe('Asset manipulation', function(){
         });
     });
     describe('Publishing', function(){
+        var extraPostedAsset;
+        before(function(done){
+            postFiles('asset/create',
+                    [{
+                        "name" : "info",
+                        "filename" : "sampleasset/sample-info.json"
+                    }, {
+                        "name" : "asset",
+                        "filename" : "sampleasset/sample.pdf"
+                    },{
+                        "name" : "sample-0.png",
+                        "filename" : "sampleasset/sample-0.png"
+                    },{
+                        "name" : "sample-1.png",
+                        "filename" : "sampleasset/sample-1.png"
+                    },{
+                        "name" : "cover.jpg",
+                        "filename" : "sampleasset/cover.jpg"
+                    }],
+                      function(res) {
+                          var assetId;
+                          res.body.should.have.property('authStatus', true);
+                          res.body.should.not.have.property('error');
+                          res.body.should.have.property('asset');
+                          res.body.asset.should.have.property('id');
+                          res.body.asset.should.have.property('name');
+                          assetId = res.body.asset.id;
+                          utils.postUrl('asset/post/' + assetId, null,
+                                        function(res) {
+                                            res.body.should.have.property('authStatus', true);
+                                            res.body.should.not.have.property('error');
+                                            extraPostedAsset = assetId;
+                                            cleanupAssets.push(extraPostedAsset);
+                                            done();
+                                        });
+                      });
+        });
         after(function(done){
             var addr = utils.dbConnectionString;
+            var num = 0;
             pg.connect(addr, function(err, client, finis) {
                 client.query("delete from assets where id = $1", [completeAssetId],
                              function() {
-                                 finis();
-                                 done();
+                                 ++num;
+                                 if (num === 2) {
+                                     finis();
+                                     done();
+                                 }
+                             });
+                client.query("delete from assets where id = $1", [extraPostedAsset],
+                             function() {
+                                 ++num;
+                                 if (num === 2) {
+                                     finis();
+                                     done();
+                                 }
                              });
             });
         });
@@ -387,6 +436,32 @@ describe('Asset manipulation', function(){
         });
         it('should work with a posted asset', function(done){
             utils.postUrl('asset/publish/' + completeAssetId + "?approve=1", null,
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    done();
+                });
+        });
+        it('shouldnt allow rejecting without a reason', function(done){
+            utils.postUrl('asset/publish/' + extraPostedAsset + "?reject=1", null,
+                 function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'MissingParameters');
+                    done();
+                });
+        });
+        it('shouldnt be able to reject a published asset', function(done){
+            utils.postUrl('asset/publish/' + completeAssetId + "?reject=1&reason=hello", null,
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'AssetMissing');
+                    done();
+                });
+        });
+        it('should be able to reject a posted asset', function(done){
+            utils.postUrl('asset/publish/' + extraPostedAsset + "?reject=1&reason=hello", null,
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');

@@ -183,13 +183,13 @@ function generateIcons(db, req, res, assetInfo, cb)
 
 function setPosted(db, req, res, assetInfo, cb)
 {
-    var query = 'UPDATE incomingAssets set posted=true;';
+    var query = 'UPDATE incomingAssets set posted=true where id=$1;';
 
     //console.log(args);
     //console.log("Query is : ");
     //console.log(query);
 
-    db.query(query, [], function(err, result) {
+    db.query(query, [assetInfo.id], function(err, result) {
         var e;
         if (err) {
             e = errors.create('Database', err.message);

@@ -144,7 +144,7 @@ module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
             if (err) {
                 deleteUser(db, userId);
                 errors.report('Database', req, res, err);
-                return false;
+                return;
             }
 
             var confirmationCode = result.rows[0].activationcode;
@@ -162,11 +162,10 @@ module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
                         deleteUser(db, userId);
                         errors.report('MailerFailure', req, res, error);
                         transport.close();
-                        return false;
+                        return;
                     }
 
-                    json.message =
-                        "Confirmation email sent!";
+                    json.message = "Confirmation email sent!";
                     //console.log("Message sent!");
                     res.json(json);
                     transport.close(); // lets shut down the connection pool
@@ -235,7 +234,7 @@ module.exports.partnerId = function(db, req, res, cb, role)
                 function(err, result) {
                     if (err || !result.rows || result.rows.length === 0) {
                         errors.report('StorePartnerInvalid', req, res, err);
-                        return -1;
+                        return;
                     }
 
                     cb(result.rows[0].partner, db, req, res);
@@ -356,3 +355,26 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
     );
 };
 
+/* XXX: switch all email sending to node-email-templates */
+module.exports.sendEmail = function(opts, cb)
+{
+    var transport = nodemailer.createTransport("SMTP", app.config.service.smtp);
+
+    var mailOptions = {
+        transport: transport, // transport method to use
+        from: opts.from,
+        to: opts.to, // list of receivers
+        bcc: opts.bcc,
+        subject: opts.subject,
+        text: opts.text,
+        html: opts.html
+    };
+
+    if (app.production) {
+        transport.sendMail(mailOptions, function(error, responseStatus) {
+            cb(error);
+        });
+    } else {
+        cb();
+    }
+};
