@@ -39,6 +39,7 @@ describe('Asset info', function(){
                     res.body.asset.should.have.property('image');
                     res.body.asset.should.have.property('name');
                     res.body.asset.should.have.property('description');
+                    res.body.asset.should.have.property('size');
                     res.body.asset.should.have.property('points');
                     res.body.asset.should.have.property('canDownload');
                     done();
