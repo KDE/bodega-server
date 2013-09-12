@@ -43,8 +43,15 @@ function associateTag(db, req, res, assetInfo, tagInfo, cb)
 
 module.exports.setupTags = function(db, req, res, assetInfo, fn)
 {
-    if (!Array.isArray(assetInfo.tags) ||  assetInfo.tags.length < 1) {
-        //FIXME: should delete all tags
+    var deleteSql = "delete from incomingAssetTags where asset = $2 and tag in \
+                     (select at.tag from assettags at left join tags t on \
+                     (at.tag = t.id and (t.partner = $1 or t.partner is null)) where at.asset = $2)";
+
+    if (!Array.isArray(assetInfo.tags) || assetInfo.tags.length < 1) {
+        db.query(deleteSql, [ assetInfo.partner, assetInfo.id ],
+                 function(err) {
+                     fn(err, db, req, res, assetInfo);
+                 });
         return;
     }
 
@@ -81,7 +88,14 @@ module.exports.setupTags = function(db, req, res, assetInfo, fn)
         params.push(tag.title);
     });
 
-    //FIXME: check that params has anything in it
+    if (params.length < 1) {
+        db.query(deleteSql, [ assetInfo.partner, assetInfo.id ],
+                 function(err) {
+                     fn(err, db, req, res, assetInfo);
+                 });
+        return;
+    }
+
     var createMissingSql = "insert into tags (type, title, partner) \
                             select tt.id, pm.author, $1::int from (select *, $1::int from (values " +
                             tagValueList.join(', ') + ") as tmp \
@@ -91,9 +105,6 @@ module.exports.setupTags = function(db, req, res, assetInfo, fn)
                             ") and (t.partner is null or t.partner = $1)) as pm (type, author, asset) \
                              left join tagtypes tt on (tt.type = pm.type)";
 
-
-    // at this point we are guaranteed to have all the tags we need in the database
-    // well, assuming nobody has deleted them on us between the previous query and this one :/
 
     /* so now we insert the appropriate tags into the table; we want to use tags owned by the partner
        over global tags. we do this using another monster query.
@@ -110,10 +121,6 @@ module.exports.setupTags = function(db, req, res, assetInfo, fn)
                                      and (t.partner = 1002  or t.partner is null)
                                      and finder.type = t.type and finder.title = t.title);
     */
-    var deleteSql = "delete from incomingAssetTags where asset = $2 and tag in \
-                     (select at.tag from assettags at left join tags t on \
-                     (at.tag = t.id and (t.partner = $1 or t.partner is null)) where at.asset = $2)";
-
     var insertSql = "insert into incomingAssetTags (asset, tag) select $" +
                      (params.length + 1) +
                      ", t.id from (select max(partner) as partner, tags.type, title from tags \
