@@ -85,10 +85,20 @@ module.exports.asset = function(db, req, res) {
 };
 
 module.exports.participant = function(db, req, res) {
+    // this query gets the first N *assets* and all their ratings, sorted by most recent
+    // in case two assets were rated at the same time, they are sorted (for stability) by asset id
+    // in case a rating was edited (causing 1 asset to have multiple rating dates) the sorting is done by
+    // the most recent edit
     /*jshint multistr:true */
-    var ratingsQuery = 'SELECT r.asset, r.attribute, r.rating, extract(epoch from created) \
-                        FROM assetRatings r WHERE r.person = $1 \
-                        ORDER BY r.created desc, r.asset LIMIT $2 OFFSET $3;';
+    var ratingsQuery = 'SELECT a.name as assetname, a.version, a.description,\
+                               r.asset as assetId, r.attribute, ara.name as attributename,\
+                               r.rating, extract(epoch from r.created) as created\
+                        FROM assetRatings r JOIN\
+                           assetRatingAttributes ara ON (r.attribute = ara.id) JOIN\
+                           assets a ON (r.asset = a.id) JOIN\
+                           (SELECT asset, max(at.created) AS created FROM assetratings at WHERE person = $1\
+                            GROUP BY asset ORDER BY created desc, asset  LIMIT $2 OFFSET $3) AS assets on (r.asset = assets.asset)\
+                        WHERE person = $1 ORDER BY r.created desc, r.asset, r.attribute;'
 
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
@@ -105,11 +115,39 @@ module.exports.participant = function(db, req, res) {
                 return;
             }
 
-            if (result.rows.length > pageSize) {
+            if (result.rowsCount > pageSize) {
                 json.hasMoreRatings = true;
                 result.rows.pop();
             }
-            json.ratings = result.rows;
+
+            json.ratings = [];
+
+            // now we're going to batch up the results nicely into an array of asset objects
+            var currentAsset;
+            var asset = {};
+            for (var i = 0; i < result.rowCount; ++i) {
+                var row = result.rows[i];
+                if (currentAsset !== row.assetid) {
+                    if (i > 0) {
+                        // add the asset to the ratings
+                        json.ratings.push(asset);
+                    }
+
+                    currentAsset = row.assetid;
+                    asset = {
+                        asset: row.assetid,
+                        name: row.assetname,
+                        version: row.version,
+                        description: row.description,
+                        rated: row.created,
+                        ratings: []
+                    };
+                }
+
+                asset.ratings.push({attribute: row.attribute, name: row.attributename, rating: row.rating });
+            }
+
+            json.ratings.push(asset);
             res.json(json);
     });
 };

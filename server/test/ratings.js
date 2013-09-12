@@ -101,7 +101,51 @@ describe('Ratings', function() {
 
     describe('Ratings by participant', function() {
         it('should show Zack having 3 ratings', function(done) {
-            //remove the ratings from Zack
+            var expected = 
+                [
+                    {
+                        "asset": 2,
+                        "name": "Aquarium",
+                        "version": "0.2",
+                        "description": "Grow an aqarium full of fish!",
+                        "rated": 1375966634.14727,
+                        "ratings": [
+                            {
+                                "attribute": 5,
+                                "name": "perfomance",
+                                "rating": 1
+                            }
+                        ]
+                    },
+                    {
+                        "asset": 8,
+                        "name": "Poker1",
+                        "version": "0.1",
+                        "description": "Poker 1",
+                        "rated": 1375966634.14727,
+                        "ratings": [
+                            {
+                                "attribute": 2,
+                                "name": "Usability",
+                                "rating": 5
+                            }
+                        ]
+                    },
+                    {
+                        "asset": 9,
+                        "name": "Poker2",
+                        "version": "0.2",
+                        "description": "Poker 2",
+                        "rated": 1375966634.14727,
+                        "ratings": [
+                            {
+                                "attribute": 3,
+                                "name": "funny",
+                                "rating": 3
+                            }
+                        ]
+                    }
+                ]
             utils.getUrl('participant/ratings',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -113,6 +157,7 @@ describe('Ratings', function() {
                     var ratings = res.body.ratings;
                     ratings.should.be.an.instanceOf(Array);
                     ratings.should.have.length(3);
+                    ratings.should.eql(expected);
                     done();
                 });
         });
