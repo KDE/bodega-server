@@ -109,76 +109,21 @@ function deleteUser(db, userId)
 
 module.exports.deleteUser = deleteUser;
 
-module.exports.sendConfirmationEmail = function(db, req, res, userId, userEmail)
+module.exports.queueAccountActivationMessage = function(db, req, res, userId)
 {
-    //XXX: replace with jade and html emails
-    var template =
-'Welcome to Make·Play·Live, \n\
- \n\
- To start using your Make·Play·Live account please confirm your email address\n\
- by clicking on the following link:\n \
- \n\
- http://#{host}#{prefix}register/confirm?code=#{code}&email=#{email}&id=#{userId}\n \
- \n\
- Thank You,\n \
- Make·Play·Live Team\n';
-    var transport = nodemailer.createTransport("SMTP", app.config.service.smtp);
+    db.query("INSERT INTO emailQueue (recipient, template) VALUES ($1, 'participant_accountActivation')",
+             [userId],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                     return;
+                 }
 
-    var mailOptions = {
-        transport: transport, // transport method to use
-        from: app.config.service.email,
-        to: userEmail, // list of receivers
-        subject: "Activate your new account"
-    };
-
-    var query =
-        'select ct_createAccountActivationCode($1) as activationcode;';
-
-    db.query(
-        query, [userId],
-        function(err, result) {
-            var text;
-            var json = {
-                userId: userId
-            };
-            if (err) {
-                deleteUser(db, userId);
-                errors.report('Database', req, res, err);
-                return;
-            }
-
-            var confirmationCode = result.rows[0].activationcode;
-            text = template.replace('#{code}', confirmationCode);
-            text = text.replace('#{email}', userEmail);
-            text = text.replace('#{userId}', userId);
-            text = text.replace('#{host}', req.headers.host);
-            text = text.replace('#{prefix}', app.config.prefix);
-            mailOptions.text = text;
-
-            if (app.production) {
-                nodemailer.sendMail(mailOptions, function(error) {
-                    var json = {};
-                    if (error) {
-                        deleteUser(db, userId);
-                        errors.report('MailerFailure', req, res, error);
-                        transport.close();
-                        return;
-                    }
-
-                    json.message = "Confirmation email sent!";
-                    //console.log("Message sent!");
-                    res.json(json);
-                    transport.close(); // lets shut down the connection pool
-                });
-            } else {
-                json.confirmationCode = confirmationCode;
-                json.text = text;
-                res.json(json);
-                //console.log(text);
-            }
-        }
-    );
-    return true;
+                 var json = { userId: userId,
+                              message: "Confirmation email sent!"
+                            };
+                 res.json(json);
+             });
 };
 
 module.exports.authStore = function(req)
@@ -355,26 +300,3 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
     );
 };
 
-/* XXX: switch all email sending to node-email-templates */
-module.exports.sendEmail = function(opts, cb)
-{
-    var transport = nodemailer.createTransport("SMTP", app.config.service.smtp);
-
-    var mailOptions = {
-        transport: transport, // transport method to use
-        from: opts.from,
-        to: opts.to, // list of receivers
-        bcc: opts.bcc,
-        subject: opts.subject,
-        text: opts.text,
-        html: opts.html
-    };
-
-    if (app.production) {
-        transport.sendMail(mailOptions, function(error, responseStatus) {
-            cb(error);
-        });
-    } else {
-        cb();
-    }
-};
