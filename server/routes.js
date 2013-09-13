@@ -612,8 +612,8 @@ app.get('/api(/?*)', function(req, res) {
     fs.readFile(filePath, 'utf8', function(err, data) {
         if (err) {
             res.render('404.jade', {
-                storeName: app.config.warehouseInfo.name,
-                storeUrl: app.config.warehouseInfo.url
+                name: app.config.warehouseInfo.name,
+                url: app.config.warehouseInfo.url
             });
         } else if (filePath.substr(filePath.length - suffix.length) === suffix) {
             res.send(markdown(data));
@@ -624,10 +624,10 @@ app.get('/api(/?*)', function(req, res) {
 });
 
 //NOTE: Always has to be the last route
-app.get('/', function(req, res) {
+app.all('/', function(req, res) {
     res.render('index.jade', {
-        storeName: app.config.warehouseInfo.name,
-        storeUrl: app.config.warehouseInfo.url
+        name: app.config.warehouseInfo.name,
+        url: app.config.warehouseInfo.url
     });
 });
 

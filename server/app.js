@@ -81,8 +81,8 @@ app.set('trust proxy', app.config.behindProxy);
 app.use(express.favicon("public/favicon.ico")); 
 app.use(function(req, res, next) {
     res.render('404.jade', {
-        storeName: app.config.warehouseInfo.name,
-        storeUrl: app.config.warehouseInfo.url
+        name: app.config.warehouseInfo.name,
+        url: app.config.warehouseInfo.url
     });
 });
 
