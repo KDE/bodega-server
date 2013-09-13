@@ -108,7 +108,6 @@ describe('Ratings', function() {
                         "name": "Aquarium",
                         "version": "0.2",
                         "description": "Grow an aqarium full of fish!",
-                        "rated": 1375966634.14727,
                         "ratings": [
                             {
                                 "attribute": 5,
@@ -122,7 +121,6 @@ describe('Ratings', function() {
                         "name": "Poker1",
                         "version": "0.1",
                         "description": "Poker 1",
-                        "rated": 1375966634.14727,
                         "ratings": [
                             {
                                 "attribute": 2,
@@ -136,7 +134,6 @@ describe('Ratings', function() {
                         "name": "Poker2",
                         "version": "0.2",
                         "description": "Poker 2",
-                        "rated": 1375966634.14727,
                         "ratings": [
                             {
                                 "attribute": 3,
@@ -157,6 +154,12 @@ describe('Ratings', function() {
                     var ratings = res.body.ratings;
                     ratings.should.be.an.instanceOf(Array);
                     ratings.should.have.length(3);
+                    // the timestamp of the rating is set on creation,
+                    // iow when `make test_data` is run. so we manually
+                    // sync the timestamps as they are untestable
+                    expected[0].rated = ratings[0].rated;
+                    expected[1].rated = ratings[1].rated;
+                    expected[2].rated = ratings[2].rated;
                     ratings.should.eql(expected);
                     done();
                 });
