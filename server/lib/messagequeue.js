@@ -39,7 +39,7 @@ var MessageQueue = (function() {
             try {
                 // since we can have no recipient in some cases (the email may be in the hstore data)
                 // we do a check here for whether or not we have a valid person only when we have a recipient
-                if (task.data.recipient && !task.data.email) {
+                if (task.recipient && !task.email) {
                     cb();
                     return;
                 }
