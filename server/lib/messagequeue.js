@@ -24,7 +24,7 @@ var MessageQueue = (function() {
     var processDelay = app.production ? 5000 : 100;
     var processChunkSize = 10;
     var emailsPending = false;
-    var emailQueueQuery = 'select q.process, q.recipient, p.email, p.fullname, hstore_to_matrix(q.data) as data, q.template from emailQueue q join people p on (q.recipient = p.id) where process = $1';
+    var emailQueueQuery = 'select q.process, q.recipient, p.email, p.fullname, hstore_to_matrix(q.data) as data, q.template from emailQueue q left join people p on (q.recipient = p.id) where process = $1';
 
     function processEmailRequests(err, res)
     {
@@ -37,6 +37,13 @@ var MessageQueue = (function() {
 
         var queue = async.queue(function(task, cb) {
             try {
+                // since we can have no recipient in some cases (the email may be in the hstore data)
+                // we do a check here for whether or not we have a valid person only when we have a recipient
+                if (task.data.recipient && !task.data.email) {
+                    cb();
+                    return;
+                }
+
                 var template = require('./messengers/' + task.template);
                 try {
                     var assoc = {};
