@@ -55,7 +55,7 @@ function createUser(db, req, res, args)
                         return;
                     }
                     args.userId = result.rows[0].id;
-                    utils.sendConfirmationEmail(db, req, res, args.userId, args.email);
+                    utils.queueAccountActivationMessage(db, req, res, args.userId);
                 }
             );
         });
@@ -64,11 +64,9 @@ function createUser(db, req, res, args)
 
 function findUser(db, req, res, args)
 {
-    var findQuery =
-        'SELECT id, active FROM people WHERE email=$1;';
 
     db.query(
-        findQuery,
+        'SELECT id, active FROM people WHERE email = $1;',
         [args.email],
         function(err, result) {
             if (err) {
@@ -81,10 +79,7 @@ function findUser(db, req, res, args)
                     return;
                 }
                 args.userId = result.rows[0].id;
-                var sendConfirmationEmailResult = utils.sendConfirmationEmail(db, req, res, args.userId, args.email);
-                if (!sendConfirmationEmailResult) {
-                    utils.deleteUser(db, args.userId);
-                }
+                utils.queueAccountActivationMessage(db, req, res, args.userId);
             } else {
                 createUser(db, req, res, args);
             }
