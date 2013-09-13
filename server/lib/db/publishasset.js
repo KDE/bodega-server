@@ -354,33 +354,16 @@ function findPublisher(db, req, res, assetInfo, cb)
 
 function sendRejectionEmail(db, req, res, assetInfo, cb)
 {
-    var template =
-'Make·Play·Live rejection notice.\n\
- \n\
- Asset: \'#{assetname}\' (id=#{assetid}).\n\
- \n\
- Rejection notice: \n\
- #{reason}\n\
- \n\
- If you would like to dispute this rejection please email us at #{serviceemail}.\n\
- \n\
- Thank You,\n \
- Make·Play·Live Team\n';
-    var opts = {
-        from: app.config.service.email,
-        to: assetInfo.supportEmail,
-        bcc: app.config.service.email,
-        subject: "Make·Play·Live rejection notice"
-    };
+    db.query("INSERT INTO emailQueue (recipient, data, template) \
+              VALUES ($1, hstore(Array[['assetid', $2], ['assetname', $3], ['reason', $4]]), 'partner_distributor_assetRejection')",
+             [userId, assetInfo.id, assetInfo.name, assetInfo.rejectionReason],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                 }
 
-    opts.text = template.replace('#{assetname}', assetInfo.name);
-    opts.text = opts.text.replace('#{assetid}', assetInfo.id);
-    opts.text = opts.text.replace('#{reason}', assetInfo.rejectionReason);
-    opts.text = opts.text.replace('#{serviceemail}', app.config.service.email);
-
-    utils.sendEmail(opts, function(err) {
-        cb(err, db, req, res, assetInfo);
-    });
+                 cb(err, db, req, res, assetInfo);
+             });
 }
 
 function unpostAsset(db, req, res, assetInfo, cb)

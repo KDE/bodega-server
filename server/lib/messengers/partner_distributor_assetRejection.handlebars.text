@@ -1,0 +1,12 @@
+{{warehouse}} rejection notice.
+
+Your request for publication of '{{data.assetname}}' (id={{data.assetid}}) was rejected for the following reason:
+
+     {{data.reason}}
+
+If you would like to dispute this rejection please email us at {{serviceemail}}. Otherwise, you may correct the issue with the asset and re-submit it for approval.
+
+Thank You,
+
+The {{warehouse}} Team
+
