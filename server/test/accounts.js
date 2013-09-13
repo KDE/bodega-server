@@ -31,13 +31,20 @@ describe('Create user', function() {
                     'content-type',
                     'application/json');
                 res.body.should.have.property('userId');
-                res.body.should.have.property('confirmationCode');
                 userInfo = {
                     'email' : 'kok3rs@gmail.com',
                     'id' : res.body.userId,
-                    'code': res.body.confirmationCode
                 };
-                done();
+
+                pg.connect(utils.dbConnectionString, function(err, client, finis) {
+                    client.query("select ct_createAccountActivationCode($1) as activationcode;",
+                                 [res.body.userId],
+                                 function(err, res) {
+                                     userInfo.code = res.rows[0].activationcode;
+                                     finis();
+                                     done();
+                                 });
+                    });
             },
             { noAuth: true });
     });
