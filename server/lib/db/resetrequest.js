@@ -17,95 +17,20 @@
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
-var nodemailer = require('nodemailer');
 
-
-function sendResetEmail(db, req, res, args)
-{
-    //XXX: replace with jade and html emails
-    var template =
-'Password reset for Make·Play·Live, \n\
- \n\
- In order to reset your password visit the following link:\n\
- \n\
- http://#{host}#{prefix}participant/resetPassword?code=#{code}&id=#{userId}&email=#{userEmail}\n \
- \n\
- The request came from #{address}.\n\
- \n\
- Thank You,\n \
- Make·Play·Live Team\n';
-    var transport = nodemailer.createTransport("SMTP", app.config.service.smtp);
-
-    var mailOptions = {
-        transport: transport, // transport method to use
-        from: app.config.service.email,
-        to: args.email, // list of receivers
-        subject: "Reset your password" // Subject line
+module.exports = function(db, req, res) {
+    var args = {
+        email  : req.query.email
     };
 
-    var query =
-        'select ct_createPasswordResetCode($1) as resetcode;';
+    if (!args.email) {
+        //"Email address can not be empty.",
+        errors.report('MissingParameters', req, res);
+        return;
+    }
 
     db.query(
-        query, [args.userId],
-        function(err, result) {
-            var text;
-            var json = {
-                userId: args.userId
-            };
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-
-            var resetCode = result.rows[0].resetcode;
-            text = template.replace('#{code}', resetCode);
-            text = text.replace('#{userId}', args.userId);
-            text = text.replace('#{userEmail}', args.email);
-            text = text.replace('#{host}', req.headers.host);
-            text = text.replace('#{prefix}', app.config.prefix);
-            var clientIp;
-            if(req.headers['x-forwarded-for']){
-                clientIp = req.headers['x-forwarded-for'];
-            }
-            else {
-                clientIp = req.connection.remoteAddress;
-            }
-            text = text.replace('#{address}', clientIp);
-            mailOptions.text = text;
-
-            if (app.production) {
-                nodemailer.sendMail(mailOptions, function(error) {
-                    var json = {};
-                    if (error) {
-                        errors.report('MailerFailure', req, res, error);
-                        transport.close();
-                        return;
-                    }
-
-                    json.message = "Password reset email sent!";
-                    //console.log("Message sent!");
-                    res.json(json);
-                    transport.close(); // lets shut down the connection pool
-                });
-            } else {
-                json.resetCode = resetCode;
-                json.text = text;
-                res.json(json);
-                console.log(text);
-            }
-        }
-    );
-}
-
-
-function findUser(db, req, res, args)
-{
-    var findQuery =
-        'SELECT id, active FROM people WHERE email=$1;';
-
-    db.query(
-        findQuery,
+        'SELECT id, active FROM people WHERE email = $1;',
         [args.email],
         function(err, result) {
             if (err) {
@@ -123,24 +48,28 @@ function findUser(db, req, res, args)
                 errors.report('AccountInactive', req, res);
                 return;
             }
-            args.userId = result.rows[0].id;
-            sendResetEmail(db, req, res, args);
+
+            var clientIp;
+            if (req.headers['x-forwarded-for']) {
+                clientIp = req.headers['x-forwarded-for'];
+            } else {
+                clientIp = req.connection.remoteAddress;
+            }
+
+            // queue up a message
+            db.query("INSERT INTO emailQueue (recipient, data, template) \
+                     VALUES ($1, hstore(Array[['requestAddress', $2]]), 'participant_passwordReset')",
+                     [ result.rows[0].id, clientIp ],
+                     function(err, result) {
+                        if (err) {
+                            errors.report('Database', req, res, err);
+                            return;
+                        }
+
+                        var json = {};
+                        json.message = "Password reset email sent!";
+                        res.json(json);
+                    });
         }
     );
-}
-
-
-
-module.exports = function(db, req, res) {
-    var args = {
-        email  : req.query.email
-    };
-
-    if (!args.email) {
-        //"Email address can not be empty.",
-        errors.report('MissingParameters', req, res);
-        return;
-    }
-
-    findUser(db, req, res, args);
 };
