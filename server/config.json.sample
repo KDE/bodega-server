@@ -1,14 +1,15 @@
 {
     "host": "localhost",
     "port": 3000,
+    "prefix": "/bodega/v1/json/",
+    "externalBaseUrl": "https://example.org:3000",
     "pointConversionRate": 100,
     "cookieSecret": "love cookies",
-    "prefix": "/bodega/v1/json/",
     "behindProxy": false,
     "warehouseInfo": {
         "name": "My Warehouse",
         "description": "Warehouse description",
-        "url": "http://example.org",
+        "url": "https://example.org",
         "contact": "foo@example.gr"
     },
     "anonAccess": {
