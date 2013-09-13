@@ -9,7 +9,8 @@ module.exports.sendEmail = function(transport, db, record, cb)
    var mailOptions = {
        transport: transport,
        from: app.config.service.email,
-       to: record.email
+       to: record.data.email,
+       bcc: app.config.service.email,
        subject: app.config.warehouseInfo.name + " rejection notice"
    };
 

@@ -354,9 +354,9 @@ function findPublisher(db, req, res, assetInfo, cb)
 
 function sendRejectionEmail(db, req, res, assetInfo, cb)
 {
-    db.query("INSERT INTO emailQueue (recipient, data, template) \
-              VALUES ($1, hstore(Array[['assetid', $2], ['assetname', $3], ['reason', $4]]), 'partner_distributor_assetRejection')",
-             [userId, assetInfo.id, assetInfo.name, assetInfo.rejectionReason],
+    db.query("INSERT INTO emailQueue (data, template) \
+              VALUES (hstore(Array[['assetid', $1], ['assetname', $2], ['reason', $3], ['email', $4]]), 'partner_distributor_assetRejection')",
+             [assetInfo.id, assetInfo.name, assetInfo.rejectionReason, assetInfo.supportemail],
              function(err, result) {
                  if (err) {
                      errors.report('Database', req, res, err);
