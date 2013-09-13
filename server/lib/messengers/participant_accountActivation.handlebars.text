@@ -1,0 +1,15 @@
+Hello {{fullname}}!
+
+
+You are receiving this message because someone created a new {{warehouse}} account using this address. If this was not you, you may safely ignore this message.
+
+Otherwise: Welcome to {{warehouse}}!
+
+To activate your new account, please confirm your email address by clicking on the following link:
+
+ {{url}}
+
+
+Thank You,
+
+The {{warehouse}} Team

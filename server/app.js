@@ -69,12 +69,12 @@ if (argv.production) {
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 }
 
-app.use(express.static(__dirname + '/public'));
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.session({ secret: app.config.cookieSecret ? app.config.cookieSecret : "love cookies",
                           store: new RedisStore(app.config.service.redis) }));
 app.use(app.router);
+app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('trust proxy', app.config.behindProxy);
 
