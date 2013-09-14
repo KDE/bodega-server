@@ -107,11 +107,11 @@ BEGIN
         -- it deletes it from the ratings, worst case scenario it doesn't delete anything
         -- because there is nothing in the table to delete, we can't have invalid entries
         -- in the ratings due to trg_ct_checkAssociationOfRatingAttributeWithAsset
-        DELETE FROM assetRatings WHERE asset = assetId AND person = personId AND attribute = ratingElement[2];
+        DELETE FROM assetRatings WHERE asset = assetId AND person = personId AND attribute = ratingElement[1];
 
         -- no check again. If the values are ok we are done, and if they don't trg_ct_checkAssociationOfRatingAttributeWithAsset
         -- will fix it for us.
-        INSERT INTO assetRatings (asset, attribute, person, rating) VALUES (assetId, ratingElement[2], personId, ratingElement[1]);
+        INSERT INTO assetRatings (asset, attribute, person, rating) VALUES (assetId, ratingElement[1], personId, ratingElement[2]);
     END LOOP;
 END;
 $$ LANGUAGE 'plpgsql';
