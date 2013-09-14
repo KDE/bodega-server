@@ -177,54 +177,34 @@ module.exports.assetParticipantRatings = function(db, req, res) {
 };
 
 module.exports.addAssetRating = function(db, req, res) {
-    /*jshint multistr:true */
-    var assetInsertQuery =
-        'SELECT ct_addAssetRating($1, $2, $3)';
-
-    var userId = req.session.user.id;
-    var assetId = req.params.assetId;
+    var assetId = utils.parseNumber(req.params.assetId);
     var ratings = req.body.ratings;
 
-    if (!assetId || !ratings || ratings.length < 1) {
+    if (assetId < 1 || !Array.isArray(ratings) || ratings.length < 1) {
         errors.report('MissingParameters', req, res);
         return;
     }
-
-    var json = utils.standardJson(req);
-    json.ratings = [];
 
     // pg doesn't understand javascript object,
     // so we have to make it a pg array
     // a correct array in pg should be something
     // like { {1, 2 }, {2 ,3 } }
-    var jsToPgArray = '';
+    var temp = [];
     for (var i in ratings) {
-        var rating = ratings[i];
-        rating.rating = utils.parseNumber(rating.rating);
-        rating.attribute = utils.parseNumber(rating.attribute);
-
-        if (json.ratings.indexOf(rating) === -1) {
-            json.ratings.push(rating);
-            if (jsToPgArray === '') {
-                jsToPgArray = '{ ';
-            } else {
-                jsToPgArray = jsToPgArray.concat(', ');
-            }
-            jsToPgArray = jsToPgArray.concat('{', rating.rating, ', ', rating.attribute, '}');
-        }
+        temp.push('{' + utils.parseNumber(ratings[i].attribute) + ', ' + utils.parseNumber(ratings[i].rating) + '}');
     }
-    //close the array
-    jsToPgArray = jsToPgArray.concat(' }');
 
-    db.query(
-        assetInsertQuery, [userId, assetId, jsToPgArray],
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-            res.json(json);
-    });
+    var pgArray = '{' + temp.join(',') +  '}';
+
+    db.query("SELECT ct_addAssetRating($1, $2, $3)",
+            [req.session.user.id, assetId, pgArray],
+            function(err, result) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    return;
+                }
+                res.json(utils.standardJson(req));
+            });
 };
 
 module.exports.removeAssetRating = function(db, req, res) {
