@@ -78,8 +78,7 @@ function postUrl(path, formData, fn, opts)
     }
 
     var options = {
-        uri: 'http://' + module.exports.app.config.host + ':' +
-             module.exports.app.config.port + path,
+        uri: 'http://' + module.exports.app.config.host + ':' + module.exports.app.config.port + path,
         form: formData,
         jar: false,
         headers : {
