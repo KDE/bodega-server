@@ -179,7 +179,7 @@ module.exports.assetParticipantRatings = function(db, req, res) {
 module.exports.addAssetRating = function(db, req, res) {
     /*jshint multistr:true */
     var assetInsertQuery =
-        'SELECT ct_AddAssetRating($1, $2, $3)';
+        'SELECT ct_addAssetRating($1, $2, $3)';
 
     var userId = req.session.user.id;
     var assetId = req.params.assetId;
