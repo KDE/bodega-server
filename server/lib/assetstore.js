@@ -180,8 +180,8 @@ var AssetStore = (function() {
             res.attachment(filename);
 
             stream.on('error', fn)
-                  .on('data', function(chunk){ res.write(chunk); })
-                  .on('end', function(){ fn(null); res.end(); });
+                  .on('data', function(chunk) { res.write(chunk); })
+                  .on('end', function() { fn(null); res.end(); });
         });
     }
 
@@ -335,7 +335,6 @@ var AssetStore = (function() {
     AssetStore.prototype.download = function(res, assetInfo, fn) {
         var assetPath = pathForAsset(assetInfo);
         var parsedUrl = url.parse(assetPath);
-        //console.log(parsedUrl);
 
         if (parsedUrl.protocol === 'http:' ||
             parsedUrl.protocol === 'https:') {
