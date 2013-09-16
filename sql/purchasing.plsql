@@ -133,7 +133,7 @@ DECLARE
 BEGIN
     SELECT INTO asset name, version FROM assets WHERE id = what;
     IF FOUND THEN
-        INSERT INTO downloads (asset, person, address, title, version) VALUES (what, who, fromWhere, asset.name, asset.version);
+        INSERT INTO downloads (asset, person, store, address, title, version) VALUES (what, who, store, fromWhere, asset.name, asset.version);
     END IF;
 END;
 $$ LANGUAGE 'plpgsql';
