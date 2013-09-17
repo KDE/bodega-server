@@ -30,9 +30,7 @@ describe('Collections', function(){
             utils.getUrl('collection/list',
                 function(res){
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -48,9 +46,7 @@ describe('Collections', function(){
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -64,9 +60,7 @@ describe('Collections', function(){
             utils.getUrl('collection/delete/hello',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -92,9 +86,7 @@ describe('Collections', function(){
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(1);
@@ -116,9 +108,7 @@ describe('Collections', function(){
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(1);
@@ -138,9 +128,7 @@ describe('Collections', function(){
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(1);
@@ -154,9 +142,7 @@ describe('Collections', function(){
             utils.getUrl('collection/list',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.above(0);
@@ -182,9 +168,7 @@ describe('Collections', function(){
                 utils.getUrl('collection/' + collectionId + '/add/' + assets[i],
                     function(res) {
                         res.should.have.status(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
@@ -203,9 +187,7 @@ describe('Collections', function(){
             utils.getUrl('collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collection');
                     res.body.collection.should.have.property('id', collectionId);
@@ -223,9 +205,7 @@ describe('Collections', function(){
                 utils.getUrl('collection/' + collectionId + '/remove/' + assetsToRemove[i],
                     function(res) {
                         res.should.have.status(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
@@ -244,9 +224,7 @@ describe('Collections', function(){
             utils.getUrl('collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collection');
                     res.body.collection.should.have.property('id', collectionId);
@@ -264,9 +242,7 @@ describe('Collections', function(){
                 utils.getUrl('collection/' + collectionId + '/add/' + assetsToRemove[i],
                     function(res) {
                         res.should.have.status(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('collection');
                         res.body.collection.should.have.property('id', collectionId);
@@ -285,9 +261,7 @@ describe('Collections', function(){
             utils.getUrl('collection/list/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collection');
                     res.body.collection.should.have.property('id', collectionId);
@@ -302,9 +276,7 @@ describe('Collections', function(){
             utils.getUrl('collection/delete/' + collectionId,
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
                     done();
@@ -315,9 +287,7 @@ describe('Collections', function(){
             utils.getUrl('collection/list',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('collections');
                     res.body.collections.length.should.be.equal(numCollections - 1);

@@ -46,9 +46,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -78,9 +76,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -110,9 +106,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/points?'+querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -148,9 +142,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -177,9 +169,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -207,9 +197,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -241,9 +229,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -270,9 +256,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/count?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -306,9 +290,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -339,9 +321,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -375,9 +355,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -408,9 +386,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -444,9 +420,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -477,9 +451,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -514,9 +486,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -547,9 +517,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -583,9 +551,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -616,9 +582,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -652,9 +616,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -685,9 +647,7 @@ describe('Asset statistics', function(){
         utils.getUrl('stats/assets/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -723,9 +683,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -756,9 +714,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -788,9 +744,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -820,9 +774,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/points?'+querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -854,9 +806,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -883,9 +833,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -913,9 +861,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -943,9 +889,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -972,9 +916,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/count?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1004,9 +946,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1037,9 +977,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1069,9 +1007,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1102,9 +1038,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1134,9 +1068,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1167,9 +1099,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1200,9 +1130,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1233,9 +1161,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/points?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1265,9 +1191,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1298,9 +1222,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/downloads?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {
@@ -1330,9 +1252,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
 
@@ -1363,9 +1283,7 @@ describe('Store statistics', function(){
         utils.getUrl('stats/stores/purchases?' + querystring.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('stats');
                 var expected = {

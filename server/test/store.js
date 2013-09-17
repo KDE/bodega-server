@@ -27,9 +27,7 @@ describe('Store management', function(){
             utils.postUrl('store/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -52,9 +50,7 @@ describe('Store management', function(){
             utils.postUrl('store/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
@@ -74,9 +70,7 @@ describe('Store management', function(){
                 { partner: 1003 },
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StorePartnerInvalid');
@@ -89,9 +83,7 @@ describe('Store management', function(){
                 { partner: 1002 },
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StoreNameInvalid');
@@ -117,9 +109,7 @@ describe('Store management', function(){
                         'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                     } ];
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('storeInfo');
                     res.body.storeInfo.should.eql(expected);
@@ -144,9 +134,7 @@ describe('Store management', function(){
                         'markups': { 'min': 0, 'max': 0, 'markup': 0 }
                     } ];
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('storeInfo');
                     res.body.storeInfo.should.eql(expected);
@@ -164,9 +152,7 @@ describe('Store management', function(){
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'StoreIdExists');
@@ -213,9 +199,7 @@ describe('Store management', function(){
                         ];
 
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('success', true);
                         res.body.storeInfo.should.eql(expected);
@@ -236,8 +220,7 @@ describe('Store management', function(){
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', false);
                     res.body.error.should.have.property('type', 'StoreIdInvalid');
@@ -256,8 +239,7 @@ describe('Store management', function(){
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', false);
                     res.body.error.should.have.property('type', 'StoreIdInvalid');
@@ -286,8 +268,7 @@ describe('Store management', function(){
                         }
                     ];
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.storeInfo.should.eql(expected);
@@ -314,8 +295,7 @@ describe('Store management', function(){
                         }
                     ];
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.storeInfo.should.eql(expected);
@@ -338,8 +318,7 @@ describe('Store management', function(){
                 query,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                    res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
@@ -436,8 +415,7 @@ describe('Store management', function(){
                                     });
                     var expected = [ channel2 ];
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     res.body.channels.should.eql(expected);
                     done();
@@ -452,8 +430,7 @@ describe('Store management', function(){
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
@@ -471,8 +448,7 @@ describe('Store management', function(){
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
@@ -490,8 +466,7 @@ describe('Store management', function(){
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
@@ -505,8 +480,7 @@ describe('Store management', function(){
             utils.getUrl('store/channel/delete/KDE-1/' + newChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property('content-type',
-                                                     'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
@@ -519,9 +493,7 @@ describe('Store management', function(){
             utils.getUrl('store/delete/1002_FUN_TIMES_WITH_CLOWNS',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
@@ -532,9 +504,7 @@ describe('Store management', function(){
             utils.getUrl('store/delete/somethingcrazy',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
@@ -563,9 +533,7 @@ describe('Store management', function(){
                         ];
 
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('authStatus', true);
                         res.body.should.have.property('success', true);
                         res.body.storeInfo.should.eql(expected);

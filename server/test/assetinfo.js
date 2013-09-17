@@ -25,9 +25,7 @@ describe('Asset info', function(){
             utils.getUrl('asset/6',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('id', 6);
@@ -49,9 +47,7 @@ describe('Asset info', function(){
             utils.getUrl('asset/6',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('tags');
@@ -68,9 +64,7 @@ describe('Asset info', function(){
             utils.getUrl('asset/6?changelog=1',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('changelog');
@@ -81,9 +75,7 @@ describe('Asset info', function(){
             utils.getUrl('asset/6?previews=1',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('previews');
@@ -94,9 +86,7 @@ describe('Asset info', function(){
             utils.getUrl('asset/8?ratings=1',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('ratings');

@@ -38,8 +38,10 @@ function getUrl(path, fn, opts)
                 assert.deepEqual(contentType,
                                 'application/octet-stream');
             } else {
-                assert.deepEqual(contentType,
-                                 'application/json');
+                var isJson =
+                        contentType === 'application/json' ||
+                        contentType === 'application/json; charset=utf-8';
+                assert(isJson, 'Content type is not json: ' + contentType);
                 try {
                     res.body = JSON.parse(buf);
                 } catch (e) {
@@ -142,7 +144,7 @@ function auth(params, cb)
                    '&auth_store=' + currentlyAuthed.store,
                    function(res) {
                        res.statusCode.should.equal(200);
-                       res.headers.should.have.property('content-type', 'application/json');
+                       res.headers.should.have.property('content-type');
                        res.headers.should.have.property('set-cookie');
                        res.body.should.have.property('authStatus', true);
                        module.exports.cookie = res.headers['set-cookie'];

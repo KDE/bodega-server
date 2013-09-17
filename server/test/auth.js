@@ -31,9 +31,7 @@ describe('Authentication', function(){
             utils.getUrl('auth',
                          function(res) {
                              res.statusCode.should.equal(200);
-                             res.headers.should.have.property(
-                                 'content-type',
-                                 'application/json');
+                             res.headers.should.have.property('content-type');
                              res.body.should.eql(expected);
                              done();
                          },
@@ -54,9 +52,7 @@ describe('Authentication', function(){
             utils.getUrl('auth?auth_user=&auth_password=&auth_store=',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.eql(expected);
                     done();
                 },
@@ -76,9 +72,7 @@ describe('Authentication', function(){
             utils.getUrl('auth?auth_user=&auth_password=&auth_store=',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.eql(expected);
                     done();
                 },
@@ -98,9 +92,7 @@ describe('Authentication', function(){
             utils.getUrl('auth?auth_user=zack@kde.org&auth_password=bad_password&auth_store=2',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.eql(expected);
                     done();
                 },
@@ -120,9 +112,7 @@ describe('Authentication', function(){
             utils.getUrl('auth?auth_user=zack@kde.org&auth_password=zack&auth_store=5',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.eql(expected);
                     done();
                 },
@@ -152,9 +142,7 @@ describe('Authentication', function(){
             utils.getUrl('auth?auth_user=zack@kde.org&auth_password=zack&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.eql(expected);
                     done();
                 },

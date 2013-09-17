@@ -89,9 +89,7 @@ describe('Redeeming points code', function(){
             utils.getUrl('points/redeemCode/1111111111',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.eql(expected);
                     done();
                 });
@@ -108,9 +106,7 @@ describe('Redeeming points code', function(){
             utils.getUrl('points/redeemCode/' + testCode,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.eql(expected);
                     done();
                 });

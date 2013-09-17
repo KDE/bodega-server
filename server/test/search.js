@@ -28,9 +28,7 @@ describe('Searching', function(){
             utils.getUrl('channels',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('channels');
                     var channels = res.body.channels;
@@ -50,9 +48,7 @@ describe('Searching', function(){
             utils.getUrl('channel/' + gamesChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('channels');
                     var channels = res.body.channels;
@@ -74,9 +70,7 @@ describe('Searching', function(){
             utils.getUrl('search',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
@@ -90,9 +84,7 @@ describe('Searching', function(){
                     '&query=\'mathematica\'',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
@@ -107,9 +99,7 @@ describe('Searching', function(){
                     '&query=\'diamond\'',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('assets');
                     var assets = res.body.assets;
@@ -126,9 +116,7 @@ describe('Searching', function(){
                     '&query=\'best+app+from+Diamond+to+date\'',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('assets');
                     var assets = res.body.assets;

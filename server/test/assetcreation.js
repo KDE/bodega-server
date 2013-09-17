@@ -253,9 +253,7 @@ describe('Asset manipulation', function(){
             utils.getUrl('asset/delete/' + completeAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('id',
@@ -267,9 +265,7 @@ describe('Asset manipulation', function(){
             utils.getUrl('asset/delete/' + incompleteAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('id',
@@ -281,9 +277,7 @@ describe('Asset manipulation', function(){
             utils.getUrl('asset/delete/' + incompleteAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
                         'type', 'AssetMissing');

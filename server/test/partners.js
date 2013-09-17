@@ -75,9 +75,7 @@ describe('Partner management', function() {
             utils.postUrl('partner/create', {},
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -90,9 +88,7 @@ describe('Partner management', function() {
             utils.postUrl('partner/update/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -105,9 +101,7 @@ describe('Partner management', function() {
             utils.getUrl('partner/list',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -120,9 +114,7 @@ describe('Partner management', function() {
             utils.postUrl('partner/request/publisher/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -135,9 +127,7 @@ describe('Partner management', function() {
             utils.postUrl('partner/request/distributor/1002', {},
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.headers.should.have.property('set-cookie');
                     res.body.should.have.property('authStatus', false);
                     res.body.should.have.property('error');
@@ -153,9 +143,7 @@ describe('Partner management', function() {
         utils.getUrl('partner/list',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('partners');
                     res.body.partners.should.eql(expected);
                     done();
@@ -214,9 +202,7 @@ describe('Partner management', function() {
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'PartnerNameExists');
                     done();
@@ -231,9 +217,7 @@ describe('Partner management', function() {
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'InvalidEmailAddress');
                     utils.app.config.printErrors = true;
@@ -247,9 +231,7 @@ describe('Partner management', function() {
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('partnerId');
                     newPartnerId = res.body.partnerId;
                     newPartnerJson.id = newPartnerId;
@@ -263,9 +245,7 @@ describe('Partner management', function() {
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     done();
                 });
@@ -279,9 +259,7 @@ describe('Partner management', function() {
                 task.params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', task.error);
                     cb();
@@ -324,9 +302,7 @@ describe('Partner management', function() {
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     cb();
                 });
@@ -359,9 +335,7 @@ describe('Partner management', function() {
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     done();
                 });
@@ -380,9 +354,7 @@ describe('Partner management', function() {
                 params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', false);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'InvalidRole');
@@ -410,7 +382,7 @@ describe('Partner management', function() {
                     account,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
                         done();
                     });
@@ -424,7 +396,7 @@ describe('Partner management', function() {
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
@@ -438,7 +410,7 @@ describe('Partner management', function() {
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
@@ -452,7 +424,7 @@ describe('Partner management', function() {
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
@@ -466,7 +438,7 @@ describe('Partner management', function() {
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
@@ -480,7 +452,7 @@ describe('Partner management', function() {
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
@@ -494,7 +466,7 @@ describe('Partner management', function() {
                     badAccount,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('error');
                         res.body.error.should.have.property('type', 'MissingParameters');
                         done();
@@ -505,7 +477,7 @@ describe('Partner management', function() {
                 utils.getUrl('partner/' + newPartnerId + '/banking/account/list',
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
                         res.body.accounts.should.eql([ account ]);
                         done();
@@ -516,7 +488,7 @@ describe('Partner management', function() {
                 utils.getUrl('partner/' + newPartnerId + '/banking/account/delete',
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
                         done();
                     });
@@ -526,7 +498,7 @@ describe('Partner management', function() {
                 utils.getUrl('partner/' + newPartnerId + '/banking/account/list',
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property('content-type', 'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
                         res.body.accounts.should.eql([]);
                         done();
@@ -540,9 +512,7 @@ describe('Partner management', function() {
                 function(res) {
                     var expected = ['Accounts', 'Content Creator', 'Partner Manager', 'Store Manager', 'Validator'];
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('roles');
                     res.body.roles.should.eql(expected);
@@ -559,9 +529,7 @@ describe('Partner management', function() {
                     params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     var expected = existingPartnerJson.slice();
                     expected.push(newPartnerJson);
@@ -598,9 +566,7 @@ describe('Partner management', function() {
                     params,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
                     var expected = existingPartnerJson.slice();
                     expected.push(newPartnerJson);
@@ -636,9 +602,7 @@ describe('Partner management', function() {
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
                         var expected = existingPartnerJson.slice();
                         expected.push(newPartnerJson);
@@ -667,9 +631,7 @@ describe('Partner management', function() {
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
                         done();
                     });
@@ -684,9 +646,7 @@ describe('Partner management', function() {
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
                         done();
                     });

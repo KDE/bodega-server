@@ -73,6 +73,10 @@ var PreviewStore = (function() {
     }
 
     function isValidImageFile(preview) {
+        if (!preview.mimetype) {
+            preview.mimetype = mime.lookup(preview.file);
+        }
+
         switch (preview.mimetype) {
         case 'image/jpeg':
         case 'image/png':

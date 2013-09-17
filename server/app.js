@@ -78,7 +78,7 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('trust proxy', app.config.behindProxy);
 
-app.use(express.favicon("public/favicon.ico")); 
+app.use(express.favicon("public/favicon.ico"));
 app.use(function(req, res, next) {
     res.render('404.jade', {
         name: app.config.warehouseInfo.name,

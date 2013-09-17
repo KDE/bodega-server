@@ -98,7 +98,7 @@ module.exports.participant = function(db, req, res) {
                            assets a ON (r.asset = a.id) JOIN\
                            (SELECT asset, max(at.created) AS created FROM assetratings at WHERE person = $1\
                             GROUP BY asset ORDER BY created desc, asset  LIMIT $2 OFFSET $3) AS assets on (r.asset = assets.asset)\
-                        WHERE person = $1 ORDER BY r.created desc, r.asset, r.attribute;'
+                        WHERE person = $1 ORDER BY r.created desc, r.asset, r.attribute;';
 
     var defaultPageSize = 25;
     var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;

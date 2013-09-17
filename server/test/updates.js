@@ -24,7 +24,7 @@ describe('Asset update checks', function() {
             params,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property('content-type', 'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.not.have.property('error');
                 res.body.should.have.property('success', true);
                 res.body.should.have.property('assets');
@@ -40,7 +40,7 @@ describe('Asset update checks', function() {
             params,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property('content-type', 'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.not.have.property('error');
                 res.body.should.have.property('success', true);
                 res.body.should.have.property('assets');
@@ -61,7 +61,7 @@ describe('Asset update checks', function() {
             params,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property('content-type', 'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'TooManyParameters');
                 done();
@@ -89,7 +89,7 @@ describe('Asset update checks', function() {
             params,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property('content-type', 'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.not.have.property('error');
                 res.body.should.have.property('assets');
                 res.body.assets.length.should.eql(1);

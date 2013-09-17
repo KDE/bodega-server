@@ -27,9 +27,7 @@ describe('Create user', function() {
         utils.getUrl('register?firstname=antonis&lastname=tsiapaliokas&email=kok3rs@gmail.com&password=123456789',
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('userId');
                 userInfo = {
                     'email' : 'kok3rs@gmail.com',
@@ -69,9 +67,7 @@ describe('Deactivate user', function() {
         utils.getUrl('participant/changeAccountDetails&active=false',
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('store', 'KDE-1');
                 res.body.should.have.property('points');
@@ -97,9 +93,7 @@ function checkPersonInfo(key, value, done)
     utils.getUrl('participant/info',
         function(res) {
             res.statusCode.should.equal(200);
-            res.headers.should.have.property(
-                'content-type',
-                'application/json');
+            res.headers.should.have.property('content-type');
             res.body.should.have.property('success', true);
             res.body.should.have.property(key, value);
             done();
@@ -114,9 +108,7 @@ describe('Changing account information', function() {
         utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', true);
                 checkPersonInfo('firstName', 'Bunny', done);
             });
@@ -129,9 +121,7 @@ describe('Changing account information', function() {
         utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', true);
                 checkPersonInfo('middleNames', 'Rabbit', done);
             });
@@ -144,9 +134,7 @@ describe('Changing account information', function() {
         utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', true);
                 checkPersonInfo('lastName', 'Foofoo', done);
             });
@@ -159,9 +147,7 @@ describe('Changing account information', function() {
         utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', true);
                 checkPersonInfo('email', 'bunny_rabbit@foofoo.com', done);
             });
@@ -176,9 +162,7 @@ describe('Changing account information', function() {
         utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', false);
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'InvalidEmailAddress');
@@ -194,9 +178,7 @@ describe('Changing account information', function() {
         utils.postUrl('participant/changeAccountDetails', query,
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', false);
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'AccountExists');
@@ -224,9 +206,7 @@ describe('Changing passwords', function() {
         utils.getUrl('participant/changePassword?' + queryString.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', false);
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'PasswordTooShort');
@@ -238,9 +218,7 @@ describe('Changing passwords', function() {
         utils.getUrl('participant/changePassword',
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', false);
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'MissingParameters');
@@ -255,9 +233,7 @@ describe('Changing passwords', function() {
         utils.getUrl('participant/changePassword?' + queryString.stringify(query),
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', true);
                 done();
             });
@@ -280,9 +256,7 @@ describe('Getting account information', function() {
         utils.getUrl('participant/info',
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'Unauthorized');
                 done();
@@ -294,9 +268,7 @@ describe('Getting account information', function() {
         utils.getUrl('participant/history',
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('error');
                 res.body.error.should.have.property('type', 'Unauthorized');
                 done();
@@ -310,9 +282,7 @@ describe('Getting account information', function() {
         utils.getUrl('participant/info',
             function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', true);
                 res.body.should.have.property('storeCount');
                 res.body.should.have.property('pointsEarned');
@@ -375,9 +345,7 @@ describe('Getting account information', function() {
                     }
                 ];
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('success', true);
                 res.body.should.have.property('history');
                 res.body.history.should.eql(expected);

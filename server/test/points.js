@@ -65,9 +65,7 @@ describe('Point operations', function(){
             utils.getUrl('participant/paymentMethod',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -80,9 +78,7 @@ describe('Point operations', function(){
             utils.getUrl('points/buy?amount=500',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -106,9 +102,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -133,9 +127,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -160,9 +152,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -187,9 +177,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -214,9 +202,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -241,9 +227,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     //console.log(res.body);
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -257,9 +241,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     //console.log(res.body);
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -284,9 +266,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     //console.log(res.body);
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -298,9 +278,7 @@ describe('Point operations', function(){
             utils.getUrl('points/buy?amount=500',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('success', true);
@@ -312,9 +290,7 @@ describe('Point operations', function(){
             utils.getUrl('points/buy?amount=5',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -327,9 +303,7 @@ describe('Point operations', function(){
             utils.getUrl('points/buy?amount=5000000000',
                 function(res) {
                     res.should.have.status(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
@@ -352,9 +326,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('success', true);
@@ -373,9 +345,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
@@ -390,9 +360,7 @@ describe('Point operations', function(){
             utils.getUrl(url,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     //console.log(res.body);
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);

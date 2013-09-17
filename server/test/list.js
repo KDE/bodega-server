@@ -33,9 +33,7 @@ describe('Listing', function(){
                 utils.getUrl('auth?auth_store=KDE-1',
                     function(res) {
                         res.statusCode.should.equal(200);
-                        res.headers.should.have.property(
-                            'content-type',
-                            'application/json');
+                        res.headers.should.have.property('content-type');
                         res.headers.should.have.property('set-cookie');
                         utils.cookie = res.headers['set-cookie'];
                         done();
@@ -50,9 +48,7 @@ describe('Listing', function(){
             utils.getUrl('channels',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -74,9 +70,7 @@ describe('Listing', function(){
             utils.getUrl('channel/' + gamesChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -98,9 +92,7 @@ describe('Listing', function(){
             utils.getUrl('channel/' + cardsChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -119,9 +111,7 @@ describe('Listing', function(){
             utils.getUrl('channel/' + cardsChannelId +  '?pageSize=1',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -135,9 +125,7 @@ describe('Listing', function(){
             utils.getUrl('channel/' + cardsChannelId + '?pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -151,9 +139,7 @@ describe('Listing', function(){
             utils.getUrl('channel/' + cardsChannelId + '?pageSize=21',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -173,9 +159,7 @@ describe('Listing', function(){
             utils.getUrl('channel/' + cardsChannelId,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -190,9 +174,7 @@ describe('Listing', function(){
                     '?listType=Channel&pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }
@@ -208,9 +190,7 @@ describe('Listing', function(){
                     '?listType=Channel&offset=10&pageSize=10',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     if (authedBrowsing) {
                         res.body.should.have.property('authStatus', true);
                     }

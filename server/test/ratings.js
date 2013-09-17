@@ -26,9 +26,7 @@ describe('Ratings', function() {
             utils.getUrl('asset/ratings/attributes/1000',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', false);
                     res.body.should.have.property('ratingAttributes');
@@ -40,9 +38,7 @@ describe('Ratings', function() {
             utils.getUrl('asset/ratings/attributes/2',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     res.body.should.have.property('ratingAttributes');
@@ -59,9 +55,7 @@ describe('Ratings', function() {
             utils.getUrl('asset/ratings/list/1000',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();
@@ -71,9 +65,7 @@ describe('Ratings', function() {
             utils.getUrl('asset/ratings/list/8',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     var ratings = res.body.ratings;
@@ -86,9 +78,7 @@ describe('Ratings', function() {
             utils.getUrl('asset/ratings/list/10',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     var ratings = res.body.ratings;
@@ -101,7 +91,7 @@ describe('Ratings', function() {
 
     describe('Ratings by participant', function() {
         it('should show Zack having 3 ratings', function(done) {
-            var expected = 
+            var expected =
                 [
                     {
                         "asset": 2,
@@ -142,13 +132,11 @@ describe('Ratings', function() {
                             }
                         ]
                     }
-                ]
+                ];
             utils.getUrl('participant/ratings',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     var ratings = res.body.ratings;
@@ -170,9 +158,7 @@ describe('Ratings', function() {
             utils.getUrl('participant/ratings/2',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     var ratings = res.body.ratings;
@@ -188,9 +174,7 @@ describe('Ratings', function() {
             utils.postUrl('asset/ratings/create/1000', {},
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', false);
                     res.body.should.have.property('error');
@@ -214,9 +198,7 @@ describe('Ratings', function() {
             utils.postUrl('asset/ratings/create/10', query,
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     utils.getUrl('participant/ratings/10',
@@ -233,9 +215,7 @@ describe('Ratings', function() {
             utils.getUrl('asset/ratings/delete/1000',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     done();
                 });
@@ -244,9 +224,7 @@ describe('Ratings', function() {
             utils.getUrl('asset/ratings/delete/10',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
                     done();

@@ -30,7 +30,7 @@ describe('Fetch contact information', function() {
                         contact: app.config.warehouseInfo.contact
                     };
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property( 'content-type', 'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.eql(expected);
                     done();
                 },
@@ -73,8 +73,8 @@ describe('Fetch contact information', function() {
                          }
                   ]
                 };
-                res.statusCode.should.equal(200);
-                res.headers.should.have.property( 'content-type', 'application/json');
+                 res.statusCode.should.equal(200);
+                 res.headers.should.have.property('content-type');
                 res.body.warehouse.should.eql(warehouse);
                 res.body.store.should.eql(store);
                 done();

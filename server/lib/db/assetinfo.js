@@ -23,6 +23,7 @@ var url = require('url');
 
 function findForum(db, req, res, assetInfo, cb)
 {
+    var e;
     var discourseQuery = 'SELECT categoryName FROM discourseLinks WHERE assetId = $1;';
     db.query(discourseQuery, [req.params.assetId], function(err, result) {
         if (err) {

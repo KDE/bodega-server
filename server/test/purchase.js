@@ -32,9 +32,7 @@ describe('Purchase Asset', function() {
             utils.getUrl('purchase/26',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('points');
                     res.body.should.have.property('success', false);
@@ -50,9 +48,7 @@ describe('Purchase Asset', function() {
             utils.getUrl('purchase/25',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('points');
                     res.body.should.have.property('success', true);
@@ -66,9 +62,7 @@ describe('Purchase Asset', function() {
             utils.getUrl('purchase/999',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('points');
                     res.body.should.have.property('success', false);
@@ -93,9 +87,7 @@ describe('Purchase Asset', function() {
             utils.getUrl('download/26',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', false);
                     res.body.error.should.have.property('type', 'AccessDenied');
@@ -110,9 +102,7 @@ describe('Purchase Asset', function() {
                 'purchase/14',
                 function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('points');
                     res.body.should.have.property('success', true);

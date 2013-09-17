@@ -68,9 +68,7 @@ describe('Tags manipulation', function(){
         it('List all tags', function(done) {
             var cb = function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
@@ -83,9 +81,7 @@ describe('Tags manipulation', function(){
         it('List all tags of asset 2', function(done) {
             var cb = function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
@@ -102,9 +98,7 @@ describe('Tags manipulation', function(){
         it('List all tags of channel 2', function(done) {
             var cb = function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
@@ -121,9 +115,7 @@ describe('Tags manipulation', function(){
         it('List all tags of type contentrating', function(done) {
             var cb = function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
@@ -143,9 +135,7 @@ describe('Tags manipulation', function(){
 
                 listTags(null, null, 'contentrating', function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('tags');
 
@@ -163,9 +153,7 @@ describe('Tags manipulation', function(){
 
                 listTags(null, null, 'assetType', function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('tags');
 
@@ -182,9 +170,7 @@ describe('Tags manipulation', function(){
             deleteTag(createdTagId, function(res) {
                 listTags(null, null, 'contentrating', function(res) {
                     res.statusCode.should.equal(200);
-                    res.headers.should.have.property(
-                        'content-type',
-                        'application/json');
+                    res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('tags');
 
@@ -206,9 +192,7 @@ describe('Tags manipulation', function(){
 
             updateTag(createdTagId, 'new title', 'assetType', function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.eql(expected);
                 done();
             });
@@ -226,9 +210,7 @@ describe('Tags manipulation', function(){
 
             deleteTag(createdTagId, function(res) {
                 res.statusCode.should.equal(200);
-                res.headers.should.have.property(
-                    'content-type',
-                    'application/json');
+                res.headers.should.have.property('content-type');
                 res.body.should.eql(expected);
                 done();
             });
