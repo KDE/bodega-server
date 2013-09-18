@@ -85,15 +85,22 @@ function setupPreviews(db, req, res, assetInfo, cb)
     }
 }
 
-function addToStr(q, hash, value)
+function addToStr(q, hash, value, isNum)
 {
+    var num;
+
     if (hash[value] !== undefined && hash[value] !== null) {
         if (q.inserted) {
             q.insertStr += ", ";
             q.valuesStr += ", ";
         }
         q.insertStr += value;
-        q.valuesStr += "'" + hash[value] + "'";
+        if (isNum) {
+            num = utils.parseNumber(hash[value], 0);
+            q.valuesStr += "'" + num + "'";
+        } else {
+            q.valuesStr += "'" + hash[value] + "'";
+        }
         ++q.inserted;
     }
 }
@@ -108,13 +115,13 @@ function buildQueryString(assetInfo)
     };
 
     addToStr(q, assetInfo, 'license');
-    addToStr(q, assetInfo, 'baseprice');
+    addToStr(q, assetInfo, 'baseprice', true);
     addToStr(q, assetInfo, 'name');
     addToStr(q, assetInfo, 'description');
     addToStr(q, assetInfo, 'version');
     addToStr(q, assetInfo, 'externpath');
     addToStr(q, assetInfo, 'file');
-    addToStr(q, assetInfo, 'size');
+    addToStr(q, assetInfo, 'size', true);
 
     q.insertStr += ")";
     q.valuesStr += ")";
