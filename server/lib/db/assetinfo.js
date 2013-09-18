@@ -183,6 +183,7 @@ function findAsset(db, req, res, assetInfo, cb) {
             licenseText: result.rows[0].licenseText,
             partnerId:   result.rows[0].partnerid,
             version:     result.rows[0].version,
+            versionts:   result.rows[0].versionts,
             created:     result.rows[0].created,
             filename:    result.rows[0].file,
             image:       result.rows[0].image,
