@@ -78,73 +78,37 @@ function setupPreviews(db, req, res, assetInfo)
 function recordAsset(db, req, res, assetInfo)
 {
     var newAssetQuery = 'insert into incomingAssets (id, license, partner, baseprice, name, description, version, file, size) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
-    db.query(newAssetQuery,
-             [assetInfo.id, assetInfo.license, assetInfo.partner, assetInfo.basePrice, assetInfo.name, assetInfo.description, assetInfo.version, assetInfo.file, assetInfo.size],
-             function(err, result) {
-                 if (err) {
-                     reportError(db, req, res, assetInfo,
-                                 'Database', err);
-                     return;
-                 }
-                 setupPreviews(db, req, res, assetInfo);
-             });
+    var args = [assetInfo.id, assetInfo.license, assetInfo.partner,
+                assetInfo.basePrice, assetInfo.name, assetInfo.description,
+                assetInfo.version, assetInfo.file, assetInfo.size];
+    db.query(newAssetQuery, args, function(err, result) {
+        if (err) {
+            reportError(db, req, res, assetInfo,
+                        'Database', err);
+            return;
+        }
+        setupPreviews(db, req, res, assetInfo);
+    });
 }
 
 function storeAsset(db, req, res, assetInfo)
 {
-    db.query("select nextval('seq_assetsids') as assetId;", [],
-             function(err, result) {
-                 var fromFile = req.files.asset.path;
-                 assetInfo.id = result.rows[0].assetid;
-                 //console.log(req.files.asset);
-                 //console.log("from file " + fromFile + ", id = " + assetInfo.id + ', filename = ' + assetInfo.file);
-                 //console.log('file size = ' + req.files.asset.size);
-                 app.assetStore.upload(
-                     fromFile, assetInfo,
-                     function(err) {
-                         if (err) {
-                             //console.log("error due to bad rename?");
-                             reportError(db, req, res, assetInfo,
-                                         'UploadFailed', err);
-                             return;
-                         }
-                         recordAsset(db, req, res, assetInfo);
-                     });
-             });
-}
-
-function checkPartner(db, req, res, assetInfo)
-{
-    //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
-    var partner = assetInfo.partner;
-    if (!partner) {
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Content Creator';",
-                 [req.session.user.id],
-                 function(err, result) {
-                     if (err || !result.rows || result.rows.length === 0) {
-                         reportError(db, req, res, assetInfo,
-                                     'InvalidPartner', err);
-                         return;
-                     }
-
-                     assetInfo.partner = result.rows[0].partner;
-                     storeAsset(db, req, res, assetInfo);
-                 });
-    } else {
-        //console.log("checking up on partner");
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
-                 [partner, req.session.user.id],
-                 function(err, result) {
-                     if (err || !result.rows || result.rows.length === 0) {
-                         reportError(db, req, res, assetInfo,
-                                     'PartnerInvalid', err);
-                         return;
-                     }
-
-                     //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
-                     storeAsset(db, req, res, assetInfo);
-                 });
-    }
+    var query = "select nextval('seq_assetsids') as assetId;";
+    db.query(query, [], function(err, result) {
+        var fromFile = req.files.asset.path;
+        assetInfo.id = result.rows[0].assetid;
+        app.assetStore.upload(
+            fromFile, assetInfo,
+            function(err) {
+                if (err) {
+                    //console.log("error due to bad rename?");
+                    reportError(db, req, res, assetInfo,
+                                'UploadFailed', err);
+                    return;
+                }
+                recordAsset(db, req, res, assetInfo);
+            });
+    });
 }
 
 function processInfo(assetInfo, db, req, res)
@@ -155,7 +119,13 @@ function processInfo(assetInfo, db, req, res)
         return;
     }
     assetInfo.incoming = true;
-    checkPartner(db, req, res, assetInfo);
+    createUtils.isContentCreator(db, req, res, assetInfo, function(err) {
+        if (err) {
+            errors.report('PartnerInvalid', req, res, err);
+            return;
+        }
+        storeAsset(db, req, res, assetInfo);
+    });
 }
 
 module.exports = function(db, req, res) {
