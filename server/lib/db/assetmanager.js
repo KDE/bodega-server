@@ -50,6 +50,7 @@ function sendResponse(db, req, res, assetInfo)
 function setupTags(db, req, res, assetInfo, cb)
 {
     var e;
+
     if (assetInfo.tags) {
         createUtils.setupTags(
             db, req, res, assetInfo,
@@ -138,9 +139,63 @@ function buildQueryString(assetInfo)
     return queryStr;
 }
 
+function buildCreateQueryString(assetInfo)
+{
+    var queryStr = "insert into incomingAssets ";
+    var q = {
+        insertStr : "(",
+        valuesStr : "(",
+        inserted  : 0
+    };
+
+    addToStr(q, assetInfo, 'id', true);
+    addToStr(q, assetInfo, 'partner');
+    addToStr(q, assetInfo, 'license');
+    addToStr(q, assetInfo, 'baseprice', true);
+    addToStr(q, assetInfo, 'name');
+    addToStr(q, assetInfo, 'description');
+    addToStr(q, assetInfo, 'version');
+    addToStr(q, assetInfo, 'externpath');
+    addToStr(q, assetInfo, 'file');
+    addToStr(q, assetInfo, 'size', true);
+
+    q.insertStr += ")";
+    q.valuesStr += ")";
+
+    queryStr += q.insertStr + " values " + q.valuesStr;
+
+    if (!q.inserted) {
+        return null;
+    }
+
+    return queryStr;
+}
+
+
 function writeIncomingAsset(db, req, res, assetInfo, cb)
 {
     var queryStr = buildQueryString(assetInfo);
+
+    if (!queryStr) {
+        cb(null, db, req, res, assetInfo);
+        return;
+    }
+
+    db.query(queryStr, [], function(err, result) {
+        var e;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+
+function writeCreatedAsset(db, req, res, assetInfo, cb)
+{
+    var queryStr = buildCreateQueryString(assetInfo);
 
     if (!queryStr) {
         cb(null, db, req, res, assetInfo);
@@ -386,24 +441,69 @@ function updatePublishedAsset(db, req, res, assetInfo)
     });
 }
 
-function processInfo(assetInfo, db, req, res)
+function createAssetId(db, req, res, assetInfo, cb)
 {
+    var e;
+    var query = "select nextval('seq_assetsids') as assetId;";
+    db.query(query, [], function(err, result) {
+        if (err) {
+            e = errors.crate('UploadFailed', req, res, err);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        assetInfo.id = utils.parseNumber(result.rows[0].assetid);
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+function createAsset(db, req, res, assetInfo)
+{
+    var funcs = [function(cb) {
+        cb(null, db, req, res, assetInfo);
+    }];
+
+    funcs.push(createAssetId);
+    funcs.push(uploadIncomingAsset);
+    funcs.push(writeCreatedAsset);
+    funcs.push(setupTags);
+    funcs.push(setupPreviews);
+
+    async.waterfall(funcs, function(err, db, req, res, assetInfo) {
+        if (err) {
+            errors.report(err.name, req, res, err);
+            return;
+        }
+        sendResponse(db, req, res, assetInfo);
+    });
+}
+
+function processInfo(assetInfo, db, req, res, opts)
+{
+    var isCreating = opts && opts.create;
+
     if (!assetInfo) {
         //"Unable to parse the asset info file.",
         errors.report('UploadInvalidJson', req, res);
         return;
     }
 
-    if (req.params.assetId && !assetInfo.id) {
-        assetInfo.id = utils.parseNumber(req.params.assetId);
+    if (isCreating) {
+        assetInfo.incoming = true;
+
+        if (!assetInfo.file || assetInfo.id) {
+            //"Unable to parse the asset info file.",
+            errors.report('UploadInvalidJson', req, res);
+            return;
+        }
+    } else {
+        //we're updating
+        if (req.params.assetId && !assetInfo.id) {
+            assetInfo.id = utils.parseNumber(req.params.assetId);
+        }
     }
 
-    if (!assetInfo.id) {
-        errors.report('UploadInvalidJson', req, res);
-        return;
-    }
-
-    if (assetInfo.posted !== undefined && typeof assetInfo.posted !== 'boolean') {
+    if (assetInfo.posted !== undefined &&
+        typeof assetInfo.posted !== 'boolean') {
         assetInfo.posted = utils.parseBool(assetInfo.posted);
     }
 
@@ -414,29 +514,33 @@ function processInfo(assetInfo, db, req, res)
                 errors.report('PartnerInvalid', req, res, err);
                 return;
             }
-            createUtils.findAsset(
-                db, req, res, assetInfo, false,
-                function(err, db, req, res, assetInfo) {
-                    if (err) {
-                        errors.report('AssetMissing', req, res, err);
-                        return;
+            if (isCreating) {
+                createAsset(db, req, res, assetInfo);
+            } else {
+                createUtils.findAsset(
+                    db, req, res, assetInfo, false,
+                    function(err, db, req, res, assetInfo) {
+                        if (err) {
+                            errors.report('AssetMissing', req, res, err);
+                            return;
+                        }
+                        //Can't edit a posted asset
+                        if (assetInfo.posted) {
+                            errors.report('AssetPosted', req, res, err);
+                            return;
+                        }
+                        if (assetInfo.incoming) {
+                            updateIncomingAsset(db, req, res, assetInfo);
+                        } else {
+                            updatePublishedAsset(db, req, res, assetInfo);
+                        }
                     }
-                    //Can't edit a posted asset
-                    if (assetInfo.posted) {
-                        errors.report('AssetPosted', req, res, err);
-                        return;
-                    }
-                    if (assetInfo.incoming) {
-                        updateIncomingAsset(db, req, res, assetInfo);
-                    } else {
-                        updatePublishedAsset(db, req, res, assetInfo);
-                    }
-                }
-            );
+                );
+            }
         });
 }
 
-module.exports = function(db, req, res) {
+module.exports.update = function(db, req, res) {
     createUtils.findAssetInfo(req, function(err, assetInfo) {
         if (err) {
             errors.report(err.name, req, res, err.message);
@@ -444,5 +548,17 @@ module.exports = function(db, req, res) {
         }
 
         processInfo(assetInfo, db, req, res);
+    });
+};
+
+
+module.exports.create = function(db, req, res) {
+    createUtils.findAssetInfo(req, function(err, assetInfo) {
+        if (err) {
+            errors.report(err.name, req, res, err.message);
+            return;
+        }
+
+        processInfo(assetInfo, db, req, res, {create : true});
     });
 };
