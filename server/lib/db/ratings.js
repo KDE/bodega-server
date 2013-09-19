@@ -171,16 +171,18 @@ module.exports.assetParticipantRatings = function(db, req, res) {
             }
 
             var json = utils.standardJson(req);
-            json.ratings = result.rows;
+            json.ratings = {};
+            for (var i = 0; i < result.rowCount; ++i) {
+                json.ratings[result.rows[i].attribute] = result.rows[i].rating;
+            }
             res.json(json);
     });
 };
 
 module.exports.addAssetRating = function(db, req, res) {
     var assetId = utils.parseNumber(req.params.assetId);
-    var ratings = req.body.ratings;
 
-    if (assetId < 1 || !Array.isArray(ratings) || ratings.length < 1) {
+    if (assetId < 1) {
         errors.report('MissingParameters', req, res);
         return;
     }
@@ -189,9 +191,21 @@ module.exports.addAssetRating = function(db, req, res) {
     // so we have to make it a pg array
     // a correct array in pg should be something
     // like { {1, 2 }, {2 ,3 } }
+    var ratings = req.body.ratings ?
+                        (typeof req.body.ratings === 'string' ? JSON.parse(req.body.ratings) : req.body.ratings) :
+                        {};
     var temp = [];
     for (var i in ratings) {
-        temp.push('{' + utils.parseNumber(ratings[i].attribute) + ', ' + utils.parseNumber(ratings[i].rating) + '}');
+        var attr = utils.parseNumber(i);
+        var rating = utils.parseNumber(ratings[i], -1);
+        if (attr > 0 && rating > -1) {
+            temp.push('{' + attr + ', ' + rating + '}');
+        }
+    }
+
+    if (temp.length < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
     }
 
     var pgArray = '{' + temp.join(',') +  '}';

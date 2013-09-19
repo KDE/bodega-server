@@ -154,16 +154,14 @@ describe('Ratings', function() {
         });
 
         it('should show user\'s ratings for specific asset', function(done) {
-            //remove the ratings from Zack
+            var expected = { 5: 1 };
             utils.getUrl('participant/ratings/2',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('success', true);
-                    var ratings = res.body.ratings;
-                    ratings.should.be.an.instanceOf(Array);
-                    ratings.should.have.length(1);
+                    res.body.ratings.should.eql(expected);
                     done();
                 });
         });
@@ -183,18 +181,11 @@ describe('Ratings', function() {
                 });
         });
         it('should succeed', function(done) {
+            var ratings = { 2: 1, 3: 2 };
             var query = {
-                ratings: [
-                    {
-                        'attribute': 2,
-                        'rating': 1
-                    },
-                    {
-                        'attribute': 3,
-                        'rating': 2
-                    }
-                ]
+                ratings: JSON.stringify(ratings)
             };
+
             utils.postUrl('asset/ratings/create/10', query,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -203,7 +194,7 @@ describe('Ratings', function() {
                     res.body.should.have.property('success', true);
                     utils.getUrl('participant/ratings/10',
                         function(res) {
-                            res.body.ratings.should.be.eql(query.ratings);
+                            res.body.ratings.should.be.eql(ratings);
                             done();
                         });
                 });
