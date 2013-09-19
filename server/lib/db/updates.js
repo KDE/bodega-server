@@ -49,7 +49,7 @@ module.exports = function(db, req, res)
 
         var ts = Date.parse(asset[1]);
         if (ts) {
-            rows.push('(a.id = $' + (++count) + ' and a.versionts > $' + (++count) + ')');
+            rows.push('(a.id = $' + (++count) + " and date_trunc('second', a.versionts) > $" + (++count) + ')');
             params.push(id);
             var date = new Date();
             date.setTime(ts);
