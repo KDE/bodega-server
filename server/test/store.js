@@ -54,7 +54,7 @@ describe('Store management', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
-                                                        'StorePartnerInvalid');
+                                                        'PartnerInvalid');
                     done();
                 });
         });
@@ -73,7 +73,7 @@ describe('Store management', function(){
                     res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
-                    res.body.error.should.have.property('type', 'StorePartnerInvalid');
+                    res.body.error.should.have.property('type', 'PartnerInvalid');
                     done();
                 });
         });
@@ -311,7 +311,7 @@ describe('Store management', function(){
                 'name': 'Test Channel',
                 'parent': 2,
                 'description': 'A test channel',
-                'tags': [1, 22, 130]
+                'tags': [1, 26, 130]
             };
 
             utils.postUrl('store/channel/create/KDE-1',
@@ -320,7 +320,7 @@ describe('Store management', function(){
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
-                   res.body.should.have.property('success', true);
+                    res.body.should.have.property('success', true);
                     res.body.should.have.property('channel');
                     res.body.channel.should.have.property('id');
                     res.body.channel.should.have.property('store', 'KDE-1');
@@ -353,7 +353,7 @@ describe('Store management', function(){
                               "typeid": 9
                             },
                             {
-                              "id": 21,
+                              "id": 25,
                               "title": "application/x-plasma",
                               "type": 'mimetype',
                               "typeid": 7
@@ -374,13 +374,13 @@ describe('Store management', function(){
                                       "typeid": 9
                                     },
                                     {
-                                      "id": 18,
+                                      "id": 22,
                                       "title": "Card Game",
                                       "type": 'category',
                                       "typeid": 4
                                     },
                                     {
-                                      "id": 21,
+                                      "id": 25,
                                       "title": "application/x-plasma",
                                       "type": 'mimetype',
                                       "typeid": 7
@@ -405,7 +405,7 @@ describe('Store management', function(){
                                             "typeid": 8
                                         },
                                         {
-                                            "id": 22,
+                                            "id": 26,
                                             "title": "Zack Rusin",
                                             "type": 'author',
                                             "typeid": 11
