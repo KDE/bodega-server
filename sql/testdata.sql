@@ -18,30 +18,6 @@
 
 begin;
 
--- reset the database
-DELETE FROM pointtransactions;
-DELETE FROM people;
-DELETE FROM purchases;
-DELETE FROM downloads;
-DELETE FROM channels;
-DELETE FROM stores;
-DELETE FROM assets;
-DELETE FROM partners;
-DELETE FROM affiliations;
-DELETE FROM languages;
-DELETE FROM assetRatings;
-DELETE FROM assetRatingAttributes;
-DELETE FROM assetRatingAverages;
-
-SELECT setval('seq_assetsids', 1);
-SELECT setval('seq_languageids', 1);
-SELECT setval('seq_peopleids', 1);
-SELECT setval('seq_partnerids', 1005);
-SELECT setval('seq_channelids', 1);
-SELECT setval('seq_purchaseids', 1);
-SELECT setval('seq_tagids', 20);
-SELECT setval('seq_assetratingsIds', 1);
-
 -- create some handy functions
 
 CREATE OR REPLACE FUNCTION ct_testing_favoriteBooksByAuthor(email text, author text) RETURNS void
@@ -192,14 +168,19 @@ DELETE FROM partners;
 DELETE FROM affiliations;
 DELETE FROM languages;
 DELETE FROM assetprices WHERE ending is not null;
+DELETE FROM assetRatings;
+DELETE FROM assetRatingAttributes;
+DELETE FROM assetRatingAverages;
 SELECT ct_testing_removePriorTestingTags();
 
 SELECT setval('seq_assetsids', 1);
+SELECT setval('seq_channelids', 1);
 SELECT setval('seq_languageids', 1);
 SELECT setval('seq_peopleids', 1);
 SELECT setval('seq_partnerids', 1005);
-SELECT setval('seq_channelids', 1);
 SELECT setval('seq_purchaseids', 1);
+SELECT setval('seq_tagids', 20);
+SELECT setval('seq_assetratingsIds', 1);
 
 -- now start setting up the data
 INSERT INTO people (lastname, firstname, email, points, password, active)
@@ -222,6 +203,7 @@ INSERT INTO partnerContacts (partner, service, account, url) VALUES (1002, 'webs
 INSERT INTO partners (id, name, publisher, distributor) VALUES (1003, 'Diamond Devices', false, true);
 INSERT INTO partners (id, name, publisher, distributor) VALUES (1004, 'Saphire Software', false, true);
 
+SELECT affiliatePerson('zack@kde.org', 'Management', 'Validator');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Content Creator');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Store Manager');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Validator');
