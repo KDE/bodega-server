@@ -405,7 +405,7 @@ function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
 
 function findPostedAsset(db, req, res, assetInfo, fn)
 {
-    var q = "select * from incomingAssets where id = $1 and posted = true;";
+    var q = "select * from incomingAssets where id = $1 and posted;";
     var e;
     db.query(
         q, [assetInfo.id],
@@ -415,7 +415,7 @@ function findPostedAsset(db, req, res, assetInfo, fn)
                 fn(e, db, req, res, assetInfo);
                 return;
             }
-            if (!result.rows || result.rows.length !== 1) {
+            if (!result.rows || result.rowCount !== 1) {
                 e = errors.create('AssetMissing',
                                   'Unable to find the update asset ' +
                                   assetInfo.id);
