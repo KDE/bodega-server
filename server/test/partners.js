@@ -24,6 +24,28 @@ var utils = require('./support/utils');
 describe('Partner management', function() {
     var existingPartnerJson = [
                         {
+                            "id": 0,
+                            "name": "Management",
+                            "email": null,
+                            "publisher": true,
+                            "distributor": true,
+                            "points": 0,
+                            "links": [],
+                            "assets": 0,
+                            "downloads": 0,
+                            "purchases": 0,
+                            "stores": 1,
+                            "people": [
+                              {
+                                "name": "Zack Rusin",
+                                "email": "zack@kde.org",
+                                "roles": [
+                                  "Validator"
+                                ]
+                              }
+                            ]
+                          },
+                          {
                             id: 1002,
                             name: 'KDE',
                             email: 'info@kde.org',
@@ -189,7 +211,7 @@ describe('Partner management', function() {
                             "name": "Zack Rusin",
                             "email": "zack@kde.org",
                             "roles": [
-                                "Accounts",
+                                "Account Manager",
                                 "Partner Manager"
                             ]
                         }
@@ -510,7 +532,7 @@ describe('Partner management', function() {
             it('should allow listing known roles', function(done) {
                 utils.getUrl('partner/roles/list',
                 function(res) {
-                    var expected = ['Accounts', 'Content Creator', 'Partner Manager', 'Store Manager', 'Validator'];
+                    var expected = ['Account Manager', 'Content Creator', 'Partner Manager', 'Store Manager', 'Validator'];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
                     res.body.should.have.property('success', true);
@@ -523,7 +545,7 @@ describe('Partner management', function() {
             it('should be able to set roles for a partner we are a manager for', function(done) {
                 var params = {
                             person: 'aseigo@kde.org',
-                            roles: [ 'Validator', 'Accounts' ],
+                            roles: [ 'Validator', 'Account Manager' ],
                          };
                 utils.postUrl('partner/roles/update/' + newPartnerId,
                     params,
@@ -533,12 +555,12 @@ describe('Partner management', function() {
                     res.body.should.have.property('success', true);
                     var expected = existingPartnerJson.slice();
                     expected.push(newPartnerJson);
-                    expected[1].people = [
+                    expected[2].people = [
                         {
                             "name": "Aaron Seigo",
                             "email": "aseigo@kde.org",
                             "roles": [
-                                "Accounts",
+                                "Account Manager",
                                 "Validator"
                             ]
                         },
@@ -546,7 +568,7 @@ describe('Partner management', function() {
                             "name": "Zack Rusin",
                             "email": "zack@kde.org",
                             "roles": [
-                                "Accounts",
+                                "Account Manager",
                                 "Partner Manager"
                             ]
                         }
@@ -560,7 +582,7 @@ describe('Partner management', function() {
             it('should be able to delete a role for a partner we are a manager for', function(done) {
                var params = {
                             person: 'aseigo@kde.org',
-                            roles: [ 'Accounts' ],
+                            roles: [ 'Account Manager' ],
                          };
                 utils.postUrl('partner/roles/update/' + newPartnerId,
                     params,
@@ -570,19 +592,19 @@ describe('Partner management', function() {
                     res.body.should.have.property('success', true);
                     var expected = existingPartnerJson.slice();
                     expected.push(newPartnerJson);
-                    expected[1].people = [
+                    expected[2].people = [
                         {
                             "name": "Aaron Seigo",
                             "email": "aseigo@kde.org",
                             "roles": [
-                                "Accounts"
+                                "Account Manager"
                             ]
                         },
                         {
                             "name": "Zack Rusin",
                             "email": "zack@kde.org",
                             "roles": [
-                                "Accounts",
+                                "Account Manager",
                                 "Partner Manager"
                             ]
                         }
@@ -606,12 +628,12 @@ describe('Partner management', function() {
                         res.body.should.have.property('success', true);
                         var expected = existingPartnerJson.slice();
                         expected.push(newPartnerJson);
-                        expected[1].people = [
+                        expected[2].people = [
                             {
                                 "name": "Zack Rusin",
                                 "email": "zack@kde.org",
                                 "roles": [
-                                    "Accounts",
+                                    "Account Manager",
                                     "Partner Manager"
                                 ]
                             }
