@@ -30,7 +30,7 @@ module.exports.setTransferAccount = function(db, req, res)
         return;
     }
 
-    utils.requireRole(db, req, res, partner, 'Accounts', {},
+    utils.requireRole(db, req, res, partner, 'Account Manager', {},
                       function(err, db, req, res, partner, data) {
                           if (err) {
                               errors.report(err.name, req, res, err);
@@ -82,7 +82,7 @@ module.exports.deleteAccount = function(db, req, res)
         return;
     }
 
-    utils.requireRole(db, req, res, partner, 'Accounts', {},
+    utils.requireRole(db, req, res, partner, 'Account Manager', {},
                       function(err, db, req, res, partner, data) {
                           if (err) {
                               errors.report(err.name, req, res, err);
@@ -110,7 +110,7 @@ module.exports.listAccounts = function(db, req, res)
         return;
     }
 
-    utils.requireRole(db, req, res, partner, 'Accounts', {},
+    utils.requireRole(db, req, res, partner, 'Account Manager', {},
                       function(err, db, req, res, partner, data) {
                           if (err) {
                               errors.report(err.name, req, res, err);
