@@ -1833,9 +1833,9 @@
                     {
                         "Name": "ratings",
                         "Location": "BODY",
-                        "Description": "A list of the ratings. Each element in the list is a rating e.g. {attribute: 1, rating:1}",
+                        "Description": "A JSON object containing the rating for each attribute, e.g.: { 100: 3, 101: 4 }. The first number is the attribute ID and the second is the rating.",
                         "Required": "Y",
-                        "Type": "List"
+                        "Type": "String"
                     }
                 ]
             }
