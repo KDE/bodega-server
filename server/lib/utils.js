@@ -174,7 +174,7 @@ module.exports.partnerId = function(db, req, res, cb, role)
 
     if (partner < 1) {
         // get the default (e.g. first) partner
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1" + roleQuery,
+        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and partner > 0 " + roleQuery,
                 params,
                 function(err, result) {
                     if (err || !result.rows || result.rows.length === 0) {
