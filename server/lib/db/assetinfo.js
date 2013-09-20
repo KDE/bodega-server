@@ -172,9 +172,13 @@ function findAsset(db, req, res, assetInfo, cb) {
          FROM incomingAssets a \
          LEFT JOIN licenses l ON (a.license = l.id) \
          LEFT JOIN partners p ON (a.partner = p.id) \
-         WHERE a.id = $2" + (assetInfo.validator ? "" : " AND a.partner = $1");
+         WHERE a.id = $1";
+        args = [assetInfo.assetId];
 
-        args = [assetInfo.partner, assetInfo.assetId];
+        if (!assetInfo.validator) {
+            query += " AND a.partner = $1";
+            args.push(assetInfo.partner);
+        }
     } else {
         var multi = Array.isArray(assetInfo.assetId);
         table = 'assets';
