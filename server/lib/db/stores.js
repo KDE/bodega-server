@@ -23,7 +23,7 @@ function sendStoreJson(id, db, req, res)
 {
     var query = "select s.id, s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.markup \
                  from stores s join partners p on (s.partner = p.id) \
-                 where p.id in (select distinct partner from affiliations where person = $1)";
+                 where p.id in (select distinct partner from affiliations where person = $1 and partner > 0)";
     var params = [req.session.user.id];
     if (typeof id === 'string' && id.length > 0) {
         query += " and s.id = $2";
