@@ -445,12 +445,14 @@ describe('Asset manipulation', function(){
                     done();
                 });
         });
-        it('shouldnt be able to reject a published asset', function(done){
+        it('should not be able to reject a published asset', function(done){
+            utils.app.config.printErrors = false;
             utils.postUrl('asset/publish/' + completeAssetId + "?reject=1&reason=hello", null,
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'AssetMissing');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
