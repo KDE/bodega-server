@@ -318,38 +318,22 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
 module.exports.isValidator = function(db, req, res, assetInfo, fn)
 {
     //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
-    var partner = assetInfo.partner;
+    var partner = assetInfo.partner ? assetInfo.partner : 0;
     var e;
-    if (!partner) {
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.person = $1 and r.description = 'Validator';",
-                 [req.session.user.id],
-                 function(err, result) {
-                     if (err || !result.rows || result.rows.length === 0) {
-                         e = errors.create('PartnerInvalid',
-                                           err ? err.message : '');
-                         fn(e, db, req, res, assetInfo);
-                         return;
-                     }
+    //console.log("checking up on partner");
+    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Validator';",
+            [partner, req.session.user.id],
+            function(err, result) {
+                if (err || !result.rows || result.rows.length === 0) {
+                    e = errors.create('PartnerInvalid',
+                        err ? err.message : '');
+                    fn(e, db, req, res, assetInfo);
+                    return;
+                }
 
-                     assetInfo.partner = result.rows[0].partner;
-                     fn(null, db, req, res, assetInfo);
-                 });
-    } else {
-        //console.log("checking up on partner");
-        db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Validator';",
-                 [partner, req.session.user.id],
-                 function(err, result) {
-                     if (err || !result.rows || result.rows.length === 0) {
-                         e = errors.create('PartnerInvalid',
-                                           err ? err.message : '');
-                         fn(e, db, req, res, assetInfo);
-                         return;
-                     }
-
-                     //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
-                     fn(null, db, req, res, assetInfo);
-                 });
-    }
+                //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
+                fn(null, db, req, res, assetInfo);
+            });
 };
 
 function mergeObjects(a, b)
