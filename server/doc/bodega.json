@@ -445,16 +445,30 @@
         {
           "MethodName": "Publish",
           "read-only": "true",
-          "Synopsis": "Publishes a posted asset to the store. Only store validators can publish assets.",
+          "Synopsis": "Publishes or rejects a posted asset to the store. Only store validators can publish assets, and either approve or reject is required.",
           "HTTPMethod": "POST",
           "URI": "/asset/publish/:assetId",
           "parameters": [
             {
               "Name": "assetId",
               "Location": "URL",
-              "Description": "Publishes an asset if you are a validator.",
+              "Description": "The id of the asset",
               "Required": "Y",
               "Type": "number"
+            },
+            {
+              "Name": "approve",
+              "Location": "query",
+              "Description": "Publishes the asset (if you are a validator)",
+              "Required": "N",
+              "Type": "boolean"
+            },
+            {
+              "Name": "reject",
+              "Location": "query",
+              "Description": "Rejects the asset (if you are a validator)",
+              "Required": "N",
+              "Type": "boolean"
             }
           ]
         },
