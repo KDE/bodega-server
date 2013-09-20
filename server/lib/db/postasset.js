@@ -248,7 +248,7 @@ module.exports = function(db, req, res) {
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             if (err) {
-                errors.report('InvalidPartner', req, res, err);
+                errors.report('PartnerInvalid', req, res, err);
                 return;
             }
             createUtils.findAsset(
