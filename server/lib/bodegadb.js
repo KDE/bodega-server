@@ -79,7 +79,11 @@ var BodegaDb = (function() {
     };
 
     BodegaDb.prototype.assetInfo = function(req, res) {
-        this.dbQuery(dbAssetInfo, req, res);
+        this.dbQuery(dbAssetInfo.fullSingleAsset, req, res);
+    };
+
+    BodegaDb.prototype.listAssetBriefs = function(req, res) {
+        this.dbQuery(dbAssetInfo.multipleAssetBriefs, req, res);
     };
 
     BodegaDb.prototype.pointsPrice = function(req, res) {

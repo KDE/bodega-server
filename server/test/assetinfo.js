@@ -21,7 +21,7 @@ describe('Asset info', function(){
     utils.auth();
 
     describe('Basic fetch', function(){
-        it('should show info for an asset', function(done){
+        it('should show info for a single asset', function(done) {
             utils.getUrl('asset/6',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -30,6 +30,7 @@ describe('Asset info', function(){
                     res.body.should.have.property('asset');
                     res.body.asset.should.have.property('id', 6);
                     res.body.asset.should.have.property('partnerId');
+                    res.body.asset.should.have.property('partner');
                     res.body.asset.should.have.property('license');
                     res.body.asset.should.have.property('version');
                     res.body.asset.should.have.property('created');
@@ -43,7 +44,7 @@ describe('Asset info', function(){
                     done();
                 });
         });
-        it('should fetch tags', function(done){
+        it('should fetch tags', function(done) {
             utils.getUrl('asset/6',
                 function(res) {
                     res.should.have.status(200);
@@ -57,10 +58,35 @@ describe('Asset info', function(){
                     done();
                 });
         });
+        it("should show info for multiple assets", function(done) {
+            utils.postUrl('asset/list/briefs',
+                          { assetIds: [ 6, 7, 8, 9 ] },
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('assets');
+                    res.body.assets.length.should.eql(4);
+                    res.body.assets[0].should.have.property('id', 6);
+                    res.body.assets[0].should.have.property('partnerId');
+                    res.body.assets[0].should.have.property('partner');
+                    res.body.assets[0].should.have.property('license');
+                    res.body.assets[0].should.have.property('version');
+                    res.body.assets[0].should.have.property('created');
+                    res.body.assets[0].should.have.property('filename');
+                    res.body.assets[0].should.have.property('image');
+                    res.body.assets[0].should.have.property('name');
+                    res.body.assets[0].should.have.property('description');
+                    res.body.assets[0].should.have.property('size');
+                    res.body.assets[0].should.not.have.property('points');
+                    res.body.assets[0].should.not.have.property('canDownload');
+                    done();
+                });
+        });
     });
 
     describe('Advanced fetch', function(){
-        it('should show chanagelog', function(done){
+        it('should show changelog', function(done){
             utils.getUrl('asset/6?changelog=1',
                 function(res) {
                     res.statusCode.should.equal(200);

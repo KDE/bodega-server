@@ -321,7 +321,7 @@
       "name": "Assets",
       "methods": [
         {
-          "MethodName": "Fetch information",
+          "MethodName": "Fetch detailed information",
           "Synopsis": "Retrieves all public information related to an asset including the name, description, license, version, partner (owner/publisher), tags and related images and whether or not the currentl authenticated account can download it",
           "HTTPMethod": "Get",
           "URI": "/asset/:assetId",
@@ -499,9 +499,24 @@
           ]
         },
         {
+            "MethodName": "Fetch brief information",
+            "Synopsis": "Retrieves basic information such as title, description, version, icon and size on one or more assets in this store. Useful for fetching details on things such as lists of assets that need updating. For complete information (pricing, previews, ratings, etc) use the detailed information method (/asset/:assetId) instead",
+            "HTTPMethod": "POST",
+            "URI": "/asset/list/briefs",
+            "parameters": [
+              {
+                  "Name": "assetIds",
+                  "Location": "Body",
+                  "Description": "JSON array of the ids of the assets to fetch information on",
+                  "Required": "Y",
+                  "Type": "Array[ int ]"
+              }
+            ]
+        },
+        {
           "MethodName": "List",
           "read-only": "true",
-          "Synopsis": "Lists the assets that either belong to you or, if you are a content validator,  have been posted.",
+          "Synopsis": "Lists the assets that either belong to you or, if you are a content validator, have been posted.",
           "HTTPMethod": "GET",
           "URI": "/asset/list/:type",
           "parameters": [
