@@ -173,7 +173,6 @@ function writeAsset(db, req, res, assetInfo, cb)
         }
         cb(null, db, req, res, assetInfo);
     });
-
 }
 
 function deleteIncoming(db, req, res, assetInfo, cb)
@@ -425,24 +424,25 @@ module.exports = function(db, req, res) {
         errors.report('MissingParameters', req, res);
         return;
     }
+
     approve = utils.parseBool(req.query.approve);
     reject  = utils.parseBool(req.query.reject);
+
     if (!approve && !reject) {
         errors.report('MissingParameters', req, res);
         return;
     }
+
     if (approve && reject) {
         errors.report('TooManyParameters', req, res);
         return;
     }
 
-    assetInfo.partner = req.query.partner;
-
     createUtils.isValidator(
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             if (err) {
-                errors.report('InvalidPartner', req, res, err);
+                errors.report('PartnerInvalid', req, res, err);
                 return;
             }
             createUtils.findPostedAsset(
