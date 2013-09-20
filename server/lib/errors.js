@@ -65,7 +65,7 @@ var ErrorType = {
     "CardDuplicateTransaction" : 38,//same transaction was just submitted
     "CardProcessingError"    : 39,//error occurred while processing the card
 
-    "PartnerInvalid"         : 40,//the authorized user tried to change asset without a valid partner id
+    "PartnerInvalid"         : 40, //the partner ID provided is invalid for the request
     "UploadFailed"           : 41, //the uploading of the file did not succeed
     "UploadInvalidJson"      : 42, //asset info data was malformed
     "UploadTagError"         : 43, //one of the required tags is missing
@@ -88,7 +88,6 @@ var ErrorType = {
     "NotAValidator"          : 59, //person is not a validator
 
     "StoreIdExists"          : 60,//on creating a store, the store id already exists
-    "StorePartnerInvalid"    : 61,//the partner provided is incorrect
     "StoreNameInvalid"       : 62,//an invalid (e.g. missing) store name
     "StoreNotDeleted"        : 63,//deleting a store failed
     "StoreIdInvalid"         : 64,//the provided store id is not valid for this user

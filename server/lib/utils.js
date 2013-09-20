@@ -178,7 +178,7 @@ module.exports.partnerId = function(db, req, res, cb, role)
                 params,
                 function(err, result) {
                     if (err || !result.rows || result.rows.length === 0) {
-                        errors.report('StorePartnerInvalid', req, res, err);
+                        errors.report('PartnerInvalid', req, res, err);
                         return;
                     }
 
@@ -191,7 +191,7 @@ module.exports.partnerId = function(db, req, res, cb, role)
                 params,
                 function(err, result) {
                     if (err || !result.rows || result.rows.length === 0) {
-                        errors.report('StorePartnerInvalid', req, res, err);
+                        errors.report('PartnerInvalid', req, res, err);
                         return;
                     }
 
