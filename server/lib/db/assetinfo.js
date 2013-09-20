@@ -32,7 +32,7 @@ function findForum(db, req, res, assetInfo, cb)
             return;
         }
         assetInfo.json.asset.forum = '';
-        if (result && result.rows.length > 0) {
+        if (result && result.rowCount > 0) {
             assetInfo.json.asset.forum =  app.config.service.discourse.externalUrl + 'category/'+ url.format(result.rows[0].categoryname);
         }
         cb(null, db, req, res, assetInfo);
@@ -60,8 +60,8 @@ function findChangeLog(db, req, res, assetInfo, cb)
             return;
         }
         assetInfo.json.asset.changelog = {};
-        if (result && result.rows.length > 0) {
-            for (i = 0; i < result.rows.length; ++i) {
+        if (result && result.rowCount > 0) {
+            for (i = 0; i < result.rowCount; ++i) {
                 var obj = {
                     timestamp : result.rows[i].timestamp,
                     changes   : result.rows[i].changes
@@ -90,10 +90,8 @@ function findPreviews(db, req, res, assetInfo, cb)
             return;
         }
         assetInfo.json.asset.previews = [];
-        if (result && result.rows.length > 0) {
-            for (i = 0; i < result.rows.length; ++i) {
-                assetInfo.json.asset.previews.push(result.rows[i]);
-            }
+        for (i = 0; i < result.rowCount; ++i) {
+            assetInfo.json.asset.previews.push(result.rows[i]);
         }
 
         cb(null, db, req, res, assetInfo);
@@ -122,44 +120,105 @@ function findTags(db, req, res, assetInfo, cb)
             return;
         }
         assetInfo.json.asset.tags = [];
-        if (result && result.rows.length > 0) {
-            for (i = 0; i < result.rows.length; ++i) {
-                var obj = {};
-                obj[result.rows[i].type] = result.rows[i].title;
-                assetInfo.json.asset.tags.push(obj);
-            }
+        for (i = 0; i < result.rowCount; ++i) {
+            var obj = {};
+            obj[result.rows[i].type] = result.rows[i].title;
+            assetInfo.json.asset.tags.push(obj);
         }
 
         cb(null, db, req, res, assetInfo);
     });
 }
 
+function assetFromRow(row, brief)
+{
+    var asset = {
+        id:          row.id,
+        license:     row.license,
+        licenseText: row.licenseText,
+        partnerId:   row.partnerid,
+        partner:     row.partnername,
+        version:     row.version,
+        versionts:   row.versionts,
+        created:     row.created,
+        filename:    row.file,
+        image:       row.image,
+        name:        row.name,
+        description: row.description,
+        size:        row.size
+    };
+
+    if (!brief) {
+        asset.points = row.price;
+        asset.canDownload = row.downloadable;
+    }
+
+    return asset;
+}
+
 function findAsset(db, req, res, assetInfo, cb) {
-    var table = assetInfo.incoming ? 'incomingAssets' : 'assets';
-    var assetInfoQuery =
+    var table;
+    var query;
+    var args;
+    var expectedRowCount = 1;
+
+    if (assetInfo.incoming) {
+        table = 'incomingAssets';
+        query =
         "SELECT a.id, l.name as license, l.text as licenseText, \
-         a.partner as partnerId, a.version, a.versionTs as created, \
-         a.file, a.image, a.name, a.description, a.size, \
-         ct_canDownload($3, $2, $1) AS downloadable, \
-         ct_assetPrice($2, $1) AS price \
-         FROM assets a \
-         LEFT JOIN channelAssets ca ON (a.id = ca.asset)  \
-         LEFT JOIN channels c ON (ca.channel = c.id)  \
-         LEFT JOIN licenses l ON (a.license = l.id) \
-         WHERE a.id = $1 AND c.store = $2 LIMIT 1";
-    var incomingAssetInfoQuery =
-        "SELECT a.id, l.name as license, l.text as licenseText, \
-         a.partner as partnerId, a.version, a.file, a.image, a.name, \
-         a.description, a.size, ct_canDownload($3, $2, $1) AS downloadable, \
-         ct_assetPrice($2, $1) AS price \
+         a.partner as partnerId, p.name as partnername, \
+         a.version, a.file, a.image, a.name, \
+         a.description, a.size \
          FROM incomingAssets a \
          LEFT JOIN licenses l ON (a.license = l.id) \
-         WHERE a.id = $1" + (assetInfo.validator ? "" : " AND a.partner = $3");
-    var query = assetInfo.incoming ? incomingAssetInfoQuery : assetInfoQuery;
-    var userId = assetInfo.incoming ? assetInfo.partner : req.session.user.id;
-    var args = [req.params.assetId,
-                req.session.user.store,
-                userId];
+         LEFT JOIN partners p ON (a.partner = p.id) \
+         WHERE a.id = $2" + (assetInfo.validator ? "" : " AND a.partner = $1");
+
+        args = [assetInfo.partner, assetInfo.assetId];
+    } else {
+        var multi = Array.isArray(assetInfo.assetId);
+        table = 'assets';
+        query = "SELECT a.id, l.name as license, l.text as licenseText, \
+            a.partner as partnerId, p.name as partnername, \
+            a.version, a.versionTs as created, \
+            a.file, a.image, a.name, a.description, a.size";
+
+         if (!multi) {
+             query += ", ct_canDownload($2, $1, a.id) AS downloadable, \
+                         ct_assetPrice($1, a.id) AS price";
+         }
+
+         query += " FROM assets a \
+            LEFT JOIN licenses l ON (a.license = l.id) \
+            LEFT JOIN partners p ON (a.partner = p.id) \
+            WHERE a.id IN (SELECT ca.asset FROM channelAssets ca \
+                           LEFT JOIN channels c ON (ca.channel = c.id) \
+                           WHERE c.store = $1 AND ca.asset";
+
+        args = [req.session.user.store];
+
+        if (Array.isArray(assetInfo.assetId)) {
+            expectedRowCount = assetInfo.assetId.length;
+            var index = 1;
+            query += " IN (";
+            for (var i in assetInfo.assetId) {
+                if (index > 1) {
+                    query += ', ';
+                }
+                args[index] = assetInfo.assetId[i];
+                ++index;
+                query += "$" + index;
+            }
+            query += ")) ORDER BY a.id";
+        } else {
+            args[1] = req.session.user.id;
+            args[2] = assetInfo.assetId;
+            query += " = $3)";
+        }
+    }
+
+    //console.log("query: " + query)
+    //console.log("args: " + args);
 
     var q = db.query(query, args, function(err, result) {
         var e;
@@ -170,31 +229,26 @@ function findAsset(db, req, res, assetInfo, cb) {
             return;
         }
 
-        if (!result || result.rows.length !== 1) {
+        //console.log("we got " + result.rowCount + " and expected " + expectedRowCount);
+        if (!result || result.rowCount !== expectedRowCount) {
             e = errors.create('InvalidAsset');
             cb(e, db, req, res, assetInfo);
             return;
         }
 
         json = utils.standardJson(req);
-        json.asset = {
-            id :         result.rows[0].id,
-            license:     result.rows[0].license,
-            licenseText: result.rows[0].licenseText,
-            partnerId:   result.rows[0].partnerid,
-            version:     result.rows[0].version,
-            versionts:   result.rows[0].versionts,
-            created:     result.rows[0].created,
-            filename:    result.rows[0].file,
-            image:       result.rows[0].image,
-            name:        result.rows[0].name,
-            description: result.rows[0].description,
-            size:        result.rows[0].size,
-            points:      result.rows[0].price,
-            canDownload: result.rows[0].downloadable
-        };
+        if (expectedRowCount > 1) {
+            json.assets = [];
+            for (var i = 0; i < result.rowCount; ++i) {
+                json.assets.push(assetFromRow(result.rows[i], true));
+            }
 
-        //console.log(JSON.stringify(json.asset, 0, 2));
+            //console.log(JSON.stringify(json.assets, 0, 2));
+        } else {
+            json.asset = assetFromRow(result.rows[0], assetInfo.incoming);
+            //console.log(JSON.stringify(json.asset, 0, 2));
+        }
+
         assetInfo.json = json;
 
         cb(null, db, req, res, assetInfo);
@@ -255,16 +309,19 @@ function findRatings(db, req, res, assetInfo, cb)
     });
 }
 
-module.exports = function(db, req, res) {
-    var assetInfo = {};
-    var funcs = [function(cb) {
-        cb(null, db, req, res, assetInfo);
-    }];
-
+module.exports.fullSingleAsset = function(db, req, res) {
     if (!req.params.assetId || req.params.assetId === 'undefined') {
         errors.report('MissingParameters', req, res);
         return;
     }
+
+    var assetInfo = {
+        assetId: req.params.assetId
+    };
+
+    var funcs = [function(cb) {
+        cb(null, db, req, res, assetInfo);
+    }];
 
     if (req.query.incoming) {
         assetInfo.incoming = true;
@@ -275,9 +332,11 @@ module.exports = function(db, req, res) {
     funcs.push(findAsset);
     funcs.push(findTags);
     funcs.push(findForum);
+
     if (req.query.previews) {
         funcs.push(findPreviews);
     }
+
     if (req.query.changelog) {
         funcs.push(findChangeLog);
     }
@@ -293,4 +352,25 @@ module.exports = function(db, req, res) {
         }
         res.send(assetInfo.json);
     });
+};
+
+module.exports.multipleAssetBriefs = function(db, req, res) {
+    if (!req.body.assetIds || !Array.isArray(req.body.assetIds) || req.body.assetIds.length < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    var assetInfo = {
+        assetId: req.body.assetIds,
+    };
+
+    findAsset(db, req, res, assetInfo,
+              function(err, db, req, res, assetInfo) {
+                  if (err) {
+                      errors.report(err.name, req, res, err);
+                      return;
+                  }
+
+                  res.send(assetInfo.json);
+              });
 };
