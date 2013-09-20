@@ -176,7 +176,7 @@ function findAsset(db, req, res, assetInfo, cb) {
         args = [assetInfo.assetId];
 
         if (!assetInfo.validator) {
-            query += " AND a.partner = $1";
+            query += " AND a.partner = $2";
             args.push(assetInfo.partner);
         }
     } else {
