@@ -455,9 +455,9 @@ module.exports.findPostedAsset = function(db, req, res, assetInfo, fillIn, fn)
     var partner = assetInfo.partner;
     var e;
 
-    if (!assetInfo || !assetInfo.id || !assetInfo.partner) {
+    if (!assetInfo || !assetInfo.id) {
         e = errors.create('MissingParameters',
-                          'Asset info missing asset or partner id.');
+                          'Asset id missing.');
         fn(e, db, req, res, assetInfo);
         return;
     }
