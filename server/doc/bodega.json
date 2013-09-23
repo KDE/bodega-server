@@ -519,7 +519,7 @@
             "URI": "/asset/list/briefs",
             "parameters": [
               {
-                  "Name": "assetIds",
+                  "Name": "assets",
                   "Location": "Body",
                   "Description": "JSON array of the ids of the assets to fetch information on",
                   "Required": "Y",
