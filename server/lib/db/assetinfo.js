@@ -301,14 +301,13 @@ function findRatings(db, req, res, assetInfo, cb)
                  FROM assetRatingAverages WHERE asset = $1';
     db.query(query, [req.params.assetId],
             function(err, result) {
-                var e;
                 if (err) {
-                    e = errors.create('Database', err.message);
+                    var e = errors.create('Database', err.message);
                     cb(e, db, req, res, assetInfo);
                     return;
                 }
-                assetInfo.json.asset.ratings = result.rows;
 
+                assetInfo.json.asset.ratings = result.rows;
                 cb(null, db, req, res, assetInfo);
     });
 }
@@ -365,7 +364,7 @@ module.exports.multipleAssetBriefs = function(db, req, res) {
     }
 
     var assetInfo = {
-        assetId: req.body.assetIds,
+        assetId: req.body.assets,
     };
 
     findAsset(db, req, res, assetInfo,
