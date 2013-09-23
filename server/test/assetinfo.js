@@ -20,7 +20,7 @@ var utils = require('./support/utils');
 describe('Asset info', function(){
     utils.auth();
 
-    describe('Basic fetch', function(){
+    describe('fetch request', function(){
         it('should show info for a single asset', function(done) {
             utils.getUrl('asset/6',
                 function(res) {
@@ -60,7 +60,7 @@ describe('Asset info', function(){
         });
         it("should show info for multiple assets", function(done) {
             utils.postUrl('asset/list/briefs',
-                          { assetIds: [ 6, 7, 8, 9 ] },
+                          { assets: [ 6, 7, 8, 9 ] },
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');

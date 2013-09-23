@@ -358,7 +358,7 @@ module.exports.fullSingleAsset = function(db, req, res) {
 };
 
 module.exports.multipleAssetBriefs = function(db, req, res) {
-    if (!req.body.assetIds || !Array.isArray(req.body.assetIds) || req.body.assetIds.length < 1) {
+    if (!req.body.assets || !Array.isArray(req.body.assets) || req.body.assets.length < 1) {
         errors.report('MissingParameters', req, res);
         return;
     }
