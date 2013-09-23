@@ -336,6 +336,27 @@ module.exports.isValidator = function(db, req, res, assetInfo, fn)
             });
 };
 
+
+module.exports.isBodegaManager = function(db, req, res, fn)
+{
+    var e;
+    var query = "select partner from affiliations a \
+        left join personRoles r on (a.role = r.id) where a.partner = 0 \
+        and a.person = $1 and r.description = 'Validator';";
+    var args = [req.session.user.id];
+    db.query(query, args, function(err, result) {
+        if (err || !result.rows || result.rows.length === 0) {
+            e = errors.create('PartnerInvalid',
+                              err ? err.message : '');
+            fn(e, db, req, res);
+            return;
+        }
+
+        fn(null, db, req, res);
+    });
+};
+
+
 function mergeObjects(a, b)
 {
     var key;

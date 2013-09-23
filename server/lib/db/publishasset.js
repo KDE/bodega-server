@@ -438,32 +438,30 @@ module.exports = function(db, req, res) {
         return;
     }
 
-    createUtils.isValidator(
-        db, req, res, assetInfo,
-        function(err, db, req, res, assetInfo) {
-            if (err) {
-                errors.report('PartnerInvalid', req, res, err);
-                return;
-            }
-            createUtils.findPostedAsset(
-                db, req, res, assetInfo, true,
-                function(err, db, req, res, assetInfo) {
-                    if (err) {
-                        errors.report(err.name, req, res, err);
-                        return;
-                    }
-
-                    if (!assetInfo.incoming) {
-                        errors.report('AssetMissing', req, res);
-                        return;
-                    }
-
-                    if (approve) {
-                        approveAsset(db, req, res, assetInfo);
-                    } else if (reject) {
-                        rejectAsset(db, req, res, assetInfo);
-                    }
+    createUtils.isBodegaManager(db, req, res, function(err, db, req, res) {
+        if (err) {
+            errors.report('PartnerInvalid', req, res, err);
+            return;
+        }
+        createUtils.findPostedAsset(
+            db, req, res, assetInfo, true,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    errors.report(err.name, req, res, err);
+                    return;
                 }
-            );
-        });
+
+                if (!assetInfo.incoming) {
+                    errors.report('AssetMissing', req, res);
+                    return;
+                }
+
+                if (approve) {
+                    approveAsset(db, req, res, assetInfo);
+                } else if (reject) {
+                    rejectAsset(db, req, res, assetInfo);
+                }
+            }
+        );
+    });
 };
