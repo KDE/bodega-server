@@ -25,7 +25,7 @@ describe('Partner management', function() {
     var existingPartnerJson = [
                         {
                             "id": 0,
-                            "name": "Management",
+                            "name": "Management Group",
                             "email": null,
                             "publisher": true,
                             "distributor": true,

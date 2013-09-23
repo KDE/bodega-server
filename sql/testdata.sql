@@ -192,7 +192,7 @@ INSERT INTO people (lastname, firstname, email, points, password, active)
 INSERT INTO people (lastname, firstname, email, points, password, active)
     VALUES ('Martin', 'Marco', 'mart@kde.org', 10000, '$2a$10$VYBi6invWdeT..wQ5FFXqu67HQI5Y8WVAhN5orzUIsWAeMaAItYrS', true);
 
-INSERT INTO partners (id, name, publisher, distributor) VALUES (0, 'Management', true, true);
+INSERT INTO partners (id, name, publisher, distributor) VALUES (0, 'Management Group', true, true);
 INSERT INTO partners (id, name, publisher, distributor, supportEmail) VALUES (1000, 'Make Play Live', true, true, 'support@makeplaylive.com');
 INSERT INTO partnerContacts (partner, service, account, url) VALUES (1000, 'website', null, 'http://makeplaylive.com');
 INSERT INTO partnerContacts (partner, service, account, url) VALUES (1000, 'identi.ca', 'aseigo', null);
@@ -203,7 +203,7 @@ INSERT INTO partnerContacts (partner, service, account, url) VALUES (1002, 'webs
 INSERT INTO partners (id, name, publisher, distributor) VALUES (1003, 'Diamond Devices', false, true);
 INSERT INTO partners (id, name, publisher, distributor) VALUES (1004, 'Saphire Software', false, true);
 
-SELECT affiliatePerson('zack@kde.org', 'Management', 'Validator');
+SELECT affiliatePerson('zack@kde.org', 'Management Group', 'Validator');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Content Creator');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Store Manager');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Validator');
@@ -224,7 +224,7 @@ INSERT INTO tags (type, title) SELECT id, '0123456789' FROM tagtypes WHERE type 
 INSERT INTO tags (type, title) SELECT id, '2013' FROM tagtypes WHERE type = 'created';
 INSERT INTO tags (type, title) SELECT id, 'http://makeplaylive.com' FROM tagtypes WHERE type = 'url';
 
-INSERT INTO stores (id, partner, name) VALUES ('null', ct_testing_partnerId('Management'), 'No Store');
+INSERT INTO stores (id, partner, name) VALUES ('null', ct_testing_partnerId('Management Group'), 'No Store');
 INSERT INTO stores (id, partner, name, description) VALUES ('VIVALDI-1', ct_testing_partnerId('Make Play Live'), 'Vivaldi', 'Plasma Active tablet from Make Play Live');
 INSERT INTO stores (id, partner, name, description) VALUES ('KDE-1', ct_testing_partnerId('KDE'), 'Plasma Workspace', 'KDE Plasma user interfaces');
 INSERT INTO stores (id, partner, name, description) VALUES ('KDE-2', ct_testing_partnerId('KDE'), 'KDE Applications', 'Variety of tools');
