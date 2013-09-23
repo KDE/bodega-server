@@ -142,23 +142,24 @@ module.exports.authStore = function(req)
 module.exports.requireRole = function(db, req, res, partner, role, data, cb)
 {
     var roleQuery = 'select a.partner from affiliations a \
-                     left join personRoles r on (a.role = r.id and r.description = $1) \
-                     where a.partner = $2 and a.person = $3';
+        left join personRoles r on (a.role = r.id and r.description = $1) \
+        where a.partner = $2 and a.person = $3';
+    var args = [role, partner, req.session.user.id];
 
-    db.query(roleQuery, [ role, partner, req.session.user.id ],
-             function(err, result) {
-                if (err) {
-                    cb(errors.create('Database', err.message));
-                    return;
-                }
+    db.query(roleQuery, args, function(err, result) {
+        if (err) {
+            cb(errors.create('Database', err.message));
+            return;
+        }
 
-                if (result.rowCount < 1) {
-                    cb(errors.create('InvalidRole', 'Request requires the ' + role + ' role'));
-                    return;
-                }
+        if (result.rowCount < 1) {
+            cb(errors.create('InvalidRole',
+                             'Request requires the ' + role + ' role'));
+            return;
+        }
 
-                cb(null, db, req, res, partner, data);
-            });
+        cb(null, db, req, res, partner, data);
+    });
 };
 
 module.exports.partnerId = function(db, req, res, cb, role)
@@ -240,24 +241,17 @@ module.exports.copyFile = function(source, target, cb) {
  *
  * any number of parameters may be passed in after res and those will
  * be sent as additional parameters to this first function.
- *
- * if the last parameter passed in is a function, it is  used as a callback
- * that will be called with the usual (error, db, req, res) tuple
- * when the transaction is complete
  */
-module.exports.wrapInTransaction = function(functions, db, req, res)
+module.exports.wrapInTransactionAndReply = function(functions, db, req, res)
 {
+    var startArgs = Array.prototype.slice.call(arguments, 1);
+
     if (functions.length  < 1) {
         console.log("Can not transact without functions!");
         return;
     }
 
-    var startArgs = Array.prototype.slice.call(arguments, 1);
     startArgs.unshift(null);
-    var cb;
-    if (typeof startArgs[startArgs.length - 1] === 'function') {
-        cb = startArgs.pop();
-    }
 
     var funcs = [
         function(cb) {
@@ -276,27 +270,69 @@ module.exports.wrapInTransaction = function(functions, db, req, res)
 
     async.waterfall(funcs, function(err, json) {
         if (err) {
-            db.query("rollback", [],
-                     function() {
-                          if (cb) {
-                              cb(err, db, req, res);
-                          } else {
-                              errors.report(err.name, req, res, err);
-                          }
-                     });
+            db.query("rollback", [], function() {
+                errors.report(err.name, req, res, err);
+            });
         } else {
-            db.query("commit", [],
-                     function(err, result) {
-                          if (json) {
-                              res.json(json);
-                          }
-
-                          if (cb) {
-                              cb(null, db, req, res);
-                          }
-                     });
+            db.query("commit", [], function(err, result) {
+                res.json(json);
+            });
         }
-    }
-    );
+    });
 };
 
+
+/**
+ * Like the above but without side-effects, i.e. it doesn't send a reply
+ * but calls the provided callback. The callback has to be the
+ * last argument to the function.
+ */
+module.exports.wrapInTransaction = function(functions, db)
+{
+    var cb;
+    var startArgs = Array.prototype.slice.call(arguments, 1);
+
+    startArgs.unshift(null);
+    cb = startArgs.pop();
+    if (typeof cb !== 'function') {
+        cb(errors.create('MissingParameters',
+                         'Transaction without callback.'));
+        return;
+    }
+
+    if (functions.length  < 1) {
+        cb(errors.create('MissingParameters',
+                         'Transaction without functions to wrap.'));
+        return;
+    }
+
+
+    var funcs = [
+        function(firstFunc) {
+            db.query("BEGIN", [], function(err, result) {
+                if (err) {
+                    firstFunc(errors.create('Database', err.message));
+                    return;
+                }
+
+                firstFunc.apply(null, startArgs);
+            });
+        }
+    ];
+
+    funcs = funcs.concat(functions);
+
+    async.waterfall(funcs, function() {
+        var err = arguments[0];
+
+        if (err) {
+            db.query("rollback", [], function() {
+                cb.apply(null, arguments);
+            });
+        } else {
+            db.query("commit", [], function(err, result) {
+                cb.apply(null, arguments);
+            });
+        }
+    });
+};

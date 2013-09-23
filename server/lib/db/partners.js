@@ -419,7 +419,8 @@ module.exports.create = function(db, req, res)
         }
     }
 
-    utils.wrapInTransaction([insertPartner, addDefaultAffiliation], db, req, res, name, email);
+    utils.wrapInTransactionAndReply(
+        [insertPartner, addDefaultAffiliation], db, req, res, name, email);
 };
 
 module.exports.update = function(db, req, res)
@@ -451,8 +452,9 @@ module.exports.update = function(db, req, res)
         }
     }
 
-    utils.wrapInTransaction([utils.requireRole, updatePartner], db, req, res,
-                            partner, 'Partner Manager', data);
+    utils.wrapInTransactionAndReply(
+        [utils.requireRole, updatePartner], db, req, res,
+        partner, 'Partner Manager', data);
 };
 
 module.exports.createLink = function(db, req, res)
@@ -463,8 +465,10 @@ module.exports.createLink = function(db, req, res)
         return;
     }
 
-    utils.wrapInTransaction([utils.requireRole, confirmServiceExists, requireAccountOrUrl, createPartnerLink],
-                            db, req, res, partner, 'Partner Manager', null);
+    utils.wrapInTransactionAndReply(
+        [utils.requireRole, confirmServiceExists,
+         requireAccountOrUrl, createPartnerLink],
+        db, req, res, partner, 'Partner Manager', null);
 };
 
 module.exports.deleteLink = function(db, req, res)
@@ -475,8 +479,10 @@ module.exports.deleteLink = function(db, req, res)
         return;
     }
 
-    utils.wrapInTransaction([utils.requireRole, confirmServiceExists, requireAccountOrUrl, deletePartnerLink],
-                            db, req, res, partner, 'Partner Manager', null);
+    utils.wrapInTransactionAndReply(
+        [utils.requireRole, confirmServiceExists,
+         requireAccountOrUrl, deletePartnerLink],
+        db, req, res, partner, 'Partner Manager', null);
 };
 
 module.exports.listPersonRoles = function(db, req, res)
@@ -523,9 +529,10 @@ module.exports.setPersonRole = function(db, req, res)
             return;
         }
 
-        utils.wrapInTransaction([ utils.requireRole, setPersonRole, sendStandardJson ],
-                                db, req, res,
-                                partner, 'Partner Manager', { 'person': result.rows[0].id } );
+        utils.wrapInTransactionAndReply(
+            [utils.requireRole, setPersonRole, sendStandardJson],
+            db, req, res,
+            partner, 'Partner Manager', { 'person': result.rows[0].id } );
     });
 };
 
@@ -537,9 +544,10 @@ module.exports.requestDistributorStatus = function(db, req, res)
         return;
     }
 
-    utils.wrapInTransaction([ utils.requireRole, requestDistributorStatus, sendStandardJson ],
-                            db, req, res,
-                            partner, 'Partner Manager', null);
+    utils.wrapInTransactionAndReply(
+        [ utils.requireRole, requestDistributorStatus, sendStandardJson ],
+        db, req, res,
+        partner, 'Partner Manager', null);
 };
 
 module.exports.requestPublisherStatus = function(db, req, res)
@@ -550,9 +558,8 @@ module.exports.requestPublisherStatus = function(db, req, res)
         return;
     }
 
-    utils.wrapInTransaction([ utils.requireRole, requestPublisherStatus, sendStandardJson ],
-                            db, req, res,
-                            partner, 'Partner Manager', null);
+    utils.wrapInTransactionAndReply(
+        [ utils.requireRole, requestPublisherStatus, sendStandardJson ],
+        db, req, res,
+        partner, 'Partner Manager', null);
 };
-
-
