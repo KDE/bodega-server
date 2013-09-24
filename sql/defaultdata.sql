@@ -105,7 +105,7 @@ INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
               type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
 
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Theme', 'Critical gaps', 'Comprehensive', id FROM tags
+    SELECT 'Content', 'Critical gaps', 'Exceptional', id FROM tags
         WHERE (title = 'book' OR title = 'magazine') AND
               type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
@@ -127,7 +127,7 @@ INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
               type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
 
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Art', 'Poor quality', 'Amazing', id FROM tags
+    SELECT 'Graphics', 'Poor quality', 'Amazing', id FROM tags
         WHERE title = 'game' AND
               type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)

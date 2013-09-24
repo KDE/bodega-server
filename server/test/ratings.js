@@ -98,10 +98,11 @@ describe('Ratings', function() {
                         "name": "Aquarium",
                         "version": "0.2",
                         "description": "Grow an aqarium full of fish!",
+                        "rated": '',
                         "ratings": [
                             {
-                                "attribute": 5,
-                                "name": "perfomance",
+                                "attribute": 1,
+                                "name": "Usability",
                                 "rating": 1
                             }
                         ]
@@ -111,10 +112,11 @@ describe('Ratings', function() {
                         "name": "Poker1",
                         "version": "0.1",
                         "description": "Poker 1",
+                        "rated": '',
                         "ratings": [
                             {
-                                "attribute": 2,
-                                "name": "Usability",
+                                "attribute": 12,
+                                "name": "Graphics",
                                 "rating": 5
                             }
                         ]
@@ -124,10 +126,11 @@ describe('Ratings', function() {
                         "name": "Poker2",
                         "version": "0.2",
                         "description": "Poker 2",
+                        "rated": '',
                         "ratings": [
                             {
-                                "attribute": 3,
-                                "name": "funny",
+                                "attribute": 15,
+                                "name": "Enjoyability",
                                 "rating": 3
                             }
                         ]
@@ -154,7 +157,7 @@ describe('Ratings', function() {
         });
 
         it('should show user\'s ratings for specific asset', function(done) {
-            var expected = { 5: 1 };
+            var expected = { 1: 1 };
             utils.getUrl('participant/ratings/2',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -181,7 +184,7 @@ describe('Ratings', function() {
                 });
         });
         it('should succeed', function(done) {
-            var ratings = { 2: 1, 3: 2 };
+            var ratings = { 12: 1, 13: 2 };
             var query = {
                 ratings: JSON.stringify(ratings)
             };

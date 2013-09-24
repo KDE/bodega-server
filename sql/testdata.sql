@@ -169,7 +169,6 @@ DELETE FROM affiliations;
 DELETE FROM languages;
 DELETE FROM assetprices WHERE ending is not null;
 DELETE FROM assetRatings;
-DELETE FROM assetRatingAttributes;
 DELETE FROM assetRatingAverages;
 SELECT ct_testing_removePriorTestingTags();
 
@@ -620,22 +619,17 @@ INSERT INTO downloads (asset, person, downloadedOn, store, address, title, versi
      VALUES (ct_testing_assetByName('Jewels'), ct_testing_personByEmail('mart@kde.org'), '2013-10-01 23:10:11Z', 'KDE-1', '67.68.69.70', 'Jewels', 1);
 
 --ratings
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType) VALUES ('Usability', 'completely unusable', 'Wonderfully', ct_testing_tagByName('game'));
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('game'));
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType) VALUES ('funny', 'not funny at all', 'too much funny', ct_testing_tagByName('book'));
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType) VALUES ('perfomance', 'laggy', 'super smooth', ct_testing_tagByName('application'));
+INSERT INTO assetRatings (asset, attribute, person, rating)
+    VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Graphics'), ct_testing_personByEmail('aseigo@kde.org'), 1);
+INSERT INTO assetRatings (asset, attribute, person, rating)
+    VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('Playability'), ct_testing_personByEmail('aseigo@kde.org'), 2);
 
 INSERT INTO assetRatings (asset, attribute, person, rating)
-    VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('aseigo@kde.org'), 1);
+    VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Graphics'), ct_testing_personByEmail('zack@kde.org'), 5);
 INSERT INTO assetRatings (asset, attribute, person, rating)
-    VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('funny'), ct_testing_personByEmail('aseigo@kde.org'), 2);
-
+    VALUES (ct_testing_assetByName('Aquarium'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('zack@kde.org'), 1);
 INSERT INTO assetRatings (asset, attribute, person, rating)
-    VALUES (ct_testing_assetByName('Poker1'), ct_testing_ratingAttributeByName('Usability'), ct_testing_personByEmail('zack@kde.org'), 5);
-INSERT INTO assetRatings (asset, attribute, person, rating)
-    VALUES (ct_testing_assetByName('Aquarium'), ct_testing_ratingAttributeByName('perfomance'), ct_testing_personByEmail('zack@kde.org'), 1);
-INSERT INTO assetRatings (asset, attribute, person, rating)
-    VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('funny'), ct_testing_personByEmail('zack@kde.org'), 3);
+    VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('Enjoyability'), ct_testing_personByEmail('zack@kde.org'), 3);
 
 -- cleanup
 DROP FUNCTION ct_testing_favoriteBooksByAuthor(email text, author text);
