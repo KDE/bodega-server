@@ -32,4 +32,8 @@ insert into partners (id, name, publisher, distributor)
        values (100, 'Project Gutenberg', true, false);
 insert into partnercontacts (partner, service, url) values (100, 'website', 'http://http://www.gutenberg.org');
 
+INSERT INTO tags (type, title) SELECT id, 'Vivaldi' FROM tagTypes WHERE type = 'platform';
+INSERT INTO tags (type, title) SELECT id, 'Plasma/Applet' FROM tagTypes WHERE type = 'servicetype';
+INSERT INTO tags (type, title) SELECT id, 'Plasma/Wallpaper' FROM tagTypes WHERE type = 'servicetype';
+
 --end;
