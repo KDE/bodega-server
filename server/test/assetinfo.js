@@ -58,7 +58,7 @@ describe('Asset info', function(){
                     done();
                 });
         });
-        it("should show info for multiple assets", function(done) {
+        it("should show brief info for multiple assets", function(done) {
             utils.postUrl('asset/list/briefs',
                           { assets: [ 6, 7, 8, 9 ] },
                 function(res) {
@@ -67,6 +67,31 @@ describe('Asset info', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.eql(4);
+                    res.body.assets[0].should.have.property('id', 6);
+                    res.body.assets[0].should.have.property('partnerId');
+                    res.body.assets[0].should.have.property('partner');
+                    res.body.assets[0].should.have.property('license');
+                    res.body.assets[0].should.have.property('version');
+                    res.body.assets[0].should.have.property('created');
+                    res.body.assets[0].should.have.property('filename');
+                    res.body.assets[0].should.have.property('image');
+                    res.body.assets[0].should.have.property('name');
+                    res.body.assets[0].should.have.property('description');
+                    res.body.assets[0].should.have.property('size');
+                    res.body.assets[0].should.not.have.property('points');
+                    res.body.assets[0].should.not.have.property('canDownload');
+                    done();
+                });
+        });
+        it("should show brief info for a single asset", function(done) {
+            utils.postUrl('asset/list/briefs',
+                          { assets: [ 6 ] },
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('assets');
+                    res.body.assets.length.should.eql(1);
                     res.body.assets[0].should.have.property('id', 6);
                     res.body.assets[0].should.have.property('partnerId');
                     res.body.assets[0].should.have.property('partner');

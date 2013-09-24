@@ -33,7 +33,7 @@ function findForum(db, req, res, assetInfo, cb)
         }
         assetInfo.json.asset.forum = '';
         if (result && result.rowCount > 0) {
-            assetInfo.json.asset.forum =  app.config.service.discourse.externalUrl + 'category/'+ url.format(result.rows[0].categoryname);
+            assetInfo.json.asset.forum =  app.config.service.discourse.externalUrl + 'category/' + url.format(result.rows[0].categoryname);
         }
         cb(null, db, req, res, assetInfo);
     });
@@ -160,6 +160,7 @@ function findAsset(db, req, res, assetInfo, cb) {
     var table;
     var query;
     var args;
+    var multi = false;
     var expectedRowCount = 1;
 
     if (assetInfo.incoming) {
@@ -180,7 +181,7 @@ function findAsset(db, req, res, assetInfo, cb) {
             args.push(assetInfo.partner);
         }
     } else {
-        var multi = Array.isArray(assetInfo.assetId);
+        multi = Array.isArray(assetInfo.assetId);
         table = 'assets';
         query = "SELECT a.id, l.name as license, l.text as licenseText, \
             a.partner as partnerId, p.name as partnername, \
@@ -201,7 +202,7 @@ function findAsset(db, req, res, assetInfo, cb) {
 
         args = [req.session.user.store];
 
-        if (Array.isArray(assetInfo.assetId)) {
+        if (multi) {
             expectedRowCount = assetInfo.assetId.length;
             var index = 1;
             query += " IN (";
@@ -241,7 +242,7 @@ function findAsset(db, req, res, assetInfo, cb) {
         }
 
         json = utils.standardJson(req);
-        if (expectedRowCount > 1) {
+        if (multi) {
             json.assets = [];
             for (var i = 0; i < result.rowCount; ++i) {
                 json.assets.push(assetFromRow(result.rows[i], true));
