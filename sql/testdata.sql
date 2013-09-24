@@ -32,15 +32,15 @@ DECLARE
 BEGIN
     SELECT id into authorTagId FROM tagTypes WHERE type = 'author';
     SELECT id into personId FROM people WHERE people.email = $1;
-    SELECT id into favoriteCollectionId FROM collections WHERE person=personId AND name = 'Authors' and type = 'favorites';
+    SELECT id into favoriteCollectionId FROM collections WHERE person = personId AND name = 'Authors' and type = 'favorites';
     IF NOT FOUND THEN
        INSERT INTO collections (person, name, public, type)
             VALUES (personId, 'Authors', false, 'favorites');
-       SELECT id into favoriteCollectionId FROM collections WHERE person=personId AND name = 'Authors' and type = 'favorites';
+       SELECT id into favoriteCollectionId FROM collections WHERE person = personId AND name = 'Authors' and type = 'favorites';
     END IF;
 
     FOR foundTag IN SELECT tags.id, tags.title
-            FROM tags WHERE tags.type=authorTagId AND tags.en_index @@ plainto_tsquery('english', $2)
+            FROM tags WHERE tags.type = authorTagId AND tags.en_index @@ plainto_tsquery('english', $2)
     LOOP
         -- RAISE NOTICE 'tag is %', foundTag;
         FOR foundAsset IN SELECT atags.asset

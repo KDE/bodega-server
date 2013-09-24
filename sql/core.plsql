@@ -319,7 +319,7 @@ BEGIN
         END LOOP;
     END LOOP;
 
-    IF  processed THEN
+    IF processed THEN
         PERFORM ct_markNonExtantPricesDone();
 
         UPDATE channels SET assetCount = tmp.assets from
