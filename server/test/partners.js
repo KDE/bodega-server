@@ -23,74 +23,73 @@ var utils = require('./support/utils');
 
 describe('Partner management', function() {
     var existingPartnerJson = [
-                        {
-                            "id": 0,
-                            "name": "Management Group",
-                            "email": null,
-                            "publisher": true,
-                            "distributor": true,
-                            "points": 0,
-                            "links": [],
-                            "assets": 0,
-                            "downloads": 0,
-                            "purchases": 0,
-                            "stores": 1,
-                            "people": [
-                              {
-                                "name": "Zack Rusin",
-                                "email": "zack@kde.org",
-                                "roles": [
-                                  "Validator"
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            id: 1002,
-                            name: 'KDE',
-                            email: 'info@kde.org',
-                            publisher: false,
-                            distributor: true,
-                            points: 0,
-                            links: [
-                             {
-                                 "service": "blog",
-                                 "account": "",
-                                 "url": "http://planet.kde.org",
-                                 "icon": "extern/blog.png"
-                             },
-                             {
-                                 "service": "website",
-                                 "account": "",
-                                 "url": "http://kde.org",
-                                 "icon": ""
-                             }
-                            ],
-                            "assets": 25,
-                            "downloads": 22,
-                            "purchases": 13,
-                            "stores": 2,
-                            people: [
-                                {
-                                    "name": "Aaron Seigo",
-                                    "email": "aseigo@kde.org",
-                                    "roles": [
-                                        "Content Creator",
-                                        "Partner Manager"
-                                    ]
-                                },
-                                {
-                                    "name": "Zack Rusin",
-                                    "email": "zack@kde.org",
-                                    "roles": [
-                                        "Content Creator",
-                                        "Store Manager",
-                                        "Validator"
-                                    ]
-                                }
-                            ]
-                        }
-                    ];
+        {
+            "id": 0,
+            "name": "Management Group",
+            "email": null,
+            "publisher": true,
+            "distributor": true,
+            "points": 0,
+            "links": [],
+            "assets": 0,
+            "downloads": 0,
+            "purchases": 0,
+            "stores": 1,
+            "people": [
+                {
+                    "name": "Aaron Seigo",
+                    "email": "aseigo@kde.org",
+                    "roles": [
+                        "Validator"
+                    ]
+                }
+            ]
+        },
+        {
+            id: 1002,
+            name: 'KDE',
+            email: 'info@kde.org',
+            publisher: false,
+            distributor: true,
+            points: 0,
+            links: [
+                {
+                    "service": "blog",
+                    "account": "",
+                    "url": "http://planet.kde.org",
+                    "icon": "extern/blog.png"
+                },
+                {
+                    "service": "website",
+                    "account": "",
+                    "url": "http://kde.org",
+                    "icon": ""
+                }
+            ],
+            "assets": 25,
+            "downloads": 22,
+            "purchases": 13,
+            "stores": 2,
+            people: [
+                {
+                    "name": "Aaron Seigo",
+                    "email": "aseigo@kde.org",
+                    "roles": [
+                        "Partner Manager"
+                    ]
+                },
+                {
+                    "name": "Zack Rusin",
+                    "email": "zack@kde.org",
+                    "roles": [
+                        "Content Creator",
+                        "Store Manager",
+                        "Validator"
+                    ]
+                }
+            ]
+        }
+    ];
 
     describe('without authenticating', function(){
         it('Creating a partner should fail', function(done) {
@@ -159,7 +158,11 @@ describe('Partner management', function() {
         });
     });
 
-    utils.auth({ store: 'null' });
+    utils.auth({
+        user: 'aseigo@kde.org',
+        password: 'aseigo',
+        store: 'null'
+    });
 
     function checkPartnerList(expected, done) {
         utils.getUrl('partner/list',
@@ -208,8 +211,8 @@ describe('Partner management', function() {
                     "stores": 0,
                     people: [
                         {
-                            "name": "Zack Rusin",
-                            "email": "zack@kde.org",
+                            "name": "Aaron Seigo",
+                            "email": "aseigo@kde.org",
                             "roles": [
                                 "Account Manager",
                                 "Partner Manager"
@@ -544,8 +547,8 @@ describe('Partner management', function() {
 
             it('should be able to set roles for a partner we are a manager for', function(done) {
                 var params = {
-                            person: 'aseigo@kde.org',
-                            roles: [ 'Validator', 'Account Manager' ],
+                            person: 'zack@kde.org',
+                            roles: [ 'Validator', 'Account Manager' ]
                          };
                 utils.postUrl('partner/roles/update/' + newPartnerId,
                     params,
@@ -561,7 +564,7 @@ describe('Partner management', function() {
                             "email": "aseigo@kde.org",
                             "roles": [
                                 "Account Manager",
-                                "Validator"
+                                "Partner Manager"
                             ]
                         },
                         {
@@ -569,11 +572,9 @@ describe('Partner management', function() {
                             "email": "zack@kde.org",
                             "roles": [
                                 "Account Manager",
-                                "Partner Manager"
+                                "Validator"
                             ]
-                        }
-                    ];
-
+                        }];
                     checkPartnerList(expected, done);
                 });
 
@@ -581,9 +582,9 @@ describe('Partner management', function() {
 
             it('should be able to delete a role for a partner we are a manager for', function(done) {
                var params = {
-                            person: 'aseigo@kde.org',
-                            roles: [ 'Account Manager' ],
-                         };
+                   person: 'zack@kde.org',
+                   roles: [ 'Account Manager' ]
+               };
                 utils.postUrl('partner/roles/update/' + newPartnerId,
                     params,
                 function(res) {
@@ -592,24 +593,20 @@ describe('Partner management', function() {
                     res.body.should.have.property('success', true);
                     var expected = existingPartnerJson.slice();
                     expected.push(newPartnerJson);
-                    expected[2].people = [
-                        {
-                            "name": "Aaron Seigo",
-                            "email": "aseigo@kde.org",
-                            "roles": [
-                                "Account Manager"
-                            ]
-                        },
-                        {
-                            "name": "Zack Rusin",
-                            "email": "zack@kde.org",
-                            "roles": [
-                                "Account Manager",
-                                "Partner Manager"
-                            ]
-                        }
-                    ];
-
+                    expected[2].people = [{
+                        "name": "Aaron Seigo",
+                        "email": "aseigo@kde.org",
+                        "roles": [
+                            "Account Manager",
+                            "Partner Manager"
+                        ]
+                    }, {
+                        "name": "Zack Rusin",
+                        "email": "zack@kde.org",
+                        "roles": [
+                            "Account Manager"
+                        ]
+                    }];
                     checkPartnerList(expected, done);
                 });
 
@@ -617,7 +614,8 @@ describe('Partner management', function() {
 
             it('should be able to delete all roles for a person with a partner we are a manager for', function(done) {
                 var params = {
-                    person: 'aseigo@kde.org'
+                    person: 'zack@kde.org',
+                    roles: []
                 };
 
                 utils.postUrl('partner/roles/update/' + newPartnerId,
@@ -630,8 +628,8 @@ describe('Partner management', function() {
                         expected.push(newPartnerJson);
                         expected[2].people = [
                             {
-                                "name": "Zack Rusin",
-                                "email": "zack@kde.org",
+                                "name": "Aaron Seigo",
+                                "email": "aseigo@kde.org",
                                 "roles": [
                                     "Account Manager",
                                     "Partner Manager"
@@ -640,9 +638,8 @@ describe('Partner management', function() {
                         ];
 
                         checkPartnerList(expected, done);
-                });
-
-               });
+                    });
+            });
 
             it('request publisher status', function(done) {
                var params = {

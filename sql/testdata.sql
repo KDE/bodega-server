@@ -202,11 +202,10 @@ INSERT INTO partnerContacts (partner, service, account, url) VALUES (1002, 'webs
 INSERT INTO partners (id, name, publisher, distributor) VALUES (1003, 'Diamond Devices', false, true);
 INSERT INTO partners (id, name, publisher, distributor) VALUES (1004, 'Saphire Software', false, true);
 
-SELECT affiliatePerson('zack@kde.org', 'Management Group', 'Validator');
+SELECT affiliatePerson('aseigo@kde.org', 'Management Group', 'Validator');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Content Creator');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Store Manager');
 SELECT affiliatePerson('zack@kde.org', 'KDE', 'Validator');
-SELECT affiliatePerson('aseigo@kde.org', 'KDE', 'Content Creator');
 SELECT affiliatePerson('aseigo@kde.org', 'KDE', 'Partner Manager');
 SELECT affiliatePerson('mart@kde.org', 'Diamond Devices', 'Content Creator');
 SELECT affiliatePerson('mart@kde.org', 'Diamond Devices', 'Validator');

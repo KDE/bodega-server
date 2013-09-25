@@ -77,16 +77,18 @@ describe('Asset manipulation', function(){
 
     var incompleteAssetId;
     var completeAssetId;
+    var extraPostedAsset;
     var cleanupAssets = [];
 
-    function deleteAsset(assets, i, cb)
+    function deleteIncomingAsset(assets, i, cb)
     {
         var asset = assets[i];
-        utils.getUrl('asset/delete/' + asset,
-            function(res) {
-                ++i;
-                cb(null, assets, i);
+        var deleteQuery = 'DELETE FROM incomingAssets WHERE id=$1;';
+        app.db.dbQuery(function(db) {
+            db.query(deleteQuery, [assets[i]], function(err, result) {
+                cb(null, assets, ++i);
             });
+        });
     }
 
     function deleteCompleteAsset(assets, i, cb)
@@ -316,7 +318,7 @@ describe('Asset manipulation', function(){
                           incompleteAssetId = res.body.asset.id;
                           cleanupAssets.push(incompleteAssetId);
                           ++finished;
-                          if (finished === 2) {
+                          if (finished === 3) {
                               done();
                           }
                       });
@@ -346,23 +348,10 @@ describe('Asset manipulation', function(){
                           completeAssetId = res.body.asset.id;
                           cleanupAssets.push(completeAssetId);
                           ++finished;
-                          if (finished === 2) {
+                          if (finished === 3) {
                               done();
                           }
                       });
-        });
-        it('should work with a complete asset', function(done){
-            utils.postUrl('asset/post/' + completeAssetId, null,
-                function(res) {
-                    res.body.should.have.property('authStatus', true);
-                    res.body.should.not.have.property('error');
-                    done();
-                });
-        });
-    });
-    describe('Publishing', function(){
-        var extraPostedAsset;
-        before(function(done){
             postFiles('asset/create',
                     [{
                         "name" : "info",
@@ -394,9 +383,53 @@ describe('Asset manipulation', function(){
                                             res.body.should.not.have.property('error');
                                             extraPostedAsset = assetId;
                                             cleanupAssets.push(extraPostedAsset);
-                                            done();
+                                            ++finished;
+                                            if (finished === 3) {
+                                                done();
+                                            }
                                         });
                       });
+        });
+        it('should work with a complete asset', function(done){
+            utils.postUrl('asset/post/' + completeAssetId, null,
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    done();
+                });
+        });
+    });
+    describe('Publishing without permissions', function(){
+        it('should not be  to publish an asset', function(done){
+            utils.postUrl('asset/publish/' + completeAssetId + "?approve=1", null,
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'PartnerInvalid');
+                    done();
+                });
+        });
+        it('should not be able to reject an asset', function(done){
+            utils.app.config.printErrors = false;
+            utils.postUrl('asset/publish/' + completeAssetId + "?reject=1&reason=hello", null,
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'PartnerInvalid');
+                    utils.app.config.printErrors = true;
+                    done();
+                });
+        });
+    });
+
+    utils.auth({
+        user: 'aseigo@kde.org',
+        password: 'aseigo',
+        store: 'null'
+    });
+    describe('Publishing', function(){
+        before(function(done){
+            done();
         });
         after(function(done){
             var addr = utils.dbConnectionString;
@@ -480,7 +513,7 @@ describe('Asset manipulation', function(){
             return;
         }
         for (i = 0; i < numToDelete; ++i) {
-            funcs.push(deleteAsset);
+            funcs.push(deleteIncomingAsset);
         }
 
         async.waterfall(funcs, function() {

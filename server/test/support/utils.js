@@ -122,7 +122,6 @@ function auth(params, cb)
             if (!params) {
                 params = defaultAuth;
             }
-
             if (!cb &&
                 module.exports.cookie !== '' &&
                 (((!params.user && currentlyAuthed.user === defaultAuth.user) ||
@@ -239,4 +238,3 @@ module.exports.getStream = getStream;
 module.exports.postUrl = postUrl;
 module.exports.auth = auth;
 module.exports.dbSnapshot = dbSnapshot;
-
