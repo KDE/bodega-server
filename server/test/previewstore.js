@@ -45,7 +45,7 @@ describe('Preview Store, ', function(){
         incoming : true,
         previews : [
             {type : "icon", "subtype" : "medium", mimetype : 'image/png', file : tmpIcon64 },
-            {type : "icon", "subtype" : "large", mimetype : 'image/png', file : tmpIcon128 },
+            {type : "icon", "subtype" : "big", mimetype : 'image/png', file : tmpIcon128 },
             {type : "icon", "subtype" : "huge", mimetype : 'image/png', file : tmpIcon512 },
             {type : "screenshot", "subtype" : "screen1", mimetype : 'image/png', file : tmpScreenshot }
         ],

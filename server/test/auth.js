@@ -133,7 +133,8 @@ describe('Authentication', function(){
                         "tiny": hostname + "/icons/22",
                        "small": hostname + "/icons/32",
                       "medium": hostname + "/icons/64",
-                       "large": hostname + "/icons/128",
+                         "big": hostname + "/icons/128",
+                       "large": hostname + "/icons/256",
                         "huge": hostname + "/icons/512",
                     "previews": hostname + "/previews"
                 },
