@@ -50,11 +50,48 @@ function launchDownload(db, req, res)
     });
 }
 
+
+function launchIncomingDownload(db, req, res)
+{
+    var assetInfoQuery =
+        "SELECT a.id, a.partner as partnerId, a.version, a.file, a.name \
+         FROM incomingAssets a WHERE a.id = $1";
+    var args = [req.params.assetId];
+
+    db.query(assetInfoQuery, args, function(err, result) {
+        var assetInfo;
+        if (err) {
+            errors.report('Database', req, res, err);
+            return;
+        }
+        if (!result || !result.rows || result.rows.length < 1) {
+            //"Could not find the specified asset.",
+            errors.report('NoMatch', req, res);
+            return;
+        }
+        assetInfo = result.rows[0];
+        assetInfo.incoming = true;
+        app.assetStore.download(res, assetInfo, function(err) {
+            if (err) {
+                errors.report('Download', req, res, err);
+                return;
+            }
+
+            //nothing. we don't record downloads of an incoming asset
+        });
+    });
+}
+
 module.exports = function(db, req, res) {
-    var query = "SELECT ct_canDownload($1, $2, $3) as allowed;";
+    var isIncoming = req.query.incoming !== undefined;
+    var nquery = "SELECT ct_canDownload($1, $2, $3) as allowed;";
+    var iquery = "SELECT ct_canDownloadIncoming($1, $2, $3) as allowed;";
     var args = [req.session.user.id,
                 req.session.user.store,
                 req.params.assetId];
+    var e;
+    var query = isIncoming ? iquery : nquery;
+
     db.query(query, args, function(err, result) {
         if (err || !result || result.rows.length < 1) {
             errors.report('Database', req, res, err);
@@ -67,6 +104,10 @@ module.exports = function(db, req, res) {
             return;
         }
 
-        launchDownload(db, req, res);
+        if (isIncoming) {
+            launchIncomingDownload(db, req, res);
+        } else {
+            launchDownload(db, req, res);
+        }
     });
 };

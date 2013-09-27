@@ -1,3 +1,4 @@
+-- -*- mode:sql -*-
 /*
     Copyright 2013 Coherent Theory LLC
 
@@ -14,10 +15,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
-
-
--- -*- mode:sql -*-
-
 
 CREATE OR REPLACE FUNCTION ct_addTagsToAsset(assetId int, tags int[]) RETURNS VOID AS $$
 DECLARE
@@ -144,3 +141,21 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE function ct_isSuperuserValidator(who int) returns BOOL
+AS
+$$
+DECLARE
+    validatorId  int;
+BEGIN
+    SELECT INTO validatorId id FROM personroles
+           WHERE description = 'Validator';
+    PERFORM * FROM affiliations WHERE
+            partner = 0 AND
+            role = validatorId AND
+            person = who;
+    IF FOUND THEN
+       RETURN TRUE;
+    END IF;
+    RETURN FALSE;
+END;
+$$ LANGUAGE 'plpgsql';

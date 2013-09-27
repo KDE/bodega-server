@@ -427,6 +427,29 @@ describe('Asset manipulation', function(){
         password: 'aseigo',
         store: 'null'
     });
+    describe('Validation before publishing', function() {
+        it('should list posted assets', function(done){
+            utils.getUrl('asset/list/posted',
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('assets');
+                    res.body.assets.length.should.be.equal(2);
+                    res.body.assets[0].should.have.property('id', extraPostedAsset);
+                    res.body.assets[1].should.have.property('id', completeAssetId);
+                    done();
+                });
+        });
+
+        it('should download correctly', function(done) {
+            utils.getStream('download/' + completeAssetId + "?incoming",
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-length', '137887');
+                    done();
+                });
+        });
+    });
     describe('Publishing', function(){
         before(function(done){
             done();
@@ -453,6 +476,7 @@ describe('Asset manipulation', function(){
                              });
             });
         });
+
         it('should complain about missing options', function(done){
             utils.postUrl('asset/publish/' + completeAssetId, null,
                 function(res) {

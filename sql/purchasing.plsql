@@ -110,6 +110,11 @@ BEGIN
             RETURN TRUE;
         END IF;
 
+        -- you can always download things as superuser validator
+        IF ct_isSuperuserValidator(who) THEN
+            RETURN TRUE;
+        END IF;
+
         SELECT INTO price ct_assetPrice(fromStore, what);
         IF price < 0 THEN
             RETURN FALSE;
@@ -121,6 +126,28 @@ BEGIN
     END IF;
 
     RETURN TRUE;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+-- check if download of an incoming asset is allowed
+--   it is but only for superusers and owners
+-- PARAMETERS: int person, int asset
+-- RETURNS: bool true if can download, false if not
+CREATE OR REPLACE FUNCTION ct_canDownloadIncoming(who int, fromStore text, what int) RETURNS BOOL AS $$
+BEGIN
+    -- you can always download your own stuff
+    PERFORM * FROM assets WHERE id = what AND partner = who;
+    IF FOUND THEN
+       RETURN TRUE;
+    END IF;
+
+    -- you can always download things as superuser validator
+    IF ct_isSuperuserValidator(who) THEN
+       RETURN TRUE;
+    END IF;
+
+    RETURN FALSE;
 END;
 $$ LANGUAGE 'plpgsql';
 

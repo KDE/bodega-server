@@ -576,4 +576,3 @@ BEGIN
     return true;
 END;
 $$ LANGUAGE 'plpgsql';
-

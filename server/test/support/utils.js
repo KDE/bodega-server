@@ -35,8 +35,10 @@ function getUrl(path, fn, opts)
                 assert.deepEqual(contentType, 'text/html; charset=utf-8');
                 res.body = buf;
             } else if (opts && opts.stream) {
-                assert.deepEqual(contentType,
-                                'application/octet-stream');
+                var isStreamOrPdf =
+                    contentType === 'application/octet-stream' ||
+                    contentType === 'application/pdf';
+                assert(isStreamOrPdf, 'Content type is wrong: ' + contentType);
             } else {
                 var isJson =
                         contentType === 'application/json' ||
