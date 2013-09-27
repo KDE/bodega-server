@@ -387,7 +387,7 @@ function unpostAsset(db, req, res, assetInfo, cb)
 function rejectAsset(db, req, res, assetInfo)
 {
     var funcs = [];
-    var reason = req.query.reason;
+    var reason = req.body.reason;
 
     if (!reason) {
         errors.report('MissingParameters', req, res);
