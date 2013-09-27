@@ -53,6 +53,9 @@ function findCategory(db, req, res, cb) {
                           categoryUrl + '?page=' + ~~(req.query.offset / TOPICS_PER_PAGE) : categoryUrl;
 
             cb(null, req, res, json, categoryUrl);
+        } else {
+            var e = errors.create('NoMatch');
+            cb(e, req, res, json);
         }
     });
 }
