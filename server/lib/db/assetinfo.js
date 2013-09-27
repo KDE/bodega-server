@@ -102,9 +102,10 @@ function findPreviews(db, req, res, assetInfo, cb)
 function findTags(db, req, res, assetInfo, cb)
 {
     var tagsQuery =
-        "SELECT tagTypes.type, tags.title FROM assetTags a JOIN tags ON \
-         (a.tag = tags.id) LEFT JOIN tagTypes ON \
-         (tags.type = tagTypes.id) where a.asset = $1;";
+        "SELECT tagTypes.type, tags.title FROM \
+             assetTags a JOIN tags ON (a.tag = tags.id) LEFT JOIN \
+             tagTypes ON (tags.type = tagTypes.id) \
+         where a.asset = $1 AND tagTypes.listPublicly;";
     var incomingTagsQuery =
         "SELECT tagTypes.type, tags.title FROM incomingAssetTags a \
          JOIN tags ON (a.tag = tags.id) LEFT JOIN tagTypes ON \
