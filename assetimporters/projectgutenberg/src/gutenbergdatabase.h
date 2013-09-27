@@ -31,10 +31,10 @@ namespace Gutenberg
 class GutenbergDatabase : public Database
 {
 public:
-    static void write(const Catalog &catalog, const QString &contentPath, bool clearOldData);
+    static void write(const Catalog &catalog, const QString &contentPath, const QString &repositoryPath, bool clearOldData);
 
 private:
-    GutenbergDatabase(const QString &contentPath);
+    GutenbergDatabase(const QString &contentPath, const QString &repositoryPath);
 
     void clearData();
     void writeBookInit();
@@ -45,11 +45,13 @@ private:
     void writeBookChannelTags();
     int writeBookAsset(const Ebook &book, QSqlQuery &query);
     void writeBookAssetTags(const Ebook &book, int assetId);
-    int bookAssetQuery(const Ebook &book) const;
+    int bookExistsInDatabase(const Ebook &book) const;
     int languageId(const QString &lang);
 
 private:
     QSqlDatabase m_db;
+    QString m_contentPath;
+    QString m_repositoryPath;
     int m_authorTagId;
     int m_categoryTagId;
     int m_licenseId;

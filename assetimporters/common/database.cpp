@@ -41,11 +41,14 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
     m_totalTime.start();
 
     //db.setHostName("localhost");
-    m_db.setDatabaseName("bodega");
+    m_db.setDatabaseName("bodega_production");
     m_db.setUserName("bodega");
     m_db.setPassword("bodega");
     bool ok = m_db.open();
     qDebug()<<"db opened = "<<ok;
+
+    m_checkAssetTagQuery.prepare("SELECT asset FROM assetTags WHERE asset = :assetId AND tag = :tagId");
+    m_checkChannelTagQuery.prepare("SELECT channel FROM channelTags WHERE channel = :channelId AND tag = :tagId");
 
     m_partnerId = partnerId(partner);
     if (!m_partnerId) {
@@ -53,13 +56,11 @@ Database::Database(const QString &contentPath, const QString &partner, const QSt
         return;
     }
 
-
     m_mimetypeTagTypeId = tagTypeId(QLatin1String("mimetype"));
     if (!m_mimetypeTagTypeId) {
         Q_ASSERT(!"couldn't create author tag id");
         return;
     }
-
 
     m_authorTagTypeId = tagTypeId(QLatin1String("author"));
     if (!m_authorTagTypeId) {
@@ -125,11 +126,6 @@ int Database::writeChannel(const QString &name, const QString &description, cons
 int Database::mimetypeTagTypeId()
 {
     return m_mimetypeTagTypeId;
-}
-
-int Database::authorId(const QString &author) const
-{
-    return tagId(m_authorTagTypeId, author);
 }
 
 int Database::partnerId()
@@ -204,6 +200,54 @@ int Database::licenseId(const QString &license, const QString &licenseText)
     return query.value(0).toInt();
 }
 
+int Database::genericTagId(int tagTypeId, const QString &text, QHash<QString, int> *cache) const
+{
+    if (cache && cache->contains(text)) {
+        return (*cache)[text];
+    }
+
+    QSqlQuery query;
+    query.prepare("select id from tags where type = :type and title = :text");
+
+    query.bindValue(":type", tagTypeId);
+    query.bindValue(":author", text);
+
+    if (!query.exec()) {
+        showError(query);
+        return 0;
+    }
+
+    if (query.first()) {
+        int res = query.value(0).toInt();
+        if (cache) {
+            cache->insert(text, res);
+        }
+
+        return res;
+    }
+
+    query.prepare("insert into tags (type, title) "
+                  "values (:type, :title) "
+                  "returning id");
+    query.bindValue(":type", tagTypeId);
+    query.bindValue(":title", text);
+
+    if (!query.exec()) {
+        showError(query);
+        return 0;
+    }
+
+    if (!query.first()) {
+        return 0;
+    }
+
+    int res = query.value(0).toInt();
+    if (cache) {
+        cache->insert(text, res);
+    }
+
+    return res;
+}
 int Database::tagId(int tagTypeId, const QString &text, QHash<QString, int> *cache) const
 {
     if (cache && cache->contains(text)) {
@@ -391,7 +435,7 @@ int Database::authorId(const QString &author)
 
 int Database::writeAsset(QSqlQuery query, const QString &name, const QString &description,
                          int licenseId, int partnerId,
-                         const QString &version, const QString &path, const QString &file,
+                         const QString &version, const QString &file,
                          const QString &imagePath)
 {
     query.bindValue(":name", name);
@@ -399,7 +443,6 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
     query.bindValue(":license", licenseId);
     query.bindValue(":partner", partnerId);
     query.bindValue(":version", version);
-    query.bindValue(":path", path);
     query.bindValue(":file", file);
     query.bindValue(":image", imagePath);
 
@@ -419,6 +462,13 @@ int Database::writeAsset(QSqlQuery query, const QString &name, const QString &de
 
 void Database::writeAssetTags(int assetId, int tagId)
 {
+    m_checkAssetTagQuery.bindValue(":assetId", assetId);
+    m_checkAssetTagQuery.bindValue(":tagId", tagId);
+    m_checkAssetTagQuery.exec();
+    if (m_checkAssetTagQuery.first()) {
+        return;
+    }
+
     static int count = 0;
     ++count;
     if (m_assetTagInsertQuery.isEmpty()) {
@@ -453,6 +503,13 @@ void Database::writeAssetTags(int assetId, QVariant &tagId)
 
 void Database::writeChannelTags(int channelId, int tagId)
 {
+    m_checkChannelTagQuery.bindValue(":channelId", channelId);
+    m_checkChannelTagQuery.bindValue(":tagId", tagId);
+    m_checkChannelTagQuery.exec();
+    if (m_checkChannelTagQuery.first()) {
+        return;
+    }
+
     static int count = 0;
     ++count;
     if (m_channelTagInsertQuery.isEmpty()) {

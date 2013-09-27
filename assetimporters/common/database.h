@@ -63,8 +63,7 @@ public:
 protected:
     int writeAsset(QSqlQuery query, const QString &name, const QString &description,
                    int licenseId, int partnerId,
-                   const QString &version,
-                   const QString &path, const QString &file,
+                   const QString &version, const QString &file,
                    const QString &imagePath);
     void writeAssetTags(int assetId, int tagId);
 
@@ -80,8 +79,10 @@ protected:
     int partnerId(const QString &partner);
     int licenseId(const QString &license, const QString &licenseText = QString());
 
-    int authorId(const QString &author) const;
     int contributorQuery(const QString &author) const;
+    // tag not owned by partner
+    int genericTagId(int tagTypeId, const QString &text, QHash<QString, int> *cache = 0) const;
+    // tag owned by partner
     int tagId(int tagTypeId, const QString &text, QHash<QString, int> *cache = 0) const;
     int tagTypeId(const QString &type) const;
     int categoryId(const QString &name) const;
@@ -107,6 +108,8 @@ private:
     QString m_channelTagInsertQuery;
     int m_tagBatchCount;
     QTime m_totalTime;
+    QSqlQuery m_checkAssetTagQuery;
+    QSqlQuery m_checkChannelTagQuery;
 };
 
 #define showError(query) \

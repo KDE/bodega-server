@@ -32,9 +32,9 @@
 
 using namespace Gutenberg;
 
-void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath, bool clearOldData)
+void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath, const QString &repositoryPath, bool clearOldData)
 {
-    GutenbergDatabase db(contentPath);
+    GutenbergDatabase db(contentPath, repositoryPath);
 
     Q_ASSERT(catalog.isCompiled());
     if (!catalog.isCompiled()) {
@@ -53,8 +53,10 @@ void GutenbergDatabase::write(const Catalog &catalog, const QString &contentPath
     db.writeBookChannels(catalog);
 }
 
-GutenbergDatabase::GutenbergDatabase(const QString &contentPath)
+GutenbergDatabase::GutenbergDatabase(const QString &contentPath, const QString &repositoryPath)
     : Database(contentPath, "Project Gutenberg", "VIVALDI-1"),
+      m_contentPath(contentPath),
+      m_repositoryPath(repositoryPath),
       m_categoryTagId(0),
       m_licenseId(0),
       m_mimetypeTagTypeId(0),
@@ -118,7 +120,7 @@ void GutenbergDatabase::writeBookInit()
     m_mimetypeTagTypeId = mimetypeTagTypeId();
     m_descriptionTagTypeId = tagTypeId("description");
 
-    m_ebookMimetypeTag = tagId(m_mimetypeTagTypeId, Ebook::epubMimetype());
+    m_ebookMimetypeTag = genericTagId(m_mimetypeTagTypeId, Ebook::epubMimetype());
 }
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
@@ -149,7 +151,7 @@ void GutenbergDatabase::writeLanguages(const Catalog &catalog)
         }
 
         // now we insert the tag if needed and record its value for later use
-        tagId(languageTagType, code, &m_languageTagIds);
+        genericTagId(languageTagType, code, &m_languageTagIds);
     }
 
     qDebug() << "\tLanguage creation took" << t.elapsed() / 1000. << "seconds";
@@ -192,16 +194,16 @@ void GutenbergDatabase::writeBooks(const Catalog &catalog)
 
     QSqlQuery query;
     query.prepare("insert into assets "
-                  "(name, license, partner, version, externpath, file, image, size) "
+                  "(name, license, partner, version, file, image, size) "
                   "values "
-                  "(:name, :license, :partner, :version, :path, :file, :image, :size) "
+                  "(:name, :license, :partner, :version, :file, :image, :size) "
                   "returning id");
 
     QString recordExternalIdQuery;
 
     foreach (const Ebook &book, catalog.m_ebooks) {
         //qDebug() << "Ok, let's put in this book" << book.bookId() << book.title();
-        if (bookAssetQuery(book)) {
+        if (bookExistsInDatabase(book)) {
             // already in the database
             ++numSkipped;
         } else {
@@ -333,7 +335,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
     qDebug() << "\tWriting all channel tags took" << t.elapsed() / 1000. << "seconds";
 }
 
-int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
+int GutenbergDatabase::bookExistsInDatabase(const Ebook &book) const
 {
     QSqlQuery query;
     query.prepare("SELECT id FROM gutenberg where id = :id");
@@ -354,20 +356,59 @@ int GutenbergDatabase::bookAssetQuery(const Ebook &book) const
 
 int GutenbergDatabase::writeBookAsset(const Ebook &book, QSqlQuery &query)
 {
+    static const QRegExp idRegExp("([0-9]+)");
     static const QString filePrefix("gutenberg/");
     Gutenberg::File epubFile = book.epubFile();
-    QFileInfo fi(epubFile.url.path());
+    QString filename = epubFile.url.toString();
+    filename.replace("http://www.gutenberg.org/ebooks/", "pg");
+    filename.replace("http://www.gutenberg.org/files/", "pg");
+    filename.replace(".epub.images", "-images.epub");
+    filename.replace(".noimages", "");
 
+    idRegExp.indexIn(filename);
+    const QString idNumber = idRegExp.cap(1);
+    const QString sourceFile = m_repositoryPath + idNumber + '/' + filename;
+    QFile file(sourceFile);
+    if (!file.exists()) {
+        qDebug() << "The book file does not exist:" << sourceFile;
+        return 0;
+    }
+
+    //qDebug() << "Going to write" << filename << idNumber << sourceFile;
+    QString cover = QLatin1String("default/book.png");
+    /*
     QString cover = QFileInfo(book.coverImage()).fileName();
     if (cover.isEmpty()) {
         cover = QLatin1String("default/book.png");
     } else {
-        cover.prepend("gutenberg/");
+        cover.replace("ebooks", "");
+        cover.prepend(filePrefix + book.bookId() + '/');
     }
+    */
+    query.bindValue(":name", book.title());
+    query.bindValue(":description", QString());
+    query.bindValue(":license", m_licenseId);
+    query.bindValue(":partner", partnerId());
+    query.bindValue(":version", QLatin1String("1.0"));
+    query.bindValue(":file", filename);
+    query.bindValue(":image", cover);
 
-    const int id = writeAsset(query, book.title(), QString(),
-                              m_licenseId, partnerId(), QLatin1String("1.0"),
-                              epubFile.url.toString(), filePrefix + fi.fileName(), cover);
+    query.bindValue(":size", file.size());
+
+    if (!query.exec()) {
+        showError(query);
+        return 0;
+    }
+    if (!query.first()) {
+        return 0;
+    }
+    const int id = query.value(0).toInt();
+    //qDebug()<<"Last id"<<res;
+    QDir dir(m_contentPath);
+    dir.mkdir(QString::number(id));
+    const QString targetFile = m_contentPath + QString::number(id) + '/' + filename;
+    //qDebug() << "     copying to" << targetFile;
+    file.copy(targetFile);
     return id;
 }
 
