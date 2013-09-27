@@ -120,7 +120,7 @@ void GutenbergDatabase::writeBookInit()
     m_mimetypeTagTypeId = mimetypeTagTypeId();
     m_descriptionTagTypeId = tagTypeId("description");
 
-    m_ebookMimetypeTag = genericTagId(m_mimetypeTagTypeId, Ebook::epubMimetype());
+    m_ebookMimetypeTag = tagId(m_mimetypeTagTypeId, Ebook::epubMimetype());
 }
 
 void GutenbergDatabase::writeLanguages(const Catalog &catalog)
