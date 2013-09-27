@@ -41,7 +41,7 @@ module.exports.parseNumber = function(string, defaultValue)
 
 module.exports.findImagePaths = function(req)
 {
-    var serverUrl = "http://" + req.header('host');
+    var serverUrl = app.config.externalBaseUrl;
     var previewPaths = app.previewStore.previewPaths();
     var imageUrls = {
         tiny: serverUrl + previewPaths.icons.tiny,
