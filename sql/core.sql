@@ -149,8 +149,9 @@ create sequence seq_tagTypeIds;
 
 create table tagTypes
 (
-    id          int         primary key default nextval('seq_tagTypeIds'),
-    type        text        not null
+    id           int        primary key default nextval('seq_tagTypeIds'),
+    type         text       not null,
+    listPublicly bool       not null default true
 );
 
 create sequence seq_tagIds;
