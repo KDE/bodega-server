@@ -111,20 +111,27 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION ct_charSynonym(c char) RETURNS char AS $$
 DECLARE
 BEGIN
-    IF c IN ('æ', 'à', 'á', 'â', 'ä', 'ã') THEN
+    c = lower(c);
+    IF c IN ('æ', 'à', 'á', 'â', 'ä', 'ã', 'ā', 'ă', 'ą', 'ǎ') THEN
         RETURN 'a';
-    ELSIF c IN ('è', 'é', 'ê', 'ë', 'ẽ')  THEN
+    ELSIF c IN ('è', 'é', 'ê', 'ë', 'ẽ', 'ę', 'ě')  THEN
         RETURN 'e';
-    ELSIF c IN ('ì', 'í', 'î', 'ï', 'ĩ')  THEN
+    ELSIF c IN ('ì', 'í', 'î', 'ï', 'ĩ', 'ī', 'ĭ', 'ǐ')  THEN
         RETURN 'i';
-    ELSIF c IN ('ò', 'ó', 'ô', 'ö', 'õ')  THEN
+    ELSIF c IN ('ò', 'ó', 'ô', 'ö', 'õ', 'ø', 'ǒ')  THEN
         RETURN 'o';
-    ELSIF c IN ('ù', 'ú', 'û', 'ü', 'ũ')  THEN
+    ELSIF c IN ('ù', 'ú', 'û', 'ü', 'ũ', 'ů', 'ū', 'ǔ', 'ŭ')  THEN
         RETURN 'u';
+    ELSIF c IN ('ç', 'ĉ', 'ć', 'ċ', 'č') THEN
+        RETURN 'c';
     ELSIF c IN ('ł') THEN
         RETURN 'l';
-    ELSIF c IN ('š') THEN
+    ELSIF c IN ('ñ') THEN
+        RETURN 'n';
+    ELSIF c IN ('š', 'ś', 'ŝ', 'ş', 'š') THEN
         RETURN 's';
+    ELSIF c IN ('ż', 'ź', 'ž') THEN
+        RETURN 'z';
     END IF;
 
     RETURN c;
@@ -142,7 +149,7 @@ BEGIN
 
     SELECT INTO groupTagTitle type FROM tagTypes WHERE id = NEW.type AND type IN ('author');
     IF FOUND THEN
-        groupTagTitle = groupTagTitle || '_' || ct_charSynonym(lower(substr(NEW.title, 1, 1)));
+        groupTagTitle = groupTagTitle || '_' || ct_charSynonym(substr(NEW.title, 1, 1));
         SELECT INTO groupingId id FROM tagTypes WHERE type = 'grouping';
         INSERT INTO autoTags (source, target)
             SELECT NEW.id, id FROM tags
@@ -498,7 +505,7 @@ BEGIN
         leadChar = substring(name from '[\w]');
     END IF;
 
-    leadChar = ct_charSynonym(lower(leadChar));
+    leadChar = ct_charSynonym(leadChar);
 
     IF leadChar ~ '\d' THEN
         groupTagTitle = groupTagTitle || '0-9';
