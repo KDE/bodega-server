@@ -270,7 +270,7 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
                                              "default/book.png", booksChannelId);
     const int groupingTagTypeId = tagTypeId("grouping");
     QSqlQuery query;
-    query.prepare("select distinct t.id, upper(substring(t.title from '.$')) from assettags at join tags t on (at.tag = t.id) "
+    query.prepare("select distinct t.id, upper(substring(t.title from '_(.*)$')) from assettags at join tags t on (at.tag = t.id) "
                   "join assets a on (at.asset = a.id) "
                   "where a.partner = :partner and t.type = :groupingTagType and t.title ~ :pattern");
     query.bindValue(":partner", partnerId());
