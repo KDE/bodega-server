@@ -196,28 +196,19 @@ bool Ebook::hasEpubFile() const
 
 File Ebook::epubFile() const
 {
-    QList<Gutenberg::File> epubFiles;
+    Gutenberg::File epubFile;
 
     foreach(const Gutenberg::File &file, m_files) {
         if (file.format.contains(s_epubMimetype)) {
-            epubFiles.append(file);
+            if (file.url.toString().contains("noimages")) {
+                epubFile = file;
+            } else {
+                return file;
+            }
         }
     }
 
-    if (epubFiles.isEmpty()){
-        return Gutenberg::File();
-    }
-
-    /*
-     * If possible we want to return the version with images
-     */
-    if (epubFiles.count() > 1) {
-        Q_ASSERT(epubFiles.count() == 2);
-        if (!epubFiles.first().url.toString().contains("-images.epub")) {
-            return epubFiles[1];
-        }
-    }
-    return epubFiles[0];
+    return epubFile;
 }
 
 QString Ebook::coverImage() const
