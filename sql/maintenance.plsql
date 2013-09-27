@@ -31,3 +31,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION ct_removeChannelTagDupes() RETURNS VOID AS $$
+BEGIN
+    LOOP
+        DELETE FROM channeltags WHERE ctid in
+            (SELECT ctid FROM
+                (SELECT max(ctid) as ctid, channel, tag, COUNT(channel) as COUNT
+                 FROM channeltags GROUP by channel, tag order by channel) as finder
+              WHERE finder.COUNT > 1);
+
+        IF NOT FOUND THEN
+            EXIT;
+        END IF;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
