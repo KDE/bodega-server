@@ -129,17 +129,22 @@ function writeAsset(db, req, res, assetInfo, cb)
         ++idx;
     }
 
+    var firstField = true;
+
     for (i = 0; i < fields.length; ++i) {
         field = fields[i];
         if (typeof assetInfo[field] !== 'undefined' &&
             assetInfo[field] !== null) {
 
-            fieldsStr += ', ';
-            valuesStr += ', ';
+            if (!firstField) {
+                fieldsStr += ', ';
+                valuesStr += ', ';
+            }
 
             fieldsStr += field;
             args.push(assetInfo[field]);
             valuesStr += "$" + idx;
+            firstField = false;
             ++idx;
         }
     }

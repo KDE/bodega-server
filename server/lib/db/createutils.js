@@ -426,7 +426,7 @@ function findIncomingAsset(db, req, res, assetInfo, fillIn, fn)
 
 function findPostedAsset(db, req, res, assetInfo, fn)
 {
-    var q = "select * from incomingAssets where id = $1 and posted;";
+    var q = "select ia.*, a.id is not null as published from incomingAssets ia left join assets a on (ia.id = a.id)  where ia.id = $1 and posted;";
     var e;
     db.query(
         q, [assetInfo.id],
