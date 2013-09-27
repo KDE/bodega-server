@@ -50,23 +50,11 @@ void descend(const QString &path)
     }
 }
 
-void addEbook(const Gutenberg::Ebook &book)
-{
-    if (book.title().isEmpty()) {
-        qDebug() << "no title on book" << book.bookId();
-        return;
-    }
-
-#ifdef TESTING
-    qDebug() << book;
-#endif
-}
-
 int main(int argc, char **argv)
 {
-    if (argc < 2) {
+    if (argc < 3) {
         qWarning() << "Usage:";
-        qWarning() << "\t" << argv[0] << "path/to/epub/files [imageCacheDir]";
+        qWarning() << "\t" << argv[0] << "rdfFilesPath bodegaContentPath epubRepositoryPath";
         return 0;
     }
 
@@ -84,18 +72,19 @@ int main(int argc, char **argv)
     Gutenberg::Reader::init();
     catalog.m_ebooks = QtConcurrent::blockingMapped<QList<Gutenberg::Ebook> >(paths, Gutenberg::Reader::parseRdf);
     qDebug() << "Parsed" << catalog.m_ebooks.size() << "books in" << t.restart() / 1000. << "seconds";
-    catalog.compile(argc > 2 ? QString::fromLatin1(argv[2]) : QString());
+    catalog.compile(QString());
     qDebug() << "Compiled" << catalog.m_ebooks.size() << "books in" << t.restart() / 1000. << "seconds";
 
-    Gutenberg::GutenbergDatabase::write(catalog, argv[2],
+    Gutenberg::GutenbergDatabase::write(catalog, argv[2], argv[3],
 #ifdef TESTING
             true
 #else
             false
 #endif
             );
-    return 0;
 
+    /*
+     * better to just grab the images from the mirrored content
     if (argc > 2) {
         // only fetch if we were given a cache dir
         QCoreApplication app(argc, argv);
@@ -106,4 +95,5 @@ int main(int argc, char **argv)
     } else {
         return 0;
     }
+    */
 }
