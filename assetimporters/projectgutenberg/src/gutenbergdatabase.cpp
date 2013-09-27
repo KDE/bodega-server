@@ -281,8 +281,8 @@ void GutenbergDatabase::writeBookChannels(const Catalog &catalog)
         const int tagId = query.value(0).toInt();
         const QString name = query.value(1).toString();
         const int subChannelId = writeChannel(name, QString(), "default/book.png", authorChannelId);
-        writeChannelTags(subChannelId, tagId);
-        writeChannelTags(subChannelId, m_ebookMimetypeTag);
+        //writeChannelTags(subChannelId, tagId);
+        //writeChannelTags(subChannelId, m_ebookMimetypeTag);
         qDebug() << "\t\tTagged channel" << subChannelId << "By Author /" << name
                  << "in" << channelTagTime.restart() / 1000. << "seconds";
     }
