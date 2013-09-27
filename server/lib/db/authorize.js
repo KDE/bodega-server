@@ -52,7 +52,7 @@ function authenticate(db, req, res)
 
             var userData = result.rows[0];
             if (!userData.active) {
-                utils.queueAccountActivationMessage(db, req, userData.id, userData.email);
+                utils.queueAccountActivationMessage(db, req, res, userData.id);
                 errors.report('AccountInactive', req, res);
                 return;
             }
