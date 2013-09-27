@@ -411,7 +411,7 @@ describe('Asset manipulation', function(){
         });
         it('should not be able to reject an asset', function(done){
             utils.app.config.printErrors = false;
-            utils.postUrl('asset/publish/' + completeAssetId + "?reject=1?reason=hello", null,
+            utils.postUrl('asset/publish/' + completeAssetId + "?reject=1", {'reason':'sample'},
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('error');
@@ -514,7 +514,7 @@ describe('Asset manipulation', function(){
                 });
         });
         it('should be able to reject a posted asset', function(done){
-            utils.postUrl('asset/publish/' + extraPostedAsset + "?reject=1&reason=hello", null,
+            utils.postUrl('asset/publish/' + extraPostedAsset + "?reject=1", {'reason':"sample reason"},
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
