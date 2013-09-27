@@ -544,6 +544,36 @@
               "EnumeratedList": ["published", "incoming", "all", "posted"]
             }
           ]
+        },
+        {
+          "MethodName": "Forum Messages",
+          "read-only": "true",
+          "Synopsis": "Lists the messages of the asset from the forum.",
+          "HTTPMethod": "GET",
+          "URI": "/asset/forum/:assetId",
+          "parameters": [
+            {
+              "Name": "assetId",
+              "Location": "URL",
+              "Description": "The id of the asset to show its messages.",
+              "Required": "Y",
+              "Type": "number"
+            },
+            {
+              "Name": "pageSize",
+              "Location": "query",
+              "Description": "The number of results to return at a time",
+              "Required": "N",
+              "Type": "number"
+            },
+            {
+              "Name": "offset",
+              "Location": "query",
+              "Description": "The search result offset to start listing from",
+              "Required": "N",
+              "Type": "number"
+            }
+          ]
         }
       ]
     },
