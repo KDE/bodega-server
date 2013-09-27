@@ -120,16 +120,16 @@ function writeAsset(db, req, res, assetInfo, cb)
     var field;
     var i;
     var idx = 1;
+    var firstField = true;
 
 
     if (!assetInfo.published) {
         args.push(assetInfo.id);
         fieldsStr += 'id';
         valuesStr += '$' + idx;
+        firstField = false;
         ++idx;
     }
-
-    var firstField = true;
 
     for (i = 0; i < fields.length; ++i) {
         field = fields[i];
