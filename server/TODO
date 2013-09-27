@@ -1,15 +1,6 @@
 Now
 ===
-* Jade templated HTML page in lib/db/confirm.js for account activation
-
 * list of featured apps
-
-* errors audit
-- the language of the some the errors is quite primitive and should be
-   audited
-
-* ability to upload assets
-- and edit them (at least changelog)
 
 Later
 =====
@@ -22,7 +13,6 @@ Later
     * created date - changelog or tag?
     * name
     * number of downloads
-* identify the language of an asset (e.g. book only in latin or german)
 * searching in other languages (new search idx table)
 * robust rankings
 - we could use wilson score to measure them,
