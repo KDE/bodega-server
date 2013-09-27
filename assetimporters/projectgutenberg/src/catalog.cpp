@@ -44,6 +44,7 @@ void Catalog::compile(const QString &imageCachePath)
     QSet<QString> authors;
 
     const QFileInfo imageCacheInfo(imageCachePath);
+    QDir imageCacheDir(imageCachePath);
     const bool fetchImages = imageCacheInfo.isDir() && imageCacheInfo.isWritable();
     m_coversToDownload.clear();
 
@@ -61,8 +62,9 @@ void Catalog::compile(const QString &imageCachePath)
         if (fetchImages) {
             const QUrl image = book.coverImage();
             if (!image.isEmpty()) {
-                const QString path = imageCachePath + '/' + QFileInfo(image.path()).fileName();
+                const QString path = imageCachePath + '/' + book.bookId() + '/' + QFileInfo(image.path()).fileName();
                 if (!QFile::exists(path)) {
+                     imageCacheDir.mkpath(book.bookId());
                      m_coversToDownload.insert(image, path);
                 }
             }
