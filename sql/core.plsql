@@ -108,6 +108,29 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION ct_charSynonym(c char) RETURNS char AS $$
+DECLARE
+BEGIN
+    IF c IN ('æ', 'à', 'á', 'â', 'ä', 'ã') THEN
+        RETURN 'a';
+    ELSIF c IN ('è', 'é', 'ê', 'ë', 'ẽ')  THEN
+        RETURN 'e';
+    ELSIF c IN ('ì', 'í', 'î', 'ï', 'ĩ')  THEN
+        RETURN 'i';
+    ELSIF c IN ('ò', 'ó', 'ô', 'ö', 'õ')  THEN
+        RETURN 'o';
+    ELSIF c IN ('ù', 'ú', 'û', 'ü', 'ũ')  THEN
+        RETURN 'u';
+    ELSIF c IN ('ł') THEN
+        RETURN 'l';
+    ELSIF c IN ('š') THEN
+        RETURN 's';
+    END IF;
+
+    RETURN c;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION ct_generateAutoTags() RETURNS TRIGGER AS $$
 DECLARE
     groupTagTitle text;
@@ -119,7 +142,7 @@ BEGIN
 
     SELECT INTO groupTagTitle type FROM tagTypes WHERE id = NEW.type AND type IN ('author');
     IF FOUND THEN
-        groupTagTitle := groupTagTitle || '_' || lower(substr(NEW.title, 1, 1));
+        groupTagTitle = groupTagTitle || '_' || ct_charSynonym(lower(substr(NEW.title, 1, 1)));
         SELECT INTO groupingId id FROM tagTypes WHERE type = 'grouping';
         INSERT INTO autoTags (source, target)
             SELECT NEW.id, id FROM tags
@@ -464,16 +487,25 @@ $$ LANGUAGE 'plpgsql';
 CREATE OR REPLACE FUNCTION ct_setNameGroupingTag(assetId int, name text) RETURNS VOID AS $$
 DECLARE
     groupTagTitle text := 'name_';
+    leadChar char;
     groupingId int;
 BEGIN
-    IF name ~* '^the' THEN
-        groupTagTitle := groupTagTitle || lower(substring(name from 'The[^\w](\w)'));
-    ELSIF name ~* 'a ' OR name ~* 'an ' THEN
-        groupTagTitle := groupTagTitle || lower(substring(name from 'An?[^\w](\w)'));
-    ELSIF name ~ '^[^\w]*\d' THEN
-        groupTagTitle := groupTagTitle || '0-9';
+    IF name ~ '^[tT]he ' THEN
+        leadChar = substring(name from '[tT]he[^\w](\w)');
+    ELSIF name ~ '^[aA]n? ' THEN
+        leadChar = substring(name from '[aA]n?[^\w](\w)');
     ELSE
-        groupTagTitle := groupTagTitle || lower(substring(name from '[\w]'));
+        leadChar = substring(name from '[\w]');
+    END IF;
+
+    leadChar = ct_charSynonym(lower(leadChar));
+
+    IF leadChar ~ '\d' THEN
+        groupTagTitle = groupTagTitle || '0-9';
+    ELSIF leadChar >= 'α' AND leadChar <= 'х' THEN
+        groupTagTitle = groupTagTitle || 'α-х';
+    ELSE
+        groupTagTitle = groupTagTitle || leadChar;
     END IF;
 
     SELECT INTO groupingId id FROM tagTypes WHERE type = 'grouping';
