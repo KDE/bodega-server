@@ -34,7 +34,8 @@ var PreviewStore = (function() {
         "tiny"   : 22,
         "small"  : 32,
         "medium" : 64,
-        "large"  : 128,
+        "big"    : 128,
+        "large"  : 256,
         "huge"   : 512
     };
     var coverConstraints = {

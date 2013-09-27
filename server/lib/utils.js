@@ -47,6 +47,7 @@ module.exports.findImagePaths = function(req)
         tiny: serverUrl + previewPaths.icons.tiny,
         small: serverUrl + previewPaths.icons.small,
         medium: serverUrl + previewPaths.icons.medium,
+        big: serverUrl + previewPaths.icons.big,
         large: serverUrl + previewPaths.icons.large,
         huge: serverUrl + previewPaths.icons.huge,
         previews: serverUrl + previewPaths.previews
