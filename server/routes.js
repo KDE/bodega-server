@@ -370,6 +370,13 @@ app.get(serverPath('asset/ratings/list/:assetId'), isAuthorized,
         }
 );
 
+app.get(serverPath('asset/forum/:assetId'), isAuthorized,
+        function(req, res) {
+            //console.log(req.query);
+            app.db.forum(req, res);
+        }
+);
+
 //*******************************
 // Stats
 app.get(serverPath('stats/assets/?:metric?'), isAuthorized,

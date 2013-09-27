@@ -19,6 +19,7 @@ var async = require('async');
 var nodemailer = require('nodemailer');
 var errors = require('./errors.js');
 var fs = require('fs');
+var request = require('request');
 
 module.exports.parseBool = function(string)
 {
@@ -336,3 +337,16 @@ module.exports.wrapInTransaction = function(functions, db)
         }
     });
 };
+
+module.exports.get = function get(url, cb) {
+    request(url, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            cb(null, JSON.parse(body));
+        } else {
+            //FIXME
+            cb(error, null)
+            console.log(error);
+        }
+    });
+};
+

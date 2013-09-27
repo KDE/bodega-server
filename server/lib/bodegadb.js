@@ -48,6 +48,7 @@ var dbBanking = require('./db/banking.js');
 var dbParticipantInfo = require('./db/participantInfo.js');
 var dbUpdates = require('./db/updates.js');
 var dbRatings = require('./db/ratings.js');
+var dbForum = require('./db/forum.js');
 
 var BodegaDb = (function() {
     var connectionString;
@@ -352,6 +353,10 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.checkUpdates = function(req, res) {
         this.dbQuery(dbUpdates, req, res);
+    };
+
+    BodegaDb.prototype.forum = function(req, res) {
+        this.dbQuery(dbForum.forum, req, res);
     };
 
     return BodegaDb;
