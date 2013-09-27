@@ -171,7 +171,9 @@ function create(partner, db, req, res) {
                              }
 
                              var json = utils.standardJson(req);
-                             json.id = result.rows[0].id;
+                             if (result.rowCount > 0) {
+                                json.id = result.rows[0].id;
+                             }
                              res.json(json);
                     });
              });
