@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -122,7 +122,7 @@ describe('Authentication', function(){
 
     describe('proper authorization', function(){
         it('authorize correctly.', function(done){
-            var hostname = 'http://' + app.config.host + ':' + app.config.port;
+            var hostname = app.config.externalBaseUrl;
             var expected = {
                 "authStatus":true,
                 "device":"VIVALDI-1",
