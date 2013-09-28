@@ -73,7 +73,7 @@ BEGIN
         RETURN NEW;
     END IF;
 
-    SELECT INTO NEW.topLevel topLevel from channels where id = NEW.parent;
+    SELECT INTO NEW.topLevel, NEW.store topLevel, store from channels where id = NEW.parent;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
