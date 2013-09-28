@@ -630,6 +630,8 @@ INSERT INTO assetRatings (asset, attribute, person, rating)
 INSERT INTO assetRatings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('Enjoyability'), ct_testing_personByEmail('zack@kde.org'), 3);
 
+UPDATE warehouses SET minMarkup = 15;
+
 -- cleanup
 DROP FUNCTION ct_testing_favoriteBooksByAuthor(email text, author text);
 DROP FUNCTION ct_testing_downloadBooksByAuthor(email text, author text);
