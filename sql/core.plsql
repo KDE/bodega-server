@@ -453,7 +453,7 @@ BEGIN
         FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
                       LEFT JOIN channels c ON (c.id = sa.channel)
                       LEFT JOIN stores s ON (c.store = s.id)
-        WHERE c.parent IS NULL AND a.basePrice > 0;
+        WHERE c.parent IS NULL AND a.basePrice > 0 AND s.id IS NOT NULL;
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
