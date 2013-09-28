@@ -17,15 +17,14 @@
 // if no entry exists in mandatoryTags for an assetType tag, then
 // any assets of that type will be rejected from upload
 module.exports.mandatoryTags = {
-    application: ["author", "license", "contentrating"],
-    article: ["author", "license", "contentrating"],
-    audio: ["author", "license", "contentrating"],
-    audiobook: ["author", "license", "contentrating"],
+    application: ["author", "contentrating"],
+    article: ["author", "contentrating"],
+    audio: ["author", "contentrating"],
+    audiobook: ["author", "contentrating"],
     book: ["author", "publisher", "contentrating"],
-    game: ["author", "license", "contentrating"],
-    magazine: ["author", "license", "contentrating"],
+    game: ["author", "contentrating"],
+    magazine: ["author", "contentrating"],
     movie: ["license", "contentrating"],
     tvshow: ["license", "contentrating"],
-    wallpaper: ["author", "license", "contentrating"]
+    wallpaper: ["author", "contentrating"]
 };
-
