@@ -1,0 +1,25 @@
+{
+    "name" : "Sample Application",
+    "version" : "1.0",
+    "license" : "3",
+    "description" : "description of an app",
+    "partner" : "1002",
+    "basePrice" : "0",
+    "file" : "sample.pdf",
+    "size" : "137887",
+    "languages" : ["en"],
+    "previews" : [
+        { "type" : "icon", "subtype" : "huge", "file" : "icon512.png",
+          "mimetype" : "image/png" },
+        { "type" : "screenshot", "subtype" : "screen1", "file" : "cover.jpg",
+          "mimetype" : "image/jpeg" }
+    ],
+    "tags" : [
+        {"type" : "contentrating", "title" : "Everyone" },
+        {"type" : "assetType", "title" : "application" },
+        {"type" : "author", "title" : "Zack Rusin"},
+        {"type" : "publisher", "title" : "Coherent Theory" },
+        {"type" : "created", "title" : "2013"},
+        {"type" : "url", "title" : "http://makeplaylive.com"}
+    ]
+}

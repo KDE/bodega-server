@@ -38,6 +38,8 @@ var PreviewStore = (function() {
         "large"  : 256,
         "huge"   : 512
     };
+    var iconSizesSorted = ['huge', 'large', 'big',
+                           'medium', 'small', 'tiny'];
     var coverConstraints = {
         sizes : {
             min : { w : 500, h : 500 },
@@ -799,7 +801,7 @@ var PreviewStore = (function() {
         });
     };
 
-    function generateIcon(assetInfo, assetPaths, preview, icons, i, cb) {
+    function generateIconFromPreview(assetInfo, assetPaths, preview, icons, i, cb) {
         var icon = icons[i];
         var w = iconSizes[icon.subtype];
         var h = iconSizes[icon.subtype];
@@ -819,6 +821,112 @@ var PreviewStore = (function() {
         icon.file = undefined;
 
         fullIncomingPath = previewFullPath(assetInfo, icon, true);
+        //console.log('Full from path = ' + fromPath);
+        //console.log('Full incoming path = ' + fullIncomingPath);
+        dirname = path.dirname(fullIncomingPath);
+
+        checkDirectory(dirname, "0700", function(err) {
+            gm(fromPath)
+                .size(function(err, size) {
+                    //console.log(size);
+                    if (size.width > size.height) {
+                        w1 = w;
+                        h1 = Math.floor(size.height * (w/size.width));
+                        if (h1 > h) {
+                            w1 = Math.floor(w1 * (((h-h1)/h) + 1));
+                            h1 = h;
+                        }
+                    } else if (size.width < size.height) {
+                        h1 = h;
+                        w1 = Math.floor(size.width * (h/size.height));
+                        if (w1 > w) {
+                            h1 = Math.floor(h1 * (((w-w1)/w) + 1));
+                            w1 = w;
+                        }
+                    } else if (size.width === size.height) {
+                        var bigger = (w<h?w:h);
+                        w1 = bigger;
+                        h1 = bigger;
+                    }
+
+                    if (w < w1) {
+                        xoffset = (w1 - w)/2;
+                    }
+                    if (h < h1) {
+                        yoffset = (h1-h)/2;
+                    }
+
+                    //jshint -W024
+                    gm(fromPath)
+                        .quality(100)
+                        .in("-size", w1+"x"+h1)
+                        .scale(w1, h1)
+                        .noProfile()
+                        .write(fullIncomingPath, function(err) {
+                            cb(err, assetInfo, assetPaths, preview, icons, ++i);
+                        });
+                });
+        });
+    }
+
+    PreviewStore.prototype.generateCoverIcons = function(assetInfo, fn) {
+        var previews = splitPreviews(assetInfo.previews);
+        var iconsToGenerate = [];
+        var iconType;
+        var assetPaths = fillPathsForAsset(assetInfo);
+        var cover = previews.splitCovers.front;
+        var funcs = [function(cb) {
+            cb(null, assetInfo, assetPaths, cover,
+               iconsToGenerate, 0);
+        }];
+
+        if (!cover) {
+            fn(null);
+            return;
+        }
+
+        for (iconType in iconSizes) {
+            if (!previews.splitIcons[iconType]) {
+                iconsToGenerate.push({
+                    asset: assetInfo.id,
+                    type : 'icon',
+                    subtype : iconType
+                });
+                funcs.push(generateIconFromPreview);
+            }
+        }
+
+        async.waterfall(funcs, function(err, assetInfo, icons, i) {
+            fn(err);
+        });
+    };
+
+    function scaleIcon(data, cb) {
+        var assetInfo = data.assetInfo;
+        var fromIcon = data.fromIcon;
+        var toIcon = {
+            type : 'icon',
+            subtype : data.toSubtype
+        };
+        var w = iconSizes[data.toSubtype];
+        var h = iconSizes[data.toSubtype];
+        var w1, h1;
+        var xoffset = 0;
+        var yoffset = 0;
+        var fullIncomingPath;
+        var dirname;
+        var fromPath = previewFullPath(assetInfo, fromIcon, true);
+        var toPath;
+
+        //we need a temporary 'file' attribute to figure out the path
+        toIcon.file = fromPath;
+        toIcon.path = iconRelativePath(assetInfo, toIcon);
+        toIcon.file = undefined;
+
+        //all icon names are the same so make sure they're set on the assetinfo
+        assetInfo.image = toIcon.path;
+
+        fullIncomingPath = previewFullPath(assetInfo, toIcon, true);
         //console.log('Full from path = ' + fromPath);
         //console.log('Full incoming path = ' + fullIncomingPath);
         dirname = path.dirname(fullIncomingPath);
@@ -861,45 +969,37 @@ var PreviewStore = (function() {
                     .scale(w1, h1)
                     .noProfile()
                     .write(fullIncomingPath, function(err) {
-                        cb(err, assetInfo, assetPaths, preview, icons, ++i);
+                        cb(err);
                     });
                 });
         });
     }
 
-    PreviewStore.prototype.generateCoverIcons = function(assetInfo, fn) {
+    PreviewStore.prototype.generateScaledIcons = function(assetInfo, fn) {
         var previews = splitPreviews(assetInfo.previews);
         var iconsToGenerate = [];
-        var iconType;
+        var iconType, lastIcon;
         var assetPaths = fillPathsForAsset(assetInfo);
-        var cover = previews.splitCovers.front;
-        var funcs = [function(cb) {
-            cb(null, assetInfo, assetPaths, cover,
-               iconsToGenerate, 0);
-        }];
+        var i;
+        var q = async.queue(scaleIcon, 2);
 
-        if (!cover) {
-            fn(null);
-            return;
-        }
+        q.drain = function(err) {
+            fn(err);
+        };
 
-        for (iconType in iconSizes) {
+        lastIcon = previews.splitIcons.huge;
+        for (i = 1; i < iconSizesSorted.length; ++i) {
+            iconType = iconSizesSorted[i];
             if (!previews.splitIcons[iconType]) {
-                iconsToGenerate.push({
-                    asset: assetInfo.id,
-                    type : 'icon',
-                    subtype : iconType
+                q.push({
+                    assetInfo: assetInfo,
+                    fromIcon: lastIcon,
+                    toSubtype : iconType
                 });
-                funcs.push(generateIcon);
+            } else {
+                lastIcon = previews.splitIcons[iconType];
             }
         }
-
-        async.waterfall(funcs, function(err, assetInfo, icons, i) {
-            fn(err);
-    });
-};
-
-    PreviewStore.prototype.generateScaledIcons = function(assetInfo, fn) {
     };
 
     function publishIcon(assetInfo, assetPaths, icons, i, cb) {

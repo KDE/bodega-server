@@ -355,16 +355,13 @@ describe('Asset manipulation', function(){
             postFiles('asset/create',
                     [{
                         "name" : "info",
-                        "filename" : "sampleasset/sample-info.json"
+                        "filename" : "sampleasset/sample-app-info.json"
                     }, {
                         "name" : "asset",
                         "filename" : "sampleasset/sample.pdf"
                     },{
-                        "name" : "sample-0.png",
-                        "filename" : "sampleasset/sample-0.png"
-                    },{
-                        "name" : "sample-1.png",
-                        "filename" : "sampleasset/sample-1.png"
+                        "name" : "icon512.png",
+                        "filename" : "sampleasset/icon512.png"
                     },{
                         "name" : "cover.jpg",
                         "filename" : "sampleasset/cover.jpg"
