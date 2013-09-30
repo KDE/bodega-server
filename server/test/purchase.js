@@ -37,7 +37,7 @@ describe('Purchase Asset', function() {
                     res.body.should.have.property('points');
                     res.body.should.have.property('success', false);
                     res.body.should.have.property('error');
-                    res.body.error.should.have.property('type', 'PurchaseNotEnoughPoints');
+                    res.body.error.should.have.property('type', 'AccountNotEnoughPoints');
                     done();
                 });
         });

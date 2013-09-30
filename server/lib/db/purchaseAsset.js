@@ -48,7 +48,7 @@ module.exports = function(db, req, res) {
                      errors.report('Database', req, res);
                      return;
                  case 3:
-                     errors.report('PurchaseNotEnoughPoints', req, res);
+                     errors.report('AccountNotEnoughPoints', req, res);
                      return;
                  default:
                      errors.report('PurchaseFailed', req, res);
