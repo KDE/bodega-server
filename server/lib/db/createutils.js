@@ -532,21 +532,22 @@ module.exports.findAssetInfo = function(req, cb) {
                 cb(e);
                 return;
             }
+
             try {
                 assetInfo = JSON.parse(data);
+                //console.log(JSON.stringify(assetInfo, 0, 2));
             } catch (err) {
                 //JSON parser failed
                 assetInfo = null;
                 e = errors.create('UploadInvalidJson', err.message);
-                return cb(e, null);
+                cb(e, null);
             }
+
             cb(null, assetInfo);
-            return;
         });
     } else {
         //"The asset info file is missing.",
         e = errors.create('MissingParameters');
         cb(e);
-        return;
     }
 };
