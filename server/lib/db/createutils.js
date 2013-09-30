@@ -278,6 +278,30 @@ function bindPreviewsToFiles(assetInfo, files, fn)
 
 module.exports.bindPreviewsToFiles = bindPreviewsToFiles;
 
+module.exports.partnerForAsset = function(db, req, res, assetInfo, fn)
+{
+    db.query("SELECT partner FROM incomingAssets WHERE id = $1 \
+              UNION \
+              SELECT partner FROM assets WHERE id = $1",
+             [assetInfo.id],
+             function(err, results) {
+                 if (err) {
+                     var e = errors.create('Database', err.message);
+                     fn(e, db, req, res, assetInfo);
+                     return;
+                 }
+
+                 if (results.rowCount < 1) {
+                     e = errors.create('AssetMissing');
+                     fn(e, db, req, res, assetInfo);
+                     return;
+                 }
+
+                 assetInfo.partner = results.rows[0].partner;
+                 fn(null, db, req, res, assetInfo);
+            });
+}
+
 module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
 {
     //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
