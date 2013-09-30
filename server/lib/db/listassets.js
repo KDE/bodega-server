@@ -97,7 +97,7 @@ function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb
 
 function findPublishedAssets(db, req, res, assetInfo, assets, cb)
 {
-    var query = 'select * from assets where partner=$1 and active=true';
+    var query = 'select *, \'published\' as status from assets where partner=$1 and active=true';
     var e;
 
     db.query(query, [assetInfo.partner], function(err, results) {
@@ -114,7 +114,7 @@ function findPublishedAssets(db, req, res, assetInfo, assets, cb)
 
 function findIncomingAssets(db, req, res, assetInfo, assets, cb)
 {
-    var query = 'select * from incomingAssets where partner=$1';
+    var query = 'select *, (case when posted = true then \'posted\' else \'incoming\' end) status from incomingAssets where partner=$1';
     var e;
 
     db.query(query, [assetInfo.partner], function(err, results) {
@@ -130,7 +130,7 @@ function findIncomingAssets(db, req, res, assetInfo, assets, cb)
 
 function findPostedAssets(db, req, res, assetInfo, assets, cb)
 {
-    var query = 'select * from incomingAssets where posted=true';
+    var query = 'select *, \'posted\' as status from incomingAssets where posted=true';
     var e;
 
     db.query(query, [], function(err, results) {
