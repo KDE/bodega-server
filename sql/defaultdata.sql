@@ -16,65 +16,80 @@
 */
 
 
-INSERT INTO languages (code, name) VALUES('C', 'English');
-INSERT INTO languages (code, name) VALUES ('fr', 'French');
-INSERT INTO languages (code, name) VALUES ('de', 'German');
-INSERT INTO languages (code, name) VALUES ('es', 'Spanish');
-INSERT INTO languages (code, name) VALUES ('it', 'Italian');
+INSERT INTO languages (code, name)
+    VALUES
+        ('C', 'English'),
+        ('fr', 'French'),
+        ('de', 'German'),
+        ('es', 'Spanish'),
+        ('it', 'Italian');
 
-INSERT INTO tagTypes (type, listPublicly) VALUES ('partnership', false);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('signoff', false);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('market', false);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('category', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('descriptive', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('user', false);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('mimetype', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('contentrating', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('assetType', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('created', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('author', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('contributor', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('genre', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('publisher', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('url', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('isbn', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('platform', false);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('grouping', false);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('easter eggs', false);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('language', true);
-INSERT INTO tagTypes (type, listPublicly) VALUES ('servicetype', true);
+INSERT INTO tagTypes (type, listPublicly)
+    VALUES
+        ('partnership', false),
+        ('signoff', false),
+        ('market', false),
+        ('category', true),
+        ('descriptive', true),
+        ('user', false),
+        ('mimetype', true),
+        ('contentrating', true),
+        ('assetType', true),
+        ('created', true),
+        ('author', true),
+        ('contributor', true),
+        ('genre', true),
+        ('publisher', true),
+        ('url', true),
+        ('isbn', true),
+        ('platform', false),
+        ('grouping', false),
+        ('easter eggs', false),
+        ('language', true),
+        ('servicetype', true);
 
-INSERT INTO tags (type, title) SELECT id, 'Early Childhood' FROM tagtypes WHERE type = 'contentrating';
-INSERT INTO tags (type, title) SELECT id, 'Everyone' FROM tagtypes WHERE type = 'contentrating';
-INSERT INTO tags (type, title) SELECT id, 'Everyone 10+' FROM tagtypes WHERE type = 'contentrating';
-INSERT INTO tags (type, title) SELECT id, 'Teen' FROM tagtypes WHERE type = 'contentrating';
-INSERT INTO tags (type, title) SELECT id, 'Mature' FROM tagtypes WHERE type = 'contentrating';
-INSERT INTO tags (type, title) SELECT id, 'Adults Only' FROM tagtypes WHERE type = 'contentrating';
-
+INSERT INTO tags (type, title)
+    SELECT id, titles.*  FROM tagtypes,
+        (VALUES
+            ('Early Childhood'),
+            ('Everyone'),
+            ('Everyone 10+'),
+            ('Teen'),
+            ('Mature'),
+            ('Adults Only')
+        ) AS titles
+        WHERE type = 'contentrating';
 
 -- IMPORTANT NOTE: if you add to the assetType set you MUST also add an entry in the
 --                 mandatoryTags object in assetRules.js
-INSERT INTO tags (type, title) SELECT id, 'application' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'article' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'audio' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'audiobook' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'book' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'game' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'magazine' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'movie' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'tvshow' FROM tagtypes WHERE type = 'assetType';
-INSERT INTO tags (type, title) SELECT id, 'wallpaper' FROM tagtypes WHERE type = 'assetType';
+INSERT INTO tags (type, title)
+    SELECT id, titles.* FROM tagTypes,
+        (VALUES
+            ('application'),
+            ('article'),
+            ('audio'),
+            ('audiobook'),
+            ('book'),
+            ('game'),
+            ('magazine'),
+            ('movie'),
+            ('tvshow'),
+            ('wallpaper')
+        ) AS titles
+        WHERE type = 'assetType';
 
-INSERT INTO licenses (name, text) VALUES ('GPL', '');
-INSERT INTO licenses (name, text) VALUES ('LGPL', '');
-INSERT INTO licenses (name, text) VALUES ('BSD', '');
-INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution', '');
-INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-ShareAlike', '');
-INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NoDerivs', '');
-INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NonCommercial', '');
-INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NonCommercial-ShareAlike', '');
-INSERT INTO licenses (name, text) VALUES ('Creative Commons Attribution-NonCommercial-NoDerivs', '');
-INSERT INTO licenses (name, text) VALUES ('Proprietary', '');
+INSERT INTO licenses (name, text)
+    VALUES
+        ('GPL', ''),
+        ('LGPL', ''),
+        ('BSD', ''),
+        ('Creative Commons Attribution', ''),
+        ('Creative Commons Attribution-ShareAlike', ''),
+        ('Creative Commons Attribution-NoDerivs', ''),
+        ('Creative Commons Attribution-NonCommercial', ''),
+        ('Creative Commons Attribution-NonCommercial-ShareAlike', ''),
+        ('Creative Commons Attribution-NonCommercial-NoDerivs', ''),
+        ('Proprietary', '');
 
 -- a "NULL" store for use with e.g. the bodegamarket log ins
 SELECT setval('seq_partnerIds', 1000);
@@ -83,70 +98,62 @@ INSERT INTO stores (partner, name, id) VALUES (0, 'No Store', 'null');
 INSERT INTO warehouses (id, minMarkup, maxMarkup, markup) VALUES ('main', 0, 10000, 15);
 
 -- some social media contact end points
-INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('facebook', 'extern/facebook.png', 'https://www.facebook.com/pages/');
-INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('twitter', 'extern/twitter.png', 'https://www.twitter.com/');
-INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('identi.ca', 'extern/identica.png', 'https://identi.ca/');
-INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('google+', 'extern/googleplus.png', 'https://plus.google.com/');
-INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('blog', 'extern/blog.png', null);
-INSERT INTO partnerContactServices (service, icon, baseUrl) VALUES ('website', null, null);
+INSERT INTO partnerContactServices (service, icon, baseUrl)
+    VALUES
+        ('facebook', 'extern/facebook.png', 'https://www.facebook.com/pages/'),
+        ('twitter', 'extern/twitter.png', 'https://www.twitter.com/'),
+        ('identi.ca', 'extern/identica.png', 'https://identi.ca/'),
+        ('google+', 'extern/googleplus.png', 'https://plus.google.com/'),
+        ('blog', 'extern/blog.png', null),
+        ('website', null, null);
 
 -- default asset rating attributes
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Usability', 'Clumsy', 'Elegant', id FROM tags
-        WHERE title = 'application' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Features', 'Critical gaps', 'Everything needed', id FROM tags
-        WHERE title = 'application' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Performance', 'Slow and unstable', 'Fast and reliable', id FROM tags
-        WHERE title = 'application' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+    SELECT details.*, id FROM tags,
+        (VALUES
+            ('Usability', 'Clumsy', 'Elegant'),
+            ('Features', 'Critical gaps', 'Everything needed'),
+            ('Performance', 'Slow and unstable', 'Fast and reliable')
+        ) AS details
+        WHERE type IN (SELECT id FROM tagTypes WHERE type = 'assetType') AND
+              title = 'application';
 
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Content', 'Critical gaps', 'Exceptional', id FROM tags
-        WHERE (title = 'book' OR title = 'magazine') AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Writing', 'Clumsy', 'Powerful', id FROM tags
-        WHERE (title = 'book' OR title = 'magazine') AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Layout', 'Poorly arranged', 'Beautiful', id FROM tags
-        WHERE (title = 'book' OR title = 'magazine') AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+    SELECT details.*, id FROM tags,
+        (VALUES
+            ('Content', 'Critical gaps', 'Exceptional'),
+            ('Writing', 'Clumsy', 'Powerful'),
+            ('Layout', 'Poorly arranged', 'Beautiful')
+        ) AS details
+        WHERE type IN (SELECT id FROM tagTypes WHERE type = 'assetType') AND
+              (title = 'book' OR title = 'magazine');
 
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Creativity', 'Uninspired', 'Highly unique', id FROM tags
-        WHERE title = 'wallpaper' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Beauty', 'Ugly', 'Gorgeous', id FROM tags
-        WHERE title = 'wallpaper' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+    SELECT details.*, id FROM tags,
+        (VALUES
+            ('Creativity', 'Uninspired', 'Highly unique'),
+            ('Beauty', 'Ugly', 'Gorgeous')
+        ) AS details
+        WHERE type IN (SELECT id FROM tagTypes WHERE type = 'assetType') AND
+              title = 'wallpaper';
 
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Graphics', 'Poor quality', 'Amazing', id FROM tags
-        WHERE title = 'game' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Playability', 'Clumsy', 'Smooth', id FROM tags
-        WHERE title = 'game' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Performance', 'Slow and unstable', 'Smooth and reliable', id FROM tags
-        WHERE title = 'game' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
-INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
-    SELECT 'Enjoyability', 'Boring', 'Could play all day', id FROM tags
-        WHERE title = 'game' AND
-              type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+    SELECT details.*, id FROM tags,
+        (VALUES
+            ('Graphics', 'Poor quality', 'Amazing'),
+            ('Playability', 'Clumsy', 'Smooth'),
+            ('Performance', 'Slow and unstable', 'Smooth and reliable'),
+            ('Enjoyability', 'Boring', 'Could play all day')
+        ) AS details
+        WHERE type IN (SELECT id FROM tagTypes WHERE type = 'assetType') AND
+              title = 'game';
 
 -- default roles for the accounts
-INSERT INTO personRoles (description) VALUES ('Store Manager');
-INSERT INTO personRoles (description) VALUES ('Content Creator');
-INSERT INTO personRoles (description) VALUES ('Validator');
-INSERT INTO personRoles (description) VALUES ('Account Manager');
-INSERT INTO personRoles (description) VALUES ('Partner Manager');
+INSERT INTO personRoles (description)
+    VALUES
+        ('Store Manager'),
+        ('Content Creator'),
+        ('Validator'),
+        ('Account Manager'),
+        ('Partner Manager');
 
