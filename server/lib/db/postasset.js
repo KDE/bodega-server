@@ -242,28 +242,35 @@ module.exports = function(db, req, res) {
         errors.report('MissingParameters', req, res);
         return;
     }
-    assetInfo.partner = req.query.partner;
 
-    createUtils.isContentCreator(
-        db, req, res, assetInfo,
-        function(err, db, req, res, assetInfo) {
-            if (err) {
-                errors.report('PartnerInvalid', req, res, err);
-                return;
-            }
-            createUtils.findAsset(
-                db, req, res, assetInfo, true,
-                function(err, db, req, res, assetInfo) {
-                    if (err) {
-                        errors.report('AssetMissing', req, res);
-                        return;
-                    }
-                    if (!assetInfo.incoming || assetInfo.published) {
-                        errors.report('AssetMissing', req, res);
-                        return;
-                    }
-                    postAsset(db, req, res, assetInfo);
+    createUtils.partnerForAsset(db, req, res, assetInfo,
+            function(err, db, req, res, assetInfo) {
+                if (err) {
+                    errors.report(err.type, req, res, err);
+                    return;
                 }
-            );
-        });
+
+                createUtils.isContentCreator(
+                    db, req, res, assetInfo,
+                    function(err, db, req, res, assetInfo) {
+                        if (err) {
+                            errors.report('PartnerInvalid', req, res, err);
+                            return;
+                        }
+                        createUtils.findAsset(
+                            db, req, res, assetInfo, true,
+                            function(err, db, req, res, assetInfo) {
+                                if (err) {
+                                    errors.report('AssetMissing', req, res);
+                                    return;
+                                }
+                                if (!assetInfo.incoming || assetInfo.published) {
+                                    errors.report('AssetMissing', req, res);
+                                    return;
+                                }
+                                postAsset(db, req, res, assetInfo);
+                            }
+                        );
+                    });
+            });
 };
