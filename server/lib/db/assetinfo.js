@@ -25,7 +25,7 @@ function findForum(db, req, res, assetInfo, cb)
 {
     var e;
     var discourseQuery = 'SELECT categoryName FROM discourseLinks WHERE assetId = $1;';
-    db.query(discourseQuery, [req.params.assetId], function(err, result) {
+    db.query(discourseQuery, [assetInfo.id], function(err, result) {
         if (err) {
             e = errors.create('Database', err.message);
             cb(e, db, req, res, assetInfo);
@@ -51,7 +51,7 @@ function findChangeLog(db, req, res, assetInfo, cb)
          WHERE log.asset=$1 AND log.changes IS NOT NULL ORDER BY versionts;";
     var query = assetInfo.incoming ? incomingChangeQuery : changeQuery;
 
-    var q = db.query(query, [req.params.assetId], function(err, result) {
+    var q = db.query(query, [assetInfo.id], function(err, result) {
         var i;
         var e;
         if (err) {
@@ -81,7 +81,7 @@ function findPreviews(db, req, res, assetInfo, cb)
         "SELECT path FROM incomingAssetPreviews p WHERE p.asset=$1;";
     var query = assetInfo.incoming ? incomingPreviewsQuery : previewsQuery;
 
-    var q = db.query(query, [req.params.assetId], function(err, result) {
+    var q = db.query(query, [assetInfo.id], function(err, result) {
         var i;
         var e;
         if (err) {
@@ -112,7 +112,7 @@ function findTags(db, req, res, assetInfo, cb)
          (tags.type = tagTypes.id) where a.asset = $1;";
     var query = assetInfo.incoming ? incomingTagsQuery : tagsQuery;
 
-    var q = db.query(query, [req.params.assetId], function(err, result) {
+    var q = db.query(query, [assetInfo.id], function(err, result) {
         var i;
         var e;
         if (err) {
@@ -175,14 +175,14 @@ function findAsset(db, req, res, assetInfo, cb) {
          LEFT JOIN licenses l ON (a.license = l.id) \
          LEFT JOIN partners p ON (a.partner = p.id) \
          WHERE a.id = $1";
-        args = [assetInfo.assetId];
+        args = [assetInfo.id];
 
         if (!assetInfo.validator) {
             query += " AND a.partner = $2";
             args.push(assetInfo.partner);
         }
     } else {
-        multi = Array.isArray(assetInfo.assetId);
+        multi = Array.isArray(assetInfo.id);
         table = 'assets';
         query = "SELECT a.id, l.name as license, l.text as licenseText, \
             a.partner as partnerId, p.name as partnername, \
@@ -204,21 +204,21 @@ function findAsset(db, req, res, assetInfo, cb) {
         args = [req.session.user.store];
 
         if (multi) {
-            expectedRowCount = assetInfo.assetId.length;
+            expectedRowCount = assetInfo.id.length;
             var index = 1;
             query += " IN (";
-            for (var i in assetInfo.assetId) {
+            for (var i in assetInfo.id) {
                 if (index > 1) {
                     query += ', ';
                 }
-                args[index] = assetInfo.assetId[i];
+                args[index] = assetInfo.id[i];
                 ++index;
                 query += "$" + index;
             }
             query += ")) ORDER BY a.id";
         } else {
             args[1] = req.session.user.id;
-            args[2] = assetInfo.assetId;
+            args[2] = assetInfo.id;
             query += " = $3)";
         }
     }
@@ -262,46 +262,42 @@ function findAsset(db, req, res, assetInfo, cb) {
 }
 
 
-function findIsCreator(db, req, res, assetInfo, cb)
+function checkCanViewIncoming(db, req, res, assetInfo, cb)
 {
-    if (assetInfo.validator) {
-        cb(null, db, req, res, assetInfo);
-        return;
-    }
+    // now we check to see if they are a content creator
     createUtils.isContentCreator(
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             var e;
             if (err) {
-                e = errors.create('PartnerInvalid', err.message);
-                cb(e, db, req, res, assetInfo);
-                return;
+                // no? then how about a validator for the partner
+                createUtils.isValidator(
+                    db, req, res, assetInfo,
+                    function(err, db, req, res, assetInfo) {
+                        var e;
+                        if (err) {
+                            e = errors.create('PartnerInvalid', err.message);
+                            cb(e, db, req, res, assetInfo);
+                        } else {
+                            assetInfo.validator = true;
+                            cb(null, db, req, res, assetInfo);
+                        }
+                    });
+            } else {
+                cb(null, db, req, res, assetInfo);
             }
-            cb(null, db, req, res, assetInfo);
         });
 }
 
 function findIsValidator(db, req, res, assetInfo, cb)
 {
-    createUtils.isValidator(
-        db, req, res, assetInfo,
-        function(err, db, req, res, assetInfo) {
-            var e;
-            if (!err) {
-                assetInfo.validator = true;
-            }
-
-            var json = utils.standardJson(req);
-
-            cb(null, db, req, res, assetInfo);
-        });
 }
 
 function findRatings(db, req, res, assetInfo, cb)
 {
     var query = 'SELECT rating AS averageRating, ratingsCount, attribute \
                  FROM assetRatingAverages WHERE asset = $1';
-    db.query(query, [req.params.assetId],
+    db.query(query, [assetInfo.id],
             function(err, result) {
                 if (err) {
                     var e = errors.create('Database', err.message);
@@ -321,7 +317,7 @@ module.exports.fullSingleAsset = function(db, req, res) {
     }
 
     var assetInfo = {
-        assetId: req.params.assetId
+        id: req.params.assetId
     };
 
     var funcs = [function(cb) {
@@ -330,8 +326,8 @@ module.exports.fullSingleAsset = function(db, req, res) {
 
     if (req.query.incoming) {
         assetInfo.incoming = true;
-        funcs.push(findIsValidator);
-        funcs.push(findIsCreator);
+        funcs.push(createUtils.partnerForAsset);
+        funcs.push(checkCanViewIncoming);
     }
 
     funcs.push(findAsset);
@@ -366,7 +362,7 @@ module.exports.multipleAssetBriefs = function(db, req, res) {
     }
 
     var assetInfo = {
-        assetId: req.body.assets,
+        id: req.body.assets,
     };
 
     findAsset(db, req, res, assetInfo,
