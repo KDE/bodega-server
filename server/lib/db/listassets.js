@@ -165,15 +165,14 @@ function findPostedAssets(db, req, res, assetInfo, assets, cb)
 }
 
 
-function checkIfIsContentCreator(db, req, res, assetInfo, assets, cb)
+function checkPartnerRole(db, req, res, assetInfo, assets, cb)
 {
     createUtils.isContentCreator(
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             var e;
             if (err) {
-                e = errors.create('PartnerInvalid', err.message);
-                cb(e, db, req, res, assetInfo, assets);
+                checkIfIsValidator(db, req, res, assetInfo, assets, cb);
                 return;
             }
             cb(null, db, req, res, assetInfo, assets);
@@ -187,7 +186,7 @@ function checkIfIsValidator(db, req, res, assetInfo, assets, cb)
         function(err, db, req, res, assetInfo) {
             var e;
             if (err) {
-                e = errors.create('NotAValidator', err.message);
+                e = errors.create('PartnerRoleMissing', err.message);
                 cb(e, db, req, res, assetInfo, assets);
                 return;
             }
@@ -213,11 +212,8 @@ module.exports = function(db, req, res) {
         callback(null, db, req, res, assetInfo, assets);
     });
 
-    if (req.params.type === 'posted') {
-        funcs.push(checkIfIsValidator);
-    } else {
-        funcs.push(checkIfIsContentCreator);
-    }
+    assetInfo.partner = utils.parseNumber(req.params.partnerId);
+    funcs.push(checkPartnerRole);
 
     switch (req.params.type) {
     case 'all':
