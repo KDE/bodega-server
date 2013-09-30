@@ -123,6 +123,9 @@ module.exports.dbErrorType = function(err, type)
 module.exports.create = function(name, msg)
 {
     var e = new Error();
+    if (ErrorType[name]) {
+        e.type = name;
+    }
     e.name = name;
     e.message = msg;
     return e;
