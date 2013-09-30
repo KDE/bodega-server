@@ -102,7 +102,8 @@ var ErrorType = {
     "TagNotDeleted"          : 91,//The tag that has been requested to be deleted is still there
     "TagExists"              : 92,//The tag that has been requested to be created already exists
     "TagTypeInvalid"         : 93,//The tag that has been requested doesn't exist
-    "RatingExists"           : 94//rating already exists
+    "RatingExists"           : 94,//rating already exists
+    "UploadMissingTag"       : 95//The asset doesn't have a required tag
 };
 
 var DbErrorType = {
