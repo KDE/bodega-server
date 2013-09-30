@@ -508,7 +508,7 @@
               "Location": "Body",
               "Required": "N",
               "Default": "",
-              "Type": "Array[ [int, date] ]"
+              "Type": "Array[ [number, date] ]"
             }
           ]
         },
@@ -523,17 +523,24 @@
                   "Location": "Body",
                   "Description": "JSON array of the ids of the assets to fetch information on",
                   "Required": "Y",
-                  "Type": "Array[ int ]"
+                  "Type": "Array[number]"
               }
             ]
         },
         {
           "MethodName": "List",
           "read-only": "true",
-          "Synopsis": "Lists the assets that either belong to you or, if you are a content validator, have been posted.",
+          "Synopsis": "Lists the assets that belong to a partner. The authenticated account must be a Content Creator or a Validator with the partner."
           "HTTPMethod": "GET",
-          "URI": "/asset/list/:type",
+          "URI": "/asset/list/:partnerId/:type",
           "parameters": [
+            {
+              "Name": "partnerId",
+              "Description": "The id of the partner to list assets for",
+              "Location": "URL",
+              "Required": "Y",
+              "Type": "number",
+            },
             {
               "Name": "type",
               "Description": "Which kind of listing to use",
@@ -1208,7 +1215,7 @@
                     "Location": "query",
                     "Description": "The assets to fetch data for; if not provided then data for all assets owned by you are fetched",
                     "Required": "N",
-                    "Type": "Array[int]"
+                    "Type": "Array[number]"
                 }
             ]
         },
@@ -1246,7 +1253,7 @@
                     "Location": "query",
                     "Description": "The assets to fetch data for; if not provided then data for all assets owned by you are fetched",
                     "Required": "N",
-                    "Type": "Array[int]"
+                    "Type": "Array[number]"
                 }
             ]
         },
@@ -1322,7 +1329,7 @@
                     "Location": "query",
                     "Description": "The assets to fetch data for; if not provided then data for all assets owned by you are fetched",
                     "Required": "N",
-                    "Type": "Array[int]"
+                    "Type": "Array[number]"
                 }
             ]
         },
@@ -1360,7 +1367,7 @@
                     "Location": "query",
                     "Description": "The assets to fetch data for; if not provided then data for all assets owned by you are fetched",
                     "Required": "N",
-                    "Type": "Array[int]"
+                    "Type": "Array[number]"
                 }
             ]
         },

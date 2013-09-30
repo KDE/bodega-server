@@ -333,7 +333,7 @@ app.post(serverPath('asset/list/briefs'),
             app.db.listAssetBriefs(req, res);
         });
 
-app.get(serverPath('asset/list/:type?*'), isAuthorized,
+app.get(serverPath('asset/list/:partnerId/:type?*'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.listAssets(req, res);

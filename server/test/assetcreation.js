@@ -155,7 +155,7 @@ describe('Asset manipulation', function(){
 
     describe('Listing assets', function(){
         it('lists published by default', function(done){
-            utils.getUrl('asset/list',
+            utils.getUrl('asset/list/1002',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -165,7 +165,7 @@ describe('Asset manipulation', function(){
                 });
         });
         it('lists published when asked', function(done){
-            utils.getUrl('asset/list/published',
+            utils.getUrl('asset/list/1002/published',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -175,7 +175,7 @@ describe('Asset manipulation', function(){
                 });
         });
         it('lists incoming when asked', function(done){
-            utils.getUrl('asset/list/incoming',
+            utils.getUrl('asset/list/1002/incoming',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -185,7 +185,7 @@ describe('Asset manipulation', function(){
                 });
         });
         it('lists all when asked', function(done){
-            utils.getUrl('asset/list/all',
+            utils.getUrl('asset/list/1002/all',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -235,7 +235,8 @@ describe('Asset manipulation', function(){
             var name = 'sample 123456';
             var description = 'sample description of a new asset';
             var query = '?info[name]=' + querystring.escape(name) +
-                '&info[description]='+querystring.escape(description);
+                        '&info[description]=' + querystring.escape(description) +
+                        '&info[partner]=1002';
 
             utils.postUrl('asset/update/' + incompleteAssetId + query, null,
                           function(res) {
@@ -251,7 +252,7 @@ describe('Asset manipulation', function(){
     });
 
     describe('Deletion', function(){
-        it('should work a complete assets', function(done){
+        it('should work with complete assets', function(done){
             utils.getUrl('asset/delete/' + completeAssetId,
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -288,7 +289,7 @@ describe('Asset manipulation', function(){
         });
 
         it('listing incoming after deletion shouldnt return any', function(done){
-            utils.getUrl('asset/list/incoming',
+            utils.getUrl('asset/list/1002/incoming',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
@@ -299,7 +300,7 @@ describe('Asset manipulation', function(){
         });
     });
 
-    describe('Posting', function(){
+    describe('Posting', function() {
         before(function(done){
             var finished = 0;
             postFiles('asset/create',
@@ -426,7 +427,7 @@ describe('Asset manipulation', function(){
     });
     describe('Validation before publishing', function() {
         it('should list posted assets', function(done){
-            utils.getUrl('asset/list/posted',
+            utils.getUrl('asset/list/1002/posted',
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
