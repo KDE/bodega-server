@@ -330,7 +330,8 @@ module.exports.isValidator = function(db, req, res, assetInfo, fn)
     var partner = assetInfo.partner ? assetInfo.partner : 0;
     var e;
     //console.log("checking up on partner");
-    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Validator';",
+    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) \
+              where (a.partner = 0 OR a.partner = $1) and a.person = $2 and r.description = 'Validator';",
             [partner, req.session.user.id],
             function(err, result) {
                 if (err || !result.rows || result.rows.length === 0) {
