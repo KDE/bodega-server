@@ -148,7 +148,7 @@ module.exports.report = function(type, req, res, err)
     var json = utils.standardJson(req, false);
     json.error = {
         'type' : type,
-        'message' : err.message
+        'message' : err && err.message ? err.message : ''
     };
 
     module.exports.log(err);
