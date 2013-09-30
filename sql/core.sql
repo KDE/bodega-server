@@ -174,6 +174,14 @@ create table autoTags
 
 create index idx_autoTagsBySource on autoTags(source);
 
+create table relatedTags
+(
+    tag         int         not null references tags(id) on delete cascade,
+    related     int         not null references tags(id) on delete cascade
+);
+
+create index idx_relatedTagsByTag on relatedTags(tag);
+
 create sequence seq_assetsIds;
 
 create table tagText

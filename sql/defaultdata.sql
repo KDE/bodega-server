@@ -46,7 +46,8 @@ INSERT INTO tagTypes (type, listPublicly)
         ('grouping', false),
         ('easter eggs', false),
         ('language', true),
-        ('servicetype', true);
+        ('servicetype', true),
+        ('resolution', true);
 
 INSERT INTO tags (type, title)
     SELECT id, titles.*  FROM tagtypes,
