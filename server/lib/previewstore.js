@@ -983,11 +983,20 @@ var PreviewStore = (function() {
         var i;
         var q = async.queue(scaleIcon, 2);
 
+        if (previews.splitIcons === undefined ||
+            Object.keys(previews.splitIcons).length === 0) {
+            var e = errors.create('AssetIconMissing',
+                              'The asset needs at least one icon.');
+            fn(e);
+            return;
+        }
+
         q.drain = function(err) {
             fn(err);
         };
 
         lastIcon = previews.splitIcons.huge;
+
         for (i = 1; i < iconSizesSorted.length; ++i) {
             iconType = iconSizesSorted[i];
             if (!previews.splitIcons[iconType]) {

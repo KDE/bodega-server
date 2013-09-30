@@ -103,7 +103,8 @@ var ErrorType = {
     "TagExists"              : 92,//The tag that has been requested to be created already exists
     "TagTypeInvalid"         : 93,//The tag that has been requested doesn't exist
     "RatingExists"           : 94,//rating already exists
-    "UploadMissingTag"       : 95//The asset doesn't have a required tag
+    "UploadMissingTag"       : 95, //The asset doesn't have a required tag
+    "AssetIconMissing"       : 96 //The asset Doesn't have any icon
 };
 
 var DbErrorType = {
