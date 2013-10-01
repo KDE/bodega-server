@@ -561,6 +561,24 @@ app.post(serverPath('partner/request/distributor/:partner'), isAuthorized,
     }
 );
 
+app.get(serverPath('partner/request/list'), isAuthorized,
+    function(req, res) {
+        app.db.listPartnerRequests(req, res);
+    }
+);
+
+app.post(serverPath('partner/managerequest/publisher/:partner'), isAuthorized,
+    function(req, res) {
+        app.db.approvePublisherStatus(req, res);
+    }
+);
+
+app.post(serverPath('partner/managerequest/distributor/:partner'), isAuthorized,
+    function(req, res) {
+        app.db.approveDistributorStatus(req, res);
+    }
+);
+
 /******************************************************
  * Store and warehouse contact listing
  */
