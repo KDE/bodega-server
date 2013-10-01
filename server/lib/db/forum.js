@@ -19,9 +19,20 @@ var errors = require('../errors.js');
 var async = require('async');
 var utils = require('../utils.js');
 var url = require('url');
-
+var request = require('request');
 var TOPICS_PER_PAGE = 29;
 var DEFAULT_PAGESIZE = 50;
+
+function get(url, cb) {
+    request(url, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            cb(null, JSON.parse(body));
+        } else {
+            cb(error, null);
+            console.log(error);
+        }
+    });
+}
 
 function findCategory(db, req, res, cb) {
     var assetId = utils.parseNumber(req.params.assetId);
@@ -41,21 +52,34 @@ function findCategory(db, req, res, cb) {
 
     json.topics = [];
     db.query(forumQuery, [assetId], function(err, result) {
+        var e = null;
         if (err) {
-            var e = errors.create('Database', err.message);
+            e = errors.create('Database', err.message);
             cb(e, db, req, res, json, categoryUrl);
             return;
         }
 
         if (result && result.rowCount > 0) {
-            categoryUrl =  app.config.service.discourse.externalUrl + 'category/' + url.format(result.rows[0].categoryname+ '.json');
+            categoryUrl =  app.config.service.discourse.httpLocation + 'category/' + url.format(result.rows[0].categoryname+ '.json');
+            //jshint -W052
             categoryUrl = ~~(req.query.offset / TOPICS_PER_PAGE) > 0 ?
                           categoryUrl + '?page=' + ~~(req.query.offset / TOPICS_PER_PAGE) : categoryUrl;
 
             cb(null, req, res, json, categoryUrl);
         } else {
-            var e = errors.create('NoMatch');
+             e = errors.create('NoMatch');
             cb(e, req, res, json);
+        }
+    });
+}
+
+function findPost (topicSlug, topicId) {
+    var url = app.config.service.discourse.httpLocation + 't/' + topicSlug + '/' + topicId + '.json';
+    get(url, function(error, info) {
+        if (error === null) {
+            return info.post_stream.posts[0].cooked;
+        } else {
+            console.log(error);
         }
     });
 }
@@ -63,50 +87,46 @@ function findCategory(db, req, res, cb) {
 function findTopics(req, res, json, categoryUrl, cb) {
     var ok;
     async.whilst(
-        function() { return json.topics.length < req.query.pagesize && categoryUrl !== null },
+        function() { return json.topics.length < req.query.pagesize && categoryUrl !== null; },
         function(callback) {
-            utils.get(categoryUrl, function(error, info) {
+            get(categoryUrl, function(error, info) {
                 if (error === null) {
                     var forumTopics = info.topic_list.topics;
-                    // Q: Why a custom limit and not the entire array?
-                    // A: Each discourse page has 29 assets.so if we have 3
-                    //    as a pagesize without the `var end` it will
-                    //    parse 29 instead of 3. But if our pagesize is 50
-                    //    then we want to parse the entire array and also
-                    //    we will need another page.
-                    var end = req.query.pagesize > TOPICS_PER_PAGE ? forumTopics.length : req.query.pagesize;
+                    categoryUrl = info.topic_list.hasOwnProperty('more_topics_url') ?
+                                   (app.config.service.discourse.httpLocation + info.topic_list.more_topics_url) : null;
 
-                    var begin = 0;
-                    if (req.query.offset > 0) {
-                        if (req.query.offset < TOPICS_PER_PAGE) {
-                            begin = req.query.offset - 1;
-                        } else {
-                            begin = req.query.offset % TOPICS_PER_PAGE;
+
+                    if (forumTopics.length !== 0 && categoryUrl !== null) {
+                        // we have more topics, so lets continue
+
+                        // Q: Why a custom limit and not the entire array?
+                        // A: Each discourse page has 29 assets.so if we have 3
+                        //    as a pagesize without the `var end` it will
+                        //    parse 29 instead of 3. But if our pagesize is 50
+                        //    then we want to parse the entire array and also
+                        //    we will need another page.
+                        var end = req.query.pagesize > TOPICS_PER_PAGE ? forumTopics.length : req.query.pagesize;
+
+                        var begin = 0;
+                        if (req.query.offset > 0) {
+                            if (req.query.offset < TOPICS_PER_PAGE) {
+                                begin = req.query.offset - 1;
+                            } else {
+                                begin = req.query.offset % TOPICS_PER_PAGE;
+                            }
+                            end += begin;
                         }
-                        end += begin;
-                    }
 
-                    // we are about to access a javascript array
-                    // which may have a end > length. So if this
-                    // is the case our server will crash. Instead
-                    // we will put it in a try-catch block and if
-                    // it fails a nice error will appear.
-                    try {
                         for (begin; begin < end; begin++) {
                             var topic = {
                                 title: forumTopics[begin].fancy_title,
                                 slug: forumTopics[begin].slug,
                                 id: forumTopics[begin].id,
-                                message: ''
+                                message: findPost(forumTopics[begin].slug, forumTopics[begin].id)
                             };
                             json.topics.push(topic);
                         }
-                    } catch(err) {
-                        callback(err);
                     }
-
-                    categoryUrl = info.topic_list.hasOwnProperty('more_topics_url') ?
-                                    (app.config.service.discourse.externalUrl + info.topic_list.more_topics_url) : null;
                     callback(null);
                 } else {
                     callback(error);
@@ -119,40 +139,12 @@ function findTopics(req, res, json, categoryUrl, cb) {
     );
 }
 
-function findPost (req, res, json, cb) {
-    var tmpJson = [];
-    async.whilst(
-       function() { return json.topics.length > 0 },
-       function(callback) {
-            topic = json.topics.shift();
-            var url = app.config.service.discourse.externalUrl + 't/' + topic.slug + '/' + topic.id + '.json';
-            utils.get(url, function(error, info) {
-                // clean the json
-                delete topic.id;
-                delete topic.slug;
-                if (error === null) {
-                    topic.message = info.post_stream.posts[0].cooked;
-                    tmpJson.push(topic);
-                    callback(null);
-                } else {
-                    callback(error);
-                }
-            });
-       },
-       function(err) {
-            json.topics = tmpJson;
-            cb(null, req, res, json);
-       }
-    );
-}
-
 module.exports.forum = function(db, req, res) {
     var funcs = [ function(cb) {
-        cb(null, db, req, res)
+        cb(null, db, req, res);
     }];
     funcs.push(findCategory);
     funcs.push(findTopics);
-    funcs.push(findPost);
 
     async.waterfall(funcs, function(err, req, res, json) {
         if (err) {

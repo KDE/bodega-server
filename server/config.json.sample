@@ -41,7 +41,8 @@
             "database": "discourse_development",
             "username": "bodega",
             "password": "bodega",
-            "externalUrl": ""
+            "externalUrl": "",
+            "httpLocation": "http://localhost:3000/"
         },
         "email": "Name <returnaddress@example.org>"
     },
