@@ -567,17 +567,12 @@ app.get(serverPath('partner/request/list'), isAuthorized,
     }
 );
 
-app.post(serverPath('partner/managerequest/publisher/:partner'), isAuthorized,
+app.post(serverPath('partner/managerequest/:requestId'), isAuthorized,
     function(req, res) {
-        app.db.approvePublisherStatus(req, res);
+        app.db.managePartnerRequest(req, res);
     }
 );
 
-app.post(serverPath('partner/managerequest/distributor/:partner'), isAuthorized,
-    function(req, res) {
-        app.db.approveDistributorStatus(req, res);
-    }
-);
 
 /******************************************************
  * Store and warehouse contact listing

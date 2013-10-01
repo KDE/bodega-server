@@ -351,12 +351,8 @@ var BodegaDb = (function() {
         this.dbQuery(dbPartnersRequests.listPartnerRequests, req, res);
     };
 
-    BodegaDb.prototype.approvePublisherStatus = function(req, res) {
-        this.dbQuery(dbPartnersApprove.approvePublisherStatus, req, res);
-    };
-
-    BodegaDb.prototype.approveDistributorStatus = function(req, res) {
-        this.dbQuery(dbPartnersApprove.approveDistributorStatus, req, res);
+    BodegaDb.prototype.managePartnerRequest = function(req, res) {
+        this.dbQuery(dbPartnersRequests.managePartnerRequest, req, res);
     };
 
     BodegaDb.prototype.participantInfo = function(req, res) {

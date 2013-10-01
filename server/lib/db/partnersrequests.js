@@ -22,11 +22,105 @@ var sanitize = require('validator').sanitize;
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
+function beginTransaction(db, req, res, requestInfo, cb)
+{
+    var query = "BEGIN;";
+    var e;
 
+    var q = db.query(query, [], function(err, result) {
+        var i;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, requestInfo);
+            return;
+        }
+        requestInfo.transaction = true;
+        cb(null, db, req, res, requestInfo);
+    });
+}
+
+function endTransaction(db, req, res, requestInfo, cb)
+{
+    var query = "COMMIT;";
+    var e;
+
+    var q = db.query(query, [], function(err, result) {
+        var i;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, requestInfo);
+            return;
+        }
+        cb(null, db, req, res, requestInfo);
+    });
+}
+
+function loadRequest (db, req, res, requestInfo, cb) {
+    var requestQuery =
+            "SELECT * from partnerrequests where id = $1;";
+    var e;
+
+    var q = db.query(
+        requestQuery, [req.params.requestId],
+        function(err, result) {
+            var i;
+            if (err) {
+                e = errors.create('Database', err.message);
+                cb(e, db, req, res, requestInfo);
+                return;
+            }
+            requestInfo = result.rows[0];
+
+            cb(null, db, req, res, requestInfo);
+        });
+}
+
+function approveDistributorRequest (db, req, res, requestInfo, cb) {
+       
+    var updateQuery =
+            'update partners set distributor = true where id = $1';
+    var e;
+
+    var q = db.query(
+        updateQuery, [requestInfo.partner],
+        function(err, result) {
+            var i;
+            if (err) {
+                e = errors.create('Database', err.message);
+                cb(e, db, req, res, requestInfo);
+                return;
+            }
+
+            cb(null, db, req, res, requestInfo);
+        });
+}
+
+function deleteFromPartnerRequests (db, req, res, requestInfo, cb) {
+
+    var deleteQuery =
+            'delete from partnerrequests where id = $1';
+    var e;
+
+    var q = db.query(
+        deleteQuery, [requestInfo.id],
+        function(err, result) {
+            var i;
+            if (err) {
+                e = errors.create('Database', err.message);
+                cb(e, db, req, res, requestInfo);
+                return;
+            }
+
+            cb(null, db, req, res, requestInfo);
+        });
+}
 
 module.exports.listPartnerRequests = function(db, req, res)
 {
-    db.query("select * from partnerrequests order by id",
+    db.query("select partnerrequests.id, partner, name,\
+              supportemail, type, reason\
+              from partnerrequests\
+              join partners on partners.id = partner order by id",
             [],
             function (err, result) {
                 if (err) {
@@ -47,13 +141,42 @@ module.exports.listPartnerRequests = function(db, req, res)
             });
 };
 
-module.exports.approvePublisherStatus = function(db, req, res)
+module.exports.managePartnerRequest = function(db, req, res)
 {
-    
-}
+    var requestInfo = {};
 
-module.exports.approveDistributorStatus = function(db, req, res)
-{
-    
+    var funcs = [function(cb) {
+        cb(null, db, req, res, requestInfo);
+    }];
+
+
+
+    //begin transaction
+    funcs.push(beginTransaction);
+    // fetch info on the particular request
+    funcs.push(loadRequest);
+    //  approve a request
+    funcs.push(approveDistributorRequest);
+    //  delete from requests
+    funcs.push(deleteFromPartnerRequests);
+    //end transaction
+    funcs.push(endTransaction);
+
+    async.waterfall(funcs, function(err, results) {
+        if (err) {
+            if (results.transaction) {
+                db.query("rollback", [], function() {
+                    errors.report(err.name, req, res, err);
+                });
+            } else {
+                errors.report(err.name, req, res, err);
+            }
+            return;
+        }
+        
+        var json = utils.standardJson(req, true);
+
+        res.send(json);
+    });
 }
 
