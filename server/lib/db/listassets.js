@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2013 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -165,20 +165,6 @@ function findPostedAssets(db, req, res, assetInfo, assets, cb)
 }
 
 
-function checkPartnerRole(db, req, res, assetInfo, assets, cb)
-{
-    createUtils.isContentCreator(
-        db, req, res, assetInfo,
-        function(err, db, req, res, assetInfo) {
-            var e;
-            if (err) {
-                checkIfIsValidator(db, req, res, assetInfo, assets, cb);
-                return;
-            }
-            cb(null, db, req, res, assetInfo, assets);
-        });
-}
-
 function checkIfIsValidator(db, req, res, assetInfo, assets, cb)
 {
     createUtils.isValidator(
@@ -188,6 +174,20 @@ function checkIfIsValidator(db, req, res, assetInfo, assets, cb)
             if (err) {
                 e = errors.create('PartnerRoleMissing', err.message);
                 cb(e, db, req, res, assetInfo, assets);
+                return;
+            }
+            cb(null, db, req, res, assetInfo, assets);
+        });
+}
+
+function checkPartnerRole(db, req, res, assetInfo, assets, cb)
+{
+    createUtils.isContentCreator(
+        db, req, res, assetInfo,
+        function(err, db, req, res, assetInfo) {
+            var e;
+            if (err) {
+                checkIfIsValidator(db, req, res, assetInfo, assets, cb);
                 return;
             }
             cb(null, db, req, res, assetInfo, assets);

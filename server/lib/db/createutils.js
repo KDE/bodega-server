@@ -285,8 +285,9 @@ module.exports.partnerForAsset = function(db, req, res, assetInfo, fn)
               SELECT partner FROM assets WHERE id = $1",
              [assetInfo.id],
              function(err, results) {
+                 var e;
                  if (err) {
-                     var e = errors.create('Database', err.message);
+                     e = errors.create('Database', err.message);
                      fn(e, db, req, res, assetInfo);
                      return;
                  }
@@ -299,8 +300,8 @@ module.exports.partnerForAsset = function(db, req, res, assetInfo, fn)
 
                  assetInfo.partner = results.rows[0].partner;
                  fn(null, db, req, res, assetInfo);
-            });
-}
+             });
+};
 
 module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
 {

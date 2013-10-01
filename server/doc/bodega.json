@@ -530,7 +530,7 @@
         {
           "MethodName": "List",
           "read-only": "true",
-          "Synopsis": "Lists the assets that belong to a partner. The authenticated account must be a Content Creator or a Validator with the partner."
+          "Synopsis": "Lists the assets that belong to a partner. The authenticated account must be a Content Creator or a Validator with the partner.",
           "HTTPMethod": "GET",
           "URI": "/asset/list/:partnerId/:type",
           "parameters": [
@@ -539,7 +539,7 @@
               "Description": "The id of the partner to list assets for",
               "Location": "URL",
               "Required": "Y",
-              "Type": "number",
+              "Type": "number"
             },
             {
               "Name": "type",
