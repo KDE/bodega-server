@@ -76,9 +76,9 @@ function findChangeLog(db, req, res, assetInfo, cb)
 function findPreviews(db, req, res, assetInfo, cb)
 {
     var previewsQuery =
-        "SELECT path FROM assetPreviews p WHERE p.asset=$1;";
+        "SELECT path, type, subtype FROM assetPreviews p WHERE p.asset=$1;";
     var incomingPreviewsQuery =
-        "SELECT path FROM incomingAssetPreviews p WHERE p.asset=$1;";
+        "SELECT path, type, subtype FROM incomingAssetPreviews p WHERE p.asset=$1;";
     var query = assetInfo.incoming ? incomingPreviewsQuery : previewsQuery;
 
     var q = db.query(query, [assetInfo.id], function(err, result) {
@@ -231,8 +231,8 @@ function findAsset(db, req, res, assetInfo, cb) {
         }
     }
 
-    console.log("query: " + query)
-    console.log("args: " + args);
+    //console.log("query: " + query)
+    //console.log("args: " + args);
 
     var q = db.query(query, args, function(err, result) {
         var e;
