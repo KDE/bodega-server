@@ -561,6 +561,21 @@ app.post(serverPath('partner/request/distributor/:partner'), isAuthorized,
     }
 );
 
+/****************************************************
+ * get previews of published and incoming assets
+ */
+
+app.get(serverPath('incomingimages/:assetId/:imagePath'), isAuthorized,
+    function(req, res) {
+        app.db.sendIncomingAssetImage(req, res);
+    }
+);
+
+app.get(serverPath('images/:assetId/:imagePath'), function(req, res) {
+    res.sendfile(__dirname + '/public/' + req.params.imagePath);
+});
+
+
 /******************************************************
  * Store and warehouse contact listing
  */

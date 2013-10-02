@@ -354,6 +354,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbUpdates, req, res);
     };
 
+    BodegaDb.prototype.sendIncomingAssetImage = function(req, res) {
+        this.dbQuery(dbAssetInfo.sendIncomingAssetImage, req, res);
+    };
+
     return BodegaDb;
 })();
 

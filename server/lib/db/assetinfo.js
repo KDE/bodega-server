@@ -101,11 +101,13 @@ function findPreviews(db, req, res, assetInfo, cb)
 
 function findTags(db, req, res, assetInfo, cb)
 {
+    //FIXME: listPublicly is gone?
     var tagsQuery =
         "SELECT tagTypes.type, tags.title FROM \
              assetTags a JOIN tags ON (a.tag = tags.id) LEFT JOIN \
              tagTypes ON (tags.type = tagTypes.id) \
-         where a.asset = $1 AND tagTypes.listPublicly;";
+         where a.asset = $1 \
+         --AND tagTypes.listPublicly;";
     var incomingTagsQuery =
         "SELECT tagTypes.type, tags.title FROM incomingAssetTags a \
          JOIN tags ON (a.tag = tags.id) LEFT JOIN tagTypes ON \
@@ -164,20 +166,26 @@ function findAsset(db, req, res, assetInfo, cb) {
     var multi = false;
     var expectedRowCount = 1;
 
-    if (assetInfo.incoming) {
-        table = 'incomingAssets';
+    if (assetInfo.incoming ||
+        req.session.user.store == undefined ||
+        req.session.user.store == 'null') {
+        if (assetInfo.incoming) {
+            table = 'incomingAssets';
+        } else {
+            table = 'assets';
+        }
         query =
         "SELECT a.id, l.name as license, l.text as licenseText, \
          a.partner as partnerId, p.name as partnername, \
          a.version, a.file, a.image, a.name, \
          a.description, a.size \
-         FROM incomingAssets a \
+         FROM " + table + " a \
          LEFT JOIN licenses l ON (a.license = l.id) \
          LEFT JOIN partners p ON (a.partner = p.id) \
          WHERE a.id = $1";
         args = [assetInfo.id];
 
-        if (!assetInfo.validator) {
+        if (!assetInfo.validator && assetInfo.incoming) {
             query += " AND a.partner = $2";
             args.push(assetInfo.partner);
         }
@@ -223,8 +231,8 @@ function findAsset(db, req, res, assetInfo, cb) {
         }
     }
 
-    //console.log("query: " + query)
-    //console.log("args: " + args);
+    console.log("query: " + query)
+    console.log("args: " + args);
 
     var q = db.query(query, args, function(err, result) {
         var e;
@@ -375,3 +383,34 @@ module.exports.multipleAssetBriefs = function(db, req, res) {
                   res.send(assetInfo.json);
               });
 };
+
+
+module.exports.sendIncomingAssetImage = function(db, req, res) {
+    if (!req.params.assetId || req.params.assetId === 'undefined' ||
+        !req.params.imagePath || req.params.imagePath === 'undefined') {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    var assetInfo = {
+        id: req.params.assetId
+    };
+
+    var funcs = [function(cb) {
+        cb(null, db, req, res, assetInfo);
+    }];
+
+    assetInfo.incoming = true;
+    funcs.push(createUtils.partnerForAsset);
+    funcs.push(checkCanViewIncoming);
+
+
+    async.waterfall(funcs, function(err, db, req, res, assetInfo) {
+        if (err) {
+            errors.report(err.name, req, res, err);
+            return;
+        }
+        res.sendfile(__dirname.substring(0, __dirname.length - 7) + '/incoming/' + req.params.imagePath);
+    });
+};
+
