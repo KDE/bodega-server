@@ -329,7 +329,7 @@ function requestPublisherStatus(db, req, res, partner, data, cb)
 {
     db.query("insert into partnerRequests (partner, person, type, reason) \
               values ($1, $2, $3, $4)",
-              [partner, req.session.user.id, 'distributorRequest', req.body.reason],
+              [partner, req.session.user.id, 'publisherRequest', req.body.reason],
               function(err, result) {
                   if (err) {
                       cb(errors.create('Database', err.message));

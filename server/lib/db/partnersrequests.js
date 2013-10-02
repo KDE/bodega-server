@@ -57,7 +57,11 @@ function endTransaction(db, req, res, requestInfo, cb)
 
 function loadRequest (db, req, res, requestInfo, cb) {
     var requestQuery =
-            "SELECT * from partnerrequests where id = $1;";
+            "SELECT partnerrequests.id, partner, name,\
+              supportemail, type, person, reason\
+              from partnerrequests\
+              join partners on partners.id = partner\
+              where partnerrequests.id = $1";
     var e;
 
     var q = db.query(
@@ -75,10 +79,17 @@ function loadRequest (db, req, res, requestInfo, cb) {
         });
 }
 
-function approveDistributorRequest (db, req, res, requestInfo, cb) {
-       
-    var updateQuery =
-            'update partners set distributor = true where id = $1';
+function approveRequest (db, req, res, requestInfo, cb) {
+
+    var updateQuery;
+    if (requestInfo.type === 'distributorRequest') {
+        updateQuery =
+                'update partners set distributor = true where id = $1';
+    //default as publisher
+    } else {
+        updateQuery =
+                'update partners set publisher = true where id = $1';
+    }
     var e;
 
     var q = db.query(
@@ -94,6 +105,7 @@ function approveDistributorRequest (db, req, res, requestInfo, cb) {
             cb(null, db, req, res, requestInfo);
         });
 }
+
 
 function deleteFromPartnerRequests (db, req, res, requestInfo, cb) {
 
@@ -115,10 +127,24 @@ function deleteFromPartnerRequests (db, req, res, requestInfo, cb) {
         });
 }
 
+function sendRejectionEmail(db, req, res, requestInfo, cb)
+{
+    db.query("INSERT INTO emailQueue (recipient, data, template) \
+              VALUES ($1, hstore(Array[['partner', $2], ['reason', $3]]), $4)",
+             [requestInfo.person, requestInfo.partner, req.body.reason, ('partner_' + requestInfo.type + 'Reject')],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                 }
+
+                 cb(err, db, req, res, requestInfo);
+             });
+}
+
 module.exports.listPartnerRequests = function(db, req, res)
 {
     db.query("select partnerrequests.id, partner, name,\
-              supportemail, type, reason\
+              supportemail, type, person, reason\
               from partnerrequests\
               join partners on partners.id = partner order by id",
             [],
@@ -150,13 +176,17 @@ module.exports.managePartnerRequest = function(db, req, res)
     }];
 
 
-
     //begin transaction
     funcs.push(beginTransaction);
     // fetch info on the particular request
     funcs.push(loadRequest);
-    //  approve a request
-    funcs.push(approveDistributorRequest);
+    if (req.body.approved) {
+        //  approve a request
+        funcs.push(approveRequest);
+    } else {
+        //  Thell the user why is refused
+        funcs.push(sendRejectionEmail);
+    }
     //  delete from requests
     funcs.push(deleteFromPartnerRequests);
     //end transaction
