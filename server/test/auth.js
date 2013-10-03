@@ -89,7 +89,7 @@ describe('Authentication', function(){
                 "points":0,
                 "success":false,
                 "error": {"type" : "NoMatch"}};
-            utils.getUrl('auth?auth_user=zack@kde.org&auth_password=bad_password&auth_store=2',
+            utils.getUrl('auth?auth_user=zack@kde.org&auth_password=bad_password&auth_store=VIVALDI-1',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
