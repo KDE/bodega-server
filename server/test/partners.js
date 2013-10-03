@@ -671,7 +671,7 @@ describe('Partner management', function() {
                     });
             });
 
-            it('should list both requests', function(done) {
+            it('should list both requests for aaron (Management Group Validator)', function(done) {
                 utils.getUrl('partner/request/list',
                     function(res) {
                         res.statusCode.should.equal(200);
@@ -679,6 +679,25 @@ describe('Partner management', function() {
                         res.body.should.have.property('success', true);
                         res.body.should.have.property('partners');
                         res.body.partners.length.should.eql(2);
+                        done();
+                    });
+            });
+        });
+
+        utils.auth({
+            user: 'zack@kde.org',
+            password: 'zack',
+            store: 'null'
+        });
+
+        describe('role management with unpriveleged account', function(done) {
+            it('should not list requests for zack', function(done) {
+                utils.getUrl('partner/request/list',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.should.have.property('success', false);
+                        res.body.should.not.have.property('partners');
                         done();
                     });
             });
