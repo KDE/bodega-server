@@ -117,6 +117,97 @@ describe('Password reset', function() {
             },
             { noAuth: true } );
     });
+
+    it('a reset with a bad code should fail', function(done) {
+        utils.postUrl('participant/resetPassword?code=192839283&email=kok3rs%40gmail.com&id=' + userInfo.id,
+                      { password1: "newpassword" },
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                assert(res.body.indexOf('Specified password reset code was invalid') > -1);
+                done();
+            },
+            { noAuth: true,
+              html: true} );
+    });
+
+    it('a reset code with the wrong id should fail', function(done) {
+        utils.postUrl('participant/resetPassword?code=' + resetCode + '&email=kok3rs%40gmail.com&id=1',
+                      { password1: "newpassword" },
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                assert(res.body.indexOf('Specified password reset code was invalid') > -1);
+                done();
+            },
+            { noAuth: true,
+              html: true} );
+    });
+
+    it('a reset with no code should fail', function(done) {
+        utils.postUrl('participant/resetPassword?email=kok3rs%40gmail.com&id=' + userInfo.id,
+                      { password1: "newpassword" },
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                assert(res.body.indexOf('Arguments missing') > -1);
+                done();
+            },
+            { noAuth: true,
+              html: true} );
+    });
+
+    it('a reset with no email should fail', function(done) {
+        utils.postUrl('participant/resetPassword?code=192839283&id=' + userInfo.id,
+                      { password1: "newpassword" },
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                assert(res.body.indexOf('Arguments missing') > -1);
+                done();
+            },
+            { noAuth: true,
+              html: true} );
+    });
+
+    it('a reset with no id should fail', function(done) {
+        utils.postUrl('participant/resetPassword?code=192839283&email=kok3rs%40gmail.com',
+                      { password1: "newpassword" },
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                assert(res.body.indexOf('Arguments missing') > -1);
+                done();
+            },
+            { noAuth: true,
+              html: true} );
+    });
+
+    it('a reset with no new password should fail', function(done) {
+        utils.postUrl('participant/resetPassword?code=192839283&email=kok3rs%40gmail.com&id=' + userInfo.id,
+                      { },
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                assert(res.body.indexOf('Arguments missing') > -1);
+                done();
+            },
+            { noAuth: true,
+              html: true} );
+    });
+
+    it('a proper reset should complete successfully', function(done) {
+        utils.postUrl('participant/resetPassword?code=' + resetCode + '&email=kok3rs%40gmail.com&id=' + userInfo.id,
+                      { password1: "newpassword" },
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                assert(res.body.indexOf('Password successfully reset') > -1);
+                done();
+            },
+            { noAuth: true,
+              html: true} );
+    });
 });
 
 utils.auth();
