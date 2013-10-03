@@ -247,7 +247,7 @@ module.exports.wrapInTransactionAndReply = function(functions, db, req, res)
 {
     var startArgs = Array.prototype.slice.call(arguments, 1);
 
-    if (functions.length  < 1) {
+    if (functions.length < 1) {
         console.log("Can not transact without functions!");
         return;
     }
@@ -271,11 +271,11 @@ module.exports.wrapInTransactionAndReply = function(functions, db, req, res)
 
     async.waterfall(funcs, function(err, json) {
         if (err) {
-            db.query("rollback", [], function() {
+            db.query("ROLLBACK", [], function() {
                 errors.report(err.name, req, res, err);
             });
         } else {
-            db.query("commit", [], function(err, result) {
+            db.query("COMMIT", [], function(err, result) {
                 res.json(json);
             });
         }
