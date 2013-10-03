@@ -64,6 +64,22 @@ describe('Tags manipulation', function(){
             });
     }
 
+    describe('Tag types', function() {
+        it('List all tag types', function(done) {
+            utils.getUrl('tag/types',
+                function(res) {
+                    var expected = { id: 1, type: 'partnership' }
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('types');
+                    res.body.types.length.should.be.above(21);
+                    res.body.types[0].should.eql(expected);
+                    done();
+             });
+        });
+    });
+
     describe('Tags', function() {
         it('List all tags', function(done) {
             var cb = function(res) {
