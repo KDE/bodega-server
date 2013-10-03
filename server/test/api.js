@@ -73,4 +73,15 @@ describe('List api', function() {
                 });
         });
     });
+
+    describe('Easter eggs', function() {
+        it('should find correct for test', function(done) {
+            utils.getUrl('hunt/VIVALDI-1/test',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.body.should.have.property('egg', 'correct');
+                    done();
+                });
+        });
+    });
 });

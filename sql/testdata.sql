@@ -170,6 +170,7 @@ DELETE FROM languages;
 DELETE FROM assetprices WHERE ending is not null;
 DELETE FROM assetRatings;
 DELETE FROM assetRatingAverages;
+DELETE FROM easterEggs;
 SELECT ct_testing_removePriorTestingTags();
 
 SELECT setval('seq_assetsids', 1);
@@ -631,6 +632,8 @@ INSERT INTO assetRatings (asset, attribute, person, rating)
     VALUES (ct_testing_assetByName('Poker2'), ct_testing_ratingAttributeByName('Enjoyability'), ct_testing_personByEmail('zack@kde.org'), 3);
 
 UPDATE warehouses SET minMarkup = 15;
+
+INSERT INTO easterEggs (phrase, store, egg) VALUES ('test', 'VIVALDI-1', 'correct');
 
 -- cleanup
 DROP FUNCTION ct_testing_favoriteBooksByAuthor(email text, author text);
