@@ -562,7 +562,7 @@ app.post(serverPath('partner/request/distributor/:partner'), isAuthorized,
 );
 
 /****************************************************
- * get previews of published and incoming assets
+ * get previews of incoming assets
  */
 
 app.get(serverPath('incomingimages/:assetId/:imagePath'), isAuthorized,
@@ -570,10 +570,6 @@ app.get(serverPath('incomingimages/:assetId/:imagePath'), isAuthorized,
         app.db.sendIncomingAssetImage(req, res);
     }
 );
-
-app.get(serverPath('images/:assetId/:imagePath'), function(req, res) {
-    res.sendfile(__dirname + '/public/' + req.params.imagePath);
-});
 
 
 /******************************************************
