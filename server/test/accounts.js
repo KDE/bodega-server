@@ -237,11 +237,12 @@ describe('Password reset', function() {
     });
 });
 
-utils.auth();
+utils.auth({ user: 'kok3rs@gmail.com', password: 'newpassword'});
 
 describe('Deactivate user', function() {
     it('succeeds', function(done) {
-        utils.getUrl('participant/changeAccountDetails&active=false',
+        utils.postUrl('participant/changeAccountDetails',
+            { active: false },
             function(res) {
                 res.statusCode.should.equal(200);
                 res.headers.should.have.property('content-type');
@@ -251,6 +252,20 @@ describe('Deactivate user', function() {
                 res.body.should.have.property('success');
                 done();
             });
+    });
+
+    it('should disallow authentication', function(done) {
+        utils.getUrl('/bodega/v1/json/auth?auth_user=kok3rs@gmail.com&auth_password=newpassword&auth_store=VIVALDI-1',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                res.headers.should.have.property('set-cookie');
+                res.body.should.have.property('authStatus', false);
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'AccountInactive');
+                done();
+            },
+            { noAuth: true });
     });
 
     after(function(done) {
@@ -263,6 +278,8 @@ describe('Deactivate user', function() {
                    });
     });
 });
+
+utils.auth();
 
 function checkPersonInfo(key, value, done)
 {
