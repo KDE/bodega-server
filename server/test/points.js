@@ -42,12 +42,25 @@ describe('Point operations', function() {
                     done();
                 });
         });
+
+        it('should give us a price in CHF if requested', function(done) {
+            utils.getUrl('points/price?amount=510&otherCurrency=CHF',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('USD', 6);
+                    res.body.should.have.property('CHF');
+                    console.log(res.body.CHF);
+                    done();
+                });
+        });
     });
 
     /* Only run the rest of the payments tests if the secret key
      * is in the config.json file */
-    if (!app.config.payment.stripe.testSecretKey ||
-        app.config.payment.stripe.testSecretKey.length < 10) {
+    if (!app.config.appkeys.stripe.testSecretKey ||
+        app.config.appkeys.stripe.testSecretKey.length < 10) {
         it('skips - .', function(done) {
             console.log("Stripe tests disabled");
             done();

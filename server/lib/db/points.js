@@ -105,7 +105,9 @@ module.exports.price = function(db, req, res)
         'USD': (Math.round((app.config.pointConversionRate / 100 * points) * 100) / 100)
     };
 
-    if (!req.query.otherCurrency) {
+    if (!req.query.otherCurrency ||
+        !app.config.appkeys.openexchangerates ||
+        app.config.appkeys.openexchangerates === '') {
         res.json(json);
         return;
     }
@@ -113,7 +115,7 @@ module.exports.price = function(db, req, res)
     if (currencies.length < 1 || currencyTs + 3600 < Math.round(Date.now() / 1000)) {
         var options = {
             'host': 'openexchangerates.org',
-            'path': '/latest.json'
+            'path': '/api/latest.json?app_id=' + app.config.appkeys.openexchangerates
         };
 
         var currencyData = '';
@@ -124,7 +126,14 @@ module.exports.price = function(db, req, res)
             });
 
             downRes.on('end', function(data) {
-                currencyData = JSON.parse(currencyData);
+                try {
+                    currencyData = JSON.parse(currencyData);
+                } catch (e) {
+                    var error = { message: 'Bad response on currency exchange rate for ' + otherCurrency };
+                    errors.log(error);
+                    res.json(json);
+                    return;
+                }
                 if (currencyData.rates) {
                     currencies = currencyData.rates;
                 }
