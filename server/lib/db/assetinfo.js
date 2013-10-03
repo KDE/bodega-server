@@ -444,8 +444,7 @@ module.exports.sendIncomingAssetPreview = function(db, req, res) {
                         res.sendfile(process.cwd() + '/incoming/' + req.params.imagePath);
                     }
                 } else {
-                    var json = utils.standardJson(req);
-                    res.send(json);
+                    errors.report('AccessDenied', req, res);
                 }
         });
     });

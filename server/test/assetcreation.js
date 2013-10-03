@@ -231,18 +231,6 @@ describe('Asset manipulation', function(){
                       });
         });
 
-        it('should get screenshot file of incoming asset', function(done){
-            utils.getUrl('incomingassetpreview/' + incompleteAssetId + '/' + incompleteAssetId + '%2Fsample-1.png',
-                function(res) {
-                    res.should.have.status(200);
-                    console.log(res.body)
-                    res.headers.should.have.property('content-type');
-                    console.log(res.headers)
-                    res.headers['content-type'].should.equal('image/png');
-                    done();
-                }, {'stream': true});
-        });
-
         it('work with assetInfo in the url', function(done){
             var name = 'sample 123456';
             var description = 'sample description of a new asset';
@@ -260,6 +248,18 @@ describe('Asset manipulation', function(){
                               res.body.asset.should.have.property('description', description);
                               done();
                           });
+        });
+    });
+
+    describe('See preview of incoming assets', function(){
+        it('should get screenshot file of incoming asset', function(done){
+            utils.getUrl('incomingassetpreview/' + incompleteAssetId + '/' + incompleteAssetId + '%2Fsample-1.png',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property('content-type');
+                    res.headers['content-type'].should.equal('image/png');
+                    done();
+                }, {'stream': true});
         });
     });
 
@@ -427,6 +427,25 @@ describe('Asset manipulation', function(){
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'PartnerInvalid');
                     utils.app.config.printErrors = true;
+                    done();
+                });
+        });
+    });
+
+    describe('Unhauthorized preview of incoming assets', function(){
+        utils.auth({
+            user: 'mart@kde.org',
+            password: 'mart',
+            store: 'null'
+        });
+        it('should be denied screenshot file of incoming asset', function(done){
+            utils.getUrl('incomingassetpreview/' + incompleteAssetId + '/' + incompleteAssetId + '%2Fsample-1.png',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property('content-type');
+                    res.headers['content-type'].should.equal('application/json');
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'AccessDenied');
                     done();
                 });
         });

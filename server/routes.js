@@ -567,7 +567,7 @@ app.post(serverPath('partner/request/distributor/:partner'), isAuthorized,
 
 app.get(serverPath('incomingassetpreview/:assetId/:imagePath'), isAuthorized,
     function(req, res) {
-        app.db.sendIncomingAssetImage(req, res);
+        app.db.sendIncomingAssetPreview(req, res);
     }
 );
 
