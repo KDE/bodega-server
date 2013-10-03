@@ -110,7 +110,7 @@ function approveRequest (db, req, res, requestInfo, cb) {
 function deleteFromPartnerRequests (db, req, res, requestInfo, cb) {
 
     var deleteQuery =
-            'delete from partnerrequests where id = $1';
+            'DELETE FROM partnerrequests where id = $1';
     var e;
 
     var q = db.query(
@@ -181,10 +181,10 @@ module.exports.managePartnerRequest = function(db, req, res)
     // fetch info on the particular request
     funcs.push(loadRequest);
     if (req.body.approved) {
-        //  approve a request
+        // approve a request
         funcs.push(approveRequest);
     } else {
-        //  Thell the user why is refused
+        // Tell the user why is refused
         funcs.push(sendRejectionEmail);
     }
     //  delete from requests
@@ -203,7 +203,7 @@ module.exports.managePartnerRequest = function(db, req, res)
             }
             return;
         }
-        
+
         var json = utils.standardJson(req, true);
 
         res.send(json);

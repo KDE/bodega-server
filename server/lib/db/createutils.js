@@ -17,10 +17,11 @@
 
 var async = require('async');
 var path = require('path');
+var fs = require('fs');
 
 var errors = require('../errors.js');
+var roles = require('../roles.js');
 var utils = require('../utils.js');
-var fs = require('fs');
 
 function associateTag(db, req, res, assetInfo, tagInfo, cb)
 {
@@ -307,65 +308,22 @@ module.exports.isContentCreator = function(db, req, res, assetInfo, fn)
     //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
     var partner = assetInfo.partner ? assetInfo.partner : 0;
 
-    var e;
-    //console.log("checking up on partner");
-    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) where a.partner = $1 and a.person = $2 and r.description = 'Content Creator';",
-             [partner, req.session.user.id],
-             function(err, result) {
-                 if (err || !result.rows || result.rows.length === 0) {
-                     e = errors.create('PartnerInvalid',
-                                       err ? err.message : '');
-                     fn(e, db, req, res, assetInfo);
-                     return;
-                 }
-
-                 //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
-                 fn(null, db, req, res, assetInfo);
-             });
+    roles.isContentCreator(db, req, res, partner,
+            function(err, db, req, res) {
+                fn(err, db, req, res, assetInfo);
+            });
 };
 
 module.exports.isValidator = function(db, req, res, assetInfo, fn)
 {
     //console.log("checking " + assetInfo.partner + ' ' + req.session.user.id);
     var partner = assetInfo.partner ? assetInfo.partner : 0;
-    var e;
-    //console.log("checking up on partner");
-    db.query("select partner from affiliations a left join personRoles r on (a.role = r.id) \
-              where (a.partner = 0 OR a.partner = $1) and a.person = $2 and r.description = 'Validator';",
-            [partner, req.session.user.id],
-            function(err, result) {
-                if (err || !result.rows || result.rows.length === 0) {
-                    e = errors.create('PartnerInvalid',
-                        err ? err.message : '');
-                    fn(e, db, req, res, assetInfo);
-                    return;
-                }
 
-                //console.log("going to store the asset now .. " + partner + " " + result.rows.length);
-                fn(null, db, req, res, assetInfo);
+    roles.isValidator(db, req, res, partner,
+            function(err, db, req, res) {
+                fn(err, db, req, res, assetInfo);
             });
 };
-
-
-module.exports.isBodegaManager = function(db, req, res, fn)
-{
-    var e;
-    var query = "select partner from affiliations a \
-        left join personRoles r on (a.role = r.id) where a.partner = 0 \
-        and a.person = $1 and r.description = 'Validator';";
-    var args = [req.session.user.id];
-    db.query(query, args, function(err, result) {
-        if (err || !result.rows || result.rows.length === 0) {
-            e = errors.create('PartnerInvalid',
-                              err ? err.message : '');
-            fn(e, db, req, res);
-            return;
-        }
-
-        fn(null, db, req, res);
-    });
-};
-
 
 function mergeObjects(a, b)
 {
