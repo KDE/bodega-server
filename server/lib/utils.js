@@ -22,6 +22,10 @@ var fs = require('fs');
 
 module.exports.parseBool = function(string)
 {
+    if (typeof string === 'boolean') {
+        return string;
+    }
+
     return (string === 'true' || string === '1') ? true : false;
 };
 
