@@ -23,6 +23,7 @@ var assert = require('assert');
 
 describe('Create user', function() {
     var userInfo;
+
     it('register successful', function(done) {
         utils.getUrl('register?firstname=antonis&lastname=tsiapaliokas&email=kok3rs@gmail.com&password=123456789',
             function(res) {
@@ -46,6 +47,7 @@ describe('Create user', function() {
             },
             { noAuth: true });
     });
+
     describe('needs to activate', function() {
         it('should activate', function(done) {
             utils.getHtml('register/confirm?' + queryString.stringify(userInfo),
@@ -57,6 +59,51 @@ describe('Create user', function() {
                 },
                 { noAuth: true });
         });
+    });
+});
+
+describe('Password reset', function() {
+    var resetCode;
+    it('reset request should require an email parameter', function(done) {
+        utils.getUrl('participant/resetRequest',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                res.body.should.have.property('success', false);
+                res.body.should.not.have.property('code');
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'MissingParameters');
+                done();
+            },
+            { noAuth: true } );
+    });
+
+    it('reset request should fail with an invalid email', function(done) {
+        utils.getUrl('participant/resetRequest?email=foo@bar.com',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                res.body.should.have.property('success', false);
+                res.body.should.not.have.property('code');
+                res.body.should.have.property('error');
+                res.body.error.should.have.property('type', 'NoMatch');
+                done();
+            },
+            { noAuth: true } );
+    });
+
+    it('reset request should succeed with a code with a valid email', function(done) {
+        utils.getUrl('participant/resetRequest?email=kok3rs@gmail.com',
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                res.body.should.have.property('success', true);
+                res.body.should.have.property('message');
+                res.body.should.have.property('code');
+                resetCode = res.body.code;
+                done();
+            },
+            { noAuth: true } );
     });
 });
 

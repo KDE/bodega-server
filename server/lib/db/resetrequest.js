@@ -56,20 +56,35 @@ module.exports = function(db, req, res) {
                 clientIp = req.connection.remoteAddress;
             }
 
-            // queue up a message
-            db.query("INSERT INTO emailQueue (recipient, data, template) \
-                     VALUES ($1, hstore(Array[['requestAddress', $2]]), 'participant_passwordReset')",
-                     [ result.rows[0].id, clientIp ],
+            // generate a reset code
+            var personId = result.rows[0].id;
+            db.query('select ct_createPasswordResetCode($1) as resetcode;',
+                     [ personId ],
                      function(err, result) {
-                        if (err) {
-                            errors.report('Database', req, res, err);
-                            return;
-                        }
+                         if (err || result.rowCount < 1) {
+                             errors.report('Database', req, res);
+                         }
 
-                        var json = {};
-                        json.message = "Password reset email sent!";
-                        res.json(json);
-                    });
-        }
-    );
+                         var resetCode = result.rows[0].resetcode;
+
+                         // queue up a message
+                         db.query("INSERT INTO emailQueue (recipient, data, template) \
+                                  VALUES ($1, hstore(Array[['requestAddress', $2], ['code', $3]]), \
+                                          'participant_passwordReset')",
+                             [ personId, clientIp, resetCode ],
+                             function(err, result) {
+                                 if (err) {
+                                     errors.report('Database', req, res, err);
+                                     return;
+                                 }
+
+                                 var json = {
+                                     success: true,
+                                     message: "Password reset email sent!",
+                                     code: resetCode
+                                 };
+                                 res.json(json);
+                             });
+                     });
+        });
 };
