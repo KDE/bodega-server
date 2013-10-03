@@ -410,12 +410,44 @@ module.exports.sendIncomingAssetImage = function(db, req, res) {
             errors.report(err.name, req, res, err);
             return;
         }
-        //HACK: pretty much every single line here is one
-        if (req.params.imagePath.indexOf('icon') === -1) {
-            res.sendfile(__dirname.substring(0, __dirname.length - 7) + '/incoming/' + req.params.imagePath);
-        } else {
-            res.sendfile(__dirname.substring(0, __dirname.length - 7) + '/incoming/' + req.params.assetId + '/512/' + req.params.imagePath.substring(req.params.imagePath.indexOf('/')));
-        }
+
+        var query = 'SELECT * from incomingassetpreviews \
+                     WHERE asset = $1 and path = $2';
+        db.query(query, [assetInfo.id, req.params.imagePath],
+            function(err, result) {
+                if (err) {
+                    var e = errors.create('Database', err.message);
+                    cb(e, db, req, res, assetInfo);
+                    return;
+                }
+
+                if (result.rows.length >= 1) {
+                    var imageData = result.rows[0];
+
+                    if (imageData.type == 'icon') {
+                        var size;
+                        if (imageData.subtype == 'huge') {
+                            size = '512';
+                        } else if (imageData.subtype == 'large') {
+                            size = '256';
+                        } else if (imageData.subtype == 'big') {
+                            size = '128';
+                        } else if (imageData.subtype == 'medium') {
+                            size = '64';
+                        } else if (imageData.subtype == 'small') {
+                            size = '32';
+                        } else if (imageData.subtype == 'tiny') {
+                            size = '22';
+                        } 
+                        res.sendfile(process.cwd() + '/incoming/' + req.params.assetId + '/' + size + '/' + req.params.imagePath.substring(req.params.imagePath.indexOf('/')));
+                    } else {
+                        res.sendfile(process.cwd() + '/incoming/' + req.params.imagePath);
+                    }
+                } else {
+                    var json = utils.standardJson(req);
+                    res.send(json);
+                }
+        });
     });
 };
 
