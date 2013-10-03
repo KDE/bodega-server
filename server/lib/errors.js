@@ -40,6 +40,7 @@ var ErrorType = {
     "InvalidAccount"         : 1003,//The account does not exist
     "TooManyParameters"      : 1004,//Too many parameters were passed in to a call
     "AccountNotEnoughPoints" : 1005,//Not enough points to complete an asset purchase
+    "InvalidRequestId"       : 1006,//The request id does not exist
 
     "PurchaseMethodCreation" : 17,//could not link credit card to customer
     "PurchaseMethodDeletion" : 18,//delete card details

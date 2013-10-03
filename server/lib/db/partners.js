@@ -270,8 +270,7 @@ function deletePartnerLink(db, req, res, partner, cb)
 
 function sendStandardJson(req, res, cb)
 {
-    res.json(utils.standardJson(req));
-    cb();
+    cb(null, utils.standardJson(req));
 }
 
 function setPersonRole(db, req, res, partner, data, cb)
@@ -329,7 +328,7 @@ function requestPublisherStatus(db, req, res, partner, data, cb)
 {
     db.query("insert into partnerRequests (partner, person, type, reason) \
               values ($1, $2, $3, $4)",
-              [partner, req.session.user.id, 'distributorRequest', req.body.reason],
+              [partner, req.session.user.id, 'publisherRequest', req.body.reason],
               function(err, result) {
                   if (err) {
                       cb(errors.create('Database', err.message));

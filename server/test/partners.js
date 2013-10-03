@@ -640,7 +640,9 @@ describe('Partner management', function() {
                         checkPartnerList(expected, done);
                     });
             });
+        });
 
+        describe('publisher and distributors', function(done) {
             it('request publisher status', function(done) {
                var params = {
                     reason: 'So we can upload content.'
@@ -661,12 +663,95 @@ describe('Partner management', function() {
                     reason: 'So we can make stores.'
                 };
 
-                utils.postUrl('partner/request/publisher/' + newPartnerId,
+                utils.postUrl('partner/request/distributor/' + newPartnerId,
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
+                        done();
+                    });
+            });
+
+            var requests = 0;
+
+            it('should list both requests for aaron (Management Group Validator)', function(done) {
+                utils.getUrl('partner/request/list',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.should.have.property('success', true);
+                        res.body.should.have.property('requests');
+                        res.body.requests.length.should.eql(2);
+                        requests = res.body.requests;
+                        done();
+                    });
+            });
+
+            it('should allow a Management group validator to approve a request', function(done) {
+                utils.postUrl('partner/request/manage/' + requests[0].id,
+                    { approved: true },
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.should.have.property('success', true);
+                        done();
+                    });
+            });
+
+            it('should allow a Management group validator to approve a request', function(done) {
+                utils.postUrl('partner/request/manage/' + requests[1].id,
+                    { approved: false },
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.should.have.property('success', true);
+                        done();
+                    });
+            });
+
+            it('should reject a Management group validator to approve a non-existent request', function(done) {
+                utils.postUrl('partner/request/manage/' + requests[0].id,
+                    { approved: true },
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.should.have.property('success', false);
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'InvalidRequestId');
+                        done();
+                    });
+            });
+        });
+
+        utils.auth({
+            user: 'zack@kde.org',
+            password: 'zack',
+            store: 'null'
+        });
+
+        describe('role management with unpriveleged account', function(done) {
+            it('should not list requests for zack', function(done) {
+                utils.getUrl('partner/request/list',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.should.have.property('success', false);
+                        res.body.should.not.have.property('requests');
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'Unauthorized');
+                        done();
+                    });
+            });
+
+            it('should not allow zack to approve requests', function(done) {
+                utils.getUrl('partner/request/list',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.should.have.property('success', false);
+                        res.body.should.have.property('error');
+                        res.body.error.should.have.property('type', 'Unauthorized');
                         done();
                     });
             });

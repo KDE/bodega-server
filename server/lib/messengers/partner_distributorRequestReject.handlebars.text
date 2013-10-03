@@ -1,0 +1,10 @@
+Your request for becoming a distributor for {{partnerName}}  was rejected for the following reason:
+
+{{data.reason}}
+
+
+If you would like to dispute this rejection please email us at {{serviceemail}}.
+
+Thank You,
+
+The {{warehouse}} Team

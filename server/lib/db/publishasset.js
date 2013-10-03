@@ -15,9 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var utils = require('../utils.js');
 var errors = require('../errors.js');
+var utils = require('../utils.js');
+var roles = require('../roles.js');
 var createUtils = require('./createutils.js');
+
 var fs = require('fs');
 var path = require('path');
 var async = require('async');
@@ -443,7 +445,7 @@ module.exports = function(db, req, res) {
         return;
     }
 
-    createUtils.isBodegaManager(db, req, res, function(err, db, req, res) {
+    roles.isBodegaManager(db, req, res, function(err, db, req, res) {
         if (err) {
             errors.report('PartnerInvalid', req, res, err);
             return;

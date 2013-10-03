@@ -17,6 +17,8 @@
 
 var utils = require('./lib/utils.js');
 var errors = require('./lib/errors.js');
+var roles = require('./lib/roles.js');
+
 var markdown = require("marked");
 var fs = require('fs');
 var path = require('path');
@@ -35,6 +37,21 @@ function isAuthorized(req, res, next)
     } else {
         errors.report("Unauthorized", req, res);
     }
+}
+
+function isBodegaManager(req, res, next)
+{
+    app.db.dbQuery(
+        function(db, req, res) {
+            roles.isBodegaManager(db, req, res,
+                function(err) {
+                    if (err) {
+                        errors.report("Unauthorized", req, res);
+                    } else {
+                        next();
+                    }
+                });
+        }, req, res);
 }
 
 function serverPath(path)
@@ -560,6 +577,19 @@ app.post(serverPath('partner/request/distributor/:partner'), isAuthorized,
         app.db.requestDistributorStatus(req, res);
     }
 );
+
+app.get(serverPath('partner/request/list'), isAuthorized, isBodegaManager,
+    function(req, res) {
+        app.db.listPartnerRequests(req, res);
+    }
+);
+
+app.post(serverPath('partner/request/manage/:requestId'), isAuthorized, isBodegaManager,
+    function(req, res) {
+        app.db.managePartnerRequest(req, res);
+    }
+);
+
 
 /******************************************************
  * Store and warehouse contact listing
