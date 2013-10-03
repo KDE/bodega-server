@@ -354,8 +354,8 @@ var BodegaDb = (function() {
         this.dbQuery(dbUpdates, req, res);
     };
 
-    BodegaDb.prototype.sendIncomingAssetImage = function(req, res) {
-        this.dbQuery(dbAssetInfo.sendIncomingAssetImage, req, res);
+    BodegaDb.prototype.sendIncomingAssetPreview = function(req, res) {
+        this.dbQuery(dbAssetInfo.sendIncomingAssetPreview, req, res);
     };
 
     return BodegaDb;

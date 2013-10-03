@@ -232,7 +232,7 @@ describe('Asset manipulation', function(){
         });
 
         it('should get screenshot file of incoming asset', function(done){
-            utils.getUrl('incomingimages/' + incompleteAssetId + '/' + incompleteAssetId + '%2Fsample-1.png',
+            utils.getUrl('incomingassetpreview/' + incompleteAssetId + '/' + incompleteAssetId + '%2Fsample-1.png',
                 function(res) {
                     res.should.have.status(200);
                     console.log(res.body)

@@ -565,7 +565,7 @@ app.post(serverPath('partner/request/distributor/:partner'), isAuthorized,
  * get previews of incoming assets
  */
 
-app.get(serverPath('incomingimages/:assetId/:imagePath'), isAuthorized,
+app.get(serverPath('incomingassetpreview/:assetId/:imagePath'), isAuthorized,
     function(req, res) {
         app.db.sendIncomingAssetImage(req, res);
     }

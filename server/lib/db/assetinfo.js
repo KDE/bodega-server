@@ -385,7 +385,7 @@ module.exports.multipleAssetBriefs = function(db, req, res) {
 };
 
 
-module.exports.sendIncomingAssetImage = function(db, req, res) {
+module.exports.sendIncomingAssetPreview = function(db, req, res) {
     if (!req.params.assetId || req.params.assetId === 'undefined' ||
         !req.params.imagePath || req.params.imagePath === 'undefined') {
         errors.report('MissingParameters', req, res);
