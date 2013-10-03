@@ -32,6 +32,17 @@ describe('Point operations', function() {
                 });
         });
 
+        it('should return the price of 100 points if we ask for less', function(done) {
+            utils.getUrl('points/price?amount=0',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('USD', 1);
+                    done();
+                });
+        });
+
         it('should return the price of 510 points as if it were 600', function(done) {
             utils.getUrl('points/price?amount=510',
                 function(res) {
