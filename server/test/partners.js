@@ -661,7 +661,7 @@ describe('Partner management', function() {
                     reason: 'So we can make stores.'
                 };
 
-                utils.postUrl('partner/request/publisher/' + newPartnerId,
+                utils.postUrl('partner/request/distributor/' + newPartnerId,
                     params,
                     function(res) {
                         res.statusCode.should.equal(200);
