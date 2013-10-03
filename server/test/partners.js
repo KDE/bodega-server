@@ -699,9 +699,10 @@ describe('Partner management', function() {
                     });
             });
 
-            it('should allow a Management group validator to approve a request', function(done) {
+            it('should allow a Management group validator to reject a request', function(done) {
                 utils.postUrl('partner/request/manage/' + requests[1].id,
-                    { approved: false },
+                    { approved: false,
+                      reason: 'Rolled the dice, came up snakey-eyes.'},
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type');
