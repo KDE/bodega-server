@@ -17,20 +17,34 @@
 
 var utils = require('./support/utils');
 
-describe('Point operations', function(){
+describe('Point operations', function() {
     var startPoints;
 
-    it('should return the price of points', function(done) {
-        utils.getUrl('points/price?amount=500',
-            function(res) {
-                res.should.have.status(200);
-                res.headers.should.have.property('content-type');
-                res.body.should.not.have.property('error');
-                res.body.should.have.property('USD', 500);
-                done();
-            });
+    describe('Point price', function(done) {
+        it('should return the price of 500 points', function(done) {
+            utils.getUrl('points/price?amount=500',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('USD', 5);
+                    done();
+                });
+        });
+
+        it('should return the price of 510 points as if it were 600', function(done) {
+            utils.getUrl('points/price?amount=510',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.not.have.property('error');
+                    res.body.should.have.property('USD', 6);
+                    done();
+                });
+        });
     });
 
+    return;
     /* Only run the rest of the payments tests if the secret key
      * is in the config.json file */
     if (!app.config.payment.stripe.testSecretKey ||

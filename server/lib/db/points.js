@@ -93,10 +93,13 @@ module.exports.price = function(db, req, res)
     if (points < 100) {
         points = 100;
     }
+
     // round upwards to the next 100 (we only sell in blocks of 100)
     if (points % 100 != 0) {
-        points = (points + (100 - (points % 100))) / 100;
+        points = points + (100 - (points % 100));
     }
+
+    points = points / 100;
 
     var json = {
         'USD': (Math.round((app.config.pointConversionRate / 100 * points) * 100) / 100)
