@@ -56,9 +56,6 @@ function performUpdate(db, field, value, user, next)
 function performFirstNameUpdate(db, req, res, next)
 {
     var firstName = sanitize(req.body.firstName).trim();
-    if (firstName === '') {
-        firstName = sanitize(req.query.firstName).trim();
-    }
 
     if (firstName !== '') {
         performUpdate(db, 'firstName', firstName, req.session.user.id, next);
@@ -70,9 +67,6 @@ function performFirstNameUpdate(db, req, res, next)
 function performMiddleNameUpdate(db, req, res, next)
 {
     var middleNames = sanitize(req.body.middleNames).trim();
-    if (middleNames === '') {
-        middleNames = sanitize(req.query.middleNames).trim();
-    }
 
     // middleNames can be null, so we don't check if middelNames !== ''
     performUpdate(db, 'middleNames', middleNames, req.session.user.id, next);
@@ -81,9 +75,6 @@ function performMiddleNameUpdate(db, req, res, next)
 function performLastNameUpdate(db, req, res, next)
 {
     var lastName = sanitize(req.body.lastName).trim();
-    if (lastName === '') {
-        lastName = sanitize(req.query.lastName).trim();
-    }
 
     if (lastName !== '') {
         performUpdate(db, 'lastName', lastName, req.session.user.id, next);
@@ -95,9 +86,6 @@ function performLastNameUpdate(db, req, res, next)
 function performEmailUpdate(db, req, res, next)
 {
     var email = sanitize(req.body.email).trim();
-    if (email === '') {
-        email = sanitize(req.query.email).trim();
-    }
 
     if (email !== '') {
         try {
@@ -133,7 +121,7 @@ function performEmailUpdate(db, req, res, next)
 
 function performCardUpdate(db, req, res, next)
 {
-    var card = req.body.card ? req.body.card : req.query.card;
+    var card = req.body.card;
 
     if (card) {
         var query =
@@ -173,15 +161,10 @@ function performAccountStatusUpdate(db, req, res, next)
     var stat;
 
     if (req.body.hasOwnProperty("active")) {
-        stat = req.body.active;
-    } else if (req.query.hasOwnProperty("active")) {
-       stat = req.query.active;
+        performUpdate(db, 'active', req.body.active, req.session.user.id, next);
     } else {
         next();
-        return;
     }
-
-    performUpdate(db, 'active', stat, req.session.user.id, next);
 }
 
 function completeUpdate(db, req, res, next)
