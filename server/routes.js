@@ -17,6 +17,8 @@
 
 var utils = require('./lib/utils.js');
 var errors = require('./lib/errors.js');
+var roles = require('./lib/roles.js');
+
 var markdown = require("marked");
 var fs = require('fs');
 var path = require('path');
@@ -35,6 +37,21 @@ function isAuthorized(req, res, next)
     } else {
         errors.report("Unauthorized", req, res);
     }
+}
+
+function isBodegaManager(req, res, next)
+{
+    app.db.query(
+        function(db, req, res) {
+            roles.isBodegaManager(db, req, res,
+                function(err) {
+                    if (err) {
+                        errors.report("Unauthorized", req, res);
+                    } else {
+                        next();
+                    }
+                });
+        }, req, res);
 }
 
 function serverPath(path)
@@ -567,7 +584,7 @@ app.get(serverPath('partner/request/list'), isAuthorized,
     }
 );
 
-app.post(serverPath('partner/managerequest/:requestId'), isAuthorized,
+app.post(serverPath('partner/request/manage/:requestId'), isAuthorized, isBodegaManager,
     function(req, res) {
         app.db.managePartnerRequest(req, res);
     }
