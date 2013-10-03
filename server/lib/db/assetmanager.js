@@ -277,7 +277,7 @@ function endTransaction(db, req, res, assetInfo, cb)
 
 function duplicateTag(db, req, res, assetInfo, tag, callback)
 {
-    var query = 'insert into assetTags (asset, tag) values ($1, $2);';
+    var query = 'insert into incomingassettags (asset, tag) values ($1, $2);';
     var args = [tag.asset, tag.tag];
     var e;
 
@@ -320,7 +320,7 @@ function findTags(db, req, res, assetInfo, cb)
 
 function duplicatePreview(db, req, res, assetInfo, preview, callback)
 {
-    var query = 'insert into assetPreviews (asset, path, mimetype, \
+    var query = 'insert into incomingassetpreviews (asset, path, mimetype, \
     type, subtype) values ($1, $2, $3, $4, $5);';
     var args = [preview.asset, preview.path, preview.mimetype,
                 preview.type, preview.subtype];
