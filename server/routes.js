@@ -578,7 +578,7 @@ app.post(serverPath('partner/request/distributor/:partner'), isAuthorized,
     }
 );
 
-app.get(serverPath('partner/request/list'), isAuthorized,
+app.get(serverPath('partner/request/list'), isAuthorized, isBodegaManager,
     function(req, res) {
         app.db.listPartnerRequests(req, res);
     }
