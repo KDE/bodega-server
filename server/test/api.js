@@ -20,24 +20,40 @@ var assert = require('assert');
 
 describe('List api', function() {
     describe('Request index page', function() {
+
         it('should work with no trailing slash (/api)', function(done) {
             utils.getHtml('/api',
                 function(res) {
                     res.statusCode.should.equal(200);
+                    var pageNotFound = res.body.indexOf('Page Not Found') > -1;
+                    assert.equal(pageNotFound, false);
                     done();
                 });
         });
-        it('should work with  atrailing slash (/api/)', function(done) {
+
+        it('should work with atrailing slash (/api/)', function(done) {
             utils.getHtml('/api/',
                 function(res) {
                     res.statusCode.should.equal(200);
+                    var pageNotFound = res.body.indexOf('Page Not Found') > -1;
+                    assert.equal(pageNotFound, false);
+                    done();
+                });
+        });
+
+        it('should work with api/index', function(done) {
+            utils.getHtml('/api/index',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    var pageNotFound = res.body.indexOf('Page Not Found') > -1;
+                    assert.equal(pageNotFound, false);
                     done();
                 });
         });
     });
 
-    describe('when markdown file is found', function() {
-        it('should show the content', function(done) {
+    describe('Request content', function() {
+        it('should show when file is found', function(done) {
             utils.getHtml('/api/bodega.json',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -46,10 +62,8 @@ describe('List api', function() {
                     done();
                 });
         });
-     });
 
-    describe('when markdown file is not found', function() {
-        it('should return the 404 page', function(done) {
+        it('should return the 404 page when the file does not exist', function(done) {
             utils.getHtml('/api/wrongPath',
                 function(res) {
                     res.statusCode.should.equal(200);
