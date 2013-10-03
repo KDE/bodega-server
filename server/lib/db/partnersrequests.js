@@ -110,11 +110,11 @@ function approveRequest (db, req, res, requestInfo, cb) {
 function deleteFromPartnerRequests (db, req, res, requestInfo, cb) {
 
     var deleteQuery =
-            'DELETE FROM partnerrequests where id = $1';
+            'DELETE FROM partnerrequests WHERE partner = $1 AND type = $2';
     var e;
 
     var q = db.query(
-        deleteQuery, [requestInfo.id],
+        deleteQuery, [requestInfo.partner, requestInfo.type],
         function(err, result) {
             var i;
             if (err) {
@@ -143,10 +143,10 @@ function sendRejectionEmail(db, req, res, requestInfo, cb)
 
 module.exports.listPartnerRequests = function(db, req, res)
 {
-    db.query("select partnerrequests.id, partner, name,\
+    db.query("SELECT partnerrequests.id, partner, name,\
               supportemail, type, person, reason\
-              from partnerrequests\
-              join partners on partners.id = partner order by id",
+              FROM partnerrequests\
+              JOIN partners ON partners.id = partner ORDER BY id",
             [],
             function (err, result) {
                 if (err) {
