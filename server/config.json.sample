@@ -49,18 +49,13 @@
         "partnerRequests": "partnerrequests@example.org"
     },
     "storage": {
-        "system": "localStorage",
-        "s3": {
-            "key": "",
-            "secret": "",
-            "bucket": ""
-        },
         "localStorage": {
             "basePath": "/content/",
             "incomingBasePath": "/incoming/"
         }
     },
-    "payment": {
+    "appkeys": {
+        "openexchangerates": "",
         "stripe": {
             "testSecretKey": "",
             "liveSecretKey": ""

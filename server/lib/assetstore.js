@@ -17,7 +17,6 @@
 
 var utils = require('./utils.js');
 var errors = require('./errors.js');
-var knox = require('knox');
 var mime = require('mime');
 var fs = require('fs');
 var path = require('path');
@@ -27,7 +26,6 @@ var url = require('url');
 
 var AssetStore = (function() {
     var storageConfig;
-    var storageSystem;
     var incomingDirPath;
     var contentDirPath;
 
@@ -65,11 +63,8 @@ var AssetStore = (function() {
 
     function AssetStore() {
         var stats;
+        storageConfig = app.config.storage.localStorage;
 
-        storageSystem = app.config.storage.system;
-        storageConfig = app.config.storage[storageSystem];
-
-        if (storageSystem !== "s3") {
             incomingDirPath = path.join(process.cwd(),
                                         storageConfig.incomingBasePath);
             contentDirPath = path.join(process.cwd(),
@@ -88,7 +83,6 @@ var AssetStore = (function() {
                     process.exit(1);
                 }
             });
-        }
     }
 
     function pathForAsset(assetInfo) {
@@ -108,23 +102,13 @@ var AssetStore = (function() {
             return null;
         }
 
-        if (storageSystem === 's3') {
-            assetPath = assetInfo.id + assetInfo.file;
-            if (assetInfo.incoming) {
-                assetPath = "incoming-" + assetPath;
-            }
+        if (assetInfo.incoming) {
+            assetPath = path.join(incomingDirPath, assetInfo.id.toString());
         } else {
-            if (assetInfo.incoming) {
-                assetPath =
-                    path.join(incomingDirPath,
-                              assetInfo.id.toString());
-            } else {
-                assetPath =
-                    path.join(contentDirPath,
-                              assetInfo.id.toString());
-            }
-            assetPath = path.join(assetPath, assetInfo.file);
+            assetPath = path.join(contentDirPath, assetInfo.id.toString());
         }
+
+        assetPath = path.join(assetPath, assetInfo.file);
         return assetPath;
     }
 
@@ -183,70 +167,6 @@ var AssetStore = (function() {
                   .on('data', function(chunk) { res.write(chunk); })
                   .on('end', function() { fn(null); res.end(); });
         });
-    }
-
-    function s3PutStream(fromFile, assetPath, client, fn)
-    {
-        client.putFile(fromFile, assetPath, {'x-amz-acl': 'private'},
-                       function (err, res) {
-                           if (res.statusCode !== 200) {
-                               fn(new Error("File is unavailable. " +
-                                            "Please try again later."));
-                               return;
-                           }
-                           fn(err, res);
-                       });
-    }
-
-    function s3GetStream(res, parsedUrl, filename, fn)
-    {
-        var client;
-
-        try {
-            client = knox.createClient(storageConfig);
-        } catch (err) {
-            fn(err);
-            return;
-        }
-
-        var clientReq = client.get(parsedUrl.path);
-        clientReq.on('response', function(downRes) {
-            //console.log("download statusCode: ", downRes.statusCode);
-            //console.log("headers: ", downRes.headers);
-
-            if (downRes.statusCode !== 200 ||
-                !downRes.headers['Content-Length'] ||
-                !downRes.headers['Content-Type']) {
-                fn(new Error("File is unavailable. Please try again later."));
-                return;
-            }
-
-            res.header('Content-Length', downRes.headers['Content-Length']);
-            res.header('Content-Type', downRes.headers['Content-Type']);
-            res.attachment(filename);
-
-            downRes.on('data', function(data) {
-                //console.log('data received = ' + data.length)
-                //console.log(data.toString());
-                res.write(data);
-            });
-            downRes.on('end', function(data) {
-                fn(null);
-                res.end();
-            });
-            downRes.on('close', function(err) {
-                //console.log(err);
-                //fn(err);
-                res.close(err);
-            });
-        });
-
-        clientReq.on('error', function(e) {
-            fn(e);
-            return;
-        });
-
-        clientReq.end();
     }
 
     function keysToLowerCase(input) {
@@ -315,19 +235,7 @@ var AssetStore = (function() {
                 return;
             }
             assetInfo.size = stat.size;
-            if (storageSystem === 's3') {
-                var client;
-
-                try {
-                    client = knox.createClient(storageConfig);
-                } catch (err) {
-                    fn(err);
-                    return;
-                }
-                s3PutStream(fromFile, assetPath, client, fn);
-            } else {
-                localPutStream(fromFile, assetPath, fn);
-            }
+            localPutStream(fromFile, assetPath, fn);
         });
     };
 
@@ -339,8 +247,6 @@ var AssetStore = (function() {
         if (parsedUrl.protocol === 'http:' ||
             parsedUrl.protocol === 'https:') {
             httpGetStream(res, parsedUrl, assetInfo.file, fn);
-        } else if (storageSystem === 's3') {
-            s3GetStream(res, parsedUrl, assetInfo.file, fn);
         } else {
             localGetStream(res, parsedUrl, assetInfo.file, fn);
         }
@@ -350,41 +256,10 @@ var AssetStore = (function() {
         var assetPath = pathForAsset(assetInfo);
         var parsedUrl = url.parse(assetPath);
 
-        if (storageSystem === 's3') {
-            var client;
-
-            try {
-                client = knox.createClient(storageConfig);
-            } catch (err) {
-                fn(err);
-                return;
-            }
-
-            var clientReq = client.del(parsedUrl.path);
-            clientReq.on('response', function(downRes) {
-                //console.log("download statusCode: ", downRes.statusCode);
-                //console.log("headers: ", downRes.headers);
-
-                if (downRes.statusCode !== 200 &&
-                    downRes.statusCode !== 204) {
-                    fn(new Error("File is unavailable. Please try again later."));
-                    return;
-                }
-                fn(null, downRes);
-            });
-
-            clientReq.on('error', function(e) {
-                fn(e);
-                return;
-            });
-
-            clientReq.end();
-        } else {
-            fs.unlink(parsedUrl.path, function(err) {
-                fn(err);
-                return;
-            });
-        }
+        fs.unlink(parsedUrl.path, function(err) {
+            fn(err);
+            return;
+        });
     };
 
     AssetStore.prototype.publish = function(assetInfo, fn) {
@@ -409,19 +284,7 @@ var AssetStore = (function() {
         assetPath = pathForAsset(assetInfo);
         assetInfo.incoming = true;
 
-        if (storageSystem === 's3') {
-            var client;
-            console.log("S3 publishing isn't well tested!");
-            try {
-                client = knox.createClient(storageConfig);
-            } catch (err) {
-                fn(err);
-                return;
-            }
-            client.copyFile(incomingAssetPath, assetPath, fn);
-        } else {
-            localPutStream(incomingAssetPath, assetPath, fn);
-        }
+        localPutStream(incomingAssetPath, assetPath, fn);
     };
 
     AssetStore.prototype.copyAsset = function(assetInfo, cb) {

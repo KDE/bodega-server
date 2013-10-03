@@ -26,7 +26,6 @@ var async = require('async');
 
 var PreviewStore = (function() {
     var storageConfig;
-    var storageSystem;
     var previewPaths = {};
     var fullPreviewPaths = {};
 
@@ -279,8 +278,7 @@ var PreviewStore = (function() {
     function PreviewStore() {
         var i;
 
-        storageSystem = app.config.storage.system;
-        storageConfig = app.config.storage[storageSystem];
+        storageConfig = app.config.storage.localStorage;
 
         previewPaths = findPreviewPaths();
 
