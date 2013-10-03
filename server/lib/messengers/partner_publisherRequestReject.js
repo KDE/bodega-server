@@ -18,7 +18,7 @@
 var mailer = require('nodemailer');
 var path = require('path');
 var template = require('email-template');
-var wrap = require('wordwrap')(40, 80);
+var wrap = require('wordwrap')(15, 80);
 
 var utils = require('../utils.js');
 
@@ -32,7 +32,14 @@ module.exports.sendEmail = function(transport, db, record, cb)
     };
 
     // break the message up into nice short lines for the email
-    record.data.reason = wrap(record.data.reason);
+    if (record.data.reason) {
+        record.data.reason = wrap(record.data.reason);
+    }
+
+    if (!record.data.reason || record.data.reason === '') {
+        record.data.reason = 'No reason given.';
+    }
+
     record.warehouse = app.config.warehouseInfo.name;
     record.serviceemail = app.config.service.email;
 
