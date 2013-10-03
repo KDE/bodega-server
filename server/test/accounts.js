@@ -21,8 +21,9 @@ var queryString = require('querystring');
 var utils = require('./support/utils');
 var assert = require('assert');
 
+var userInfo;
+
 describe('Create user', function() {
-    var userInfo;
 
     it('register successful', function(done) {
         utils.getUrl('register?firstname=antonis&lastname=tsiapaliokas&email=kok3rs@gmail.com&password=123456789',
@@ -101,6 +102,17 @@ describe('Password reset', function() {
                 res.body.should.have.property('message');
                 res.body.should.have.property('code');
                 resetCode = res.body.code;
+                done();
+            },
+            { noAuth: true } );
+    });
+
+    it('should return the reset form with the code returned', function(done) {
+        utils.getHtml('participant/resetPassword?code=' + resetCode + '&email=kok3rs%40gmail.com&id=' + userInfo.id,
+            function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                assert(res.body.indexOf('Reset Password For Your') > -1);
                 done();
             },
             { noAuth: true } );
