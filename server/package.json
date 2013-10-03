@@ -24,6 +24,7 @@
     },
     "devDependencies": {
         "cookie-jar": "latest",
+        "istanbul": "latest",
         "jshint": ">= 0.5.8",
         "mocha": ">= 0.12.1",
         "querystring" : "latest",

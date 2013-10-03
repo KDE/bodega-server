@@ -2,8 +2,12 @@ REPORTER = spec
 
 test:
 	./node_modules/.bin/mocha --reporter $(REPORTER)
+
 test/%:
 	./node_modules/.bin/mocha $@.js --reporter $(REPORTER)
+
+coverage:
+	./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- -R spec
 
 check:
 	@./node_modules/.bin/jshint --verbose --extra-ext .json . ; if [ $$? -eq 0 ] ; then echo "Done. Clean!" ; fi
