@@ -31,7 +31,7 @@ module.exports.sendEmail = function(transport, db, record, cb)
 
     record.warehouse = app.config.warehouseInfo.name;
     var url = Url.parse(app.config.externalBaseUrl + app.config.prefix + "participant/resetPassword");
-    url.query = { 'code': record.code,
+    url.query = { 'code': record.data.code,
                   'email': record.email,
                   'id': record.recipient };
     record.url = Url.format(url);
