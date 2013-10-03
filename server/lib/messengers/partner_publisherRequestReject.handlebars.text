@@ -1,4 +1,6 @@
-Your request for becoming a publisher for {{partnerName}}  was rejected for the following reason:
+Hello,
+
+Your request for {{data.partner}} to become a publisher was rejected for the following reason:
 
 {{data.reason}}
 

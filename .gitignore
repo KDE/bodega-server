@@ -1,6 +1,7 @@
 qtcreator-build
 assetimporters/kdeartwork-wallpapers/wallpapersSvn/
 server/content/*/*
+server/coverage
 server/incoming/*
 server/incoming/*/*
 server/public

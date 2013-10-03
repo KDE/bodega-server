@@ -89,12 +89,10 @@ function approveRequest (db, req, res, requestInfo, cb) {
 
     var updateQuery;
     if (requestInfo.type === 'distributorRequest') {
-        updateQuery =
-                'update partners set distributor = true where id = $1';
-    //default as publisher
+        updateQuery = 'update partners set distributor = true where id = $1';
     } else {
-        updateQuery =
-                'update partners set publisher = true where id = $1';
+        //default is publisher
+        updateQuery = 'update partners set publisher = true where id = $1';
     }
     var e;
 
@@ -133,11 +131,25 @@ function deleteFromPartnerRequests (db, req, res, requestInfo, cb) {
         });
 }
 
-function sendRejectionEmail(db, req, res, requestInfo, cb)
+function queueAcceptenceMessage(db, req, res, requestInfo, cb)
+{
+    db.query("INSERT INTO emailQueue (recipient, data, template) \
+              VALUES ($1, hstore(Array[['partner', $2]]), $3)",
+             [requestInfo.person, requestInfo.name, ('partner_' + requestInfo.type + 'Accept')],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                 }
+
+                 cb(err, db, req, res, requestInfo);
+             });
+}
+
+function queueRejectionMessage(db, req, res, requestInfo, cb)
 {
     db.query("INSERT INTO emailQueue (recipient, data, template) \
               VALUES ($1, hstore(Array[['partner', $2], ['reason', $3]]), $4)",
-             [requestInfo.person, requestInfo.partner, req.body.reason, ('partner_' + requestInfo.type + 'Reject')],
+             [requestInfo.person, requestInfo.name, req.body.reason, ('partner_' + requestInfo.type + 'Reject')],
              function(err, result) {
                  if (err) {
                      errors.report('Database', req, res, err);
@@ -191,9 +203,10 @@ module.exports.managePartnerRequest = function(db, req, res)
     if (utils.parseBool(req.body.approved)) {
         // approve a request
         funcs.push(approveRequest);
+        funcs.push(queueAcceptenceMessage);
     } else {
         // Tell the user why is refused
-        funcs.push(sendRejectionEmail);
+        funcs.push(queueRejectionMessage);
     }
     //  delete from requests
     funcs.push(deleteFromPartnerRequests);

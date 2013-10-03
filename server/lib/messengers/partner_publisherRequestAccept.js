@@ -28,21 +28,14 @@ module.exports.sendEmail = function(transport, db, record, cb)
         transport: transport,
         from: app.config.service.email,
         to: app.config.addresses.partnerRequests,
-        subject: "Distributor account upgrade request"
+        subject: "Publisher account upgrade denied"
     };
 
-    // break the message up into nice short lines for the email
-    if (record.data.reason) {
-        record.data.reason = wrap(record.data.reason);
-    }
-
-    if (!record.data.reason || record.data.reason === '') {
-        record.data.reason = 'No reason given.';
-    }
+    record.warehouse = app.config.warehouseInfo.name;
 
     template.createBodies(
             {
-                text: path.join(__dirname, '/partner_distributorRequestReject.handlebars.text')
+                text: path.join(__dirname, '/partner_publisherRequestAccept.handlebars.text')
             },
             record,
             function(err, output) {
