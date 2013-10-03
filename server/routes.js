@@ -41,7 +41,7 @@ function isAuthorized(req, res, next)
 
 function isBodegaManager(req, res, next)
 {
-    app.db.query(
+    app.db.dbQuery(
         function(db, req, res) {
             roles.isBodegaManager(db, req, res,
                 function(err) {
