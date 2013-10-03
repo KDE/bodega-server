@@ -670,6 +670,18 @@ describe('Partner management', function() {
                         done();
                     });
             });
+
+            it('should list both requests', function(done) {
+                utils.getUrl('partner/request/list',
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.should.have.property('success', true);
+                        res.body.should.have.property('partners');
+                        res.body.partners.length.should.eql(2);
+                        done();
+                    });
+            });
         });
 
         after(function(done) {
