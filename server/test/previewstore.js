@@ -118,18 +118,6 @@ describe('Preview Store, ', function(){
             });
         });
 
-        it('should get screenshot file of incoming app', function(done){
-            utils.getUrl('incomingimages/134/134%2Ftmpscreen.png',
-                function(res) {
-                    res.should.have.status(200);
-                    console.log(res.body)
-                    res.headers.should.have.property('content-type');
-                    res.headers['content-type'].should.equal('image/png');
-                    res.body.should.have.property('authStatus', true);
-                    done();
-                });
-        });
-
         it('can publish finished book.', function(done){
             app.previewStore.canPublish(sampleBookAsset, function(err, result) {
                 //console.log(res);

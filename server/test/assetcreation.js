@@ -231,6 +231,18 @@ describe('Asset manipulation', function(){
                       });
         });
 
+        it('should get screenshot file of incoming asset', function(done){
+            utils.getUrl('incomingimages/' + incompleteAssetId + '/' + incompleteAssetId + '%2Fsample-1.png',
+                function(res) {
+                    res.should.have.status(200);
+                    console.log(res.body)
+                    res.headers.should.have.property('content-type');
+                    console.log(res.headers)
+                    res.headers['content-type'].should.equal('image/png');
+                    done();
+                }, {'stream': true});
+        });
+
         it('work with assetInfo in the url', function(done){
             var name = 'sample 123456';
             var description = 'sample description of a new asset';
