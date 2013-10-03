@@ -96,20 +96,6 @@ module.exports.standardJson = function(req, success)
     return json;
 };
 
-function deleteUser(db, userId)
-{
-    var query = 'DELETE FROM people WHERE id=$1;';
-    db.query(
-        query, [userId],
-        function(err, result) {
-            if (err) {
-                return;
-            }
-        });
-}
-
-module.exports.deleteUser = deleteUser;
-
 module.exports.queueAccountActivationMessage = function(db, req, res, userId)
 {
     db.query("INSERT INTO emailQueue (recipient, template) VALUES ($1, 'participant_accountActivation')",
