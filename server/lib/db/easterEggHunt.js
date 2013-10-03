@@ -18,14 +18,12 @@
 var utils = require('../utils.js');
 
 module.exports = function(db, req, res) {
-    var query = 'SELECT egg FROM easterEggs WHERE phrase = $1 AND store = $2';
-    var errorObj;
     var json = {
         egg: ''
     };
 
     db.query(
-        query,
+        'SELECT egg FROM easterEggs WHERE phrase = $1 AND store = $2',
         [req.params.code, req.params.store],
         function(err, result) {
             if (!err && result && result.rows.length > 0) {
