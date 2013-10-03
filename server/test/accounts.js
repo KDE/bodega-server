@@ -50,6 +50,20 @@ describe('Create user', function() {
     });
 
     describe('needs to activate', function() {
+        it('should disallow authentication', function(done) {
+            utils.getUrl('/bodega/v1/json/auth?auth_user=kok3rs@gmail.com&auth_password=123456789&auth_store=VIVALDI-1',
+                   function(res) {
+                       res.statusCode.should.equal(200);
+                       res.headers.should.have.property('content-type');
+                       res.headers.should.have.property('set-cookie');
+                       res.body.should.have.property('authStatus', false);
+                       res.body.should.have.property('error');
+                       res.body.error.should.have.property('type', 'AccountInactive');
+                       done();
+                   },
+                   { noAuth: true });
+        });
+
         it('should activate', function(done) {
             utils.getHtml('register/confirm?' + queryString.stringify(userInfo),
                 function(res) {
