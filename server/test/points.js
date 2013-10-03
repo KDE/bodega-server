@@ -44,7 +44,6 @@ describe('Point operations', function() {
         });
     });
 
-    return;
     /* Only run the rest of the payments tests if the secret key
      * is in the config.json file */
     if (!app.config.payment.stripe.testSecretKey ||
@@ -338,7 +337,7 @@ describe('Point operations', function() {
         });
     });
 
-    describe('on users ', function(){
+    describe('on users', function(){
         var validCard = '4408041234567893';
         it('should allow changing the card', function(done) {
             var url = 'participant/changeAccountDetails?';
