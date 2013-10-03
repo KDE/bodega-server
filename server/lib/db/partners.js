@@ -270,8 +270,7 @@ function deletePartnerLink(db, req, res, partner, cb)
 
 function sendStandardJson(req, res, cb)
 {
-    res.json(utils.standardJson(req));
-    cb();
+    cb(null, utils.standardJson(req));
 }
 
 function setPersonRole(db, req, res, partner, data, cb)
