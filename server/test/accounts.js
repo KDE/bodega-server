@@ -74,6 +74,19 @@ describe('Create user', function() {
                 },
                 { noAuth: true });
         });
+
+        it('should now allow authentication', function(done) {
+            utils.getUrl('/bodega/v1/json/auth?auth_user=kok3rs@gmail.com&auth_password=123456789&auth_store=VIVALDI-1',
+                   function(res) {
+                       res.statusCode.should.equal(200);
+                       res.headers.should.have.property('content-type');
+                       res.headers.should.have.property('set-cookie');
+                       res.body.should.have.property('authStatus', true);
+                       res.body.should.not.have.property('error');
+                       done();
+                   },
+                   { noAuth: true });
+        });
     });
 });
 
