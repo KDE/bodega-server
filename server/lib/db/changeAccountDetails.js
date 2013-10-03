@@ -170,13 +170,18 @@ function performCardUpdate(db, req, res, next)
 
 function performAccountStatusUpdate(db, req, res, next)
 {
-    var stat = req.body.active ? req.body.active : req.query.active;
+    var stat;
 
-    if (stat) {
-        performUpdate(db, 'active', stat, req.session.user.id, next);
+    if (req.body.hasOwnProperty("active")) {
+        stat = req.body.active;
+    } else if (req.query.hasOwnProperty("active")) {
+       stat = req.query.active;
     } else {
         next();
+        return;
     }
+
+    performUpdate(db, 'active', stat, req.session.user.id, next);
 }
 
 function completeUpdate(db, req, res, next)
