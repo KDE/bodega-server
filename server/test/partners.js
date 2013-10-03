@@ -671,14 +671,17 @@ describe('Partner management', function() {
                     });
             });
 
+            var requestId = 0;
+
             it('should list both requests for aaron (Management Group Validator)', function(done) {
                 utils.getUrl('partner/request/list',
                     function(res) {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', true);
-                        res.body.should.have.property('partners');
-                        res.body.partners.length.should.eql(2);
+                        res.body.should.have.property('requests');
+                        res.body.requests.length.should.eql(2);
+                        requestId = res.body.requests[0]
                         done();
                     });
             });
@@ -697,7 +700,7 @@ describe('Partner management', function() {
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type');
                         res.body.should.have.property('success', false);
-                        res.body.should.not.have.property('partners');
+                        res.body.should.not.have.property('requests');
                         done();
                     });
             });

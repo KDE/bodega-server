@@ -157,14 +157,14 @@ module.exports.listPartnerRequests = function(db, req, res)
                 }
 
                 var json = utils.standardJson(req);
-                json.partners = [];
 
                 if (result.rowCount < 1) {
+                    json.requests = [];
                     res.json(json);
                     return;
                 }
 
-                json.partners = result.rows;
+                json.requests = result.rows;
                 res.json(json);
             });
 };
