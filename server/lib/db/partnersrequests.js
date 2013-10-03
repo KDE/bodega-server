@@ -188,7 +188,7 @@ module.exports.managePartnerRequest = function(db, req, res)
     funcs.push(beginTransaction);
     // fetch info on the particular request
     funcs.push(loadRequest);
-    if (req.body.approved) {
+    if (utils.parseBool(req.body.approved)) {
         // approve a request
         funcs.push(approveRequest);
     } else {
@@ -213,7 +213,6 @@ module.exports.managePartnerRequest = function(db, req, res)
         }
 
         var json = utils.standardJson(req, true);
-
         res.send(json);
     });
 }
