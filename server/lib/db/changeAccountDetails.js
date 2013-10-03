@@ -107,7 +107,7 @@ function performEmailUpdate(db, req, res, next)
             return;
         }
         var findQuery =
-            'SELECT id, active FROM people WHERE email = $1 AND id !=  $2;';
+            'SELECT id FROM people WHERE email = $1 AND id !=  $2;';
         db.query(
             findQuery,
             [email, req.session.user.id],
@@ -117,8 +117,7 @@ function performEmailUpdate(db, req, res, next)
                     return;
                 }
 
-                if (result.rows && result.rows.length > 0 &&
-                    result.rows[0].active) {
+                if (result.rows && result.rows.length > 0) {
                     next(errors.create('AccountExists'));
                     return;
                 } else {
