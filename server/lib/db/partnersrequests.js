@@ -73,6 +73,12 @@ function loadRequest (db, req, res, requestInfo, cb) {
                 cb(e, db, req, res, requestInfo);
                 return;
             }
+
+            if (result.rowCount < 1) {
+                cb(errors.create('InvalidRequestId'), db, req, res);
+                return;
+            }
+
             requestInfo = result.rows[0];
 
             cb(null, db, req, res, requestInfo);
