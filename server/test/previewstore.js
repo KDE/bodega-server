@@ -20,6 +20,8 @@ var should = require('should');
 var fs = require('fs');
 
 describe('Preview Store, ', function(){
+    utils.auth();
+
     var cookie;
     var tmpCoverFile  = __dirname + "/sampleasset/tmpcover.jpg";
     var tmpScreenshot = __dirname + "/sampleasset/tmpscreen.png";
@@ -114,6 +116,18 @@ describe('Preview Store, ', function(){
                 should.not.exist(err);
                 done();
             });
+        });
+
+        it('should get screenshot file of incoming app', function(done){
+            utils.getUrl('incomingimages/134/134%2Ftmpscreen.png',
+                function(res) {
+                    res.should.have.status(200);
+                    console.log(res.body)
+                    res.headers.should.have.property('content-type');
+                    res.headers['content-type'].should.equal('image/png');
+                    res.body.should.have.property('authStatus', true);
+                    done();
+                });
         });
 
         it('can publish finished book.', function(done){
