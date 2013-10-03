@@ -143,10 +143,12 @@ function sendRejectionEmail(db, req, res, requestInfo, cb)
 
 module.exports.listPartnerRequests = function(db, req, res)
 {
-    db.query("SELECT partnerrequests.id, partner, name,\
-              supportemail, type, person, reason\
-              FROM partnerrequests\
-              JOIN partners ON partners.id = partner ORDER BY id",
+    db.query("SELECT r.id, r.partner, pa.name, \
+              pa.supportemail, r.type, r.person, pe.fullname, r.reason \
+              FROM partnerrequests r \
+              JOIN partners pa ON r.partner = pa.id \
+              JOIN people pe ON r.person = pe.id \
+              ORDER BY r.id",
             [],
             function (err, result) {
                 if (err) {
