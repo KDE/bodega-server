@@ -410,7 +410,12 @@ module.exports.sendIncomingAssetImage = function(db, req, res) {
             errors.report(err.name, req, res, err);
             return;
         }
-        res.sendfile(__dirname.substring(0, __dirname.length - 7) + '/incoming/' + req.params.imagePath);
+        //HACK: pretty much every single line here is one
+        if (req.params.imagePath.indexOf('icon') === -1) {
+            res.sendfile(__dirname.substring(0, __dirname.length - 7) + '/incoming/' + req.params.imagePath);
+        } else {
+            res.sendfile(__dirname.substring(0, __dirname.length - 7) + '/incoming/' + req.params.assetId + '/512/' + req.params.imagePath.substring(req.params.imagePath.indexOf('/')));
+        }
     });
 };
 

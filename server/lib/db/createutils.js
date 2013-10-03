@@ -223,6 +223,8 @@ function setupPreview(db, req, res, assetInfo, previewInfo, cb)
 
     previewPath = app.previewStore.previewRelativePath(assetInfo,
                                                        previewInfo);
+    console.log(assetInfo)
+    console.log(previewInfo)
     recordPreview(db, req, res, assetInfo, previewPath,
                   previewInfo, cb);
 }
