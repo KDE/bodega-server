@@ -19,18 +19,6 @@ var utils = require('../utils.js');
 var errors = require('../errors.js');
 var BCrypt = require('bcrypt');
 
-function generateHash(pass)
-{
-    var start = Date.now();
-    BCrypt.genSalt(10, function(err, salt) {
-        //console.log('salt: ' + salt);
-        BCrypt.hash(pass, salt, function(err, crypted) {
-            //console.log('crypted: ' + crypted);
-            //saveHashedPass(db, req, res, crypted);
-        });
-    });
-}
-
 function authenticate(db, req, res)
 {
     var authQuery =
