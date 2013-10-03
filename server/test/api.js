@@ -20,29 +20,32 @@ var assert = require('assert');
 
 describe('List api', function() {
     describe('Request index page', function() {
-     it('should work with no trailing slash (/api)', function(done) {
-        utils.getHtml('/api',
-            function(res) {
-                res.statusCode.should.equal(200);
-                done();
-            });
-     });
-     it('should work with  atrailing slash (/api/)', function(done) {
-        utils.getHtml('/api/',
-            function(res) {
-                res.statusCode.should.equal(200);
-                done();
-            });
-     });
+        it('should work with no trailing slash (/api)', function(done) {
+            utils.getHtml('/api',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    done();
+                });
+        });
+        it('should work with  atrailing slash (/api/)', function(done) {
+            utils.getHtml('/api/',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    done();
+                });
+        });
     });
 
     describe('when markdown file is found', function() {
-     it('should show the content', function(done) {
-        utils.getHtml('/api/json_api',
-            function(res) {
-                res.statusCode.should.equal(200);
-                done();
-            });
+        it('should show the content', function(done) {
+            utils.getHtml('/api/bodega.json',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    var pageNotFound = res.body.indexOf('Page Not Found') > -1;
+                    assert.equal(pageNotFound, false);
+                    done();
+                });
+        });
      });
 
     describe('when markdown file is not found', function() {
@@ -54,7 +57,6 @@ describe('List api', function() {
                     assert.equal(pageNotFound, true);
                     done();
                 });
-            });
         });
     });
 });
