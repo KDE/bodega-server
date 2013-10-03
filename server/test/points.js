@@ -20,11 +20,22 @@ var utils = require('./support/utils');
 describe('Point operations', function(){
     var startPoints;
 
-    /* Only run the payments tests if the secret key
+    it('should return the price of points', function(done) {
+        utils.getUrl('points/price?amount=500',
+            function(res) {
+                res.should.have.status(200);
+                res.headers.should.have.property('content-type');
+                res.body.should.not.have.property('error');
+                res.body.should.have.property('USD', 500);
+                done();
+            });
+    });
+
+    /* Only run the rest of the payments tests if the secret key
      * is in the config.json file */
-    if (!app.config.payment.stripe.secretKey ||
-        app.config.payment.stripe.secretKey.length < 10) {
-        it('skips - .', function(done){
+    if (!app.config.payment.stripe.testSecretKey ||
+        app.config.payment.stripe.testSecretKey.length < 10) {
+        it('skips - .', function(done) {
             console.log("Stripe tests disabled");
             done();
         });
@@ -61,7 +72,7 @@ describe('Point operations', function(){
     });
 
     describe('Payment registration', function(){
-        it('should not have any card', function(done){
+        it('should not have any card', function(done) {
             utils.getUrl('participant/paymentMethod',
                 function(res) {
                     res.should.have.status(200);
@@ -74,7 +85,7 @@ describe('Point operations', function(){
                     done();
                 });
         });
-        it('should error without card card', function(done){
+        it('should error without card card', function(done) {
             utils.getUrl('points/buy?amount=500',
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -87,7 +98,7 @@ describe('Point operations', function(){
                     done();
                 });
         });
-        it('should emit card_declined', function(done){
+        it('should emit card_declined', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4000000000000002');
             url += '&';
@@ -112,7 +123,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('should emit CardIncorrectNumber', function(done){
+        it('should emit CardIncorrectNumber', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424241');
             url += '&';
@@ -137,7 +148,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('should emit CardInvalidExpiryMonth', function(done){
+        it('should emit CardInvalidExpiryMonth', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
@@ -162,7 +173,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('should emit CardInvalidExpiryYear', function(done){
+        it('should emit CardInvalidExpiryYear', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
@@ -187,7 +198,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('should emit CardInvalidCVC', function(done){
+        it('should emit CardInvalidCVC', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
@@ -212,7 +223,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('should register successfully', function(done){
+        it('should register successfully', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
@@ -235,7 +246,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('should delete successfully', function(done){
+        it('should delete successfully', function(done) {
             var url = 'participant/deletePaymentMethod';
             //console.log(url);
             utils.getUrl(url,
@@ -251,7 +262,7 @@ describe('Point operations', function(){
     });
 
     describe('Buying points', function(){
-        it('should register successfully', function(done){
+        it('should register successfully', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4242424242424242');
             url += '&';
@@ -274,7 +285,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('succeeds', function(done){
+        it('succeeds buying 500 points', function(done) {
             utils.getUrl('points/buy?amount=500',
                 function(res) {
                     res.should.have.status(200);
@@ -286,7 +297,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('errors on too few points', function(done){
+        it('errors on too few points', function(done) {
             utils.getUrl('points/buy?amount=5',
                 function(res) {
                     res.should.have.status(200);
@@ -299,7 +310,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('errors on too many points', function(done){
+        it('errors on too many points', function(done) {
             utils.getUrl('points/buy?amount=5000000000',
                 function(res) {
                     res.should.have.status(200);
@@ -315,7 +326,7 @@ describe('Point operations', function(){
 
     describe('on users ', function(){
         var validCard = '4408041234567893';
-        it('should allow changing the card', function(done){
+        it('should allow changing the card', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent(validCard);
             url += '&';
@@ -334,7 +345,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('shouldnt change to an invalid card', function(done){
+        it('shouldnt change to an invalid card', function(done) {
             var url = 'participant/changeAccountDetails?';
             url += 'card[number]=' + encodeURIComponent('4408041234567890');
             url += '&';
@@ -354,7 +365,7 @@ describe('Point operations', function(){
                 });
         });
 
-        it('should fetch the payment method', function(done){
+        it('should fetch the payment method', function(done) {
             var url = 'participant/paymentMethod';
             //console.log(url);
             utils.getUrl(url,
