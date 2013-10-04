@@ -20,6 +20,8 @@ var should = require('should');
 var fs = require('fs');
 
 describe('Preview Store, ', function(){
+    utils.auth();
+
     var cookie;
     var tmpCoverFile  = __dirname + "/sampleasset/tmpcover.jpg";
     var tmpScreenshot = __dirname + "/sampleasset/tmpscreen.png";

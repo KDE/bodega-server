@@ -251,6 +251,18 @@ describe('Asset manipulation', function(){
         });
     });
 
+    describe('See preview of incoming assets', function(){
+        it('should get screenshot file of incoming asset', function(done){
+            utils.getUrl('incomingassetpreview/' + incompleteAssetId + '/' + incompleteAssetId + '%2Fsample-1.png',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property('content-type');
+                    res.headers['content-type'].should.equal('image/png');
+                    done();
+                }, {'stream': true});
+        });
+    });
+
     describe('Deletion', function(){
         it('should work with complete assets', function(done){
             utils.getUrl('asset/delete/' + completeAssetId,
@@ -415,6 +427,25 @@ describe('Asset manipulation', function(){
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'PartnerInvalid');
                     utils.app.config.printErrors = true;
+                    done();
+                });
+        });
+    });
+
+    describe('Unhauthorized preview of incoming assets', function(){
+        utils.auth({
+            user: 'mart@kde.org',
+            password: 'mart',
+            store: 'null'
+        });
+        it('should be denied screenshot file of incoming asset', function(done){
+            utils.getUrl('incomingassetpreview/' + incompleteAssetId + '/' + incompleteAssetId + '%2Fsample-1.png',
+                function(res) {
+                    res.should.have.status(200);
+                    res.headers.should.have.property('content-type');
+                    res.headers['content-type'].should.equal('application/json');
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'AccessDenied');
                     done();
                 });
         });

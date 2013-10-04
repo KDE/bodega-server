@@ -37,7 +37,9 @@ function getUrl(path, fn, opts)
             } else if (opts && opts.stream) {
                 var isStreamOrPdf =
                     contentType === 'application/octet-stream' ||
-                    contentType === 'application/pdf';
+                    contentType === 'application/pdf' ||
+                    contentType === 'image/png' ||
+                    contentType === 'image/jpeg';
                 assert(isStreamOrPdf, 'Content type is wrong: ' + contentType);
             } else {
                 var isJson =

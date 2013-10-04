@@ -583,6 +583,16 @@ app.post(serverPath('partner/request/manage/:requestId'), isAuthorized, isBodega
     }
 );
 
+/****************************************************
+ * get previews of incoming assets
+ */
+
+app.get(serverPath('incomingassetpreview/:assetId/:imagePath'), isAuthorized,
+    function(req, res) {
+        app.db.sendIncomingAssetPreview(req, res);
+    }
+);
+
 
 /******************************************************
  * Store and warehouse contact listing

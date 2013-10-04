@@ -76,9 +76,9 @@ function findChangeLog(db, req, res, assetInfo, cb)
 function findPreviews(db, req, res, assetInfo, cb)
 {
     var previewsQuery =
-        "SELECT path FROM assetPreviews p WHERE p.asset=$1;";
+        "SELECT path, type, subtype FROM assetPreviews p WHERE p.asset=$1;";
     var incomingPreviewsQuery =
-        "SELECT path FROM incomingAssetPreviews p WHERE p.asset=$1;";
+        "SELECT path, type, subtype FROM incomingAssetPreviews p WHERE p.asset=$1;";
     var query = assetInfo.incoming ? incomingPreviewsQuery : previewsQuery;
 
     var q = db.query(query, [assetInfo.id], function(err, result) {
@@ -101,11 +101,13 @@ function findPreviews(db, req, res, assetInfo, cb)
 
 function findTags(db, req, res, assetInfo, cb)
 {
+    //FIXME: listPublicly is gone?
     var tagsQuery =
         "SELECT tagTypes.type, tags.title FROM \
              assetTags a JOIN tags ON (a.tag = tags.id) LEFT JOIN \
              tagTypes ON (tags.type = tagTypes.id) \
-         where a.asset = $1 AND tagTypes.listPublicly;";
+         where a.asset = $1 \
+         --AND tagTypes.listPublicly;";
     var incomingTagsQuery =
         "SELECT tagTypes.type, tags.title FROM incomingAssetTags a \
          JOIN tags ON (a.tag = tags.id) LEFT JOIN tagTypes ON \
@@ -164,20 +166,26 @@ function findAsset(db, req, res, assetInfo, cb) {
     var multi = false;
     var expectedRowCount = 1;
 
-    if (assetInfo.incoming) {
-        table = 'incomingAssets';
+    if (assetInfo.incoming ||
+        req.session.user.store == undefined ||
+        req.session.user.store == 'null') {
+        if (assetInfo.incoming) {
+            table = 'incomingAssets';
+        } else {
+            table = 'assets';
+        }
         query =
         "SELECT a.id, l.name as license, l.text as licenseText, \
          a.partner as partnerId, p.name as partnername, \
          a.version, a.file, a.image, a.name, \
          a.description, a.size \
-         FROM incomingAssets a \
+         FROM " + table + " a \
          LEFT JOIN licenses l ON (a.license = l.id) \
          LEFT JOIN partners p ON (a.partner = p.id) \
          WHERE a.id = $1";
         args = [assetInfo.id];
 
-        if (!assetInfo.validator) {
+        if (!assetInfo.validator && assetInfo.incoming) {
             query += " AND a.partner = $2";
             args.push(assetInfo.partner);
         }
@@ -375,3 +383,70 @@ module.exports.multipleAssetBriefs = function(db, req, res) {
                   res.send(assetInfo.json);
               });
 };
+
+
+module.exports.sendIncomingAssetPreview = function(db, req, res) {
+    if (!req.params.assetId || req.params.assetId === 'undefined' ||
+        !req.params.imagePath || req.params.imagePath === 'undefined') {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    var assetInfo = {
+        id: req.params.assetId
+    };
+
+    var funcs = [function(cb) {
+        cb(null, db, req, res, assetInfo);
+    }];
+
+    assetInfo.incoming = true;
+    funcs.push(createUtils.partnerForAsset);
+    funcs.push(checkCanViewIncoming);
+
+
+    async.waterfall(funcs, function(err, db, req, res, assetInfo) {
+        if (err) {
+            errors.report(err.name, req, res, err);
+            return;
+        }
+
+        var query = 'SELECT * from incomingassetpreviews \
+                     WHERE asset = $1 and path = $2';
+        db.query(query, [assetInfo.id, req.params.imagePath],
+            function(err, result) {
+                if (err) {
+                    var e = errors.create('Database', err.message);
+                    cb(e, db, req, res, assetInfo);
+                    return;
+                }
+
+                if (result.rows.length >= 1) {
+                    var imageData = result.rows[0];
+
+                    if (imageData.type == 'icon') {
+                        var size;
+                        if (imageData.subtype == 'huge') {
+                            size = '512';
+                        } else if (imageData.subtype == 'large') {
+                            size = '256';
+                        } else if (imageData.subtype == 'big') {
+                            size = '128';
+                        } else if (imageData.subtype == 'medium') {
+                            size = '64';
+                        } else if (imageData.subtype == 'small') {
+                            size = '32';
+                        } else if (imageData.subtype == 'tiny') {
+                            size = '22';
+                        } 
+                        res.sendfile(process.cwd() + '/incoming/' + req.params.assetId + '/' + size + '/' + req.params.imagePath.substring(req.params.imagePath.indexOf('/')));
+                    } else {
+                        res.sendfile(process.cwd() + '/incoming/' + req.params.imagePath);
+                    }
+                } else {
+                    errors.report('AccessDenied', req, res);
+                }
+        });
+    });
+};
+
