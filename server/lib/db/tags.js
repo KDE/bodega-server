@@ -20,6 +20,32 @@ var errors = require('../errors.js');
 var sanitize = require('validator').sanitize;
 
 
+module.exports.listRelatedTags = function(db, req, res) {
+    var tagId = utils.parseNumber(req.params.tagId);
+    if (tagId < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    db.query("SELECT t.id, t.type as typeid, tt.type as type, t.title \
+              FROM relatedTags rt JOIN tags \
+                   t ON (rt.related = t.id) \
+                   JOIN tagTypes tt ON (t.type = tt.id) \
+              WHERE rt.tag = $1",
+              [tagId],
+              function(err, result) {
+                  if (err) {
+                      errors.report('Database', req, res, err);
+                      return;
+                  }
+
+                  var json = utils.standardJson(req);
+                  json.tags = result.rows;
+                  res.json(json);
+              }
+            );
+}
+
 module.exports.listTypes = function(db, req, res) {
     var json = utils.standardJson(req);
 

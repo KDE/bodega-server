@@ -1702,6 +1702,21 @@
             ]
         },
         {
+            "MethodName": "List tags related to another tag",
+            "Synopsis": "list all tags marked as related to another tag",
+            "HTTPMethod": "GET",
+            "URI": "/tag/list/related/:tagId",
+            "parameters": [
+                {
+                    "Name": "tagId",
+                    "Location": "URL",
+                    "Description": "The id of the tag we want to list related tags for",
+                    "Required": "Y",
+                    "Type": "number"
+                }
+            ]
+        },
+        {
             "MethodName": "Create",
             "Synopsis": "Create a new tag",
             "HTTPMethod": "POST",

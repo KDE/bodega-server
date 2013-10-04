@@ -171,6 +171,7 @@ DELETE FROM assetprices WHERE ending is not null;
 DELETE FROM assetRatings;
 DELETE FROM assetRatingAverages;
 DELETE FROM easterEggs;
+DELETE FROM relatedTags;
 SELECT ct_testing_removePriorTestingTags();
 
 SELECT setval('seq_assetsids', 1);
@@ -181,6 +182,11 @@ SELECT setval('seq_partnerids', 1005);
 SELECT setval('seq_purchaseids', 1);
 SELECT setval('seq_tagids', 20);
 SELECT setval('seq_assetratingsIds', 1);
+
+INSERT INTO relatedTags (tag, related)
+    SELECT t.id, r.id FROM tags t, tags r
+        WHERE t.title = 'application'
+              AND r.type IN (SELECT id FROM tagTypes WHERE type = 'contentrating');
 
 -- now start setting up the data
 INSERT INTO people (lastname, firstname, email, points, password, active)

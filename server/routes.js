@@ -477,6 +477,12 @@ app.get(serverPath('tag/list/?:type?'), isAuthorized,
     }
 );
 
+app.get(serverPath('tag/list/related/:tagId'), isAuthorized,
+    function(req, res) {
+        app.db.listRelatedTags(req, res);
+    }
+);
+
 app.post(serverPath('tag/create'), isAuthorized,
     function(req, res) {
         app.db.createTag(req, res);
