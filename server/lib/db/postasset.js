@@ -167,6 +167,25 @@ function validatePreviews(db, req, res, assetInfo, cb)
     });
 }
 
+function saveIconOnIncomingAssetsDb(db, req, res, assetInfo, cb)
+{
+    console.log(assetInfo)
+    var query = 'UPDATE incomingAssets set image=$1 where id=$2;';
+
+    //console.log("Query is : ");
+    //console.log(query);
+
+    db.query(query, [assetInfo.image, assetInfo.id], function(err, result) {
+        var e;
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
 function generateIcons(db, req, res, assetInfo, cb)
 {
     if (assetInfo.assetType === 'book' ||
@@ -216,6 +235,8 @@ function postAsset(db, req, res, assetInfo)
     funcs.push(fetchPreviews);
     // generate icons from covers/larger icons
     funcs.push(generateIcons);
+    // save the generated asset icon in the database
+    funcs.push(saveIconOnIncomingAssetsDb)
     // validatePreviews
     funcs.push(validatePreviews);
 
