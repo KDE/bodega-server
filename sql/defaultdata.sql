@@ -75,7 +75,8 @@ INSERT INTO tags (type, title)
             ('magazine'),
             ('movie'),
             ('tvshow'),
-            ('wallpaper')
+            ('wallpaper'),
+            ('widget')
         ) AS titles
         WHERE type = 'assetType';
 
@@ -117,7 +118,7 @@ INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
             ('Performance', 'Slow and unstable', 'Fast and reliable')
         ) AS details
         WHERE type IN (SELECT id FROM tagTypes WHERE type = 'assetType') AND
-              title = 'application';
+              title IN ('application', 'widget');
 
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
     SELECT details.*, id FROM tags,
@@ -127,7 +128,7 @@ INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
             ('Layout', 'Poorly arranged', 'Beautiful')
         ) AS details
         WHERE type IN (SELECT id FROM tagTypes WHERE type = 'assetType') AND
-              (title = 'book' OR title = 'magazine');
+              title IN ('book', 'magazine');
 
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
     SELECT details.*, id FROM tags,
