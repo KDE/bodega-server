@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -95,7 +95,7 @@ module.exports.price = function(db, req, res)
     }
 
     // round upwards to the next 100 (we only sell in blocks of 100)
-    if (points % 100 != 0) {
+    if (points % 100 !== 0) {
         points = points + (100 - (points % 100));
     }
 
@@ -129,7 +129,8 @@ module.exports.price = function(db, req, res)
                 try {
                     currencyData = JSON.parse(currencyData);
                 } catch (e) {
-                    var error = { message: 'Bad response on currency exchange rate for ' + otherCurrency };
+                    var error = { message: 'Bad response on currency exchange rate for ' +
+                                  req.query.otherCurrency };
                     errors.log(error);
                     res.json(json);
                     return;
@@ -154,4 +155,3 @@ module.exports.price = function(db, req, res)
         addOtherCurrency(req, res, json);
     }
 };
-

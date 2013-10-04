@@ -228,5 +228,4 @@ module.exports.managePartnerRequest = function(db, req, res)
         var json = utils.standardJson(req, true);
         res.send(json);
     });
-}
-
+};

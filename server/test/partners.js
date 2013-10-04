@@ -91,6 +91,17 @@ describe('Partner management', function() {
         }
     ];
 
+    var dbSnapshotBefore;
+    before(function(done) {
+        utils.dbSnapshot(null, function(err, res) {
+            if (err) {
+                console.log("Couldn't snapshot the db!");
+            }
+            dbSnapshotBefore = res;
+            done();
+        });
+    });
+
     describe('without authenticating', function(){
         it('Creating a partner should fail', function(done) {
             utils.postUrl('partner/create', {},
@@ -765,11 +776,18 @@ describe('Partner management', function() {
 
             pg.connect(utils.dbConnectionString,
                        function(err, client, finis) {
-                            client.query("delete from partners where id = $1", [newPartnerId],
-                                    function() {
-                                        finis();
-                                        done();
-                            });
+                           client.query("delete from partners where id = $1;", [newPartnerId],
+                                         function(err, result) {
+                                             finis();
+                                             utils.dbSnapshot(null, function(err, res) {
+                                                 var dbSnapshotAfter = res;
+                                                 if (err) {
+                                                     console.log("Couldn't snapshot the db!");
+                                                 }
+                                                 dbSnapshotAfter.should.eql(dbSnapshotBefore);
+                                                 done();
+                                             });
+                                         });
             });
         });
     });

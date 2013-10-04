@@ -68,7 +68,7 @@ describe('Tags manipulation', function(){
         it('List all tag types', function(done) {
             utils.getUrl('tag/types',
                 function(res) {
-                    var expected = { id: 1, type: 'partnership' }
+                    var expected = { id: 1, type: 'partnership' };
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
