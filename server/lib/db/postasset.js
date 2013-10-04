@@ -167,10 +167,10 @@ function validatePreviews(db, req, res, assetInfo, cb)
     });
 }
 
-function saveIconOnIncomingAssetsDb(db, req, res, assetInfo, cb)
+function saveIconToIncomingAssetsDb(db, req, res, assetInfo, cb)
 {
-    console.log(assetInfo)
-    var query = 'UPDATE incomingAssets set image=$1 where id=$2;';
+    //console.log(assetInfo)
+    var query = 'UPDATE incomingAssets set image = $1 where id = $2;';
 
     //console.log("Query is : ");
     //console.log(query);
@@ -236,7 +236,7 @@ function postAsset(db, req, res, assetInfo)
     // generate icons from covers/larger icons
     funcs.push(generateIcons);
     // save the generated asset icon in the database
-    funcs.push(saveIconOnIncomingAssetsDb)
+    funcs.push(saveIconToIncomingAssetsDb);
     // validatePreviews
     funcs.push(validatePreviews);
 
