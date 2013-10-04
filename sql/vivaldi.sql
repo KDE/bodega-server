@@ -193,7 +193,7 @@ BEGIN
     END LOOP;
 
 
-    FOR tagRec IN SELECT id, title FROM relatedTags rt JOIN tags t ON (rt.related = t.id)
+    FOR tagRec IN SELECT distinct id, title FROM relatedTags rt JOIN tags t ON (rt.related = t.id)
                         WHERE tag = applicationTag AND
                               t.type IN (SELECT id FROM tagTypes WHERE type = 'descriptive')
     LOOP
