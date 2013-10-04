@@ -40,6 +40,7 @@ INSERT INTO tags (type, title) SELECT id, titles.*
             ('Plasma/Wallpaper')
         ) AS titles
     WHERE type = 'servicetype';
+
 INSERT INTO tags (type, title)
     SELECT id, titles.*  FROM tagtypes,
         (VALUES
@@ -63,11 +64,30 @@ INSERT INTO tags (type, title)
         ) AS titles
         WHERE type = 'resolution';
 
-
 INSERT INTO relatedTags (tag, related)
-    SELECT t.id, d.*
-    FROM tags AS t,
-    (
+    SELECT w.id, r.id FROM tags w, tags r
+        WHERE (w.title = 'wallpaper' AND w.type IN (SELECT id FROM tagTypes WHERE type = 'assetType')) AND
+              (r.type IN (SELECT id FROM tagTypes WHERE type = 'resolution'));
+
+CREATE OR REPLACE FUNCTION vivaldi_generateWallpaperStore() RETURNS VOID AS $$
+DECLARE
+    wallpaperTag int;
+    descTag int;
+    wallpaperChannel int;
+    subChannel int;
+    tagRec record;
+BEGIN
+    SELECT INTO wallpaperTag id FROM tags
+        WHERE title = 'wallpaper' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+
+    INSERT INTO channels (image, name, store)
+        VALUES ('default/wallpaper.png', 'Wallpapers', 'VIVALDI-1');
+    SELECT INTO wallpaperChannel id FROM channels WHERE store = 'VIVALDI-1' AND
+                                                        parent IS NULL AND
+                                                        name = 'Wallpapers';
+    RAISE NOTICE 'we have a wallpaper channel id of %', wallpaperChannel;
+
+    FOR descTag IN
     INSERT INTO tags (type, title) SELECT id, names.*
         FROM tagTypes,
             (VALUES
@@ -87,8 +107,26 @@ INSERT INTO relatedTags (tag, related)
             ) AS names
         WHERE type = 'descriptive'
         RETURNING id
-    ) AS d
-    WHERE t.title= 'wallpaper' AND
-          t.type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+    LOOP
+        INSERT INTO relatedTags (tag, related) VALUES (wallpaperTag, descTag);
+    END LOOP;
+
+
+    FOR tagRec IN SELECT id, title FROM relatedTags rt JOIN tags t ON (rt.related = t.id)
+                        WHERE tag = wallpaperTag AND
+                              t.type IN (SELECT id FROM tagTypes WHERE type = 'descriptive')
+    LOOP
+        INSERT INTO channels (parent, image, name)
+            VALUES (wallpaperChannel, 'default/wallpaper.png', tagRec.title);
+        INSERT INTO channelTags (channel, tag) VALUES
+            (currval('seq_channelIds'), tagRec.id),
+            (currval('seq_channelIds'), wallpaperTag);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT vivaldi_generateWallpaperStore();
+
+DROP FUNCTION vivaldi_generateWallpaperStore();
 
 --end;
