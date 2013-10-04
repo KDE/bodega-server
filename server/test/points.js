@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2012 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -54,18 +54,20 @@ describe('Point operations', function() {
                 });
         });
 
-        it('should give us a price in CHF if requested', function(done) {
-            utils.getUrl('points/price?amount=510&otherCurrency=CHF',
-                function(res) {
-                    res.should.have.status(200);
-                    res.headers.should.have.property('content-type');
-                    res.body.should.not.have.property('error');
-                    res.body.should.have.property('USD', 6);
-                    res.body.should.have.property('CHF');
-                    console.log(res.body.CHF);
-                    done();
-                });
-        });
+        if (app.config.appkeys.openexchangerates) {
+            it('should give us a price in CHF if requested', function(done) {
+                utils.getUrl('points/price?amount=510&otherCurrency=CHF',
+                             function(res) {
+                                 res.should.have.status(200);
+                                 res.headers.should.have.property('content-type');
+                                 res.body.should.not.have.property('error');
+                                 console.log(res.body);
+                                 res.body.should.have.property('USD', 6);
+                                 res.body.should.have.property('CHF');
+                                 done();
+                             });
+            });
+        }
     });
 
     /* Only run the rest of the payments tests if the secret key
