@@ -76,7 +76,6 @@ DECLARE
     wallpaperTag int;
     descTag int;
     wallpaperChannel int;
-    subChannel int;
     tagRec record;
 BEGIN
     SELECT INTO wallpaperTag id FROM tags
@@ -135,14 +134,17 @@ CREATE OR REPLACE FUNCTION vivaldi_generateApplicationStore() RETURNS VOID AS $$
 DECLARE
     platformTag int;
     applicationTag int;
+    widgetTag int;
     descTag int;
     applicationChannel int;
-    subChannel int;
+    widgetChannel int;
     tagRec record;
 BEGIN
     SELECT INTO platformTag id FROM tags
         WHERE title = 'Vivaldi' AND type IN (SELECT id FROM tagTypes WHERE type = 'platform');
     SELECT INTO applicationTag id FROM tags
+        WHERE title = 'application' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+    SELECT INTO widgetTag id FROM tags
         WHERE title = 'application' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
 
     INSERT INTO channels (image, name, store)
@@ -150,6 +152,11 @@ BEGIN
     SELECT INTO applicationChannel id FROM channels WHERE store = 'VIVALDI-1' AND
                                                           parent IS NULL AND
                                                           name = 'Applications';
+    INSERT INTO channels (image, name, store)
+        VALUES ('default/application.png', 'Widgets', 'VIVALDI-1');
+    SELECT INTO widgetChannel id FROM channels WHERE store = 'VIVALDI-1' AND
+                                                     parent IS NULL AND
+                                                     name = 'Widgets';
 
     FOR descTag IN
     INSERT INTO tags (type, title) SELECT id, names.*
@@ -182,6 +189,7 @@ BEGIN
         RETURNING id
     LOOP
         INSERT INTO relatedTags (tag, related) VALUES (applicationTag, descTag);
+        INSERT INTO relatedTags (tag, related) VALUES (applicationTag, descTag);
     END LOOP;
 
 
@@ -194,6 +202,12 @@ BEGIN
         INSERT INTO channelTags (channel, tag) VALUES
             (currval('seq_channelIds'), tagRec.id),
             (currval('seq_channelIds'), applicationTag);
+
+        INSERT INTO channels (parent, name)
+            VALUES (widgetChannel, tagRec.title);
+        INSERT INTO channelTags (channel, tag) VALUES
+            (currval('seq_channelIds'), tagRec.id),
+            (currval('seq_channelIds'), widgetTag);
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
@@ -201,6 +215,5 @@ $$ LANGUAGE plpgsql;
 SELECT vivaldi_generateApplicationStore();
 
 DROP FUNCTION vivaldi_generateApplicationStore();
-
 
 --end;
