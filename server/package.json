@@ -18,7 +18,7 @@
         "optimist": "latest",
         "pg": ">= 0.6.10",
         "prompt": "latest",
-        "stripe": "latest",
+        "stripe": "git://github.com/abh/node-stripe.git#master",
         "validator": ">= 0.4.5",
         "wordwrap": "latest"
     },

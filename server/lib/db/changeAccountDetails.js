@@ -122,7 +122,6 @@ function performEmailUpdate(db, req, res, next)
 function performCardUpdate(db, req, res, next)
 {
     var card = req.body.card;
-
     if (card) {
         var query =
             "SELECT u.id, u.email, u.active FROM people u WHERE u.id = $1;";
@@ -229,4 +228,3 @@ module.exports.changeDetails = function(db, req, res) {
         completeUpdate
         ], errorHandler, db, req, res);
 };
-

@@ -124,7 +124,7 @@ app.get(serverPath('search'), anonBrowsing, isAuthorized,
 
 //********************************
 // Points and purchases
-app.get(serverPath('points/buy'), isAuthorized,
+app.post(serverPath('points/buy'), isAuthorized,
         function(req, res) {
             //console.log(req.query);
             app.db.buyPoints(req, res);
@@ -244,7 +244,7 @@ app.post(serverPath('participant/paymentMethod/update'),
     }
 );
 
-app.get(serverPath('participant/paymentMethod/delete'),
+app.post(serverPath('participant/paymentMethod/delete'),
     function(req, res) {
         app.db.deletePaymentMethod(req, res);
     }
@@ -658,4 +658,3 @@ app.all('/', function(req, res) {
         url: app.config.warehouseInfo.url
     });
 });
-

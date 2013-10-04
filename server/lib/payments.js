@@ -196,7 +196,7 @@ var charges = {
 
         stripe.charges.create(data, function(err, response) {
             if (err) {
-                console.log(err);
+                //console.log(err);
                 fn(stripeErrorConvert(err, 'CustomerCharge'));
                 return;
             }
@@ -346,6 +346,7 @@ module.exports.buyPoints = function(db, args, fn)
                 }
                 return;
             }
+
             recordPointsPurchase(db, args, charge, fn);
         });
     });
@@ -372,7 +373,7 @@ module.exports.updateCardDetails = function(db, args, fn)
                 fn(err);
             }
         } else {
-            customers.update(customerId, args.card, function(err) {
+            customers.update(customerId, args.card, function(err, res) {
                 if (isBadCustomerRecord(db, args, err)) {
                     createCustomer(db, args, fn);
                 } else {
@@ -403,13 +404,13 @@ module.exports.retrievePaymentMethod = function(db, args, fn)
                     }
                     return;
                 }
-
-                if (!customer || !customer.active_card) {
+                if (!customer || customer.cards.count < 1) {
                     fn(perr('PurchaseMethodMissing'));
                     return;
                 }
                 //console.log(customer);
-                fn(null, customer.active_card);
+
+                fn(null, customer.cards.data[0]);
             });
         }
     });

@@ -19,7 +19,10 @@ var utils = require('./support/utils');
 
 describe('Point operations', function() {
     var startPoints;
-
+    //Stripe can take its sweet time, lets increase timeout to 6 seconds
+    // and what the test considers slow test to 4 seconds
+    this.slow(4000);
+    this.timeout(6000);
     describe('Point price', function(done) {
         it('should return the price of 500 points', function(done) {
             utils.getUrl('points/price?amount=500',
@@ -112,6 +115,7 @@ describe('Point operations', function() {
 
     describe('Payment registration', function(){
         it('should not have any card', function(done) {
+            utils.app.config.printErrors = false;
             utils.getUrl('participant/paymentMethod',
                 function(res) {
                     res.should.have.status(200);
@@ -121,11 +125,13 @@ describe('Point operations', function() {
                     res.body.error.should.have.property(
                         'type',
                         'PurchaseMethodMissing');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
         it('should error without card card', function(done) {
-            utils.getUrl('points/buy?amount=500',
+            utils.app.config.printErrors = false;
+            utils.postUrl('points/buy', {amount: 500},
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -134,22 +140,25 @@ describe('Point operations', function() {
                     res.body.error.should.have.property(
                         'type',
                         'PurchaseMethodMissing');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
         it('should emit card_declined', function(done) {
-            var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent('4000000000000002');
-            url += '&';
-            url += 'card[exp_month]=12';
-            url += '&';
-            url += 'card[exp_year]=2013';
-            url += '&';
-            url += 'card[cvc]=333';
-            url += '&';
-            url += 'card[name]=' + encodeURIComponent('Zack Rusin');
+            var url = 'participant/changeAccountDetails';
+            var obj = {
+                card : {
+                    number: 4000000000000002,
+                    exp_month: 12,
+                    exp_year: 2013,
+                    cvc: 333,
+                    name: "Zack Rusin"
+                }
+            };
+
+            utils.app.config.printErrors = false;
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, obj,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -158,23 +167,26 @@ describe('Point operations', function() {
                     res.body.error.should.have.property(
                         'type',
                         'CardDeclined');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
 
-        it('should emit CardIncorrectNumber', function(done) {
-            var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent('4242424242424241');
-            url += '&';
-            url += 'card[exp_month]=12';
-            url += '&';
-            url += 'card[exp_year]=2013';
-            url += '&';
-            url += 'card[cvc]=333';
-            url += '&';
-            url += 'card[name]=' + encodeURIComponent('Zack Rusin');
+        it('should fail with wrong number', function(done) {
+            var url = 'participant/changeAccountDetails';
+            var obj = {
+                card : {
+                    number: 4242424242424241,
+                    exp_month:12,
+                    exp_year:2013,
+                    cvc: 333,
+                    name: 'Zack Rusin'
+                }
+            };
+
+            utils.app.config.printErrors = false;
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, obj,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -183,23 +195,24 @@ describe('Point operations', function() {
                     res.body.error.should.have.property(
                         'type',
                         'CardIncorrectNumber');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
 
         it('should emit CardInvalidExpiryMonth', function(done) {
             var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent('4242424242424242');
-            url += '&';
-            url += 'card[exp_month]=13';
-            url += '&';
-            url += 'card[exp_year]=2013';
-            url += '&';
-            url += 'card[cvc]=333';
-            url += '&';
-            url += 'card[name]=' + encodeURIComponent('Zack Rusin');
-            //console.log(url);
-            utils.getUrl(url,
+            var obj = {
+                card : {
+                    number: 4242424242424242,
+                    exp_month:13,
+                    exp_year:2013,
+                    cvc: 333,
+                    name: 'Zack Rusin'
+                }
+            };
+            utils.app.config.printErrors = false;
+            utils.postUrl(url, obj,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -208,23 +221,25 @@ describe('Point operations', function() {
                     res.body.error.should.have.property(
                         'type',
                         'CardInvalidExpiryMonth');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
 
         it('should emit CardInvalidExpiryYear', function(done) {
             var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent('4242424242424242');
-            url += '&';
-            url += 'card[exp_month]=12';
-            url += '&';
-            url += 'card[exp_year]=1970';
-            url += '&';
-            url += 'card[cvc]=333';
-            url += '&';
-            url += 'card[name]=' + encodeURIComponent('Zack Rusin');
+            var obj = {
+                card : {
+                    number: 4242424242424242,
+                    exp_month:12,
+                    exp_year:1970,
+                    cvc: 333,
+                    name: 'Zack Rusin'
+                }
+            };
+            utils.app.config.printErrors = false;
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, obj,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -233,23 +248,25 @@ describe('Point operations', function() {
                     res.body.error.should.have.property(
                         'type',
                         'CardInvalidExpiryYear');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
 
+        /*
         it('should emit CardInvalidCVC', function(done) {
             var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent('4242424242424242');
-            url += '&';
-            url += 'card[exp_month]=12';
-            url += '&';
-            url += 'card[exp_year]=2013';
-            url += '&';
-            url += 'card[cvc]=99';
-            url += '&';
-            url += 'card[name]=' + encodeURIComponent('Zack Rusin');
+            var obj = {
+                card : {
+                    number: 4242424242424242,
+                    exp_month:12,
+                    exp_year:2013,
+                    cvc: 99,
+                    name: 'Zack Rusin'
+                }
+            };
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, null,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -260,21 +277,21 @@ describe('Point operations', function() {
                         'CardInvalidCVC');
                     done();
                 });
-        });
+        });*/
 
         it('should register successfully', function(done) {
             var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent('4242424242424242');
-            url += '&';
-            url += 'card[exp_month]=12';
-            url += '&';
-            url += 'card[exp_year]=2013';
-            url += '&';
-            url += 'card[cvc]=333';
-            url += '&';
-            url += 'card[name]=' + encodeURIComponent('Zack Rusin');
+            var obj = {
+                card : {
+                    number: 4242424242424242,
+                    exp_month:12,
+                    exp_year:2013,
+                    cvc: 333,
+                    name: 'Zack Rusin'
+                }
+            };
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, obj,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -286,9 +303,9 @@ describe('Point operations', function() {
         });
 
         it('should delete successfully', function(done) {
-            var url = 'participant/deletePaymentMethod';
+            var url = 'participant/paymentMethod/delete';
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, null,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -302,18 +319,18 @@ describe('Point operations', function() {
 
     describe('Buying points', function(){
         it('should register successfully', function(done) {
-            var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent('4242424242424242');
-            url += '&';
-            url += 'card[exp_month]=12';
-            url += '&';
-            url += 'card[exp_year]=2013';
-            url += '&';
-            url += 'card[cvc]=333';
-            url += '&';
-            url += 'card[name]=' + encodeURIComponent('Zack Rusin');
+            var url = 'participant/changeAccountDetails';
+            var obj = {
+                card : {
+                    number: 4242424242424242,
+                    exp_month:12,
+                    exp_year:2013,
+                    cvc: 333,
+                    name: 'Zack Rusin'
+                }
+            };
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, obj,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -325,7 +342,7 @@ describe('Point operations', function() {
         });
 
         it('succeeds buying 500 points', function(done) {
-            utils.getUrl('points/buy?amount=500',
+            utils.postUrl('points/buy', {amount:500},
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property('content-type');
@@ -337,7 +354,8 @@ describe('Point operations', function() {
         });
 
         it('errors on too few points', function(done) {
-            utils.getUrl('points/buy?amount=5',
+            utils.app.config.printErrors = false;
+            utils.postUrl('points/buy', {amount:5},
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property('content-type');
@@ -345,12 +363,14 @@ describe('Point operations', function() {
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
                         'type', 'PurchaseNotEnoughPoints');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
 
         it('errors on too many points', function(done) {
-            utils.getUrl('points/buy?amount=5000000000',
+            utils.app.config.printErrors = false;
+            utils.postUrl('points/buy', {amount:5000000000},
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property('content-type');
@@ -358,22 +378,25 @@ describe('Point operations', function() {
                     res.body.should.have.property('error');
                     res.body.error.should.have.property(
                         'type', 'PurchaseTooManyPoints');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
     });
 
     describe('on users', function(){
-        var validCard = '4408041234567893';
+        var validCard = '4012888888881881';
         it('should allow changing the card', function(done) {
-            var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent(validCard);
-            url += '&';
-            url += 'card[exp_month]=12';
-            url += '&';
-            url += 'card[exp_year]=2013';
+            var url = 'participant/changeAccountDetails';
+            var obj = {
+                card : {
+                    number: validCard,
+                    exp_month:12,
+                    exp_year:2013
+                }
+            };
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, obj,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -385,14 +408,17 @@ describe('Point operations', function() {
         });
 
         it('shouldnt change to an invalid card', function(done) {
-            var url = 'participant/changeAccountDetails?';
-            url += 'card[number]=' + encodeURIComponent('4408041234567890');
-            url += '&';
-            url += 'card[exp_month]=12';
-            url += '&';
-            url += 'card[exp_year]=2013';
+            var url = 'participant/changeAccountDetails';
+            var obj = {
+                card : {
+                    number: 4408041234567890,
+                    exp_month:12,
+                    exp_year:2013
+                }
+            };
+            utils.app.config.printErrors = false;
             //console.log(url);
-            utils.getUrl(url,
+            utils.postUrl(url, obj,
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -400,6 +426,7 @@ describe('Point operations', function() {
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type',
                                                         'CardIncorrectNumber');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });

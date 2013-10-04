@@ -25,7 +25,7 @@ module.exports.buy = function(db, req, res) {
     //   points=%d
     var args = {
         userId : req.session.user.id,
-        points : parseInt(req.query.amount, 10)
+        points : parseInt(req.body.amount, 10)
     };
 
     if (!args.points) {
