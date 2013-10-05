@@ -44,7 +44,7 @@ module.exports.listRelatedTags = function(db, req, res) {
                   res.json(json);
               }
             );
-}
+};
 
 module.exports.listTypes = function(db, req, res) {
     var json = utils.standardJson(req);
@@ -289,4 +289,3 @@ function update(partner, db, req, res) {
 module.exports.update = function(db, req, res) {
     utils.partnerId(db, req, res, update);
 };
-

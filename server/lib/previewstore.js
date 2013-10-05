@@ -799,6 +799,24 @@ var PreviewStore = (function() {
         });
     };
 
+    function updateAssetInfoIcon(assetInfo, subtype, path) {
+        var splitIconPreviews = splitPreviews(assetInfo.previews).splitIcons;
+        var previews = assetInfo.previews;
+
+        if (splitIconPreviews[subtype]) {
+            return;
+        }
+
+        assetInfo.image = path;
+        assetInfo.previews.push({
+            path: path,
+            type: 'icon',
+            subtype: subtype,
+            mimetype: mime.lookup(path),
+            generated: true
+        });
+    }
+
     function generateIconFromPreview(assetInfo, assetPaths, preview, icons, i, cb) {
         var icon = icons[i];
         var w = iconSizes[icon.subtype];
@@ -815,7 +833,7 @@ var PreviewStore = (function() {
         icon.path = iconRelativePath(assetInfo, icon);
         //console.log("Cover file = " + icon.file);
         //console.log("Icon path = " + icon.path);
-        assetInfo.image = icon.path;
+        updateAssetInfoIcon(assetInfo, icon.subtype, icon.path);
         icon.file = undefined;
 
         fullIncomingPath = previewFullPath(assetInfo, icon, true);
@@ -922,7 +940,7 @@ var PreviewStore = (function() {
         toIcon.file = undefined;
 
         //all icon names are the same so make sure they're set on the assetinfo
-        assetInfo.image = toIcon.path;
+        updateAssetInfoIcon(assetInfo, toIcon.subtype, toIcon.path);
 
         fullIncomingPath = previewFullPath(assetInfo, toIcon, true);
         //console.log('Full from path = ' + fromPath);

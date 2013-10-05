@@ -443,7 +443,6 @@ describe('Asset manipulation', function(){
                 function(res) {
                     res.should.have.status(200);
                     res.headers.should.have.property('content-type');
-                    res.headers['content-type'].should.equal('application/json');
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'AccessDenied');
                     done();
@@ -464,8 +463,12 @@ describe('Asset manipulation', function(){
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(2);
-                    res.body.assets[0].should.have.property('id', extraPostedAsset);
-                    res.body.assets[1].should.have.property('id', completeAssetId);
+                    var refIds = [completeAssetId, extraPostedAsset];
+                    var createdIds = [res.body.assets[0].id,
+                                      res.body.assets[1].id];
+                    refIds.sort(function(a, b) { return a - b; });
+                    createdIds.sort(function(a, b) { return a - b; });
+                    refIds.should.eql(createdIds);
                     done();
                 });
         });
@@ -547,6 +550,18 @@ describe('Asset manipulation', function(){
                 function(res) {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.not.have.property('error');
+                    done();
+                });
+        });
+        it('should show info for the posted asset', function(done){
+            utils.getUrl('asset/' + completeAssetId + '?previews=1',
+                function(res) {
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.not.have.property('error');
+                    res.body.asset.should.have.property('tags');
+                    res.body.asset.should.have.property('previews');
+                    var previews = res.body.asset.previews;
+                    previews.should.have.property('length').above(3);
                     done();
                 });
         });

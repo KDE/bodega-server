@@ -167,9 +167,8 @@ function validatePreviews(db, req, res, assetInfo, cb)
     });
 }
 
-function saveIconToIncomingAssetsDb(db, req, res, assetInfo, cb)
+function recordIcon(db, req, res, assetInfo, cb)
 {
-    //console.log(assetInfo)
     var query = 'UPDATE incomingAssets set image = $1 where id = $2;';
 
     //console.log("Query is : ");
@@ -183,6 +182,37 @@ function saveIconToIncomingAssetsDb(db, req, res, assetInfo, cb)
             return;
         }
         cb(null, db, req, res, assetInfo);
+    });
+}
+
+function recordPreview(db, req, res, assetInfo, preview, cb)
+{
+    var newPreviewQuery = 'insert into incomingAssetPreviews (asset, path, mimetype, type, subtype) values ($1, $2, $3, $4, $5)';
+    var e;
+
+    db.query(newPreviewQuery,
+             [assetInfo.id, preview.path, preview.mimetype,
+              preview.type, preview.subtype],
+             function(err, result) {
+                 if (err) {
+                     e = errors.create('Database', err.message);
+                     cb(e);
+                     return;
+                 }
+                 cb(null);
+             });
+}
+
+function recordPreviews(db, req, res, assetInfo, cb)
+{
+    async.each(assetInfo.previews, function(preview, func) {
+        if (preview.generated) {
+            recordPreview(db, req, res, assetInfo, preview, func);
+        } else {
+            func(null);
+        }
+    }, function(err){
+        cb(err, db, req, res, assetInfo);
     });
 }
 
@@ -235,8 +265,10 @@ function postAsset(db, req, res, assetInfo)
     funcs.push(fetchPreviews);
     // generate icons from covers/larger icons
     funcs.push(generateIcons);
-    // save the generated asset icon in the database
-    funcs.push(saveIconToIncomingAssetsDb);
+    // write the icon to the db (if generated)
+    funcs.push(recordIcon);
+    // write previews to the db
+    funcs.push(recordPreviews);
     // validatePreviews
     funcs.push(validatePreviews);
 
