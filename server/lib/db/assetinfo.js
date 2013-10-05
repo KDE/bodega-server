@@ -167,8 +167,8 @@ function findAsset(db, req, res, assetInfo, cb) {
     var expectedRowCount = 1;
 
     if (assetInfo.incoming ||
-        req.session.user.store == undefined ||
-        req.session.user.store == 'null') {
+        req.session.user.store === undefined ||
+        req.session.user.store === 'null') {
         if (assetInfo.incoming) {
             table = 'incomingAssets';
         } else {
@@ -416,29 +416,28 @@ module.exports.sendIncomingAssetPreview = function(db, req, res) {
         db.query(query, [assetInfo.id, req.params.imagePath],
             function(err, result) {
                 if (err) {
-                    var e = errors.create('Database', err.message);
-                    cb(e, db, req, res, assetInfo);
+                    errors.report('Database', req, res, err);
                     return;
                 }
 
                 if (result.rows.length >= 1) {
                     var imageData = result.rows[0];
 
-                    if (imageData.type == 'icon') {
+                    if (imageData.type === 'icon') {
                         var size;
-                        if (imageData.subtype == 'huge') {
+                        if (imageData.subtype === 'huge') {
                             size = '512';
-                        } else if (imageData.subtype == 'large') {
+                        } else if (imageData.subtype === 'large') {
                             size = '256';
-                        } else if (imageData.subtype == 'big') {
+                        } else if (imageData.subtype === 'big') {
                             size = '128';
-                        } else if (imageData.subtype == 'medium') {
+                        } else if (imageData.subtype === 'medium') {
                             size = '64';
-                        } else if (imageData.subtype == 'small') {
+                        } else if (imageData.subtype === 'small') {
                             size = '32';
-                        } else if (imageData.subtype == 'tiny') {
+                        } else if (imageData.subtype === 'tiny') {
                             size = '22';
-                        } 
+                        }
                         res.sendfile(process.cwd() + '/incoming/' + req.params.assetId + '/' + size + '/' + req.params.imagePath.substring(req.params.imagePath.indexOf('/')));
                     } else {
                         res.sendfile(process.cwd() + '/incoming/' + req.params.imagePath);
@@ -449,4 +448,3 @@ module.exports.sendIncomingAssetPreview = function(db, req, res) {
         });
     });
 };
-
