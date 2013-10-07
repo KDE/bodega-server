@@ -18,50 +18,50 @@
 // any assets of that type will be rejected from upload
 module.exports.mandatoryTags = {
     application: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
-        descriptive: { name: "Category", multi: true, required: false }
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
     },
     widget: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
-        descriptive: { name: "Category", multi: true, required: false }
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
     },
     game: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
-        descriptive: { name: "Category", multi: true, required: false }
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
     },
     article: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
     },
     audio: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
     },
     audiobook: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
     },
     book: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
     },
     magazine: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
     },
     movie: {
-        contentrating: { name: 'Content Rating', multi: false, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
     },
     tvshow: {
-        contentrating: { name: 'Content Rating', multi: false, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
     },
     wallpaper: {
-        author: { name: "Author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', multi: false, required: true },
-        resolution: { name: "Resolution", multi: true, required: false },
-        descriptive: { name: "Category", multi: true, required: false }
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        resolution: { name: "Resolution", type: "resolution", multi: true, required: false },
+        descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
     },
 };
