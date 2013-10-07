@@ -21,6 +21,7 @@ DECLARE
     tagId INT;
 BEGIN
     SELECT INTO tagID t.id from tags t INNER JOIN tagtypes ttype ON (t.type = ttype.id) WHERE ttype.type = 'assetType' AND t.id = NEW.assetType;
+
     IF NOT FOUND THEN
         RAISE EXCEPTION 'The tag must have assetType as tagtype'
               USING ERRCODE = 'CTR02';
@@ -38,11 +39,10 @@ CREATE OR REPLACE FUNCTION ct_checkAssociationOfRatingAttributeWithAsset() RETUR
 DECLARE
     assetId INT;
 BEGIN
-
     SELECT INTO assetId asset FROM assettags at INNER JOIN tags t ON (t.id = at.tag) INNER JOIN assetRatingAttributes ra ON (ra.assettype = t.id) WHERE at.asset = NEW.asset and ra.id = NEW.attribute;
 
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'The asset can''t be associated with the rating attribute '
+        RAISE EXCEPTION 'The asset can not be associated with the rating attribute '
               USING ERRCODE = 'CTR01';
     END IF;
 

@@ -244,7 +244,7 @@ var BodegaDb = (function() {
     };
 
     BodegaDb.prototype.createAssetRating = function(req, res) {
-        this.dbQuery(dbRatings.addAssetRating, req, res);
+        this.dbQuery(dbRatings.createAssetRating, req, res);
     };
 
     BodegaDb.prototype.deleteAssetRating = function(req, res) {

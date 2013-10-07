@@ -179,7 +179,7 @@ module.exports.assetParticipantRatings = function(db, req, res) {
     });
 };
 
-module.exports.addAssetRating = function(db, req, res) {
+module.exports.createAssetRating = function(db, req, res) {
     var assetId = utils.parseNumber(req.params.assetId);
 
     if (assetId < 1) {
