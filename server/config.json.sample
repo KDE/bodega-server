@@ -25,7 +25,8 @@
             "adminuser": "postgres"
         },
         "redis": {
-            "host": "localhost"
+            "host": "localhost",
+            "prefix": "bodega-server-sess:"
         },
         "smtp": {
             "host": "mail.example.org",
