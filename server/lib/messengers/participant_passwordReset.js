@@ -26,7 +26,7 @@ module.exports.sendEmail = function(transport, db, record, cb)
         transport: transport,
         from: app.config.service.email,
         to: record.email,
-        subject: "Activate your new " + app.config.warehouseInfo.name + " account"
+        subject: "Password reset requested for your " + app.config.warehouseInfo.name + " account"
     };
 
     record.warehouse = app.config.warehouseInfo.name;
