@@ -145,32 +145,53 @@ describe('Tags manipulation', function(){
             listTags(null, null, 'contentrating', cb);
         });
 
-        it('List all tags of related to the application tag', function(done) {
-            utils.getUrl('tag/list/related/7',
+        it('List all tags of related to the application asset type', function(done) {
+            utils.getUrl('tag/list/forAssetType/application',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('tags');
 
-                    res.body.tags.length.should.equal(6);
-                    res.body.tags[0].id.should.be.eql(1);
-                    res.body.tags[0].typeid.should.be.eql(8);
-                    res.body.tags[0].type.should.be.eql('contentrating');
-                    res.body.tags[0].title.should.be.eql('Early Childhood');
+                    res.body.should.have.property('tags');
+                    res.body.tags.should.have.property('author');
+                    res.body.tags.should.have.property('contentrating');
+                    res.body.tags.should.have.property('descriptive');
+
+                    res.body.tags.contentrating.tags.length.should.equal(6);
+                    res.body.tags.contentrating.tags[0].id.should.be.eql(1);
+                    res.body.tags.contentrating.tags[0].typeid.should.be.eql(8);
+                    res.body.tags.contentrating.tags[0].type.should.be.eql('contentrating');
+                    res.body.tags.contentrating.tags[0].title.should.be.eql('Early Childhood');
+
+                    res.body.tags.author.should.not.have.property('tags');
+                    res.body.tags.descriptive.should.not.have.property('tags');
                     done();
                 });
         });
 
-        it('List all tags of related to the article tag', function(done) {
-            utils.getUrl('tag/list/related/8',
+        it('List all tags of related to the article asset type', function(done) {
+            utils.getUrl('tag/list/forAssetType/article',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
                     res.body.should.have.property('authStatus', true);
-                    res.body.should.have.property('tags');
 
-                    res.body.tags.length.should.equal(0);
+                    res.body.should.have.property('tags');
+                    res.body.tags.should.have.property('author');
+                    res.body.tags.should.have.property('contentrating');
+                    done();
+                });
+        });
+
+        it('List all tags of related to non-extant asset type', function(done) {
+            utils.getUrl('tag/list/forAssetType/nonexistent',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.have.property('authStatus', true);
+
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'TagIdInvalid');
                     done();
                 });
         });

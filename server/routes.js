@@ -477,7 +477,7 @@ app.get(serverPath('tag/list/?:type?'), isAuthorized,
     }
 );
 
-app.get(serverPath('tag/list/related/:tagId'), isAuthorized,
+app.get(serverPath('tag/list/forAssetType/:assetType'), isAuthorized,
     function(req, res) {
         app.db.listRelatedTags(req, res);
     }

@@ -15,32 +15,60 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var assetRules = require('../../assetRules.js');
 var utils = require('../utils.js');
 var errors = require('../errors.js');
+
 var sanitize = require('validator').sanitize;
 
-
 module.exports.listRelatedTags = function(db, req, res) {
-    var tagId = utils.parseNumber(req.params.tagId);
-    if (tagId < 1) {
+    if (!req.params.assetType) {
         errors.report('MissingParameters', req, res);
         return;
     }
 
     db.query("SELECT t.id, t.type as typeid, tt.type as type, t.title \
-              FROM relatedTags rt JOIN tags \
-                   t ON (rt.related = t.id) \
-                   JOIN tagTypes tt ON (t.type = tt.id) \
-              WHERE rt.tag = $1",
-              [tagId],
+              FROM tags at LEFT JOIN relatedTags rt ON (rt.tag = at.id) \
+              LEFT JOIN tags t ON (rt.related = t.id) \
+              LEFT JOIN tagTypes tt ON (t.type = tt.id) \
+              WHERE at.title = $1 AND at.type IN (SELECT id FROM tagTypes where type = 'assetType') \
+              ORDER BY t.id",
+              [req.params.assetType],
               function(err, result) {
                   if (err) {
                       errors.report('Database', req, res, err);
                       return;
                   }
 
+                  if (result.rowCount < 1) {
+                      errors.report('TagIdInvalid', req, res);
+                      return;
+                  }
+
                   var json = utils.standardJson(req);
-                  json.tags = result.rows;
+                  json.tags = assetRules.mandatoryTags[req.params.assetType];
+                  if (!json.tags) {
+                      json.tags = {};
+                  }
+
+                  for (var i = 0; i < result.rowCount; ++i) {
+                      var row = result.rows[i];
+                      if (!row.id) {
+                          continue;
+                      }
+
+                      if (!json.tags.hasOwnProperty(row.type)) {
+                          json.tags[row.type] = { mandatory: false, multi: true, name: row.type }
+                      }
+
+                      if (!Array.isArray(json.tags[row.type].tags)) {
+                          json.tags[row.type].tags = [];
+                      }
+
+                      json.tags[row.type].tags.push(row);
+                  }
+
+                  //console.log(JSON.stringify(json.tags, 0, 2));
                   res.json(json);
               }
             );
