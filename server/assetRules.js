@@ -17,14 +17,51 @@
 // if no entry exists in mandatoryTags for an assetType tag, then
 // any assets of that type will be rejected from upload
 module.exports.mandatoryTags = {
-    application: ["author", "contentrating"],
-    article: ["author", "contentrating"],
-    audio: ["author", "contentrating"],
-    audiobook: ["author", "contentrating"],
-    book: ["author", "publisher", "contentrating"],
-    game: ["author", "contentrating"],
-    magazine: ["author", "contentrating"],
-    movie: ["license", "contentrating"],
-    tvshow: ["license", "contentrating"],
-    wallpaper: ["author", "contentrating"]
+    application: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        { name: "Category", type: "descriptive", multi: true, required: false }
+    ],
+    widget: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        { name: "Category", type: "descriptive", multi: true, required: false }
+    ],
+    game: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        { name: "Category", type: "descriptive", multi: true, required: false }
+    ],
+    article: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true }
+    ],
+    audio: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true }
+    ],
+    audiobook: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true }
+    ],
+    book: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true }
+    ],
+    magazine: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true }
+    ],
+    movie: [
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true }
+    ],
+    tvshow: [
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true }
+    ],
+    wallpaper: [
+        { name: "Author", type: "author", multi: true, required: true },
+        { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        { name: "Resolution", type: "resolution", multi: true, required: false },
+        { name: "Category", type: "descriptive", multi: true, required: false }
+    ],
 };

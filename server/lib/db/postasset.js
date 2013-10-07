@@ -128,9 +128,13 @@ function validateTags(db, req, res, assetInfo, cb)
 
     for (tagIdx = 0; tagIdx < requiredTags.length; ++tagIdx) {
         tagType = requiredTags[tagIdx];
-        if (!assetHasTag(assetInfo, tagType)) {
+        if (!tagType.required) {
+            continue;
+        }
+
+        if (!assetHasTag(assetInfo, tagType.type)) {
             err = errors.create('UploadMissingTag',
-                                "Missing required tag: " + tagType);
+                                "Missing required tag: " + tagType.type);
             cb(err, db, req, res, assetInfo);
             return;
         }
