@@ -32,7 +32,7 @@ function anonBrowsing(req, res, next)
 
 function isAuthorized(req, res, next)
 {
-    if (req.preAuth === true || req.session.authorized) {
+    if (req.preAuth === true || (req.session.user && req.session.authorized)) {
         next();
     } else {
         errors.report("Unauthorized", req, res);
