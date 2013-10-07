@@ -22,39 +22,6 @@ var sanitize = require('validator').sanitize;
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
-function beginTransaction(db, req, res, requestInfo, cb)
-{
-    var query = "BEGIN;";
-    var e;
-
-    var q = db.query(query, [], function(err, result) {
-        var i;
-        if (err) {
-            e = errors.create('Database', err.message);
-            cb(e, db, req, res, requestInfo);
-            return;
-        }
-        requestInfo.transaction = true;
-        cb(null, db, req, res, requestInfo);
-    });
-}
-
-function endTransaction(db, req, res, requestInfo, cb)
-{
-    var query = "COMMIT;";
-    var e;
-
-    var q = db.query(query, [], function(err, result) {
-        var i;
-        if (err) {
-            e = errors.create('Database', err.message);
-            cb(e, db, req, res, requestInfo);
-            return;
-        }
-        cb(null, db, req, res, requestInfo);
-    });
-}
-
 function loadRequest (db, req, res, requestInfo, cb) {
     var requestQuery =
             "SELECT partnerrequests.id, partner, name,\
@@ -191,15 +158,10 @@ module.exports.managePartnerRequest = function(db, req, res)
 {
     var requestInfo = {};
 
-    var funcs = [function(cb) {
-        cb(null, db, req, res, requestInfo);
-    }];
-
+    var funcs = [loadRequest];
 
     //begin transaction
-    funcs.push(beginTransaction);
     // fetch info on the particular request
-    funcs.push(loadRequest);
     if (utils.parseBool(req.body.approved)) {
         // approve a request
         funcs.push(approveRequest);
@@ -210,22 +172,9 @@ module.exports.managePartnerRequest = function(db, req, res)
     }
     //  delete from requests
     funcs.push(deleteFromPartnerRequests);
-    //end transaction
-    funcs.push(endTransaction);
+    funcs.push(function(db, req, res, requestInfo, cb) {
+            cb(null, utils.standardJson(req));
+        });
 
-    async.waterfall(funcs, function(err, results) {
-        if (err) {
-            if (results.transaction) {
-                db.query("rollback", [], function() {
-                    errors.report(err.name, req, res, err);
-                });
-            } else {
-                errors.report(err.name, req, res, err);
-            }
-            return;
-        }
-
-        var json = utils.standardJson(req, true);
-        res.send(json);
-    });
+    utils.wrapInTransactionAndReply(funcs, db, req, res, requestInfo);
 };
