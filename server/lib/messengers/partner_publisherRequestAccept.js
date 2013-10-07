@@ -28,7 +28,7 @@ module.exports.sendEmail = function(transport, db, record, cb)
         transport: transport,
         from: app.config.service.email,
         to: app.config.addresses.partnerRequests,
-        subject: "Publisher account upgrade denied"
+        subject: "Publisher account upgrade accepted"
     };
 
     record.warehouse = app.config.warehouseInfo.name;

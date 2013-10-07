@@ -1,10 +1,10 @@
-{{warehouse}} rejection notice.
+Hello,
 
-Your request for publication of '{{data.assetname}}' (id={{data.assetid}}) was rejected for the following reason:
+We regret to inform you that your request for publication of '{{data.assetname}}' (id={{data.assetid}}) was rejected for the following reason:
 
      {{data.reason}}
 
-If you would like to dispute this rejection please email us at {{serviceemail}}. Otherwise, you may correct the issue with the asset and re-submit it for approval.
+If you would like to dispute this rejection please email us at {{serviceemail}}. Otherwise, you may correct the noted issue(s) and re-submit the asset for publication.
 
 Thank You,
 

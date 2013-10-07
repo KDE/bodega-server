@@ -28,7 +28,7 @@ module.exports.sendEmail = function(transport, db, record, cb)
         transport: transport,
         from: app.config.service.email,
         to: app.config.addresses.partnerRequests,
-        subject: "Distributor account upgrade request"
+        subject: "Distributor account upgrade request denied"
     };
 
     // break the message up into nice short lines for the email

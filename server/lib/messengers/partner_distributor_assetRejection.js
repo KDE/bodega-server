@@ -27,7 +27,7 @@ module.exports.sendEmail = function(transport, db, record, cb)
        from: app.config.service.email,
        to: record.data.email,
        bcc: app.config.service.email,
-       subject: app.config.warehouseInfo.name + " rejection notice"
+       subject: "Asset publication request denied"
    };
 
    record.warehouse = app.config.warehouseInfo.name;
