@@ -115,7 +115,7 @@ describe('Ratings', function() {
                         "rated": '',
                         "ratings": [
                             {
-                                "attribute": 12,
+                                "attribute": 15,
                                 "name": "Graphics",
                                 "rating": 5
                             }
@@ -129,7 +129,7 @@ describe('Ratings', function() {
                         "rated": '',
                         "ratings": [
                             {
-                                "attribute": 15,
+                                "attribute": 18,
                                 "name": "Enjoyability",
                                 "rating": 3
                             }
