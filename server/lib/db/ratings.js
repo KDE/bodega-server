@@ -214,7 +214,12 @@ module.exports.addAssetRating = function(db, req, res) {
             [req.session.user.id, assetId, pgArray],
             function(err, result) {
                 if (err) {
-                    errors.report('Database', req, res, err);
+                    if (err.code === 'CTR01') {
+                        errors.report('RatingAttributeInvalid', req, res, err);
+                    } else {
+                        errors.report('Database', req, res, err);
+                    }
+
                     return;
                 }
                 res.json(utils.standardJson(req));

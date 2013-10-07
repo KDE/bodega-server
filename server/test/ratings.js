@@ -172,6 +172,7 @@ describe('Ratings', function() {
 
     describe('Add asset ratings', function() {
         it('should fail because the asset is invalid', function(done) {
+            utils.app.config.printErrors = false;
             utils.postUrl('asset/ratings/create/1000', {},
                 function(res) {
                     res.statusCode.should.equal(200);
@@ -180,11 +181,33 @@ describe('Ratings', function() {
                     res.body.should.have.property('success', false);
                     res.body.should.have.property('error');
                     res.body.error.should.have.property('type', 'MissingParameters');
+                    utils.app.config.printErrors = true;
                     done();
                 });
         });
+
+        it('should fail because the rating types do not fit the asset', function(done) {
+            var ratings = { 10: 1, 12: 3, 18: 2 };
+            var query = {
+                ratings: JSON.stringify(ratings)
+            };
+
+            utils.app.config.printErrors = false;
+            utils.postUrl('asset/ratings/create/10', query,
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.have.property('authStatus', true);
+                    res.body.should.have.property('success', false);
+                    res.body.should.have.property('error');
+                    res.body.error.should.have.property('type', 'RatingAttributeInvalid');
+                    utils.app.config.printErrors = true;
+                    done();
+                });
+        });
+
         it('should succeed', function(done) {
-            var ratings = { 12: 1, 13: 2 };
+            var ratings = { 15: 1, 16: 3, 18: 2 };
             var query = {
                 ratings: JSON.stringify(ratings)
             };
