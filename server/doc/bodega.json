@@ -1703,14 +1703,14 @@
         },
         {
             "MethodName": "List tags related to another tag",
-            "Synopsis": "list all tags marked as related to another tag",
+            "Synopsis": "List groups of tags that must or should accompany a given asset type. Returns possible tag optoins, whether multiple tags of the sort are valid or not and whether it is require or not",
             "HTTPMethod": "GET",
-            "URI": "/tag/list/related/:tagId",
+            "URI": "/tag/list/forAssetType/:assetType",
             "parameters": [
                 {
-                    "Name": "tagId",
+                    "Name": "assetType",
                     "Location": "URL",
-                    "Description": "The id of the tag we want to list related tags for",
+                    "Description": "The name of the asset type we want to list related tags for",
                     "Required": "Y",
                     "Type": "number"
                 }
