@@ -97,7 +97,6 @@ function fetchTags(db, req, res, assetInfo, cb)
 function validateTags(db, req, res, assetInfo, cb)
 {
     var keys = Object.keys(assetInfo.tags);
-    var tagIdx = 0;
     var tagCount = keys.length;
     var assetType = null;
     var err, tagType;
@@ -126,13 +125,12 @@ function validateTags(db, req, res, assetInfo, cb)
         return;
     }
 
-    for (tagIdx = 0; tagIdx < requiredTags.length; ++tagIdx) {
-        tagType = requiredTags[tagIdx];
-        if (!tagType.required) {
+    for (tagType in requiredTags) {
+        if (!requiredTags[tagType].required) {
             continue;
         }
 
-        if (!assetHasTag(assetInfo, tagType.type)) {
+        if (!assetHasTag(assetInfo, tagType)) {
             err = errors.create('UploadMissingTag',
                                 "Missing required tag: " + tagType.type);
             cb(err, db, req, res, assetInfo);
