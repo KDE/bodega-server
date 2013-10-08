@@ -1025,6 +1025,10 @@ var PreviewStore = (function() {
                 lastIcon = previews.splitIcons[iconType];
             }
         }
+        //if there is nothing to do, the queue doesn't get execute, just cann the callback
+        if (q.tasks.length === 0) {
+            fn(null);
+        }
     };
 
     function publishIcon(assetInfo, assetPaths, icons, i, cb) {
