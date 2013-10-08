@@ -106,6 +106,10 @@ function findPublishedAssets(db, req, res, assetInfo, assets, cb)
         args.push(assetInfo.partner);
     }
 
+    query += ' limit $2 offset $3';
+    args.push(Math.min(100, utils.parseNumber(req.query.limit)));
+    args.push(utils.parseNumber(req.query.start));
+
     db.query(query, args, function(err, results) {
         if (err) {
             e = errors.create('Database', err.message);
@@ -114,6 +118,7 @@ function findPublishedAssets(db, req, res, assetInfo, assets, cb)
         }
 
         assets = assets.concat(results.rows);
+        JSON.stringify(assets, 0, 2);
         addTagsToAssets(db, req, res, assetInfo, results, assets, true, cb);
     });
 }
