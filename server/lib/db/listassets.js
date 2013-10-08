@@ -101,12 +101,14 @@ function findPublishedAssets(db, req, res, assetInfo, assets, cb)
     var args = [];
     var e;
 
+    var i = 1;
     if (assetInfo.partner > 0) {
-        query += ' and partner = $1';
+        query += ' and partner = $' + i;
         args.push(assetInfo.partner);
+        ++i
     }
 
-    query += ' limit $2 offset $3';
+    query += ' limit $' + i + ' offset $' + (++i);
     //take an arbitrary limit if not specified
     if (req.query.limit) {
         args.push(Math.min(100, utils.parseNumber(req.query.limit)));
