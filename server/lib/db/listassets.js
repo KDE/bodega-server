@@ -107,7 +107,12 @@ function findPublishedAssets(db, req, res, assetInfo, assets, cb)
     }
 
     query += ' limit $2 offset $3';
-    args.push(Math.min(100, utils.parseNumber(req.query.limit)));
+    //take an arbitrary limit if not specified
+    if (req.query.limit) {
+        args.push(Math.min(100, utils.parseNumber(req.query.limit)));
+    } else {
+        args.push(100);
+    }
     args.push(utils.parseNumber(req.query.start));
 
     db.query(query, args, function(err, results) {
