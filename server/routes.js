@@ -589,6 +589,12 @@ app.post(serverPath('partner/request/manage/:requestId'), isAuthorized, isBodega
     }
 );
 
+app.get(serverPath('partner/delete/:partner'), isAuthorized, isBodegaManager,
+    function(req, res) {
+        app.db.deletePartner(req, res);
+    }
+);
+
 /****************************************************
  * get previews of incoming assets
  */

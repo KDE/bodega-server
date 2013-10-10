@@ -878,6 +878,21 @@
             ]
         },
         {
+            "MethodName": "Delete",
+            "Synopsis": "Completely deletes a partner. You need to be member of the Management  Group to be able to use this function. The management group itself cannot be deleted with this.",
+            "HTTPMethod": "POST",
+            "URI": "/partner/update/:partner",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            }
+            ]
+        },
+        {
             "MethodName": "Create web link",
             "Synopsis": "Creates a partner web link. If an account is provided then a service must be defined. A url or an account is required, and a url may also have a service defined for it. See the service types listing in the utils section",
             "HTTPMethod": "POST",

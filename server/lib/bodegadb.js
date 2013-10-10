@@ -359,6 +359,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbPartnersRequests.managePartnerRequest, req, res);
     };
 
+    BodegaDb.prototype.deletePartner = function(req, res) {
+        this.dbQuery(dbPartners.deletePartner, req, res);
+    };
+
     BodegaDb.prototype.participantInfo = function(req, res) {
         this.dbQuery(dbParticipantInfo, req, res);
     };

@@ -769,26 +769,37 @@ describe('Partner management', function() {
             });
         });
 
-        after(function(done) {
-            if (newPartnerId < 1) {
-                return;
-            }
+        describe('Partner deletion, fail', function(done) {
+            it('zack should not be able to delete', function(done) {
+                utils.getUrl('partner/delete/'+newPartnerId,
+                    function(res) {
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.success.should.equal(false);
+                        res.body.error.type.should.equal('Unauthorized');
+                        done();
+                    });
+            });
+         });
 
-            pg.connect(utils.dbConnectionString,
-                       function(err, client, finis) {
-                           client.query("delete from partners where id = $1;", [newPartnerId],
-                                         function(err, result) {
-                                             finis();
-                                             utils.dbSnapshot(null, function(err, res) {
-                                                 var dbSnapshotAfter = res;
-                                                 if (err) {
-                                                     console.log("Couldn't snapshot the db!");
-                                                 }
-                                                 dbSnapshotAfter.should.eql(dbSnapshotBefore);
-                                                 done();
-                                             });
-                                         });
+        utils.auth({
+            user: 'aseigo@kde.org',
+            password: 'aseigo',
+            store: 'null'
+        });
+
+        describe('Partner deletion, success', function(done) {
+            it('deletion should succeed', function(done) {
+                utils.getUrl('partner/delete/'+newPartnerId,
+                    function(res) {
+                        console.log(res.body)
+                        res.statusCode.should.equal(200);
+                        res.headers.should.have.property('content-type');
+                        res.body.success.should.equal(true);
+                        done();
+                    });
             });
         });
+
     });
 });

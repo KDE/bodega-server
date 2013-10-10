@@ -562,3 +562,25 @@ module.exports.requestPublisherStatus = function(db, req, res)
         db, req, res,
         partner, 'Partner Manager', null);
 };
+
+module.exports.deletePartner = function(db, req, res)
+{
+    var partner = utils.parseNumber(req.params.partner);
+
+    if (partner < 1) {
+        cb(errors.create('AccessDenied', 'Cannot delete the partner 0, "Management"'));
+        return;
+    }
+
+    db.query("delete from partners where id = $1",
+        [partner],
+        function(err, result) {
+            if (err) {
+                cb(errors.create('Database', err.message));
+                return;
+            }
+
+            var json = utils.standardJson(req);
+            res.json(json);
+        });
+};
