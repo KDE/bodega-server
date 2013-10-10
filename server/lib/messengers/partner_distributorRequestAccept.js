@@ -27,7 +27,7 @@ module.exports.sendEmail = function(transport, db, record, cb)
     var mailOptions = {
         transport: transport,
         from: app.config.service.email,
-        to: app.config.addresses.partnerRequests,
+        to: record.email,
         subject: "Distributor account upgrade accepted"
     };
 
