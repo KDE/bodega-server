@@ -147,7 +147,7 @@ BEGIN
     SELECT INTO applicationTag id FROM tags
         WHERE title = 'application' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
     SELECT INTO widgetTag id FROM tags
-        WHERE title = 'application' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+        WHERE title = 'widget' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
     SELECT INTO gameTag id FROM tags
         WHERE title = 'game' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
 
