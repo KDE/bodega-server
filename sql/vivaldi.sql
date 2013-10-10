@@ -34,7 +34,7 @@ INSERT INTO stores (id, partner, name, description)
 INSERT INTO tags (type, title) SELECT id, 'application/x-plasma' FROM tagtypes WHERE type = 'mimetype';
 INSERT INTO tags (type, title) SELECT id, 'Vivaldi' FROM tagTypes WHERE type = 'platform';
 INSERT INTO tags (type, title) SELECT id, titles.*
-    FROM tagTypes, 
+    FROM tagTypes,
         (VALUES
             ('Plasma/Applet'),
             ('Plasma/Wallpaper')
@@ -69,7 +69,6 @@ INSERT INTO relatedTags (tag, related)
         WHERE (w.title = 'wallpaper' AND w.type IN (SELECT id FROM tagTypes WHERE type = 'assetType')) AND
               (r.type IN (SELECT id FROM tagTypes WHERE type = 'resolution'));
 
-              
 -- wallpaper channels
 CREATE OR REPLACE FUNCTION vivaldi_generateWallpaperStore() RETURNS VOID AS $$
 DECLARE
@@ -138,31 +137,41 @@ DECLARE
     descTag int;
     applicationChannel int;
     widgetChannel int;
+    gameTag int;
+    appGameChannel int;
     tagRec record;
 BEGIN
+    -- find the various tags: platform, app, widget and games
     SELECT INTO platformTag id FROM tags
         WHERE title = 'Vivaldi' AND type IN (SELECT id FROM tagTypes WHERE type = 'platform');
     SELECT INTO applicationTag id FROM tags
         WHERE title = 'application' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
     SELECT INTO widgetTag id FROM tags
         WHERE title = 'application' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
+    SELECT INTO gameTag id FROM tags
+        WHERE title = 'game' AND type IN (SELECT id FROM tagTypes WHERE type = 'assetType');
 
+    -- create the top level Application and Widgets channels
     INSERT INTO channels (image, name, store)
-        VALUES ('default/application.png', 'Applications', 'VIVALDI-1');
+        VALUES ('default/application.png', 'Apps', 'VIVALDI-1');
     SELECT INTO applicationChannel id FROM channels WHERE store = 'VIVALDI-1' AND
                                                           parent IS NULL AND
-                                                          name = 'Applications';
+                                                          name = 'Apps';
     INSERT INTO channels (image, name, store)
         VALUES ('default/application.png', 'Widgets', 'VIVALDI-1');
     SELECT INTO widgetChannel id FROM channels WHERE store = 'VIVALDI-1' AND
                                                      parent IS NULL AND
                                                      name = 'Widgets';
 
+    -- associate the vivaldi platform tag with the app and widget tags
+    INSERT INTO relatedTags (tag, related) VALUES (applicationTag, platformTag);
+    INSERT INTO relatedTags (tag, related) VALUES (widgetTag, platformTag);
+
+    -- set up the top level application tags
     FOR descTag IN
     INSERT INTO tags (type, title) SELECT id, names.*
         FROM tagTypes,
             (VALUES
-                ('Games'),
                 ('Books & Reference'),
                 ('Business'),
                 ('Comics'),
@@ -189,10 +198,10 @@ BEGIN
         RETURNING id
     LOOP
         INSERT INTO relatedTags (tag, related) VALUES (applicationTag, descTag);
-        INSERT INTO relatedTags (tag, related) VALUES (applicationTag, descTag);
+        INSERT INTO relatedTags (tag, related) VALUES (widgetTag, descTag);
     END LOOP;
 
-
+    -- create channels for the apps and widgets channels based on the tags just created above
     FOR tagRec IN SELECT distinct id, title FROM relatedTags rt JOIN tags t ON (rt.related = t.id)
                         WHERE tag = applicationTag AND
                               t.type IN (SELECT id FROM tagTypes WHERE type = 'descriptive')
@@ -201,13 +210,51 @@ BEGIN
             VALUES (applicationChannel, tagRec.title);
         INSERT INTO channelTags (channel, tag) VALUES
             (currval('seq_channelIds'), tagRec.id),
+            (currval('seq_channelIds'), platformTag),
             (currval('seq_channelIds'), applicationTag);
 
         INSERT INTO channels (parent, name)
             VALUES (widgetChannel, tagRec.title);
         INSERT INTO channelTags (channel, tag) VALUES
             (currval('seq_channelIds'), tagRec.id),
+            (currval('seq_channelIds'), platformTag),
             (currval('seq_channelIds'), widgetTag);
+    END LOOP;
+
+    -- set up the game channel for widgets area
+    INSERT INTO channels (parent, name) VALUES (widgetChannel, 'Games');
+    INSERT INTO tags (type, title) SELECT id, 'Games' FROM tagTypes WHERE type = 'descriptive';
+    INSERT INTO relatedTags (tag, related) VALUES (widgetTag, currval('seq_tagIds'));
+    INSERT INTO channelTags (channel, tag) VALUES
+           (currval('seq_channelIds'), currval('seq_tagIds')),
+           (currval('seq_channelIds'), widgetTag);
+
+    -- set up the game channel for applications area
+    INSERT INTO channels (parent, name) VALUES (applicationChannel, 'Games');
+    appGameChannel = currval('seq_channelIds');
+
+    FOR tagRec IN
+    INSERT INTO tags (type, title) SELECT id, names.*
+        FROM tagTypes,
+            (VALUES
+                ('Arcade & Action'),
+                ('Cards & Casino'),
+                ('Board Games'),
+                ('Puzzle'),
+                ('Racing'),
+                ('Role Playing'),
+                ('Strategy'),
+                ('Sports')
+            ) AS names
+        WHERE type = 'descriptive'
+        RETURNING id, title
+    LOOP
+        INSERT INTO  channels (parent, name)
+            VALUES (appGameChannel, tagRec.title);
+        INSERT INTO channelTags (channel, tag) VALUES
+            (currval('seq_channelIds'), tagRec.id),
+            (currval('seq_channelIds'), platformTag),
+            (currval('seq_channelIds'), gameTag);
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
