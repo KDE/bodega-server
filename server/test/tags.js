@@ -89,6 +89,7 @@ describe('Tags manipulation', function(){
                 res.body.should.have.property('tags');
 
                 res.body.tags.length.should.be.above(10);
+                res.body.totalTags.should.equal(33);
                 done();
             };
             listTags(null, null, null, cb);

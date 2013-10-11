@@ -159,12 +159,24 @@ function listTags(partner, db, req, res) {
 
     var params = [partner];
 
+    var i = 2;
     if (req.params.type !== undefined) {
-        query += " where tagtypes.type = $2";
+        query += " where tagtypes.type = $" + i;
         params.push(req.params.type);
+        ++i;
     }
 
     query += " order by title";
+
+    query += ' limit $' + i + ' offset $' + (++i);
+    //take an arbitrary limit if not specified
+    if (req.query.limit) {
+        params.push(Math.min(100, utils.parseNumber(req.query.limit)));
+    } else {
+        params.push(100);
+    }
+    params.push(utils.parseNumber(req.query.start));
+
     var json = utils.standardJson(req);
 
     var q = db.query(
@@ -180,7 +192,23 @@ function listTags(partner, db, req, res) {
             }
 
             json.tags = result.rows;
-            res.json(json);
+
+            var countQuery = "select count(*) as totalTags from tags join tagtypes on (tagtypes.id = tags.type)";
+            var countParams = [];
+
+            if (req.params.type !== undefined) {
+                countQuery += " where tagtypes.type = $1";
+                countParams.push(req.params.type);
+            }
+            db.query(countQuery, countParams, function(err, countResult) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    return;
+                }
+
+                json.totalTags = utils.parseNumber(countResult.rows[0].totaltags);
+                res.json(json);
+            });
         });
 }
 
