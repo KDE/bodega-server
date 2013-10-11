@@ -133,3 +133,20 @@ DROP TRIGGER IF EXISTS tsvectorupdate_partners ON partners;
 CREATE TRIGGER tsvectorupdate_partners BEFORE INSERT OR UPDATE OF name
 ON partners FOR EACH ROW EXECUTE PROCEDURE ct_partnersIndexTrigger();
 CREATE INDEX partners_idx ON partners USING gin(en_index);
+
+
+-- Search incomingassets
+ALTER TABLE incomingassets ADD COLUMN en_index tsvector;
+-- Trigger to update indices for the full text search
+CREATE FUNCTION ct_incomingassetsIndexTrigger() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.en_index :=
+            setweight(to_tsvector('pg_catalog.english', coalesce(NEW.name,'')), 'A') ||
+            setweight(to_tsvector('pg_catalog.english', coalesce(NEW.description,'')), 'C');
+    return NEW;
+END
+$$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS tsvectorupdate_incomingassets ON incomingassets;
+CREATE TRIGGER tsvectorupdate_incomingassets BEFORE INSERT OR UPDATE OF name 
+ON incomingassets FOR EACH ROW EXECUTE PROCEDURE ct_incomingassetsIndexTrigger();
+CREATE INDEX incomingassets_idx ON incomingassets USING gin(en_index);
