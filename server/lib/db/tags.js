@@ -212,8 +212,68 @@ function listTags(partner, db, req, res) {
         });
 }
 
+function searchTags(partner, db, req, res) {
+
+    var json = utils.standardJson(req);
+
+    if (!req.params.query) {
+        json.tags = [];
+        json.totalTags = 0;
+        res.json(json);
+        return;
+    }
+
+    var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable \
+                 from tags join tagtypes on (tagtypes.id = tags.type)\
+                 where ts_rank_cd(en_index, plainto_tsquery('english', $2)) > 0";
+
+    var params = [partner, req.params.query];
+
+
+
+    query += " order by title";
+
+    query += ' limit $3 offset $4';
+    //take an arbitrary limit if not specified
+    if (req.query.limit) {
+        params.push(Math.min(100, utils.parseNumber(req.query.limit)));
+    } else {
+        params.push(100);
+    }
+    params.push(utils.parseNumber(req.query.start));
+
+    var q = db.query(
+        query, params,
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+
+            json.tags = result.rows;
+
+            var countQuery = "select count(*) as totalTags from tags join tagtypes on (tagtypes.id = tags.type)\
+                 where ts_rank_cd(en_index, plainto_tsquery('english', $1)) > 0";
+            var countParams = [req.params.query];
+
+            db.query(countQuery, countParams, function(err, countResult) {
+                if (err) {
+                    errors.report('Database', req, res, err);
+                    return;
+                }
+
+                json.totalTags = utils.parseNumber(countResult.rows[0].totaltags);
+                res.json(json);
+            });
+        });
+}
+
 module.exports.listTags = function(db, req, res) {
     utils.partnerId(db, req, res, listTags);
+};
+
+module.exports.searchTags = function(db, req, res) {
+    utils.partnerId(db, req, res, searchTags);
 };
 
 function create(partner, db, req, res) {

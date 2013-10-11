@@ -471,6 +471,12 @@ app.get(serverPath('tag/types'), isAuthorized,
     }
 );
 
+app.get(serverPath('tag/search/:query'), isAuthorized,
+    function(req, res) {
+        app.db.searchTags(req, res);
+    }
+);
+
 app.get(serverPath('tag/list/?:type?'), isAuthorized,
     function(req, res) {
         app.db.listTags(req, res);

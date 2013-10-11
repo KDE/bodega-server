@@ -43,6 +43,15 @@ describe('Tags manipulation', function(){
             });
     }
 
+    function searchTags(query, cb) {
+        var query = '/bodega/v1/json/tag/search/'+query;
+
+        utils.getUrl(query,
+            function(res) {
+                cb(res);
+            });
+    }
+
     function createTag(title, type, cb) {
         utils.postUrl('tag/create', {'title': title, 'type': type},
             function(res) {
@@ -127,6 +136,34 @@ describe('Tags manipulation', function(){
                 done();
             };
             listTags(null, 2, null, cb);
+        });
+
+        it('Search for tags containing "everyone"', function(done) {
+            var cb = function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('tags');
+
+                res.body.tags.length.should.equal(2);
+                res.body.totalTags.should.equal(2);
+                done();
+            };
+            searchTags('everyone', cb);
+        });
+
+        it('Search for tags containing "nonexisting" should be none', function(done) {
+            var cb = function(res) {
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
+                res.body.should.have.property('authStatus', true);
+                res.body.should.have.property('tags');
+
+                res.body.tags.length.should.equal(0);
+                res.body.totalTags.should.equal(0);
+                done();
+            };
+            searchTags('nonexisting', cb);
         });
 
         it('List all tags of type contentrating', function(done) {

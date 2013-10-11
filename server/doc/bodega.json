@@ -1732,6 +1732,21 @@
             ]
         },
         {
+            "MethodName": "Search",
+            "Synopsis": "list all tags which name contains the query",
+            "HTTPMethod": "GET",
+            "URI": "/tag/search/:query",
+            "parameters": [
+                {
+                    "Name": "query",
+                    "Location": "URL",
+                    "Description": "The search string",
+                    "Required": "Y",
+                    "Type": "string"
+                }
+            ]
+        },
+        {
             "MethodName": "Create",
             "Synopsis": "Create a new tag",
             "HTTPMethod": "POST",
