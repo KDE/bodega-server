@@ -20,13 +20,14 @@ var errors = require('../errors.js');
 var createUtils = require('./createutils.js');
 var async = require('async');
 
-function sendResponse(err, db, req, res, assetInfo, assets)
+function sendResponse(err, db, req, res, assetInfo, assets, totalAssets)
 {
     if (err) {
         errors.report(err.name, req, res, err);
     } else {
         var json = utils.standardJson(req, true);
         json.assets = assets;
+        json.totalAssets = totalAssets;
         res.send(json);
     }
 }
@@ -51,11 +52,12 @@ function assetTagFetcher(asset, cb)
                     asset.allAssets[i].tags = result.rows;
                 }
             }
+
             cb();
         });
 }
 
-function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb)
+function addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, published, cb)
 {
     var error;
     function errorReporter(err) {
@@ -68,7 +70,7 @@ function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb
         if (error) {
             cb(error);
         } else {
-            cb(null, db, req, res, assetInfo, assets);
+            cb(null, db, req, res, assetInfo, assets, totalAssets);
         }
     };
 
@@ -91,11 +93,37 @@ function addTagsToAssets(db, req, res, assetInfo, results, assets, published, cb
     if (tasks.length > 0) {
         queue.push(tasks, errorReporter);
     } else {
-        cb(null, db, req, res, assetInfo, assets);
+        cb(null, db, req, res, assetInfo, assets, totalAssets);
     }
 }
 
-function findPublishedAssets(db, req, res, assetInfo, assets, cb)
+function countPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
+{
+    var query = 'select count(*) as totalAssets, \'published\' as status from assets where active';
+    var args = [];
+    var e;
+
+    var i = 1;
+    if (assetInfo.partner > 0) {
+        query += ' and partner = $' + i;
+        args.push(assetInfo.partner);
+        ++i
+    }
+
+    db.query(query, args, function(err, results) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo, assets, totalAssets);
+            return;
+        }
+
+        totalAssets += utils.parseNumber(results.rows[0].totalassets);
+
+        cb(null, db, req, res, assetInfo, assets, totalAssets);
+    });
+}
+
+function findPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
 {
     var query = 'select *, \'published\' as status from assets where active';
     var args = [];
@@ -120,19 +148,19 @@ function findPublishedAssets(db, req, res, assetInfo, assets, cb)
     db.query(query, args, function(err, results) {
         if (err) {
             e = errors.create('Database', err.message);
-            cb(e, db, req, res, assetInfo, assets);
+            cb(e, db, req, res, assetInfo, assets, totalAssets);
             return;
         }
 
         assets = assets.concat(results.rows);
         JSON.stringify(assets, 0, 2);
-        addTagsToAssets(db, req, res, assetInfo, results, assets, true, cb);
+        addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, true, cb);
     });
 }
 
-function findIncomingAssets(db, req, res, assetInfo, assets, cb)
+function countIncomingAssets(db, req, res, assetInfo, assets, totalAssets, cb)
 {
-    var query = 'select *, (case when posted = true then \'posted\' else \'incoming\' end) status from incomingAssets';
+    var query = 'select count(*) as totalAssets from incomingAssets';
     var args = [];
     var e;
 
@@ -144,19 +172,54 @@ function findIncomingAssets(db, req, res, assetInfo, assets, cb)
     db.query(query, args, function(err, results) {
         if (err) {
             e = errors.create('Database', err.message);
-            cb(e, db, req, res, assetInfo, assets);
+            cb(e, db, req, res, assetInfo, assets, totalAssets);
+            return;
+        }
+
+        totalAssets += utils.parseNumber(results.rows[0].totalassets);
+
+        cb(null, db, req, res, assetInfo, assets, totalAssets);
+    });
+}
+
+function findIncomingAssets(db, req, res, assetInfo, assets, totalAssets, cb)
+{
+    var query = 'select *, (case when posted = true then \'posted\' else \'incoming\' end) status from incomingAssets';
+    var args = [];
+    var e;
+
+    var i = 1;
+    if (assetInfo.partner > 0) {
+        query += ' where partner = $' + i;
+        args.push(assetInfo.partner);
+        ++i
+    }
+
+    query += ' limit $' + i + ' offset $' + (++i);
+    //take an arbitrary limit if not specified
+    if (req.query.limit) {
+        args.push(Math.min(100, utils.parseNumber(req.query.limit)));
+    } else {
+        args.push(100);
+    }
+    args.push(utils.parseNumber(req.query.start));
+
+    db.query(query, args, function(err, results) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo, assets, totalAssets);
             return;
         }
 
         assets = assets.concat(results.rows);
         JSON.stringify(assets, 0, 2);
-        addTagsToAssets(db, req, res, assetInfo, results, assets, false, cb);
+        addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, false, cb);
     });
 }
 
-function findPostedAssets(db, req, res, assetInfo, assets, cb)
+function countPostedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
 {
-    var query = 'select *, \'posted\' as status from incomingAssets where posted';
+    var query = 'select count(*) as totalAssets from incomingAssets where posted';
     var args = [];
     var e;
 
@@ -168,16 +231,52 @@ function findPostedAssets(db, req, res, assetInfo, assets, cb)
     db.query(query, args, function(err, results) {
         if (err) {
             e = errors.create('Database', err.message);
-            cb(e, db, req, res, assetInfo, assets);
+            cb(e, db, req, res, assetInfo, assets, totalAssets);
+            return;
+        }
+
+        totalAssets += utils.parseNumber(results.rows[0].totalassets);
+
+        cb(null, db, req, res, assetInfo, assets, totalAssets);
+    });
+}
+
+function findPostedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
+{
+    var query = 'select *, \'posted\' as status from incomingAssets where posted';
+    var args = [];
+    var e;
+
+    var i = 1;
+    if (assetInfo.partner > 0) {
+        query += ' and partner = $' + i;
+        args.push(assetInfo.partner);
+        ++i
+    }
+
+    query += ' limit $' + i + ' offset $' + (++i);
+    //take an arbitrary limit if not specified
+    if (req.query.limit) {
+        args.push(Math.min(100, utils.parseNumber(req.query.limit)));
+    } else {
+        args.push(100);
+    }
+    args.push(utils.parseNumber(req.query.start));
+
+
+    db.query(query, args, function(err, results) {
+        if (err) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo, assets, totalAssets);
             return;
         }
         assets = assets.concat(results.rows);
-        addTagsToAssets(db, req, res, assetInfo, results, assets, false, cb);
+        addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, false, cb);
     });
 }
 
 
-function checkIfIsValidator(db, req, res, assetInfo, assets, cb)
+function checkIfIsValidator(db, req, res, assetInfo, assets, totalAssets, cb)
 {
     createUtils.isValidator(
         db, req, res, assetInfo,
@@ -185,24 +284,24 @@ function checkIfIsValidator(db, req, res, assetInfo, assets, cb)
             var e;
             if (err) {
                 e = errors.create('PartnerRoleMissing', err.message);
-                cb(e, db, req, res, assetInfo, assets);
+                cb(e, db, req, res, assetInfo, assets, totalAssets);
                 return;
             }
-            cb(null, db, req, res, assetInfo, assets);
+            cb(null, db, req, res, assetInfo, assets, totalAssets);
         });
 }
 
-function checkPartnerRole(db, req, res, assetInfo, assets, cb)
+function checkPartnerRole(db, req, res, assetInfo, assets, totalAssets, cb)
 {
     createUtils.isContentCreator(
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             var e;
             if (err) {
-                checkIfIsValidator(db, req, res, assetInfo, assets, cb);
+                checkIfIsValidator(db, req, res, assetInfo, assets, totalAssets, cb);
                 return;
             }
-            cb(null, db, req, res, assetInfo, assets);
+            cb(null, db, req, res, assetInfo, assets, totalAssets);
         });
 }
 
@@ -210,6 +309,7 @@ module.exports = function(db, req, res) {
     var assetInfo = {};
     var funcs = [];
     var assets = [];
+    var totalAssets = 0;
 
     if (req.params.type &&
         req.params.type !== 'published' &&
@@ -221,7 +321,7 @@ module.exports = function(db, req, res) {
     }
 
     funcs.push(function (callback) {
-        callback(null, db, req, res, assetInfo, assets);
+        callback(null, db, req, res, assetInfo, assets, totalAssets);
     });
 
     assetInfo.partner = utils.parseNumber(req.params.partnerId);
@@ -229,20 +329,25 @@ module.exports = function(db, req, res) {
 
     switch (req.params.type) {
     case 'all':
+        funcs.push(countPublishedAssets);
         funcs.push(findPublishedAssets);
+        funcs.push(countIncomingAssets);
         funcs.push(findIncomingAssets);
         break;
     case 'incoming':
         funcs.push(findIncomingAssets);
         break;
     case 'published':
+        funcs.push(countPublishedAssets);
         funcs.push(findPublishedAssets);
         break;
     case 'posted':
+        funcs.push(countPostedAssets);
         funcs.push(findPostedAssets);
         break;
     default:
         /* By default show only published assets */
+        funcs.push(countPublishedAssets);
         funcs.push(findPublishedAssets);
         break;
     }
