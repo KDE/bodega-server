@@ -65,3 +65,45 @@ module.exports.mandatoryTags = {
         descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
     },
 };
+
+module.exports.imageTypes = {
+    cover: {
+        sizes: {
+            min : { w : 500, h : 500 },
+            max : { w : 2560, h : 2560}
+        }
+    },
+    screenshot: {
+        sizes: {
+            min : { w : 500, h : 500 },
+            max : { w : 2560, h : 2560}
+        }
+    }
+};
+
+module.exports.images = {
+    book : [{
+            type: 'cover',
+            name: "Front cover",
+            multi: false,
+            props: module.exports.imageTypes['cover']
+        }, {
+            type: 'cover',
+            name: "Back cover",
+            multi: false,
+            props: module.exports.imageTypes['cover']
+        }
+    ],
+    application : [{
+            type: 'screenshot',
+            name: "Screenshot 1",
+            multi: false,
+            props: module.exports.imageTypes['screenshot']
+        }, {
+            type: 'screenshot',
+            name: "Screenshot 2",
+            multi: false,
+            props: module.exports.imageTypes['screenshot']
+        }
+    ]
+}

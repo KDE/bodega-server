@@ -18,6 +18,7 @@
 var utils = require('./lib/utils.js');
 var errors = require('./lib/errors.js');
 var roles = require('./lib/roles.js');
+var assetRules = require('./assetRules.js');
 
 var markdown = require("marked");
 var fs = require('fs');
@@ -617,6 +618,13 @@ app.get(serverPath('incomingassetpreview/:assetId/:imagePath'), isAuthorized,
     }
 );
 
+app.get(serverPath('images/forAssetType/:assetType'), isAuthorized,
+    function(req, res) {
+        var json = utils.standardJson(req);
+        json.images = assetRules.images[req.params.assetType];
+        res.json(json);
+    }
+);
 
 /******************************************************
  * Store and warehouse contact listing
