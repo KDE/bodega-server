@@ -161,6 +161,7 @@ describe('Asset manipulation', function(){
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(25);
+                    res.body.totalAssets.should.equal(25);
                     done();
                 });
         });
@@ -171,6 +172,7 @@ describe('Asset manipulation', function(){
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(25);
+                    res.body.totalAssets.should.equal(25);
                     done();
                 });
         });
@@ -181,6 +183,7 @@ describe('Asset manipulation', function(){
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(2);
+                    res.body.totalAssets.should.equal(2);
                     done();
                 });
         });
@@ -191,6 +194,7 @@ describe('Asset manipulation', function(){
                     res.body.should.not.have.property('error');
                     res.body.should.have.property('assets');
                     res.body.assets.length.should.be.equal(27);
+                    res.body.totalAssets.should.equal(27);
                     done();
                 });
         });

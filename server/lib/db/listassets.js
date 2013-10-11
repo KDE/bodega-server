@@ -335,6 +335,7 @@ module.exports = function(db, req, res) {
         funcs.push(findIncomingAssets);
         break;
     case 'incoming':
+        funcs.push(countIncomingAssets);
         funcs.push(findIncomingAssets);
         break;
     case 'published':
