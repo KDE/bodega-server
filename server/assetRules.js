@@ -84,11 +84,13 @@ module.exports.imageTypes = {
 module.exports.images = {
     book : [{
             type: 'cover',
+            subtype: 'front',
             name: "Front cover",
             multi: false,
             props: module.exports.imageTypes['cover']
         }, {
             type: 'cover',
+            subtype: 'back',
             name: "Back cover",
             multi: false,
             props: module.exports.imageTypes['cover']
@@ -96,11 +98,13 @@ module.exports.images = {
     ],
     application : [{
             type: 'screenshot',
+            subtype: 'screen1',
             name: "Screenshot 1",
             multi: false,
             props: module.exports.imageTypes['screenshot']
         }, {
             type: 'screenshot',
+            subtype: 'screen2',
             name: "Screenshot 2",
             multi: false,
             props: module.exports.imageTypes['screenshot']
