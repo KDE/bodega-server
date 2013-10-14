@@ -66,7 +66,7 @@ module.exports.mandatoryTags = {
     },
 };
 
-module.exports.imageTypes = {
+var imageTypes = {
     cover: {
         sizes: {
             min : { w : 500, h : 500 },
@@ -78,36 +78,175 @@ module.exports.imageTypes = {
             min : { w : 500, h : 500 },
             max : { w : 2560, h : 2560}
         }
+    },
+    icon: {
+        huge: {
+            sizes: {
+                min : { w : 512, h : 512 },
+                max : { w : 512, h : 512}
+            }
+        },
+        large: {
+            sizes: {
+                min : { w : 256, h : 256 },
+                max : { w : 256, h : 256}
+            }
+        },
+        big: {
+            sizes: {
+                min : { w : 128, h : 128 },
+                max : { w : 128, h : 128}
+            }
+        },
+        medium: {
+            sizes: {
+                min : { w : 64, h : 64 },
+                max : { w : 64, h : 64}
+            }
+        },
+        small: {
+            sizes: {
+                min : { w : 32, h : 32 },
+                max : { w : 32, h : 32}
+            }
+        },
+        tiny: {
+            sizes: {
+                min : { w : 22, h : 22 },
+                max : { w : 22, h : 22}
+            }
+        }
     }
 };
 
+var icons = [{
+        type: 'icon',
+        subtype: 'huge',
+        name: "Icon (huge)",
+        multi: false,
+        props: imageTypes.icon.huge
+    }, {
+        type: 'icon',
+        subtype: 'large',
+        name: "Icon (large)",
+        multi: false,
+        props: imageTypes.icon.large
+    }, {
+        type: 'icon',
+        subtype: 'big',
+        name: "Icon (big)",
+        multi: false,
+        props: imageTypes.icon.big
+    }, {
+        type: 'icon',
+        subtype: 'medium',
+        name: "Icon (medium)",
+        multi: false,
+        props: imageTypes.icon.medium
+    }, {
+        type: 'icon',
+        subtype: 'small',
+        name: "Icon (small)",
+        multi: false,
+        props: imageTypes.icon.small
+    }, {
+        type: 'icon',
+        subtype: 'tiny',
+        name: "Icon (tiny)",
+        multi: false,
+        props: imageTypes.icon.tiny
+    }
+];
+
 module.exports.images = {
-    book : [{
-            type: 'cover',
-            subtype: 'front',
-            name: "Front cover",
-            multi: false,
-            props: module.exports.imageTypes['cover']
-        }, {
-            type: 'cover',
-            subtype: 'back',
-            name: "Back cover",
-            multi: false,
-            props: module.exports.imageTypes['cover']
-        }
-    ],
     application : [{
             type: 'screenshot',
             subtype: 'screen1',
             name: "Screenshot 1",
             multi: false,
-            props: module.exports.imageTypes['screenshot']
+            props: imageTypes['screenshot']
         }, {
             type: 'screenshot',
             subtype: 'screen2',
             name: "Screenshot 2",
             multi: false,
-            props: module.exports.imageTypes['screenshot']
+            props: imageTypes['screenshot']
+        }
+    ].concat(icons),
+    article: icons,
+    audio: icons,
+    audiobook: [{
+            type: 'cover',
+            subtype: 'front',
+            name: "Front cover",
+            multi: false,
+            props: imageTypes['cover']
+        }, {
+            type: 'cover',
+            subtype: 'back',
+            name: "Back cover",
+            multi: false,
+            props: imageTypes['cover']
+        }
+    ].concat(icons),
+    book : [{
+            type: 'cover',
+            subtype: 'front',
+            name: "Front cover",
+            multi: false,
+            props: imageTypes['cover']
+        }, {
+            type: 'cover',
+            subtype: 'back',
+            name: "Back cover",
+            multi: false,
+            props: imageTypes['cover']
+        }
+    ].concat(icons),
+    game : [{
+            type: 'screenshot',
+            subtype: 'screen1',
+            name: "Screenshot 1",
+            multi: false,
+            props: imageTypes['screenshot']
+        }, {
+            type: 'screenshot',
+            subtype: 'screen2',
+            name: "Screenshot 2",
+            multi: false,
+            props: imageTypes['screenshot']
+        }
+    ].concat(icons),
+    magazine : [{
+            type: 'cover',
+            subtype: 'front',
+            name: "Cover",
+            multi: false,
+            props: imageTypes['cover']
+        }
+    ].concat(icons),
+    movie : [{
+            type: 'cover',
+            subtype: 'front',
+            name: "Cover",
+            multi: false,
+            props: imageTypes['cover']
+        }
+    ].concat(icons),
+    tvshow : [{
+            type: 'cover',
+            subtype: 'front',
+            name: "Cover",
+            multi: false,
+            props: imageTypes['cover']
+        }
+    ].concat(icons),
+    wallpaper : [{
+            type: 'screenshot',
+            subtype: 'screen1',
+            name: "Screenshot",
+            multi: false,
+            props: imageTypes['screenshot']
         }
     ]
 }
