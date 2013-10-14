@@ -20,7 +20,8 @@ module.exports.mandatoryTags = {
     application: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
-        descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
+        descriptive: { name: "Category", type: "descriptive", multi: true, required: false },
+        platform: { name: "Platform", type: "platform", multi: true, required: false }
     },
     widget: {
         author: { name: "Author", type: "author", multi: true, required: true },
@@ -30,7 +31,8 @@ module.exports.mandatoryTags = {
     game: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
-        descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
+        descriptive: { name: "Category", type: "descriptive", multi: true, required: false },
+        platform: { name: "Platform", type: "platform", multi: true, required: false }
     },
     article: {
         author: { name: "Author", type: "author", multi: true, required: true },
