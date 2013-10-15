@@ -44,9 +44,9 @@ describe('Tags manipulation', function(){
     }
 
     function searchTags(query, cb) {
-        var query = '/bodega/v1/json/tag/search/'+query;
+        var path = '/bodega/v1/json/tag/search/' + query;
 
-        utils.getUrl(query,
+        utils.getUrl(path,
             function(res) {
                 cb(res);
             });
