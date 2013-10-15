@@ -99,7 +99,7 @@ function validateTags(db, req, res, assetInfo, cb)
     var keys = Object.keys(assetInfo.tags);
     var tagCount = keys.length;
     var assetType = null;
-    var err, tagType;
+    var err, tagType, tagIdx;
 
     for (tagIdx = 0; tagIdx < tagCount; ++tagIdx) {
         var tagInfo = assetInfo.tags[tagIdx];
