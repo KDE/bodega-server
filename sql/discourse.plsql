@@ -24,39 +24,64 @@ create table discourseLinks
 
 CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
-    trust_level INT;
+    trust_level INT := 1;
+    dupe_count INT := 0;
     currentTime TIMESTAMP;
+    baseusername TEXT;
     username TEXT;
-
-    updateFullname TEXT;
-    updateUsername TEXT;
+    fullname TEXT;
+ 
     updateEmail TEXT;
     updatePassword TEXT;
-    updateUsernameLower TEXT;
+    usernameLower TEXT;
 BEGIN
     -- NOTE: the ''' are 3 single quotes
     currentTime := current_timestamp AT TIME ZONE 'UTC';
 
     PERFORM dblink_connect(ct_setting('discourseConnectString'));
+    
+    IF TG_OP = 'UPDATE' AND NEW.fullname IS NULL THEN
+        fullname := OLD.fullname;
+    ELSE
+        fullname := NEW.fullname;
+    END IF;
+    fullname := NEW.fullname;
 
+    baseusername := regexp_replace(lower(fullname), '[^a-z0-9]', '_', 'g');
+    -- the user name needs to be lower and 20 chars or less
+    baseusername := lower(substring(baseusername, 1, 20));
+    username := baseusername;
+    
+    -- ensure we don't already have this user name
+    LOOP
+        PERFORM * FROM dblink('SELECT username FROM users WHERE username = ''' || username || '''') as t(username text);
+    
+        IF NOT FOUND THEN
+            EXIT;
+        END IF;
+
+        dupe_count := dupe_count + 1;
+        
+        -- some safety here
+        IF dupe_count > 1000 THEN
+            EXIT;
+        END IF;
+        
+        username := substring(baseusername, 1, 19 - char_length(dupe_count::text))
+                    || '_' || dupe_count;
+    END LOOP;
+
+    -- 's are special chars, so escape them in the one place they can exist
+    fullname := replace(fullname, '''', '''''');
+    
     IF (TG_OP = 'INSERT') THEN
-        username := lower(NEW.fullname);
-        username := regexp_replace(username, '[^a-z0-9]', '_', 'g');
-        trust_level := 1;
-
         PERFORM dblink_exec('INSERT INTO users (name, username, email, password_hash,
                             created_at, updated_at, username_lower, trust_level)
-                            VALUES ('''||NEW.fullname||''', '''||username||''',
+                            VALUES ('''||fullname||''', '''||username||''',
                             '''||NEW.email||''', '''||NEW.password||''',
                             '''||currentTime||''', '''||currentTime||''',
                             '''||username||''', '''||trust_level||''');' );
     ELSIF (TG_OP = 'UPDATE') THEN
-        IF NEW.fullname IS NULL THEN
-            updateFullname := OLD.fullname;
-        ELSE
-            updateFullname := NEW.fullname;
-        END IF;
-
         IF NEW.email IS NULL THEN
             updateEmail := OLD.email;
         ELSE
@@ -70,17 +95,12 @@ BEGIN
         END IF;
 
 
-        -- TODO? when the user changes his email his username in discourse
-        -- will also change, since its comes for his email. Is this a real issue?
-        updateUsername := split_part(updateEmail, '@', 1);
-        updateUsernameLower := lower(updateUsername);
-
-        PERFORM dblink_exec('UPDATE users SET name = '''||updateFullname||''',
-                             username = '''||updateUsername||''',
+        PERFORM dblink_exec('UPDATE users SET name = '''||fullname||''',
+                             username = '''||username||''',
                              email = '''||updateEmail||''',
                              password_hash = '''||updatePassword||''',
                              updated_at = '''||currentTime||''',
-                             username_lower = '''||updateUsernameLower||'''
+                             username_lower = '''||username||'''
                              WHERE email = '''||OLD.email||''';');
     END IF;
 
