@@ -43,7 +43,7 @@ var Janitor = (function() {
             }
 
             if (config.host && config.host !== '') {
-                connectString += " hostaddr=" + config.host;
+                connectString += " host=" + config.host;
             }
 
             app.db.dbQuery(function(client) {
