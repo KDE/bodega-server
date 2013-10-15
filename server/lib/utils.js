@@ -133,7 +133,7 @@ module.exports.authStore = function(req)
 module.exports.requireRole = function(db, req, res, partner, role, data, cb)
 {
     var roleQuery = 'select a.partner from affiliations a \
-        left join personRoles r on (a.role = r.id and r.description = $1) \
+        join personRoles r on (a.role = r.id and r.description = $1) \
         where a.partner = $2 and a.person = $3';
     var args = [role, partner, req.session.user.id];
 
