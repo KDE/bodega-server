@@ -792,7 +792,7 @@ describe('Partner management', function() {
             it('deletion should succeed', function(done) {
                 utils.getUrl('partner/delete/'+newPartnerId,
                     function(res) {
-                        console.log(res.body)
+                        //console.log(res.body);
                         res.statusCode.should.equal(200);
                         res.headers.should.have.property('content-type');
                         res.body.success.should.equal(true);
