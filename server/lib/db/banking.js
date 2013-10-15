@@ -47,8 +47,15 @@ module.exports.setTransferAccount = function(db, req, res)
                               return;
                           }
 
-                          db.query("delete from partnerBanking where partner = $1 and type = 'destination'",
-                                   [ partner ],
+                          var type;
+                          if (req.body.type) {
+                              type = req.body.type;
+                          } else {
+                              type = 'destination';
+                          }
+
+                          db.query("delete from partnerBanking where partner = $1 and type = $2",
+                                   [ partner, type ],
                                    function(err) {
                                        if (err) {
                                            errors.report('Database', req, res, err);
@@ -58,8 +65,8 @@ module.exports.setTransferAccount = function(db, req, res)
                                        db.query("insert into partnerBanking \
                                                  (partner, type, name, address, bank, bankAddress, \
                                                   account, swift, iban) \
-                                                 VALUES ($1, 'destination', $2, $3, $4, $5, $6, $7, $8)",
-                                                [ partner, req.body.nameOnAccount, req.body.address,
+                                                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                                                [ partner, type, req.body.nameOnAccount, req.body.address,
                                                   req.body.bank, req.body.bankAddress, req.body.account,
                                                   req.body.swift, req.body.iban ],
                                                  function(err) {
@@ -82,6 +89,13 @@ module.exports.deleteAccount = function(db, req, res)
         return;
     }
 
+    var type;
+    if (req.query.type) {
+        type = req.query.type;
+    } else {
+        type = 'destination';
+    }
+
     utils.requireRole(db, req, res, partner, 'Account Manager', {},
                       function(err, db, req, res, partner, data) {
                           if (err) {
@@ -89,8 +103,8 @@ module.exports.deleteAccount = function(db, req, res)
                               return;
                           }
 
-                          db.query("delete from partnerBanking where partner = $1 and type = 'destination'",
-                                   [ partner ],
+                          db.query("delete from partnerBanking where partner = $1 and type = $2",
+                                   [ partner, type ],
                                    function(err) {
                                        if (err) {
                                            errors.report('Database', req, res, err);
