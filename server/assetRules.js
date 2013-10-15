@@ -166,13 +166,13 @@ module.exports.images = {
             subtype: 'screen1',
             name: "Screenshot 1",
             multi: false,
-            props: imageTypes['screenshot']
+            props: imageTypes.screenshot
         }, {
             type: 'screenshot',
             subtype: 'screen2',
             name: "Screenshot 2",
             multi: false,
-            props: imageTypes['screenshot']
+            props: imageTypes.screenshot
         }
     ].concat(icons),
     article: icons,
@@ -182,13 +182,13 @@ module.exports.images = {
             subtype: 'front',
             name: "Front cover",
             multi: false,
-            props: imageTypes['cover']
+            props: imageTypes.cover
         }, {
             type: 'cover',
             subtype: 'back',
             name: "Back cover",
             multi: false,
-            props: imageTypes['cover']
+            props: imageTypes.cover
         }
     ].concat(icons),
     book : [{
@@ -196,13 +196,13 @@ module.exports.images = {
             subtype: 'front',
             name: "Front cover",
             multi: false,
-            props: imageTypes['cover']
+            props: imageTypes.cover
         }, {
             type: 'cover',
             subtype: 'back',
             name: "Back cover",
             multi: false,
-            props: imageTypes['cover']
+            props: imageTypes.cover
         }
     ].concat(icons),
     game : [{
@@ -210,13 +210,13 @@ module.exports.images = {
             subtype: 'screen1',
             name: "Screenshot 1",
             multi: false,
-            props: imageTypes['screenshot']
+            props: imageTypes.screenshot
         }, {
             type: 'screenshot',
             subtype: 'screen2',
             name: "Screenshot 2",
             multi: false,
-            props: imageTypes['screenshot']
+            props: imageTypes.screenshot
         }
     ].concat(icons),
     magazine : [{
@@ -224,7 +224,7 @@ module.exports.images = {
             subtype: 'front',
             name: "Cover",
             multi: false,
-            props: imageTypes['cover']
+            props: imageTypes.cover
         }
     ].concat(icons),
     movie : [{
@@ -232,7 +232,7 @@ module.exports.images = {
             subtype: 'front',
             name: "Cover",
             multi: false,
-            props: imageTypes['cover']
+            props: imageTypes.cover
         }
     ].concat(icons),
     tvshow : [{
@@ -240,7 +240,7 @@ module.exports.images = {
             subtype: 'front',
             name: "Cover",
             multi: false,
-            props: imageTypes['cover']
+            props: imageTypes.cover
         }
     ].concat(icons),
     wallpaper : [{
@@ -248,7 +248,7 @@ module.exports.images = {
             subtype: 'screen1',
             name: "Screenshot",
             multi: false,
-            props: imageTypes['screenshot']
+            props: imageTypes.screenshot
         }
     ]
-}
+};
