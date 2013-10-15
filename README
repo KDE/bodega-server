@@ -19,7 +19,7 @@ be followed in the order presented.
 ## Configuration
 
 Copy the config.json.sample file to config.json and customize the values within it. The configuration
-keys should be self-explanatory, and if you do not use a given service (e.g. S3 or Stripe) you can
+keys should be self-explanatory, and if you do not use a given service (e.g. Stripe) you can
 safely ignore those blocks completely.
 
 Most (often, all) of the default settings should work.
