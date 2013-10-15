@@ -46,9 +46,16 @@ BEGIN
     baseusername := lower(substring(baseusername, 1, 20));
     username := baseusername;
 
+    -- figure out which email to use for the user name collision detection to follow
+    IF TG_OP = 'INSERT' THEN
+        updateEmail := NEW.email;
+    ELSE
+        updateEmail := OLD.email;
+    END IF;
+
     -- ensure we don't already have this user name
     LOOP
-        PERFORM * FROM dblink('SELECT username FROM users WHERE username = ''' || username || '''') as t(username text);
+        PERFORM * FROM dblink('SELECT username FROM users WHERE username = ''' || username || ''' AND email !=  ''' || updateEmail || '''') as t(username text);
         IF NOT FOUND THEN
             EXIT;
         END IF;
