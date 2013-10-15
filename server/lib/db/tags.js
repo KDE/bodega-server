@@ -58,7 +58,7 @@ module.exports.listRelatedTags = function(db, req, res) {
                       }
 
                       if (!json.tags.hasOwnProperty(row.type)) {
-                          json.tags[row.type] = { mandatory: false, multi: true, name: row.type }
+                          json.tags[row.type] = { mandatory: false, multi: true, name: row.type };
                       }
 
                       if (!Array.isArray(json.tags[row.type].tags)) {
