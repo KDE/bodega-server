@@ -25,6 +25,7 @@ var sql_commands =
     'payments_stripe.sql',
     'maintenance.plsql',
     'defaultdata.sql',
+    'discourse.sql',
     'discourse.plsql',
     'settings.plsql'
 ];

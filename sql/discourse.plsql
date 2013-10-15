@@ -16,12 +16,6 @@
 */
 
 
-create table discourseLinks
-(
-    assetId         int    not null references assets(id) on delete cascade,
-    categoryName    text   not null
-);
-
 CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
     trust_level INT := 1;
@@ -30,7 +24,7 @@ DECLARE
     baseusername TEXT;
     username TEXT;
     fullname TEXT;
- 
+
     updateEmail TEXT;
     updatePassword TEXT;
     usernameLower TEXT;
@@ -39,7 +33,7 @@ BEGIN
     currentTime := current_timestamp AT TIME ZONE 'UTC';
 
     PERFORM dblink_connect(ct_setting('discourseConnectString'));
-    
+
     IF TG_OP = 'UPDATE' AND NEW.fullname IS NULL THEN
         fullname := OLD.fullname;
     ELSE
@@ -51,29 +45,28 @@ BEGIN
     -- the user name needs to be lower and 20 chars or less
     baseusername := lower(substring(baseusername, 1, 20));
     username := baseusername;
-    
+
     -- ensure we don't already have this user name
     LOOP
         PERFORM * FROM dblink('SELECT username FROM users WHERE username = ''' || username || '''') as t(username text);
-    
         IF NOT FOUND THEN
             EXIT;
         END IF;
 
         dupe_count := dupe_count + 1;
-        
+
         -- some safety here
         IF dupe_count > 1000 THEN
             EXIT;
         END IF;
-        
+
         username := substring(baseusername, 1, 19 - char_length(dupe_count::text))
                     || '_' || dupe_count;
     END LOOP;
 
     -- 's are special chars, so escape them in the one place they can exist
     fullname := replace(fullname, '''', '''''');
-    
+
     IF (TG_OP = 'INSERT') THEN
         PERFORM dblink_exec('INSERT INTO users (name, username, email, password_hash,
                             created_at, updated_at, username_lower, trust_level)
