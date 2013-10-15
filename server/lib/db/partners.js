@@ -566,9 +566,11 @@ module.exports.requestPublisherStatus = function(db, req, res)
 module.exports.deletePartner = function(db, req, res)
 {
     var partner = utils.parseNumber(req.params.partner);
+    var e;
 
     if (partner < 1) {
-        cb(errors.create('AccessDenied', 'Cannot delete the partner 0, "Management"'));
+        e = errors.create('AccessDenied', 'Cannot delete the partner 0, "Management"');
+        errors.report(e.name, req, res, e);
         return;
     }
 
@@ -576,7 +578,8 @@ module.exports.deletePartner = function(db, req, res)
         [partner],
         function(err, result) {
             if (err) {
-                cb(errors.create('Database', err.message));
+                e = errors.create('Database', err.message);
+                errors.report(e.name, req, res, e);
                 return;
             }
 
