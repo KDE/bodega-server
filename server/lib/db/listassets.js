@@ -109,7 +109,7 @@ function searchPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     if (assetInfo.partner > 0) {
         query += ' and partner = $' + i;
         args.push(assetInfo.partner);
-        ++i
+        ++i;
     }
 
     query += ' limit $' + i + ' offset $' + (++i);
@@ -128,7 +128,6 @@ function searchPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
             return;
         }
 
-        
         assets = assets.concat(results.rows);
 
         var countQuery = 'select count(*) as totalAssets, \'published\' as status from assets where active\
@@ -166,7 +165,7 @@ function searchIncomingAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     if (assetInfo.partner > 0) {
         query += ' and partner = $' + i;
         args.push(assetInfo.partner);
-        ++i
+            ++i;
     }
 
     query += ' limit $' + i + ' offset $' + (++i);
@@ -222,7 +221,7 @@ function searchPostedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     if (assetInfo.partner > 0) {
         query += ' and partner = $' + i;
         args.push(assetInfo.partner);
-        ++i
+        ++i;
     }
 
     query += ' limit $' + i + ' offset $' + (++i);
@@ -241,7 +240,6 @@ function searchPostedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
             return;
         }
 
-        
         assets = assets.concat(results.rows);
 
         var countQuery = 'select count(*) as totalAssets from incomingAssets\
@@ -261,7 +259,6 @@ function searchPostedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
             }
 
             totalAssets += utils.parseNumber(results.rows[0].totalassets);
-
             addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, true, cb);
         });
     });
@@ -287,7 +284,6 @@ function countPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
         }
 
         totalAssets += utils.parseNumber(results.rows[0].totalassets);
-
         cb(null, db, req, res, assetInfo, assets, totalAssets);
     });
 }
@@ -302,7 +298,7 @@ function findPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     if (assetInfo.partner > 0) {
         query += ' and partner = $' + i;
         args.push(assetInfo.partner);
-        ++i
+        ++i;
     }
 
     query += ' limit $' + i + ' offset $' + (++i);
@@ -322,7 +318,6 @@ function findPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
         }
 
         assets = assets.concat(results.rows);
-        
         addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, true, cb);
     });
 }
@@ -361,7 +356,7 @@ function findIncomingAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     if (assetInfo.partner > 0) {
         query += ' where partner = $' + i;
         args.push(assetInfo.partner);
-        ++i
+        ++i;
     }
 
     query += ' limit $' + i + ' offset $' + (++i);
@@ -420,7 +415,7 @@ function findPostedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     if (assetInfo.partner > 0) {
         query += ' and partner = $' + i;
         args.push(assetInfo.partner);
-        ++i
+        ++i;
     }
 
     query += ' limit $' + i + ' offset $' + (++i);
