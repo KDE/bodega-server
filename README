@@ -73,9 +73,12 @@ User feedback and discussion is provided using the Discourse server, which can b
     http://www.discourse.org/
 
 To support integration with Bodega, we maintain a patch set on top of Discourse on github.
-Start by cloning the discourse repository that contains these patches somewhere on disk:
+Start by cloning the discourse repository that contains these patches somewhere on disk
+and switch to the "bodega" branch which contains the bodega integration patches:
 
     git clone https://github.com/terietor/discourse.git
+    cd discourse
+    git checkout bodega
 
 (Preferably this should be separate from the bodega-server directory.)
 
