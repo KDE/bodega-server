@@ -562,7 +562,13 @@ app.get(serverPath('partner/:partner/banking/account/delete'), isAuthorized,
 
 app.post(serverPath('partner/:partner/banking/account/update'), isAuthorized,
     function(req, res) {
-        app.db.setBankTransferAccount(req, res);
+        app.db.updateBankAccount(req, res);
+    }
+);
+
+app.post(serverPath('partner/:partner/banking/request/withdrawal'), isAuthorized,
+    function(req, res) {
+        app.db.pointsWithdrawalRequest(req, res);
     }
 );
 

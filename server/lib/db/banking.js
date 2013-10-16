@@ -22,8 +22,7 @@ var sanitize = require('validator').sanitize;
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
-module.exports.setTransferAccount = function(db, req, res)
-{
+module.exports.updateAccount = function(db, req, res) {
     var partner = utils.parseNumber(req.params.partner);
     if (partner < 1) {
         errors.report('MissingParameters', req, res);
@@ -81,8 +80,7 @@ module.exports.setTransferAccount = function(db, req, res)
                       });
 };
 
-module.exports.deleteAccount = function(db, req, res)
-{
+module.exports.deleteAccount = function(db, req, res) {
     var partner = utils.parseNumber(req.params.partner);
     if (partner < 1) {
         errors.report('MissingParameters', req, res);
@@ -116,8 +114,7 @@ module.exports.deleteAccount = function(db, req, res)
                       });
 };
 
-module.exports.listAccounts = function(db, req, res)
-{
+module.exports.listAccounts = function(db, req, res) {
     var partner = utils.parseNumber(req.params.partner);
     if (partner < 1) {
         errors.report('MissingParameters', req, res);
@@ -147,4 +144,24 @@ module.exports.listAccounts = function(db, req, res)
                                    });
                       });
 };
+
+module.exports.pointsWithdrawalRequest = function(db, req, res) {
+    var partner = utils.parseNumber(req.params.partner);
+    if (partner < 1) {
+        errors.report('MissingParameters', req, res);
+        return;
+    }
+
+    utils.requireRole(db, req, res, partner, 'Account Manager', {},
+                      function(err, db, req, res, partner, data) {
+                          if (err) {
+                              errors.report(err.name, req, res, err);
+                              return;
+                          }
+
+                          var json = utils.standardJson(req);
+                          res.json(json);
+                     });
+};
+
 

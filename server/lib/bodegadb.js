@@ -331,8 +331,8 @@ var BodegaDb = (function() {
         this.dbQuery(dbPartners.deleteLink, req, res);
     };
 
-    BodegaDb.prototype.setBankTransferAccount = function(req, res) {
-        this.dbQuery(dbBanking.setTransferAccount, req, res);
+    BodegaDb.prototype.updateBankAccount = function(req, res) {
+        this.dbQuery(dbBanking.updateAccount, req, res);
     };
 
     BodegaDb.prototype.listBankAccounts = function(req, res) {
@@ -341,6 +341,10 @@ var BodegaDb = (function() {
 
     BodegaDb.prototype.deleteBankAccount = function(req, res) {
         this.dbQuery(dbBanking.deleteAccount, req, res);
+    };
+
+    BodegaDb.prototype.pointsWithdrawalRequest = function(req, res) {
+        this.dbQuery(dbBanking.pointsWithdrawalRequest, req, res);
     };
 
     BodegaDb.prototype.listPersonRoles = function(req, res) {
