@@ -73,17 +73,28 @@ User feedback and discussion is provided using the Discourse server, which can b
     http://www.discourse.org/
 
 To support integration with Bodega, we maintain a patch set on top of Discourse on github.
-Start by cloning the discourse repository that contains these patches somewhere on disk
-and switch to the "bodega" branch which contains the bodega integration patches:
+Start by cloning the discourse repository that contains these patches somewhere on disk,
+preferably separate from the bodega server root:
 
-    git clone https://github.com/terietor/discourse.git
+    git clone https://github.com/aseigo/discourse.git
     cd discourse
-    git checkout bodega
 
-(Preferably this should be separate from the bodega-server directory.)
+Next, switch to the latest "bodega" branch which contains the bodega integration patches:
 
-Change into the discourse directory, set it up and start discourse. Ensure that the settings in
-config.json for the discourse database are set correctly.
+    git checkout bodega_v0.9.7
+
+You can get a list of all available bodega integration branches with this commend:
+
+    git branch -r | grep bodega
+
+Next, set up the discourse installation itself, following the instructions found here:
+
+    https://github.com/discourse/discourse/blob/master/docs/INSTALL-ubuntu.md
+
+(The instructions work for distributions other than Ubuntu.)
+
+Finally, ensure that the settings for the discourse database in
+bodega-server/server/config.json are set correctly.
 
 ## Starting the server
 
