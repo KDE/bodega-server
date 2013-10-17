@@ -18,9 +18,7 @@
 
 CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
-    trust_level INT := 1;
     dupe_count INT := 0;
-    currentTime TIMESTAMP;
     baseusername TEXT;
     username TEXT;
     fullname TEXT;
@@ -29,9 +27,6 @@ DECLARE
     updatePassword TEXT;
     usernameLower TEXT;
 BEGIN
-    -- NOTE: the ''' are 3 single quotes
-    currentTime := current_timestamp AT TIME ZONE 'UTC';
-
     PERFORM dblink_connect(ct_setting('discourseConnectString'));
 
     IF TG_OP = 'UPDATE' AND NEW.fullname IS NULL THEN
@@ -74,13 +69,18 @@ BEGIN
     -- 's are special chars, so escape them in the one place they can exist
     fullname := replace(fullname, '''', '''''');
 
+    -- NOTE: the ''' are 3 single quotes
     IF (TG_OP = 'INSERT') THEN
-        PERFORM dblink_exec('INSERT INTO users (name, username, email, password_hash,
-                            created_at, updated_at, username_lower, trust_level)
-                            VALUES ('''||fullname||''', '''||username||''',
-                            '''||NEW.email||''', '''||NEW.password||''',
-                            '''||currentTime||''', '''||currentTime||''',
-                            '''||username||''', '''||trust_level||''');' );
+        PERFORM dblink_exec('INSERT INTO users (name, username, username_lower,
+                            email, password_hash,
+                            created_at, updated_at,
+                            trust_level, email_digests)
+                            VALUES
+                            (
+                            ''' || fullname || ''', ''' || username || ''',''' || username || ''',
+                            ''' || NEW.email || ''', ''' || NEW.password || ''',
+                            current_timestamp, current_timestamp,
+                            1, false);');
     ELSIF (TG_OP = 'UPDATE') THEN
         IF NEW.email IS NULL THEN
             updateEmail := OLD.email;
@@ -95,13 +95,13 @@ BEGIN
         END IF;
 
 
-        PERFORM dblink_exec('UPDATE users SET name = '''||fullname||''',
-                             username = '''||username||''',
-                             email = '''||updateEmail||''',
-                             password_hash = '''||updatePassword||''',
-                             updated_at = '''||currentTime||''',
-                             username_lower = '''||username||'''
-                             WHERE email = '''||OLD.email||''';');
+        PERFORM dblink_exec('UPDATE users SET name = ''' || fullname || ''',
+                             username = ''' || username || ''',
+                             email = ''' || updateEmail || ''',
+                             password_hash = ''' || updatePassword || ''',
+                             updated_at = current_timestamp,
+                             username_lower = ''' || username || '''
+                             WHERE email = ''' || OLD.email || ''';');
     END IF;
 
     PERFORM dblink_disconnect();
