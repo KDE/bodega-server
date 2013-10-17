@@ -225,7 +225,8 @@ function searchTags(partner, db, req, res) {
 
     var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable \
                  from tags join tagtypes on (tagtypes.id = tags.type)\
-                 where ts_rank_cd(en_index, plainto_tsquery('english', $2)) > 0";
+                 where (ts_rank_cd(en_index, plainto_tsquery('english', $2)) > 0\
+                        or tagtypes.type ~~ ('%'||$2||'%'))";
 
     var params = [partner, req.params.query];
 
