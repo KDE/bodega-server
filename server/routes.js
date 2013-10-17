@@ -339,7 +339,7 @@ app.post(serverPath('asset/list/updates'),
             app.db.checkUpdates(req, res);
         });
 
-app.post(serverPath('asset/list/briefs'),
+app.post(serverPath('asset/list/briefs'), anonBrowsing, isAuthorized,
         function(req, res) {
             app.db.listAssetBriefs(req, res);
         });
