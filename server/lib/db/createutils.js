@@ -45,7 +45,7 @@ function associateTag(db, req, res, assetInfo, tagInfo, cb)
 module.exports.setupTags = function(db, req, res, assetInfo, fn)
 {
     var deleteSql = "delete from incomingAssetTags where asset = $2 and tag in \
-                     (select at.tag from assettags at left join tags t on \
+                     (select at.tag from incomingAssetTags at join tags t on \
                      (at.tag = t.id and (t.partner = $1 or t.partner is null)) where at.asset = $2)";
 
     if (!Array.isArray(assetInfo.tags) || assetInfo.tags.length < 1) {
