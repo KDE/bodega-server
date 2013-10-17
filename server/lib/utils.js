@@ -327,3 +327,37 @@ module.exports.wrapInTransaction = function(functions, db)
         }
     });
 };
+
+/**
+ * Creates a tag owned by a partner and calls the callback with:
+ * error, dbRows (containing the row of the tag created), db, req, res
+ */
+module.exports.createTagIfMissing = function(partner, type, title, db, req, res, cb)
+{
+    db.query("SELECT * FROM tags, tagtypes WHERE partner = $1 AND tags.type = tagtypes.id AND tagtypes.type = $2 AND title = $3",
+             [partner, type, title],
+             function(err, result) {
+                 if (err) {
+                     err.type = 'Database';
+                     cb(err, null, db, req, res);
+                     return;
+                 }
+
+                 if (result.rowCount > 0) {
+                     cb(errors.create('TagExists'), null, db, req, res);
+                     return;
+                 }
+
+                db.query("insert into tags (partner, type, title) \
+                         (select $1, id, $2\
+                         from tagtypes where type = $3 limit 1) returning id as id",
+                         [partner, title, type],
+                         function(err, result) {
+                             if (err) {
+                                 err.type = 'Database';
+                             }
+
+                             cb(err, result, db, req, res);
+                        });
+             });
+}

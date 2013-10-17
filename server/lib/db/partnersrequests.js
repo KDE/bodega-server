@@ -52,14 +52,15 @@ function loadRequest (db, req, res, requestInfo, cb) {
         });
 }
 
-function approveRequest (db, req, res, requestInfo, cb) {
+function approveRequest(db, req, res, requestInfo, cb) {
 
     var updateQuery;
-    if (requestInfo.type === 'distributorRequest') {
-        updateQuery = 'update partners set distributor = true where id = $1';
+    var distributor = requestInfo.type === 'distributorRequest';
+    if (distributor) {
+        updateQuery = 'UPDATE partners SET distributor = true WHERE id = $1';
     } else {
         //default is publisher
-        updateQuery = 'update partners set publisher = true where id = $1';
+        updateQuery = 'UPDATE partners SET publisher = true WHERE id = $1';
     }
     var e;
 
@@ -73,7 +74,20 @@ function approveRequest (db, req, res, requestInfo, cb) {
                 return;
             }
 
-            cb(null, db, req, res, requestInfo);
+            if (distributor) {
+                utils.createTagIfMissing(requestInfo.partner, 'signoff',
+                                         'Signed off by ' + requestInfo.name,
+                                         db, req, res,
+                                         function(err, result, db, req, res) {
+                                            if (err && err.type === 'TagExists') {
+                                                err = null;
+                                            }
+
+                                            cb(err, db, req, res, requestInfo);
+                                        });
+            } else {
+                cb(null, db, req, res, requestInfo);
+            }
         });
 }
 

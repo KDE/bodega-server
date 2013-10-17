@@ -289,36 +289,19 @@ function create(partner, db, req, res) {
         return;
     }
 
-    db.query("select * from tags, tagtypes where partner = $1 and tags.type = tagtypes.id and tagtypes.type = $2 and title = $3",
-             [partner, req.body.type, title],
-             function(err, result) {
+    utils.createTagIfMissing(partner, req.body.type, title, db, req, res,
+            function(err, result, db, req, res) {
                  if (err) {
-                     errors.report('Database', req, res, err);
+                     errors.report(err.type, req, res, err);
                      return;
                  }
 
+                 var json = utils.standardJson(req);
                  if (result.rowCount > 0) {
-                     errors.report('TagExists', req, res, err);
-                     return;
+                    json.id = result.rows[0].id;
                  }
-
-                db.query("insert into tags (partner, type, title) \
-                         (select $1, id, $2\
-                         from tagtypes where type = $3 limit 1) returning id as id",
-                         [partner, title, req.body.type],
-                         function(err, result) {
-                             if (err) {
-                                 errors.report('Database', req, res, err);
-                                 return;
-                             }
-
-                             var json = utils.standardJson(req);
-                             if (result.rowCount > 0) {
-                                json.id = result.rows[0].id;
-                             }
-                             res.json(json);
-                    });
-             });
+                 res.json(json);
+            });
 }
 
 module.exports.create = function(db, req, res) {
@@ -357,8 +340,8 @@ module.exports.remove = function(db, req, res) {
 
 function update(partner, db, req, res) {
 
-    var id = req.params.tag;
-    if (!id || id === '') {
+    var id = utils.parseNumber(req.params.tag);
+    if (!id || id < 1) {
         errors.report('TagIdInvalid', req, res, errors.create("Invalid Tag Id", "Invalid tag passed into tag update: " + id));
         return;
     }
@@ -381,10 +364,11 @@ function update(partner, db, req, res) {
             if (err) {
                 errors.report('Database', req, res, err);
                 return;
-            } else if (result.rowCount === 0) {
+            } else if (result.rowCount < 1) {
                 errors.report('TagTypeInvalid', req, res, err);
                 return;
             }
+
             var type = result.rows[0].id;
             db.query(
                 "update tags set type = $1, title = $2 where id = $3 and partner = $4",
