@@ -107,7 +107,7 @@ BEGIN
     PERFORM dblink_disconnect();
     RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
-    RAISE WARNING 'Something is wrong with your discourse database, check if the database exists';
+    RAISE WARNING 'Discourse user syncronization failed: % %', SQLSTATE, SQLERRM;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -195,7 +195,7 @@ BEGIN
 
     RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
-    RAISE WARNING 'Something is wrong with your discourse database, check if the database exists';
+    RAISE WARNING 'Discourse forum creation failed: % %', SQLSTATE, SQLERRM;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
