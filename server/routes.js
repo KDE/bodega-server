@@ -566,12 +566,6 @@ app.post(serverPath('partner/:partner/banking/account/update'), isAuthorized,
     }
 );
 
-app.post(serverPath('partner/:partner/banking/request/withdrawal'), isAuthorized,
-    function(req, res) {
-        app.db.pointsWithdrawalRequest(req, res);
-    }
-);
-
 app.get(serverPath('partner/roles/list'), isAuthorized,
     function(req, res) {
         app.db.listPersonRoles(req, res);

@@ -343,10 +343,6 @@ var BodegaDb = (function() {
         this.dbQuery(dbBanking.deleteAccount, req, res);
     };
 
-    BodegaDb.prototype.pointsWithdrawalRequest = function(req, res) {
-        this.dbQuery(dbBanking.pointsWithdrawalRequest, req, res);
-    };
-
     BodegaDb.prototype.listPersonRoles = function(req, res) {
         this.dbQuery(dbPartners.listPersonRoles, req, res);
     };
