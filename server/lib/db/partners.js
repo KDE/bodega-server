@@ -100,6 +100,11 @@ function linkFetcher(task, cb)
                                     from purchases p join assets a on (p.asset = a.id and a.partner = $1) \
                                 union \
                                 select 'stores' as type, count(id)::int from stores where partner = $1 \
+                                union \
+                                select 'storeassets' as type, count(distinct ca.asset)::int from subchannelassets ca \
+                                        join channels c ON (ca.channel = c.id) \
+                                        WHERE c.parent IS NULL AND \
+                                              c.store IN (SELECT id FROM stores WHERE partner = $1) \
                                 order by type;",
                                 [ task.partner ],
                                 function(err, result) {

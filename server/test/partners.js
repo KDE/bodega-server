@@ -24,22 +24,23 @@ var utils = require('./support/utils');
 describe('Partner management', function() {
     var existingPartnerJson = [
         {
-            "id": 0,
-            "name": "Management Group",
-            "email": null,
-            "publisher": true,
-            "distributor": true,
-            "points": 0,
-            "links": [],
-            "assets": 0,
-            "downloads": 0,
-            "purchases": 0,
-            "stores": 1,
-            "people": [
+            id: 0,
+            name: "Management Group",
+            email: null,
+            publisher: true,
+            distributor: true,
+            points: 0,
+            links: [],
+            assets: 0,
+            downloads: 0,
+            purchases: 0,
+            storeassets: 0,
+            stores: 1,
+            people: [
                 {
-                    "name": "Aaron Seigo",
-                    "email": "aseigo@kde.org",
-                    "roles": [
+                    name: "Aaron Seigo",
+                    email: "aseigo@kde.org",
+                    roles: [
                         "Validator"
                     ]
                 }
@@ -54,34 +55,35 @@ describe('Partner management', function() {
             points: 0,
             links: [
                 {
-                    "service": "blog",
-                    "account": "",
-                    "url": "http://planet.kde.org",
-                    "icon": "extern/blog.png"
+                    service: "blog",
+                    account: "",
+                    url: "http://planet.kde.org",
+                    icon: "extern/blog.png"
                 },
                 {
-                    "service": "website",
-                    "account": "",
-                    "url": "http://kde.org",
-                    "icon": ""
+                    service: "website",
+                    account: "",
+                    url: "http://kde.org",
+                    icon: ""
                 }
             ],
-            "assets": 25,
-            "downloads": 22,
-            "purchases": 13,
-            "stores": 2,
+            assets: 25,
+            downloads: 22,
+            purchases: 13,
+            storeassets: 24,
+            stores: 2,
             people: [
                 {
-                    "name": "Aaron Seigo",
-                    "email": "aseigo@kde.org",
-                    "roles": [
+                    name: "Aaron Seigo",
+                    email: "aseigo@kde.org",
+                    roles: [
                         "Partner Manager"
                     ]
                 },
                 {
-                    "name": "Zack Rusin",
-                    "email": "zack@kde.org",
-                    "roles": [
+                    name: "Zack Rusin",
+                    email: "zack@kde.org",
+                    roles: [
                         "Content Creator",
                         "Store Manager",
                         "Validator"
@@ -196,35 +198,36 @@ describe('Partner management', function() {
         var newPartnerId = 0;
         var newPartnerJson =
                 {
-                    "id": newPartnerId,
-                    "name": "Sometime",
-                    "email": "foo@sometime.org",
-                    "publisher": false,
-                    "distributor": false,
-                    "points": 0,
-                    "links": [
+                    id: newPartnerId,
+                    name: "Sometime",
+                    email: "foo@sometime.org",
+                    publisher: false,
+                    distributor: false,
+                    points: 0,
+                    links: [
                         {
-                            "service": "blog",
-                            "account": "",
-                            "url": "http://myblog.com",
-                            "icon": "extern/blog.png"
+                            service: "blog",
+                            account: "",
+                            url: "http://myblog.com",
+                            icon: "extern/blog.png"
                         },
                         {
-                            "service": "identi.ca",
-                            "account": "sometimes",
-                            "url": "",
-                            "icon": "extern/identica.png"
+                            service: "identi.ca",
+                            account: "sometimes",
+                            url: "",
+                            icon: "extern/identica.png"
                         }
                     ],
-                    "assets": 0,
-                    "downloads": 0,
-                    "purchases": 0,
-                    "stores": 0,
+                    assets: 0,
+                    downloads: 0,
+                    purchases: 0,
+                    storeassets: 0,
+                    stores: 0,
                     people: [
                         {
-                            "name": "Aaron Seigo",
-                            "email": "aseigo@kde.org",
-                            "roles": [
+                            name: "Aaron Seigo",
+                            email: "aseigo@kde.org",
+                            roles: [
                                 "Account Manager",
                                 "Partner Manager"
                             ]
