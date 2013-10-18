@@ -81,6 +81,8 @@ BEGIN
                             ''' || NEW.email || ''', ''' || NEW.password || ''',
                             current_timestamp, current_timestamp,
                             1, false);');
+
+        PERFORM dblink_exec('INSERT INTO user_stats (user_id) VALUES (currval(''users_id_seq''));');
     ELSIF (TG_OP = 'UPDATE') THEN
         IF NEW.email IS NULL THEN
             updateEmail := OLD.email;
