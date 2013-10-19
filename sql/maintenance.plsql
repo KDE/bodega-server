@@ -24,6 +24,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION ct_hourlyMaintenance() RETURNS VOID AS $$
+BEGIN
+    PERFORM ct_updateStoreContentSummaries();
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION ct_dailyMaintenance() RETURNS VOID AS $$
 BEGIN
     -- delete accounts that are not activated within one week
@@ -46,3 +52,28 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ct_updateStoreContentSummaries() RETURNS VOID AS $$
+DECLARE
+    store record;
+BEGIN
+    -- update the store content summary table
+    DELETE FROM storeAssetSummary;
+    FOR store IN SELECT id FROM stores
+    LOOP
+        INSERT INTO storeAssetSummary (store, assetType, total)
+        SELECT store.id, t.id, counts.total
+            FROM tags t JOIN
+                (SELECT at.tag, COUNT(DISTINCT at.asset) AS total
+                    FROM assettags at
+                        JOIN subchannelassets ca ON (ca.asset = at.asset)
+                        JOIN channels c ON (ca.channel = c.id)
+                    WHERE c.parent IS NULL AND c.store = store.id AND
+                          at.tag IN
+                            (SELECT t.id FROM tags t JOIN tagtypes tt ON t.type = tt.id
+                                WHERE tt.type = 'assetType')
+                 GROUP BY at.tag) AS counts ON t.id = counts.tag;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
