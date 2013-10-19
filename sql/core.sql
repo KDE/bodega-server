@@ -191,6 +191,13 @@ create table tagText
     title       text        not null
 );
 
+CREATE TABLE storeAssetSummary
+(
+    store       text    REFERENCES stores(id) ON DELETE CASCADE,
+    assetType   int     REFERENCES tags(id) ON DELETE CASCADE,
+    total       int     default 0
+);
+
 create table assets
 (
     id          int         primary key default nextval('seq_assetsIds'),
