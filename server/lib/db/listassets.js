@@ -106,11 +106,9 @@ function searchPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     var e;
 
     var i = 2;
-    if (assetInfo.partner > 0) {
-        query += ' and partner = $' + i;
-        args.push(assetInfo.partner);
-        ++i;
-    }
+    query += ' and partner = $' + i;
+    args.push(assetInfo.partner);
+    ++i;
 
     query += ' limit $' + i + ' offset $' + (++i);
     //take an arbitrary limit if not specified
@@ -135,10 +133,8 @@ function searchPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
                      ts_rank_cd(en_tagsindex, plainto_tsquery(\'english\', $1)) > 0 )';
         var countArgs = [req.params.query];
 
-        if (assetInfo.partner > 0) {
-            countQuery += ' and partner = $2';
-            countArgs.push(assetInfo.partner);
-        }
+        countQuery += ' and partner = $2';
+        countArgs.push(assetInfo.partner);
 
         db.query(countQuery, countArgs, function(err, results) {
             if (err) {
@@ -165,7 +161,7 @@ function searchIncomingAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     if (assetInfo.partner > 0) {
         query += ' and partner = $' + i;
         args.push(assetInfo.partner);
-            ++i;
+        ++i;
     }
 
     query += ' limit $' + i + ' offset $' + (++i);
@@ -295,11 +291,9 @@ function findPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     var e;
 
     var i = 1;
-    if (assetInfo.partner > 0) {
-        query += ' and partner = $' + i;
-        args.push(assetInfo.partner);
-        ++i;
-    }
+    query += ' and partner = $' + i;
+    args.push(assetInfo.partner);
+    ++i;
 
     query += ' limit $' + i + ' offset $' + (++i);
     //take an arbitrary limit if not specified
