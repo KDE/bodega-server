@@ -447,7 +447,7 @@ function checkIfIsValidator(db, req, res, assetInfo, assets, totalAssets, cb)
         function(err, db, req, res, assetInfo) {
             var e;
             if (err) {
-                e = errors.create('PartnerRoleMissing', err.message);
+                e = errors.create('InvalidRole', err.message);
                 cb(e, db, req, res, assetInfo, assets, totalAssets);
                 return;
             }
