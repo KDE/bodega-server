@@ -22,6 +22,9 @@ var Janitor = (function() {
     var frequentPeriod = 60 * 1000;
     var frequentRunning = false;
 
+    var hourlyPeriod = 60 * 60 * 1000;
+    var hourlyRunning = false;
+
     var dailyPeriod = 24 * 60 * 60 * 1000;
     var dailyRunning = false;
 
@@ -87,6 +90,27 @@ var Janitor = (function() {
         });
     }
 
+    function hourly()
+    {
+        if (hourlyRunning) {
+            return;
+        }
+
+        hourlyRunning = true;
+
+        app.db.dbQuery(function(client) {
+            client.query("select ct_hourlyMaintenance()", [],
+                function(err) {
+                    if (err) {
+                        errors.log(err);
+                    }
+
+                    hourlyRunning = false;
+                    setTimeout(hourly, hourlyPeriod);
+                });
+        });
+    }
+
     function daily()
     {
         if (dailyRunning) {
@@ -112,6 +136,7 @@ var Janitor = (function() {
     {
         oneTime();
         frequent();
+        hourly();
         daily();
     }
 
