@@ -350,12 +350,6 @@ app.get(serverPath('asset/list/:partnerId/:type?*'), isAuthorized,
             app.db.listAssets(req, res);
         });
 
-app.get(serverPath('asset/search/:partnerId/:query/:type?*'), isAuthorized,
-        function(req, res) {
-            //console.log(req.query);
-            app.db.searchAssets(req, res);
-        });
-
 app.get(serverPath('asset/:assetId'), anonBrowsing, isAuthorized,
         function(req, res) {
             //console.log(req.query);

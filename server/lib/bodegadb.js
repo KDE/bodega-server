@@ -171,10 +171,6 @@ var BodegaDb = (function() {
         this.dbQuery(dbListAssets, req, res);
     };
 
-    BodegaDb.prototype.searchAssets = function(req, res) {
-        this.dbQuery(dbListAssets.searchAssets, req, res);
-    };
-
     BodegaDb.prototype.listCollections = function(req, res) {
         this.dbQuery(dbCollections.listAll, req, res);
     };
