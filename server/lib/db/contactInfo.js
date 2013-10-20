@@ -62,13 +62,13 @@ module.exports = function(db, req, res) {
                 name: result.rows[0].name,
                 description: result.rows[0].description,
                 owner: result.rows[0].owner,
-                contact: result.rows[0].contact
+                contact: result.rows[0].contact,
+                links: []
             };
 
             var partner = result.rows[0].partner;
 
             // now we look to see if there are any social media etc. links
-            json.store.links = [];
             db.query("SELECT p.service, p.account, p.url, \
                       CASE WHEN s.icon IS NULL THEN '' ELSE s.icon END, s.baseurl \
                       FROM partnerContacts p LEFT JOIN partnerContactServices s ON (p.service = s.service) \
@@ -93,7 +93,20 @@ module.exports = function(db, req, res) {
                              json.store.links.push({ type: contact.service, url: url, icon: contact.icon});
                          }
 
-                         res.json(json);
+                         // and finally we get the asset summary
+                         db.query("SELECT t.title as type, sas.total \
+                                   FROM storeAssetSummary sas JOIN tags t ON (sas.assetType = t.id) \
+                                   WHERE sas.store = $1",
+                                   [store],
+                                   function(err, result) {
+                                       if (!err && result.rowCount > 0) {
+                                           json.store.assetSummary = result.rows;
+                                       } else {
+                                           json.store.assetSummary = [];
+                                       }
+
+                                       res.json(json);
+                                   });
 
                      });
         });

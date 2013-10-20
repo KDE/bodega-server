@@ -33,21 +33,24 @@ describe('Fetch contact information', function() {
         contact: 'support@makeplaylive.com',
         links: [
              {
-                 "type": "identi.ca",
-                 "url": "https://identi.ca/aseigo",
-                 "icon": "extern/identica.png"
+                 type: "identi.ca",
+                 url: "https://identi.ca/aseigo",
+                 icon: "extern/identica.png"
              },
              {
-                 "type": "blog",
-                 "url": "http://aseigo.blogspot.com",
-                 "icon": "extern/blog.png"
+                 type: "blog",
+                 url: "http://aseigo.blogspot.com",
+                 icon: "extern/blog.png"
              },
              {
-                 "type": "website",
-                 "url": "http://makeplaylive.com",
-                 "icon": ""
+                 type: "website",
+                 url: "http://makeplaylive.com",
+                 icon: ""
              }
-      ]
+        ],
+        assetSummary: [
+            { type: 'game', total: 19 }
+        ]
     };
 
     describe('when not authenticated', function() {
