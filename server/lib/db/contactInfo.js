@@ -29,10 +29,10 @@ module.exports = function(db, req, res) {
 
     // if we are authenticated against a store, fetch store info
     var store;
-    if (req.session !== undefined && req.session.authorized) {
-        store = req.session.user.store;
-    } else if (req.query.store) {
+    if (req.query.store) {
         store = req.query.store;
+    } else if (req.session !== undefined && req.session.authorized) {
+        store = req.session.user.store;
     } else {
         json.warehouse = warehouse;
         res.json(json);
