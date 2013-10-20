@@ -28,60 +28,73 @@ module.exports = function(db, req, res) {
     };
 
     // if we are authenticated against a store, fetch store info
+    var store;
     if (req.session !== undefined && req.session.authorized) {
-        json = utils.standardJson(req);
-        json.warehouse = warehouse;
-
-        db.query(
-            "select s.name, s.description, p.name as owner, p.supportEmail as contact, s.partner as partner from stores s left join partners p on (s.partner = p.id) where s.id = $1", [req.session.user.store],
-            function(err, result) {
-                if (err) {
-                    errors.report('Database', req, res, err);
-                    return;
-                }
-
-                if (!result || result.rowCount < 1) {
-                    res.json(json);
-                    return;
-                }
-
-                json.store = {
-                    name: result.rows[0].name,
-                    description: result.rows[0].description,
-                    owner: result.rows[0].owner,
-                    contact: result.rows[0].contact
-                };
-
-                var partner = result.rows[0].partner;
-
-                // now we look to see if there are any social media etc. links
-                json.store.links = [];
-                db.query("select p.service, p.account, p.url, CASE WHEN s.icon IS NULL THEN '' ELSE s.icon END, s.baseurl from partnerContacts p left join partnerContactServices s on (p.service = s.service) where partner = $1",
-                         [partner],
-                         function (err, result) {
-                             if (err) {
-                                 errors.report('Database', req, res, err);
-                                 return;
-                             }
-
-
-                             for (var i = 0; i < result.rowCount; ++i) {
-                                 var contact = result.rows[i];
-                                 var url;
-                                 if (contact.url && contact.url !== '') {
-                                     url = contact.url;
-                                 } else {
-                                     url = contact.baseurl + contact.account;
-                                 }
-
-                                 json.store.links.push({ type: contact.service, url: url, icon: contact.icon});
-                             }
-
-                             res.json(json);
-
-                         });
-            });
+        store = req.session.user.store;
+    } else if (req.query.store) {
+        store = req.query.store;
     } else {
-        res.json(warehouse);
+        json.warehouse = warehouse;
+        res.json(json);
+        return;
     }
+
+    json.warehouse = warehouse;
+
+    db.query(
+        "SELECT s.name, s.description, p.name AS owner, \
+                p.supportEmail AS contact, s.partner AS partner \
+                FROM stores s LEFT JOIN partners p ON (s.partner = p.id) \
+                WHERE s.id = $1",
+        [store],
+        function(err, result) {
+            if (err) {
+                errors.report('Database', req, res, err);
+                return;
+            }
+
+            if (!result || result.rowCount < 1) {
+                res.json(json);
+                return;
+            }
+
+            json.store = {
+                name: result.rows[0].name,
+                description: result.rows[0].description,
+                owner: result.rows[0].owner,
+                contact: result.rows[0].contact
+            };
+
+            var partner = result.rows[0].partner;
+
+            // now we look to see if there are any social media etc. links
+            json.store.links = [];
+            db.query("SELECT p.service, p.account, p.url, \
+                      CASE WHEN s.icon IS NULL THEN '' ELSE s.icon END, s.baseurl \
+                      FROM partnerContacts p LEFT JOIN partnerContactServices s ON (p.service = s.service) \
+                      WHERE partner = $1",
+                     [partner],
+                     function (err, result) {
+                         if (err) {
+                             errors.report('Database', req, res, err);
+                             return;
+                         }
+
+
+                         for (var i = 0; i < result.rowCount; ++i) {
+                             var contact = result.rows[i];
+                             var url;
+                             if (contact.url && contact.url !== '') {
+                                 url = contact.url;
+                             } else {
+                                 url = contact.baseurl + contact.account;
+                             }
+
+                             json.store.links.push({ type: contact.service, url: url, icon: contact.icon});
+                         }
+
+                         res.json(json);
+
+                     });
+        });
 };

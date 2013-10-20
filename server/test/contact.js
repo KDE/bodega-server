@@ -19,19 +19,56 @@ var utils = require('./support/utils');
 var assert = require('assert');
 
 describe('Fetch contact information', function() {
+    var warehouse = {
+        name: app.config.warehouseInfo.name,
+        description: app.config.warehouseInfo.description,
+        url: app.config.warehouseInfo.url,
+        contact: app.config.warehouseInfo.contact
+    };
+
+    var store = {
+        name: 'Vivaldi',
+        description: 'Plasma Active tablet from Make Play Live',
+        owner: 'Make Play Live',
+        contact: 'support@makeplaylive.com',
+        links: [
+             {
+                 "type": "identi.ca",
+                 "url": "https://identi.ca/aseigo",
+                 "icon": "extern/identica.png"
+             },
+             {
+                 "type": "blog",
+                 "url": "http://aseigo.blogspot.com",
+                 "icon": "extern/blog.png"
+             },
+             {
+                 "type": "website",
+                 "url": "http://makeplaylive.com",
+                 "icon": ""
+             }
+      ]
+    };
+
     describe('when not authenticated', function() {
         it('should return only warehouse info', function(done) {
             utils.getUrl('contact',
                 function(res) {
-                    var expected = {
-                        name: app.config.warehouseInfo.name,
-                        description: app.config.warehouseInfo.description,
-                        url: app.config.warehouseInfo.url,
-                        contact: app.config.warehouseInfo.contact
-                    };
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
-                    res.body.should.eql(expected);
+                    res.body.warehouse.should.eql(warehouse);
+                    done();
+                },
+                { noAuth: true });
+        });
+
+        it('should return store info if store id provided as query', function(done) {
+            utils.getUrl('contact?store=VIVALDI-1',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.warehouse.should.eql(warehouse);
+                    res.body.store.should.eql(store);
                     done();
                 },
                 { noAuth: true });
@@ -44,37 +81,8 @@ describe('Fetch contact information', function() {
         it('should return both warehouse and store information when authenticated', function(done) {
          utils.getUrl('contact',
              function(res) {
-                var warehouse = {
-                    name: app.config.warehouseInfo.name,
-                    description: app.config.warehouseInfo.description,
-                    url: app.config.warehouseInfo.url,
-                    contact: app.config.warehouseInfo.contact
-                };
-                var store = {
-                    name: 'Vivaldi',
-                    description: 'Plasma Active tablet from Make Play Live',
-                    owner: 'Make Play Live',
-                    contact: 'support@makeplaylive.com',
-                    links: [
-                         {
-                             "type": "identi.ca",
-                             "url": "https://identi.ca/aseigo",
-                             "icon": "extern/identica.png"
-                         },
-                         {
-                             "type": "blog",
-                             "url": "http://aseigo.blogspot.com",
-                             "icon": "extern/blog.png"
-                         },
-                         {
-                             "type": "website",
-                             "url": "http://makeplaylive.com",
-                             "icon": ""
-                         }
-                  ]
-                };
-                 res.statusCode.should.equal(200);
-                 res.headers.should.have.property('content-type');
+                res.statusCode.should.equal(200);
+                res.headers.should.have.property('content-type');
                 res.body.warehouse.should.eql(warehouse);
                 res.body.store.should.eql(store);
                 done();
