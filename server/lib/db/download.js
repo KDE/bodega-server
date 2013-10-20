@@ -84,13 +84,19 @@ function launchIncomingDownload(db, req, res)
 
 module.exports = function(db, req, res) {
     var isIncoming = req.query.incoming !== undefined;
-    var nquery = "SELECT ct_canDownload($1, $2, $3) as allowed;";
-    var iquery = "SELECT ct_canDownloadIncoming($1, $2, $3) as allowed;";
-    var args = [req.session.user.id,
+    var e;
+    var query, args;
+
+    if (isIncoming) {
+        query = "SELECT ct_canDownloadIncoming($1, $2) as allowed;";
+        args = [req.session.user.id,
+                req.params.assetId];
+    } else {
+        query = "SELECT ct_canDownload($1, $2, $3) as allowed;";
+        args = [req.session.user.id,
                 req.session.user.store,
                 req.params.assetId];
-    var e;
-    var query = isIncoming ? iquery : nquery;
+    }
 
     db.query(query, args, function(err, result) {
         if (err || !result || result.rows.length < 1) {

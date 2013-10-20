@@ -134,7 +134,7 @@ $$ LANGUAGE 'plpgsql';
 --   it is but only for superusers and owners
 -- PARAMETERS: int person, int asset
 -- RETURNS: bool true if can download, false if not
-CREATE OR REPLACE FUNCTION ct_canDownloadIncoming(who int, fromStore text, what int) RETURNS BOOL AS $$
+CREATE OR REPLACE FUNCTION ct_canDownloadIncoming(who int, what int) RETURNS BOOL AS $$
 BEGIN
     -- you can always download your own stuff
     PERFORM * FROM assets WHERE id = what AND partner = who;
