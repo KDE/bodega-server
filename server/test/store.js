@@ -102,11 +102,12 @@ describe('Store management', function(){
                 query,
                 function(res) {
                     var expected = [ {
-                        'id': '1002_FUN_TIMES_WITH_CLOWNS',
-                        'name': 'Fun Times With Clowns',
-                        'desc': 'Clowns are actually scary',
-                        'partner': { 'id': 1002, 'name': 'KDE' },
-                        'markups': { 'min': 0, 'max': 0, 'markup': 0 }
+                        id: '1002_FUN_TIMES_WITH_CLOWNS',
+                        name: 'Fun Times With Clowns',
+                        desc: 'Clowns are actually scary',
+                        partner: { 'id': 1002, 'name': 'KDE' },
+                        markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                        assetSummary: [ ]
                     } ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -127,11 +128,12 @@ describe('Store management', function(){
                 query,
                 function(res) {
                     var expected = [ {
-                        'id': 'somethingcrazy',
-                        'name': 'More Fun',
-                        'desc': '',
-                        'partner': { 'id': 1002, 'name': 'KDE' },
-                        'markups': { 'min': 0, 'max': 0, 'markup': 0 }
+                        id: 'somethingcrazy',
+                        name: 'More Fun',
+                        desc: '',
+                        partner: { 'id': 1002, 'name': 'KDE' },
+                        markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                        assetSummary: []
                     } ];
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -169,32 +171,38 @@ describe('Store management', function(){
                     function(res) {
                         var expected = [
                         {
-                            'id': '1002_FUN_TIMES_WITH_CLOWNS',
-                            'name': 'Fun Times With Clowns',
-                            'desc': 'Clowns are actually scary',
-                            'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
+                            id: '1002_FUN_TIMES_WITH_CLOWNS',
+                            name: 'Fun Times With Clowns',
+                            desc: 'Clowns are actually scary',
+                            partner: { 'id': 1002, 'name': 'KDE' },
+                            markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                            assetSummary: [ ]
                         },
                         {
-                            'id': 'KDE-1',
-                            'name': 'Plasma Workspace',
-                            'desc': 'KDE Plasma user interfaces',
-                            'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
+                            id: 'KDE-1',
+                            name: 'Plasma Workspace',
+                            desc: 'KDE Plasma user interfaces',
+                            partner: { 'id': 1002, 'name': 'KDE' },
+                            markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                            assetSummary: [
+                                { type: 'game', total: 24 }
+                            ]
                         },
                         {
-                            'id': 'KDE-2',
-                            'name': 'KDE Applications',
-                            'desc': 'Variety of tools',
-                            'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
+                            id: 'KDE-2',
+                            name: 'KDE Applications',
+                            desc: 'Variety of tools',
+                            partner: { 'id': 1002, 'name': 'KDE' },
+                            markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                            assetSummary: []
                         },
                         {
-                            'id': 'somethingcrazy',
-                            'name': 'More Fun',
-                            'desc': '',
-                            'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
+                            id: 'somethingcrazy',
+                            name: 'More Fun',
+                            desc: '',
+                            partner: { 'id': 1002, 'name': 'KDE' },
+                            markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                            assetSummary: []
                         }
                         ];
 
@@ -260,11 +268,12 @@ describe('Store management', function(){
                 function(res) {
                     var expected = [
                         {
-                            'id': '1002_FUN_TIMES_WITH_CLOWNS',
-                            'name': 'Fun Times With Clowns',
-                            'desc': 'Clowns are not scary',
-                            'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 10, 'max': 100, 'markup': 20 }
+                            id: '1002_FUN_TIMES_WITH_CLOWNS',
+                            name: 'Fun Times With Clowns',
+                            desc: 'Clowns are not scary',
+                            partner: { 'id': 1002, 'name': 'KDE' },
+                            markups: { 'min': 10, 'max': 100, 'markup': 20 },
+                            assetSummary: [ ]
                         }
                     ];
                     res.statusCode.should.equal(200);
@@ -287,11 +296,12 @@ describe('Store management', function(){
                 function(res) {
                     var expected = [
                         {
-                            'id': '1002_FUN_TIMES_WITH_CLOWNS',
-                            'name': 'Fun Times With Clowns',
-                            'desc': 'Clowns are not scary',
-                            'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 10, 'max': 200, 'markup': 15 }
+                            id: '1002_FUN_TIMES_WITH_CLOWNS',
+                            name: 'Fun Times With Clowns',
+                            desc: 'Clowns are not scary',
+                            partner: { 'id': 1002, 'name': 'KDE' },
+                            markups: { 'min': 10, 'max': 200, 'markup': 15 },
+                            assetSummary: []
                         }
                     ];
                     res.statusCode.should.equal(200);
@@ -517,18 +527,22 @@ describe('Store management', function(){
                     function(res) {
                         var expected = [
                         {
-                            'id': 'KDE-1',
-                            'name': 'Plasma Workspace',
-                            'desc': 'KDE Plasma user interfaces',
-                            'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
+                            id: 'KDE-1',
+                            name: 'Plasma Workspace',
+                            desc: 'KDE Plasma user interfaces',
+                            partner: { 'id': 1002, 'name': 'KDE' },
+                            markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                            assetSummary: [
+                                { type: 'game', total: 24 }
+                            ]
                         },
                         {
-                            'id': 'KDE-2',
-                            'name': 'KDE Applications',
-                            'desc': 'Variety of tools',
-                            'partner': { 'id': 1002, 'name': 'KDE' },
-                            'markups': { 'min': 0, 'max': 0, 'markup': 0 }
+                            id: 'KDE-2',
+                            name: 'KDE Applications',
+                            desc: 'Variety of tools',
+                            partner: { 'id': 1002, 'name': 'KDE' },
+                            markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                            assetSummary: []
                         }
                         ];
 

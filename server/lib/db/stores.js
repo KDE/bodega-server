@@ -15,15 +15,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+var async = require('async');
 var sanitize = require('validator').sanitize;
 var errors = require('../errors.js');
 var utils = require('../utils.js');
 
 function sendStoreJson(id, db, req, res)
 {
-    var query = "select s.id, s.name, s.description, s.partner as partnerId, p.name as partnerName, s.minMarkup, s.maxMarkup, s.markup \
+    var query = "select s.id, s.name, s.description, s.partner as partnerId, \
+                 p.name as partnerName, s.minMarkup, s.maxMarkup, s.markup \
                  from stores s join partners p on (s.partner = p.id) \
-                 where p.id in (select distinct partner from affiliations where person = $1 and partner > 0)";
+                 where p.id in (select distinct partner from affiliations \
+                                where person = $1 and partner > 0)";
     var params = [req.session.user.id];
     if (typeof id === 'string' && id.length > 0) {
         query += " and s.id = $2";
@@ -42,18 +45,39 @@ function sendStoreJson(id, db, req, res)
                  for (var i = 0; i < result.rows.length; ++i) {
                      var r = result.rows[i];
                      storeInfo.push(
-                         { id: r.id,
-                           name: r.name,
-                           desc: r.description,
-                           partner: { id: r.partnerid, name: r.partnername },
-                           markups: { min: r.minmarkup, max: r.maxmarkup, markup: r.markup }
+                     {
+                         id: r.id,
+                         name: r.name,
+                         desc: r.description,
+                         partner: { id: r.partnerid, name: r.partnername },
+                         markups: { min: r.minmarkup, max: r.maxmarkup, markup: r.markup }
                      });
                  }
 
-                 var json = utils.standardJson(req);
-                 json.storeInfo = storeInfo;
-                 res.json(json);
-             });
+
+                 var queue = async.queue(
+                         function(storeInfo, cb) {
+                             db.query("SELECT t.title as type, sas.total \
+                                       FROM storeAssetSummary sas JOIN tags t ON (sas.assetType = t.id) \
+                                       WHERE sas.store = $1",
+                                       [storeInfo.id],
+                                       function(err, result) {
+                                           if (!err && result.rowCount > 0) {
+                                               storeInfo.assetSummary = result.rows;
+                                           } else {
+                                               storeInfo.assetSummary = [];
+                                           }
+                                           cb();
+                                       });
+                         }
+                         , 2);
+                 queue.drain = function() {
+                     var json = utils.standardJson(req);
+                     json.storeInfo = storeInfo;
+                     res.json(json);
+                 };
+                 queue.push(storeInfo);
+    });
 }
 
 function createWithPartner(partner, db, req, res)
