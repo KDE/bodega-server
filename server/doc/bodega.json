@@ -636,10 +636,18 @@
       "methods": [
         {
           "MethodName": "List",
-          "Synopsis": "Returns contact information for both the warehouse and, if a session is action, the store",
+          "Synopsis": "Returns contact information for both the warehouse and optionally a store",
           "HTTPMethod": "Get",
           "URI": "/contact",
-          "parameters": []
+          "parameters": [
+            {
+              "Name": "store",
+              "Location": "query",
+              "Description": "A store to list information for; if not provided and a session is active then the authenticated store is used instead",
+              "Required": "N",
+              "Type": "string"
+            }
+           ]
         }
       ]
     },
