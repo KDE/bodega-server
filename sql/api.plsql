@@ -144,18 +144,13 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE function ct_isSuperuserValidator(who int) returns BOOL
 AS
 $$
-DECLARE
-    validatorId  int;
 BEGIN
     SELECT INTO validatorId id FROM personroles
            WHERE description = 'Validator';
     PERFORM * FROM affiliations WHERE
             partner = 0 AND
-            role = validatorId AND
+            role IN (SELECT id FROM personRoles WHERE description = 'Validator') AND
             person = who;
-    IF FOUND THEN
-       RETURN TRUE;
-    END IF;
-    RETURN FALSE;
+    RETURN FOUND;
 END;
 $$ LANGUAGE 'plpgsql';
