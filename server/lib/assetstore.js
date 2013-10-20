@@ -150,15 +150,15 @@ var AssetStore = (function() {
         localMove(fromFile, assetPath, fn);
     }
 
-    function localGetStream(res, parsedUrl, filename, fn)
+    function localGetStream(res, path, filename, fn)
     {
-        fs.stat(parsedUrl.path, function(err, stat) {
+        fs.stat(path, function(err, stat) {
             if (err) {
                 fn(err);
                 return;
             }
 
-            var stream = fs.createReadStream(parsedUrl.path);
+            var stream = fs.createReadStream(path);
             res.header('Content-Length', stat.size);
             res.header('Content-Type', mime.lookup(stream.path));
             res.attachment(filename);
@@ -248,7 +248,7 @@ var AssetStore = (function() {
             parsedUrl.protocol === 'https:') {
             httpGetStream(res, parsedUrl, assetInfo.file, fn);
         } else {
-            localGetStream(res, parsedUrl, assetInfo.file, fn);
+            localGetStream(res, assetPath, assetInfo.file, fn);
         }
     };
 
