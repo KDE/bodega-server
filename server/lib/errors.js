@@ -134,6 +134,30 @@ module.exports.create = function(name, msg)
     return e;
 };
 
+module.exports.logDbQuery = function(label, db, query, params) {
+    if (app.config.printErrors) {
+    db.query("begin;", [],
+             function() {
+                 db.query("explain analyze " + query, params,
+                     function(err, result) {
+                         console.log("-- DB Query: " + label);
+                         console.log("    Query: " + query);
+                         console.log("    Param: " + JSON.stringify(params, 2));
+                         if (err) {
+                             console.log("    Error: " + JSON.stringify(err, 2));
+                         } else {
+                             console.log("    Trace: "  + result.rows[0]["QUERY PLAN"]);
+                             for (var i = 1; i < result.rows.length; ++i) {
+                                console.log("           "  + result.rows[i]["QUERY PLAN"]);
+                             }
+                         }
+
+                        db.query("rollback", []);
+                     });
+             });
+    }
+};
+
 module.exports.log = function(err)
 {
     if (app.config.printErrors && err && err.message) {
