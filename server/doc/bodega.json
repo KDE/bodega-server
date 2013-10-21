@@ -554,6 +554,40 @@
         }
       ]
     },
+    { "name": "Asset type information",
+      "methods": [
+        {
+            "MethodName": "List image expectations for an asset type",
+            "Synopsis": "List image types and their dimensions that can be associated with a given type of asset",
+            "HTTPMethod": "GET",
+            "URI": "/asset/types/:assetType/images",
+            "parameters": [
+                {
+                    "Name": "assetType",
+                    "Location": "URL",
+                    "Description": "The name of the asset type we want to list images for",
+                    "Required": "Y",
+                    "Type": "number"
+                }
+            ]
+        },
+        {
+            "MethodName": "List tags related to an asset type",
+            "Synopsis": "Lists groups of tags that must or should accompany a given asset type. Returns possible tag optoins, whether multiple tags of the sort are valid or not and whether it is require or not",
+            "HTTPMethod": "GET",
+            "URI": "/asset/types/:assetType/tags",
+            "parameters": [
+                {
+                    "Name": "assetType",
+                    "Location": "URL",
+                    "Description": "The name of the asset type we want to list related tags for",
+                    "Required": "Y",
+                    "Type": "number"
+                }
+            ]
+        }
+      ]
+    },
     {
       "name": "Browsing stores",
       "methods": [
@@ -1720,21 +1754,6 @@
                     "Location": "URL",
                     "Description": "The id of the type we want to list tags of",
                     "Required": "N",
-                    "Type": "number"
-                }
-            ]
-        },
-        {
-            "MethodName": "List tags related to another tag",
-            "Synopsis": "List groups of tags that must or should accompany a given asset type. Returns possible tag optoins, whether multiple tags of the sort are valid or not and whether it is require or not",
-            "HTTPMethod": "GET",
-            "URI": "/tag/list/forAssetType/:assetType",
-            "parameters": [
-                {
-                    "Name": "assetType",
-                    "Location": "URL",
-                    "Description": "The name of the asset type we want to list related tags for",
-                    "Required": "Y",
                     "Type": "number"
                 }
             ]

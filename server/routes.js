@@ -381,6 +381,23 @@ app.get(serverPath('asset/ratings/list/:assetId'), isAuthorized,
         }
 );
 
+app.get(serverPath('asset/types/:assetType/tags'), isAuthorized,
+    function(req, res) {
+        app.db.listRelatedTags(req, res);
+    }
+);
+
+app.get(serverPath('asset/types/:assetType/images'), isAuthorized,
+    function(req, res) {
+        var json = utils.standardJson(req);
+        json.images = assetRules.images[req.params.assetType];
+        if (!json.images) {
+            json.images = assetRules.images['generic'];
+        }
+        res.json(json);
+    }
+);
+
 //*******************************
 // Stats
 app.get(serverPath('stats/assets/?:metric?'), isAuthorized,
@@ -481,12 +498,6 @@ app.get(serverPath('tag/search/:query'), isAuthorized,
 app.get(serverPath('tag/list/?:type?'), isAuthorized,
     function(req, res) {
         app.db.listTags(req, res);
-    }
-);
-
-app.get(serverPath('tag/list/forAssetType/:assetType'), isAuthorized,
-    function(req, res) {
-        app.db.listRelatedTags(req, res);
     }
 );
 
@@ -609,17 +620,6 @@ app.get(serverPath('partner/delete/:partner'), isAuthorized, isBodegaManager,
 app.get(serverPath('incomingassetpreview/:assetId/:imagePath'), isAuthorized,
     function(req, res) {
         app.db.sendIncomingAssetPreview(req, res);
-    }
-);
-
-app.get(serverPath('images/forAssetType/:assetType'), isAuthorized,
-    function(req, res) {
-        var json = utils.standardJson(req);
-        json.images = assetRules.images[req.params.assetType];
-        if (!json.images) {
-            json.images = assetRules.images['generic'];
-        }
-        res.json(json);
     }
 );
 
