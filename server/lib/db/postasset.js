@@ -119,7 +119,7 @@ function validateTags(db, req, res, assetInfo, cb)
     var requiredTags = assetRules.mandatoryTags[assetType];
 
     if (!requiredTags) {
-        requiredTags = assetRules.mandatoryTags['generic'];
+        requiredTags = assetRules.mandatoryTags.generic;
     }
 
     for (tagType in requiredTags) {

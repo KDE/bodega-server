@@ -379,7 +379,7 @@ module.exports.listLicenses = function(db, req, res) {
                      return;
                  }
 
-                 json = utils.standardJson(req);
+                 var json = utils.standardJson(req);
                  json.licenses = result.rows;
                  res.json(json);
              });

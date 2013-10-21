@@ -360,4 +360,4 @@ module.exports.createTagIfMissing = function(partner, type, title, db, req, res,
                              cb(err, result, db, req, res);
                         });
              });
-}
+};

@@ -69,8 +69,7 @@ function sendStoreJson(id, db, req, res)
                                            }
                                            cb();
                                        });
-                         }
-                         , 2);
+                         }, 2);
                  queue.drain = function() {
                      var json = utils.standardJson(req);
                      json.storeInfo = storeInfo;

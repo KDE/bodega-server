@@ -398,7 +398,7 @@ app.get(serverPath('asset/types/:assetType/images'), isAuthorized,
         var json = utils.standardJson(req);
         json.images = assetRules.images[req.params.assetType];
         if (!json.images) {
-            json.images = assetRules.images['generic'];
+            json.images = assetRules.images.generic;
         }
         res.json(json);
     }

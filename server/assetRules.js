@@ -19,7 +19,7 @@
 module.exports.mandatoryTags = {
     generic: {
         author: { name: "Author", type: "author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true }
     },
     application: {
         author: { name: "Author", type: "author", multi: true, required: true },
