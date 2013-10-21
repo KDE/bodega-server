@@ -156,7 +156,7 @@ function listTags(partner, db, req, res) {
 
     var i = 2;
     var params = [partner];
-    var typed = req.param.type !== undefined;
+    var typed = req.params.type !== undefined;
 
     var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable \
                  from tags join tagtypes on (tagtypes.id = tags.type)";
@@ -186,7 +186,7 @@ function listTags(partner, db, req, res) {
     query += " order by editable desc, title limit $" + (i++) + " offset $" + (i);
     ++i;
 
-    errors.logDbQuery("List tags", db, query, params);
+    //errors.logDbQuery("List tags", db, query, params);
 
     //take an arbitrary limit if not specified
     if (req.query.limit) {
@@ -215,7 +215,6 @@ function listTags(partner, db, req, res) {
             var countWhereClause = null;
 
             if (typed) {
-                countQuery += " join tagtypes on (tagtypes.id = tags.type)";
                 countWhereClause = " where tagtypes.type = $" + j;
                 countParams.push(req.params.type);
                 ++j;
@@ -240,7 +239,7 @@ function listTags(partner, db, req, res) {
                 countQuery += countWhereClause;
             }
 
-            errors.logDbQuery("Count", db, countQuery, countParams);
+            //errors.logDbQuery("Count", db, countQuery, countParams);
 
             db.query(countQuery, countParams, function(err, countResult) {
                 if (err) {
