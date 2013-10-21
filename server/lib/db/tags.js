@@ -161,8 +161,8 @@ function listTags(partner, db, req, res) {
     var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable \
                  from tags join tagtypes on (tagtypes.id = tags.type)";
 
-    console.log('Listing tags with ' + JSON.stringify(req.params, 2));
-    console.log('Listing tags with ' + JSON.stringify(req.query, 2));
+    //console.log('Listing tags with ' + JSON.stringify(req.params, 2));
+    //console.log('Listing tags with ' + JSON.stringify(req.query, 2));
     if (req.query.query) {
         query += " where tags.title ~* $" + i;
         if (!typed) {
