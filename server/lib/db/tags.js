@@ -156,18 +156,23 @@ function listTags(partner, db, req, res) {
 
     var i = 2;
     var params = [partner];
+    var typed = req.param.type !== undefined;
 
     var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable \
                  from tags join tagtypes on (tagtypes.id = tags.type)";
 
+    console.log('Listing tags with ' + JSON.stringify(req.params, 2));
+    console.log('Listing tags with ' + JSON.stringify(req.query, 2));
     if (req.query.query) {
-        query += " where (ts_rank_cd(en_index, plainto_tsquery('english', $2)) > 0\
-                   or tagtypes.type ~~ ('%'||$2||'%'))";
+        query += " where tags.title ~* $" + i;
+        if (!typed) {
+            query += " or tagtypes.type ~* $" + i;
+        }
         ++i;
         params.push(req.query.query);
     }
 
-    if (req.params.type !== undefined) {
+    if (typed) {
         if (req.query.query) {
             query += " and ";
         } else {
@@ -178,9 +183,10 @@ function listTags(partner, db, req, res) {
         ++i;
     }
 
-    query += " order by title";
+    query += " order by editable desc, title limit $" + (i++) + " offset $" + (i);
+    ++i;
 
-    query += ' limit $' + i + ' offset $' + (i + 1);
+    errors.logDbQuery("List tags", db, query, params);
 
     //take an arbitrary limit if not specified
     if (req.query.limit) {
@@ -205,25 +211,36 @@ function listTags(partner, db, req, res) {
 
             var j = 1;
 
-            var countQuery = "select count(*) as totalTags from tags join tagtypes on (tagtypes.id = tags.type)";
+            var countQuery = "select count(tags.id)::int as totalTags from tags join tagTypes ON (tags.type = tagTypes.id)";
+            var countWhereClause = null;
+
+            if (typed) {
+                countQuery += " join tagtypes on (tagtypes.id = tags.type)";
+                countWhereClause = " where tagtypes.type = $" + j;
+                countParams.push(req.params.type);
+                ++j;
+            }
 
             if (req.query.query) {
-                countQuery += " where (ts_rank_cd(en_index, plainto_tsquery('english', $1)) > 0\
-                   or tagtypes.type ~~ ('%'||$1||'%'))";
+                if (countWhereClause) {
+                    countWhereClause += " and ";
+                } else {
+                    countWhereClause = " where ";
+                }
+
+                countWhereClause += "tags.title ~* $" + j;
+                if (!typed) {
+                    query += " or tagtypes.type ~* $" + j;
+                }
                 countParams.push(req.query.query);
                 ++j;
             }
 
-            if (req.params.type !== undefined) {
-                if (req.query.query) {
-                    countQuery += " and ";
-                } else {
-                    countQuery += " where ";
-                }
-                countQuery += " tagtypes.type = $" + j;
-                countParams.push(req.params.type);
-                ++j;
+            if (countWhereClause) {
+                countQuery += countWhereClause;
             }
+
+            errors.logDbQuery("Count", db, countQuery, countParams);
 
             db.query(countQuery, countParams, function(err, countResult) {
                 if (err) {
@@ -231,7 +248,7 @@ function listTags(partner, db, req, res) {
                     return;
                 }
 
-                json.totalTags = utils.parseNumber(countResult.rows[0].totaltags);
+                json.totalTags = countResult.rows[0].totaltags;
                 res.json(json);
             });
         });
