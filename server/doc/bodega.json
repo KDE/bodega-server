@@ -549,6 +549,13 @@
               "Default": "published",
               "Type": "enumerated",
               "EnumeratedList": ["published", "incoming", "all", "posted"]
+            },
+            {
+                "Name": "query",
+                "Location": "query",
+                "Description": "The search string",
+                "Required": "N",
+                "Type": "string"
             }
           ]
         }
@@ -1755,20 +1762,11 @@
                     "Description": "The id of the type we want to list tags of",
                     "Required": "N",
                     "Type": "number"
-                }
-            ]
-        },
-        {
-            "MethodName": "Search",
-            "Synopsis": "list all tags which name contains the query",
-            "HTTPMethod": "GET",
-            "URI": "/tag/search/:query",
-            "parameters": [
-                {
+                }, {
                     "Name": "query",
-                    "Location": "URL",
+                    "Location": "query",
                     "Description": "The search string",
-                    "Required": "Y",
+                    "Required": "N",
                     "Type": "string"
                 }
             ]
