@@ -383,7 +383,7 @@ app.get(serverPath('asset/ratings/list/:assetId'), isAuthorized,
 
 app.get(serverPath('asset/types/:assetType/tags'), isAuthorized,
     function(req, res) {
-        app.db.listRelatedTags(req, res);
+        app.db.listAssetTypeTags(req, res);
     }
 );
 

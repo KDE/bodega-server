@@ -21,7 +21,7 @@ var errors = require('../errors.js');
 
 var sanitize = require('validator').sanitize;
 
-module.exports.listRelatedTags = function(db, req, res) {
+module.exports.listAssetTypeTags = function(db, req, res) {
     if (!req.params.assetType) {
         errors.report('MissingParameters', req, res);
         return;
