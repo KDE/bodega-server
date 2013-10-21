@@ -145,8 +145,6 @@ CREATE OR REPLACE function ct_isSuperuserValidator(who int) returns BOOL
 AS
 $$
 BEGIN
-    SELECT INTO validatorId id FROM personroles
-           WHERE description = 'Validator';
     PERFORM * FROM affiliations WHERE
             partner = 0 AND
             role IN (SELECT id FROM personRoles WHERE description = 'Validator') AND
