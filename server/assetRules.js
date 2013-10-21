@@ -165,6 +165,7 @@ var icons = [{
 ];
 
 module.exports.images = {
+    generic: icons,
     application : [{
             type: 'screenshot',
             subtype: 'screen1',
