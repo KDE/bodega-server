@@ -32,7 +32,13 @@ INSERT INTO stores (id, partner, name, description)
 
 
 INSERT INTO tags (type, title) SELECT id, 'application/x-plasma' FROM tagtypes WHERE type = 'mimetype';
-INSERT INTO tags (type, title) SELECT id, 'Vivaldi' FROM tagTypes WHERE type = 'platform';
+INSERT INTO tags (type, title) SELECT id, titles.*
+    FROM tagTypes,
+    (VALUES
+        ('Vivaldi'),
+        ('Plasma Active - x86')
+    ) AS titles
+    WHERE type = 'platform';
 INSERT INTO tags (type, title) SELECT id, titles.*
     FROM tagTypes,
         (VALUES
