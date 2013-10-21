@@ -70,6 +70,10 @@ module.exports.mandatoryTags = {
         resolution: { name: "Resolution", type: "resolution", multi: true, required: false },
         descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
     },
+    image: {
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+    }
 };
 
 var imageTypes = {
@@ -224,6 +228,14 @@ module.exports.images = {
             props: imageTypes.screenshot
         }
     ].concat(icons),
+    image : [{
+            type: 'screenshot',
+            subtype: 'screen1',
+            name: "Screenshot",
+            multi: false,
+            props: imageTypes.screenshot
+        }
+    ],
     magazine : [{
             type: 'cover',
             subtype: 'front',

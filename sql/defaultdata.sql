@@ -76,7 +76,8 @@ INSERT INTO tags (type, title)
             ('movie'),
             ('tvshow'),
             ('wallpaper'),
-            ('widget')
+            ('widget'),
+            ('image')
         ) AS titles
         WHERE type = 'assetType';
 
@@ -91,7 +92,7 @@ INSERT INTO licenses (name, text)
         ('Creative Commons Attribution-NonCommercial', ''),
         ('Creative Commons Attribution-NonCommercial-ShareAlike', ''),
         ('Creative Commons Attribution-NonCommercial-NoDerivs', ''),
-        ('Proprietary', '');
+        ('Proprietary / All rights reserved', '');
 
 -- a "NULL" store for use with e.g. the bodegamarket log ins
 SELECT setval('seq_partnerIds', 1000);
@@ -137,7 +138,7 @@ INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
             ('Beauty', 'Ugly', 'Gorgeous')
         ) AS details
         WHERE type IN (SELECT id FROM tagTypes WHERE type = 'assetType') AND
-              title = 'wallpaper';
+              title IN ('wallpaper', 'image');
 
 INSERT INTO assetRatingAttributes (name, lowDesc, highDesc, assetType)
     SELECT details.*, id FROM tags,
