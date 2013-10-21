@@ -119,10 +119,7 @@ function validateTags(db, req, res, assetInfo, cb)
     var requiredTags = assetRules.mandatoryTags[assetType];
 
     if (!requiredTags) {
-        err = errors.create('UploadMissingTag',
-                            "Unrecognized assetType");
-        cb(err, db, req, res, assetInfo);
-        return;
+        requiredTags = assetRules.mandatoryTags['generic'];
     }
 
     for (tagType in requiredTags) {

@@ -17,6 +17,10 @@
 // if no entry exists in mandatoryTags for an assetType tag, then
 // any assets of that type will be rejected from upload
 module.exports.mandatoryTags = {
+    generic: {
+        author: { name: "Author", type: "author", multi: true, required: true },
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+    },
     application: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
