@@ -248,6 +248,7 @@ function bindPreviewsToFiles(assetInfo, files, fn)
         fn(null);
         return;
     }
+
     if (!files) {
         e = errors.create('PreviewFileMissing',
                           'All preview files are missing!');
@@ -261,7 +262,7 @@ function bindPreviewsToFiles(assetInfo, files, fn)
 
         if (!file) {
             e = errors.create('PreviewFileMissing',
-                              'File ' + preview.file + ' is missing');
+                              'Preview file ' + preview.file + ' is missing');
             fn(e);
             return;
         }
