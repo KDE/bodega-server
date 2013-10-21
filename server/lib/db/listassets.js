@@ -233,7 +233,7 @@ function findIncomingAssets(db, req, res, assetInfo, assets, totalAssets, cb)
 
             totalAssets += utils.parseNumber(countResults.rows[0].totalassets);
 
-            addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, true, cb);
+            addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, false, cb);
         });
     });
 }
@@ -299,7 +299,7 @@ function findPostedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
             }
 
             totalAssets += utils.parseNumber(countResults.rows[0].totalassets);
-            addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, true, cb);
+            addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, false, cb);
         });
     });
 }
