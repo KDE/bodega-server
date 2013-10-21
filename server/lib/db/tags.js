@@ -48,7 +48,7 @@ module.exports.listRelatedTags = function(db, req, res) {
                   var json = utils.standardJson(req);
                   json.tags = assetRules.mandatoryTags[req.params.assetType];
                   if (!json.tags) {
-                      json.tags = {};
+                      json.tags = assetRules.mandatoryTags.generic;
                   }
 
                   for (var i = 0; i < result.rowCount; ++i) {
