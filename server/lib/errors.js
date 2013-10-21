@@ -142,9 +142,9 @@ module.exports.logDbQuery = function(label, db, query, params) {
                      function(err, result) {
                          console.log("-- DB Query: " + label);
                          console.log("    Query: " + query);
-                         console.log("    Param: " + JSON.stringify(params, 2));
+                         console.log("    Param: " + JSON.stringify(params));
                          if (err) {
-                             console.log("    Error: " + JSON.stringify(err, 2));
+                             console.log("    Error: " + JSON.stringify(err, null, 2));
                          } else {
                              console.log("    Trace: "  + result.rows[0]["QUERY PLAN"]);
                              for (var i = 1; i < result.rows.length; ++i) {
