@@ -149,14 +149,14 @@ function findPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
         countQuery += ' and partner = $' + j;
         countArgs.push(assetInfo.partner);
 
-        db.query(countQuery, countArgs, function(err, results) {
+        db.query(countQuery, countArgs, function(err, countResults) {
             if (err) {
                 e = errors.create('Database', err.message);
                 cb(e, db, req, res, assetInfo, assets, totalAssets);
                 return;
             }
 
-            totalAssets += utils.parseNumber(results.rows[0].totalassets);
+            totalAssets += utils.parseNumber(countResults.rows[0].totalassets);
 
             addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, true, cb);
         });
@@ -224,14 +224,14 @@ function findIncomingAssets(db, req, res, assetInfo, assets, totalAssets, cb)
             countArgs.push(assetInfo.partner);
         }
 
-        db.query(countQuery, countArgs, function(err, results) {
+        db.query(countQuery, countArgs, function(err, countResults) {
             if (err) {
                 e = errors.create('Database', err.message);
                 cb(e, db, req, res, assetInfo, assets, totalAssets);
                 return;
             }
 
-            totalAssets += utils.parseNumber(results.rows[0].totalassets);
+            totalAssets += utils.parseNumber(countResults.rows[0].totalassets);
 
             addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, true, cb);
         });
@@ -291,14 +291,14 @@ function findPostedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
             countArgs.push(assetInfo.partner);
         }
 
-        db.query(countQuery, countArgs, function(err, results) {
+        db.query(countQuery, countArgs, function(err, countResults) {
             if (err) {
                 e = errors.create('Database', err.message);
                 cb(e, db, req, res, assetInfo, assets, totalAssets);
                 return;
             }
 
-            totalAssets += utils.parseNumber(results.rows[0].totalassets);
+            totalAssets += utils.parseNumber(countResults.rows[0].totalassets);
             addTagsToAssets(db, req, res, assetInfo, results, assets, totalAssets, true, cb);
         });
     });
