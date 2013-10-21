@@ -387,6 +387,12 @@ app.get(serverPath('asset/types/:assetType/tags'), isAuthorized,
     }
 );
 
+app.get(serverPath('asset/types/:assetType/licenses'), isAuthorized,
+    function(req, res) {
+        app.db.listLicenses(req, res);
+    }
+);
+
 app.get(serverPath('asset/types/:assetType/images'), isAuthorized,
     function(req, res) {
         var json = utils.standardJson(req);

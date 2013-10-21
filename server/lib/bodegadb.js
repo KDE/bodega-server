@@ -275,6 +275,10 @@ var BodegaDb = (function() {
         this.dbQuery(dbTags.listRelatedTags, req, res);
     };
 
+    BodegaDb.prototype.listLicenses = function(req, res) {
+        this.dbQuery(dbTags.listLicenses, req, res);
+    };
+
     BodegaDb.prototype.createTag = function(req, res) {
         this.dbQuery(dbTags.create, req, res);
     };

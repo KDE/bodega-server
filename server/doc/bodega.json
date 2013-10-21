@@ -564,6 +564,21 @@
     { "name": "Asset type information",
       "methods": [
         {
+            "MethodName": "List licenses relevant for an asset type",
+            "Synopsis": "Lists licenses that can be used for a given asset type",
+            "HTTPMethod": "GET",
+            "URI": "/asset/types/:assetType/licenses",
+            "parameters": [
+                {
+                    "Name": "assetType",
+                    "Location": "URL",
+                    "Description": "The name of the asset type we want to list licenses for",
+                    "Required": "Y",
+                    "Type": "number"
+                }
+            ]
+        },
+        {
             "MethodName": "List image expectations for an asset type",
             "Synopsis": "List image types and their dimensions that can be associated with a given type of asset",
             "HTTPMethod": "GET",

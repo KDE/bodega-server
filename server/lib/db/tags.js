@@ -370,3 +370,17 @@ function update(partner, db, req, res) {
 module.exports.update = function(db, req, res) {
     utils.partnerId(db, req, res, update);
 };
+
+module.exports.listLicenses = function(db, req, res) {
+    db.query("SELECT id, name FROM licenses ORDER BY id", [],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                     return;
+                 }
+
+                 json = utils.standardJson(req);
+                 json.licenses = result.rows;
+                 res.json(json);
+             });
+};
