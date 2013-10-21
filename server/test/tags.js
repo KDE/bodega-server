@@ -245,9 +245,9 @@ describe('Tags manipulation', function(){
                     res.body.should.have.property('tags');
 
                     res.body.tags.length.should.equal(7);
-                    res.body.tags[6].typeid.should.be.eql(8);
-                    res.body.tags[6].type.should.be.eql('contentrating');
-                    res.body.tags[6].title.should.be.eql('test');
+                    res.body.tags[0].typeid.should.be.eql(8);
+                    res.body.tags[0].type.should.be.eql('contentrating');
+                    res.body.tags[0].title.should.be.eql('test');
                     done();
                 });
             });
@@ -263,9 +263,9 @@ describe('Tags manipulation', function(){
                     res.body.should.have.property('tags');
 
                     res.body.tags.length.should.equal(11);
-                    res.body.tags[8].typeid.should.be.eql(9);
-                    res.body.tags[8].type.should.be.eql('assetType');
-                    res.body.tags[8].title.should.be.eql('new title');
+                    res.body.tags[0].typeid.should.be.eql(9);
+                    res.body.tags[0].type.should.be.eql('assetType');
+                    res.body.tags[0].title.should.be.eql('new title');
                     done();
                 });
             });
