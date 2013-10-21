@@ -152,66 +152,6 @@ module.exports.listChannelTags = function(db, req, res) {
     utils.partnerId(db, req, res, listChannelTags);
 };
 
-function listTagsa(partner, db, req, res) {
-
-    var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable \
-                 from tags join tagtypes on (tagtypes.id = tags.type)";
-
-    var params = [partner];
-
-    var i = 2;
-    if (req.params.type !== undefined) {
-        query += " where tagtypes.type = $" + i;
-        params.push(req.params.type);
-        ++i;
-    }
-
-    query += " order by title";
-
-    query += ' limit $' + i + ' offset $' + (++i);
-    //take an arbitrary limit if not specified
-    if (req.query.limit) {
-        params.push(Math.min(100, utils.parseNumber(req.query.limit)));
-    } else {
-        params.push(100);
-    }
-    params.push(utils.parseNumber(req.query.start));
-
-    var json = utils.standardJson(req);
-
-    var q = db.query(
-        query, params,
-        function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-
-            if (req.params.type) {
-                json.type = req.params.type;
-            }
-
-            json.tags = result.rows;
-
-            var countQuery = "select count(*) as totalTags from tags join tagtypes on (tagtypes.id = tags.type)";
-            var countParams = [];
-
-            if (req.params.type !== undefined) {
-                countQuery += " where tagtypes.type = $1";
-                countParams.push(req.params.type);
-            }
-            db.query(countQuery, countParams, function(err, countResult) {
-                if (err) {
-                    errors.report('Database', req, res, err);
-                    return;
-                }
-
-                json.totalTags = utils.parseNumber(countResult.rows[0].totaltags);
-                res.json(json);
-            });
-        });
-}
-
 function listTags(partner, db, req, res) {
 
     var i = 2;
@@ -263,10 +203,26 @@ function listTags(partner, db, req, res) {
             json.tags = result.rows;
             var countParams = [];
 
+            var j = 1;
+
             var countQuery = "select count(*) as totalTags from tags join tagtypes on (tagtypes.id = tags.type)";
+
             if (req.query.query) {
-                countQuery += " where ts_rank_cd(en_index, plainto_tsquery('english', $1)) > 0";
-                countParams.push(req.params.query);
+                countQuery += " where (ts_rank_cd(en_index, plainto_tsquery('english', $1)) > 0\
+                   or tagtypes.type ~~ ('%'||$1||'%'))";
+                countParams.push(req.query.query);
+                ++j;
+            }
+
+            if (req.params.type !== undefined) {
+                if (req.query.query) {
+                    countQuery += " and ";
+                } else {
+                    countQuery += " where ";
+                }
+                countQuery += " tagtypes.type = $" + j;
+                countParams.push(req.params.type);
+                ++j;
             }
 
             db.query(countQuery, countParams, function(err, countResult) {

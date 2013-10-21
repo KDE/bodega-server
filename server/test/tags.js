@@ -44,7 +44,7 @@ describe('Tags manipulation', function(){
     }
 
     function searchTags(query, cb) {
-        var path = '/bodega/v1/json/tag/search/' + query;
+        var path = '/bodega/v1/json/tag/list?query=' + query;
 
         utils.getUrl(path,
             function(res) {
@@ -184,7 +184,7 @@ describe('Tags manipulation', function(){
         });
 
         it('List all tags of related to the application asset type', function(done) {
-            utils.getUrl('tag/list/forAssetType/application',
+            utils.getUrl('asset/types/application/tags',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -208,7 +208,7 @@ describe('Tags manipulation', function(){
         });
 
         it('List all tags of related to the article asset type', function(done) {
-            utils.getUrl('tag/list/forAssetType/article',
+            utils.getUrl('asset/types/article/tags',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
@@ -222,7 +222,7 @@ describe('Tags manipulation', function(){
         });
 
         it('List all tags of related to non-extant asset type', function(done) {
-            utils.getUrl('tag/list/forAssetType/nonexistent',
+            utils.getUrl('asset/types/nonexistent/tags',
                 function(res) {
                     res.statusCode.should.equal(200);
                     res.headers.should.have.property('content-type');
