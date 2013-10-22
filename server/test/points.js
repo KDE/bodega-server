@@ -64,7 +64,6 @@ describe('Point operations', function() {
                                  res.should.have.status(200);
                                  res.headers.should.have.property('content-type');
                                  res.body.should.not.have.property('error');
-                                 console.log(res.body);
                                  res.body.should.have.property('USD', 6);
                                  res.body.should.have.property('CHF');
                                  done();
