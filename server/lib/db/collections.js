@@ -25,8 +25,8 @@ module.exports.listAll = function(db, req, res) {
          FROM collections b WHERE b.person = $1        \
          ORDER BY b.name LIMIT $2 OFFSET $3;';
     var defaultPageSize = 25;
-    var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
-    var offset = parseInt(req.query.offset, 10) || 0;
+    var pageSize = utils.parseNumber(req.query.pageSize) || defaultPageSize;
+    var offset = utils.parseNumber(req.query.offset) || 0;
     var json = utils.standardJson(req);
     json.collections = [];
 
@@ -210,8 +210,8 @@ module.exports.listAssets = function(db, req, res) {
          WHERE bc.collection = $3 \
          ORDER BY a.name LIMIT $4 OFFSET $5';
     var defaultPageSize = 25;
-    var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
-    var offset = parseInt(req.query.offset, 10) || 0;
+    var pageSize = utils.parseNumber(req.query.pageSize) || defaultPageSize;
+    var offset = utils.parseNumber(req.query.offset) || 0;
     var collectionId = req.params.collectionId;
 
     var json = utils.standardJson(req);

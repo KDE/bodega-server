@@ -251,7 +251,7 @@ var PreviewStore = (function() {
                 return;
             }
 
-            modeInt = parseInt(stat.mode.toString(8), 10);
+            modeInt = utils.parseNumber(stat.mode.toString(8));
             //we use the following two lines because
             // endsWith is only available in ecmascript 6+
             // and we need to match on ends with because our

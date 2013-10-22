@@ -56,8 +56,8 @@ module.exports.asset = function(db, req, res) {
                         ORDER BY created desc, person LIMIT $2 OFFSET $3;';
 
     var defaultPageSize = 25;
-    var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
-    var offset = parseInt(req.query.offset, 10) || 0;
+    var pageSize = utils.parseNumber(req.query.pageSize) || defaultPageSize;
+    var offset = utils.parseNumber(req.query.offset) || 0;
     var assetId = req.params.assetId;
 
     if (!assetId) {
@@ -101,8 +101,8 @@ module.exports.participant = function(db, req, res) {
                         WHERE person = $1 ORDER BY r.created desc, r.asset, r.attribute;';
 
     var defaultPageSize = 25;
-    var pageSize = parseInt(req.query.pageSize, 10) || defaultPageSize;
-    var offset = parseInt(req.query.offset, 10) || 0;
+    var pageSize = utils.parseNumber(req.query.pageSize) || defaultPageSize;
+    var offset = utils.parseNumber(req.query.offset) || 0;
 
     var json = utils.standardJson(req);
 
