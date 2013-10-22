@@ -25,10 +25,10 @@ module.exports.buy = function(db, req, res) {
     //   points=%d
     var args = {
         userId : req.session.user.id,
-        points : parseInt(req.body.amount, 10)
+        points : utils.parseNumber(req.body.amount)
     };
 
-    if (!args.points) {
+    if (args.points < 1) {
         // Number of points is missing.
         errors.report('MissingParameters', req, res);
         return;
