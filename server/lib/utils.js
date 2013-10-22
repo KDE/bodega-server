@@ -59,23 +59,6 @@ module.exports.findImagePaths = function(req)
     return imageUrls;
 };
 
-module.exports.recordDownload = function(db, req)
-{
-    var ip = req.headers['x-forwarded-for'];
-    if (!ip) {
-        ip = req.connection.socket ? req.connection.socket.remoteAddress
-                                   : req.connection.remoteAddress;
-        if (!ip) {
-            ip = "0.0.0.0";
-        }
-    }
-    db.query("SELECT ct_recordDownload($1, $2, $3, $4);",
-            [req.session.user.id, req.params.assetId, ip,
-             req.session.user.store],
-            function(err, result) { }
-            );
-};
-
 module.exports.standardJson = function(req, success)
 {
     var json = {};

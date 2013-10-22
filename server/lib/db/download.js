@@ -38,6 +38,7 @@ function launchDownload(db, req, res)
             errors.report('NoMatch', req, res);
             return;
         }
+
         assetInfo = result.rows[0];
         app.assetStore.download(res, assetInfo, function(err) {
             if (err) {
@@ -45,7 +46,17 @@ function launchDownload(db, req, res)
                 return;
             }
 
-            utils.recordDownload(db, req);
+            var ip = req.headers['x-forwarded-for'];
+            if (!ip) {
+                ip = req.connection.socket ? req.connection.socket.remoteAddress
+                : req.connection.remoteAddress;
+                if (!ip) {
+                    ip = "0.0.0.0";
+                }
+            }
+
+            db.query("SELECT ct_recordDownload($1, $2, $3, $4);",
+                     [req.session.user.id, req.params.assetId, ip, req.session.user.store]);
         });
     });
 }
