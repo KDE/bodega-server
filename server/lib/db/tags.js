@@ -158,12 +158,16 @@ function listTags(partner, db, req, res) {
     var params = [partner];
     var typed = req.params.type !== undefined;
 
-    var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, (case when partner = $1 then true else false end) as editable \
+    var query = "select tags.id, tags.type as typeid, tagtypes.type as type, title, \
+                 (case when partner = $1 then true else false end) as editable \
                  from tags join tagtypes on (tagtypes.id = tags.type)";
+
+    var whereClause = false;
 
     //console.log('Listing tags with ' + JSON.stringify(req.params, 2));
     //console.log('Listing tags with ' + JSON.stringify(req.query, 2));
     if (req.query.query) {
+        whereClause = true;
         query += " where tags.title ~* $" + i;
         if (!typed) {
             query += " or tagtypes.type ~* $" + i;
@@ -173,9 +177,10 @@ function listTags(partner, db, req, res) {
     }
 
     if (typed) {
-        if (req.query.query) {
+        if (whereClause) {
             query += " and ";
         } else {
+            whereClause = true;
             query += " where ";
         }
         query += " tagtypes.type = $" + i;
@@ -183,6 +188,14 @@ function listTags(partner, db, req, res) {
         ++i;
     }
 
+    if (whereClause) {
+        query += " and ";
+    } else {
+        whereClause = true;
+        query += " where ";
+    }
+
+    query += " (partner IS NULL OR partner = $1) ";
     query += " order by editable desc, title limit $" + (i++) + " offset $" + (i);
     ++i;
 
