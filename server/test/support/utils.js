@@ -29,22 +29,22 @@ function getUrl(path, fn, opts)
         res.on("data", function(chunk) {
             buf += chunk;
         });
-        res.on("end", function(chunk) {
+        res.on("end", function() {
             var contentType = res.headers['content-type'];
             if (opts && opts.html) {
                 assert.deepEqual(contentType, 'text/html; charset=utf-8');
                 res.body = buf;
             } else if (opts && opts.stream) {
-                var isStreamOrPdf =
+                var isStreamable =
                     contentType === 'application/octet-stream' ||
                     contentType === 'application/pdf' ||
                     contentType === 'image/png' ||
                     contentType === 'image/jpeg';
-                assert(isStreamOrPdf, 'Content type is wrong: ' + contentType);
+                assert(isStreamable, 'Content type is wrong: ' + contentType);
             } else {
                 var isJson =
-                        contentType === 'application/json' ||
-                        contentType === 'application/json; charset=utf-8';
+                    contentType === 'application/json' ||
+                    contentType === 'application/json; charset=utf-8';
                 assert(isJson, 'Content type is not json: ' + contentType);
                 try {
                     res.body = JSON.parse(buf);
@@ -52,6 +52,7 @@ function getUrl(path, fn, opts)
                     console.log("!!!! JSON Parsing failed on this return: " + buf + "\n(" + e + ")");
                 }
             }
+
             fn(res);
         });
     });
