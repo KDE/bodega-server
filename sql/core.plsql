@@ -163,6 +163,18 @@ BEGIN
         END IF;
     END IF;
 
+    -- if we have a new asset type, then associate all the content rating tags
+    IF TG_OP = 'INSERT' OR OLD.type != NEW.type THEN
+        PERFORM id FROM tagTypes WHERE type = 'assetType' AND id = NEW.type;
+        IF FOUND THEN
+            DELETE FROM relatedtags WHERE tag = NEW.id AND related IN
+                (SELECT id FROM tags
+                    WHERE type in (SELECT id FROM tagTypes WHERE type = 'contentrating'));
+            INSERT INTO relatedTags (tag, related)
+                SELECT NEW.id, t.id FROM tags t
+                    WHERE t.type in (SELECT id FROM tagTypes WHERE type = 'contentrating');
+        END IF;
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
