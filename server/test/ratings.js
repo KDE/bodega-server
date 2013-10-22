@@ -115,7 +115,7 @@ describe('Ratings', function() {
                         "rated": '',
                         "ratings": [
                             {
-                                "attribute": 15,
+                                "attribute": 17,
                                 "name": "Graphics",
                                 "rating": 5
                             }
@@ -129,7 +129,7 @@ describe('Ratings', function() {
                         "rated": '',
                         "ratings": [
                             {
-                                "attribute": 18,
+                                "attribute": 20,
                                 "name": "Enjoyability",
                                 "rating": 3
                             }
@@ -207,7 +207,7 @@ describe('Ratings', function() {
         });
 
         it('should succeed', function(done) {
-            var ratings = { 15: 1, 16: 3, 18: 2 };
+            var ratings = { 17: 1, 18: 3, 20: 2 };
             var query = {
                 ratings: JSON.stringify(ratings)
             };
