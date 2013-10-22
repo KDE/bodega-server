@@ -917,6 +917,38 @@ var PreviewStore = (function() {
         });
     };
 
+    function generateScreenhotIcons (assetInfo, fn) {
+        var previews = splitPreviews(assetInfo.previews);
+        var iconsToGenerate = [];
+        var iconType;
+        var assetPaths = fillPathsForAsset(assetInfo);
+        var shot = previews.screenshots[0];
+        var funcs = [function(cb) {
+            cb(null, assetInfo, assetPaths, shot,
+               iconsToGenerate, 0);
+        }];
+
+        if (!shot) {
+            fn(null);
+            return;
+        }
+
+        for (iconType in iconSizes) {
+            if (!previews.splitIcons[iconType]) {
+                iconsToGenerate.push({
+                    asset: assetInfo.id,
+                    type : 'icon',
+                    subtype : iconType
+                });
+                funcs.push(generateIconFromPreview);
+            }
+        }
+
+        async.waterfall(funcs, function(err, assetInfo, icons, i) {
+            fn(err);
+        });
+    };
+
     function scaleIcon(data, cb) {
         var assetInfo = data.assetInfo;
         var fromIcon = data.fromIcon;
@@ -999,8 +1031,11 @@ var PreviewStore = (function() {
         var i;
         var q = async.queue(scaleIcon, 2);
 
-        if (previews.splitIcons === undefined ||
-            Object.keys(previews.splitIcons).length === 0) {
+        if ((previews.splitIcons === undefined ||
+            Object.keys(previews.splitIcons).length === 0) && previews.screenshots.length > 0) {
+            generateScreenhotIcons(assetInfo, fn);
+            return;
+        } else if (previews.screenshots.length === 0)  {
             var e = errors.create('AssetIconMissing',
                               'The asset needs at least one icon.');
             fn(e);
