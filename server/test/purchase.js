@@ -16,6 +16,7 @@
 */
 
 var server = require('../app.js');
+var errors = require('../lib/errors.js');
 var utils = require('./support/utils');
 var fs = require('fs');
 var path = require('path');
@@ -120,22 +121,29 @@ describe('Purchase Asset', function() {
     });
 
     after(function(done) {
+        // we delay the cleanup by 500ms as a complete hack
+        // the client side closes as soon as it has received all the data it expects
+        // the server side request continues on, however; so recording the download
+        // happens ASYNCHRONOUSLY to this after function
+        // the 500ms timeout just gives the server side of this request time to finish
+        setTimeout(function() {
         pg.connect(utils.dbConnectionString,
             function(err, client, finis) {
-                   client.query("delete from purchases where asset in (25, 14) and email = 'zack@kde.org'", [],
-                   function() {
-                        client.query("delete from downloads where address = '127.0.0.1';", [],
+                client.query("delete from purchases where asset in (25, 14) and email = 'zack@kde.org'", [],
+                function(err, result) {
+                    client.query("delete from downloads where address = $1", ['127.0.0.1'],
+                    function(err, result) {
+                        client.query("update people set points = 10000 where email ='zack@kde.org'", [],
                         function(err, result) {
-                            client.query("update people set points = 10000 where email ='zack@kde.org'", [],
-                                function() {
-                                    client.query("update partners set earnedPoints = 0, owedPoints = 0 where name = 'KDE'", [],
-                                        function() {
-                                            finis();
-                                            done();
-                                        });
-                                });
+                            client.query("update partners set earnedPoints = 0, owedPoints = 0 where name = 'KDE'", [],
+                            function(err, result) {
+                                finis();
+                                done();
+                            });
                         });
-                   });
-            });
+                    });
+               });
+          });
+        }, 500);
     });
 });
