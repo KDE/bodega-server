@@ -219,7 +219,7 @@ module.exports.images = {
             multi: false,
             props: imageTypes.cover
         }
-    ].concat(icons),
+    ],
     game : [{
             type: 'screenshot',
             subtype: 'screen1',
