@@ -19,30 +19,39 @@ var utils = require('./support/utils');
 
 describe('Redeeming points code', function(){
     var testCode = 'NtTMi4EMBJugZu1hxTmv';
+    var expiredCode = 'NtTMi4EMBJugZu1hxTmf';
     var testPoints = 1000;
     var startPoints = -1;
 
     before(function(done) {
-        var insertQuery = 'INSERT INTO pointCodes (code, points, expires) \
-        VALUES($1, $2, TIMESTAMP \'2013-10-19 10:23:54\');';
+        var insertQuery = "INSERT INTO pointCodes (code, points, expires) \
+                           VALUES($1, $2, current_timestamp + ($3 || ' days')::interval)";
         app.db.dbQuery(function (db) {
-            db.query(insertQuery, [testCode, testPoints], function(err, result) {
+            db.query(insertQuery, [testCode, testPoints, '10'], function(err, result) {
                 if (err) {
                     console.warn("Couldn't modify the db for the point redeem test!");
                     console.log(err);
                 }
-                done();
+
+                db.query(insertQuery, [expiredCode, testPoints, '-10'], function(err, result) {
+                    if (err) {
+                        console.warn("Couldn't modify the db for the point redeem test!");
+                        console.log(err);
+                    }
+
+                    done();
+                });
             });
         });
     });
 
     after(function(done) {
-        var deleteCodeQuery = 'DELETE FROM pointCodes WHERE code=$1;';
+        var deleteCodeQuery = 'DELETE FROM pointCodes WHERE code IN ($1, $2);';
         var deleteTransactionQuery = "DELETE FROM pointTransactions WHERE person = 2 AND comment ~ 'Code redeemed:'";
         var updateQuery = 'UPDATE people SET points=$1 WHERE email=\'zack@kde.org\'';
 
         app.db.dbQuery(function (db) {
-            db.query(deleteCodeQuery, [testCode], function(err, result) {
+            db.query(deleteCodeQuery, [testCode, expiredCode], function(err, result) {
                 if (err) {
                     console.warn("Couldn't clean the db after the point redeem test!");
                     console.log(err);
@@ -78,7 +87,7 @@ describe('Redeeming points code', function(){
     });
 
     describe('Try to redeem codes', function(){
-        it('A non-existent code', function(done){
+        it('A non-existent code', function(done) {
             var expected = {
                 "authStatus":true,
                 "device":'VIVALDI-1',
@@ -94,7 +103,25 @@ describe('Redeeming points code', function(){
                     done();
                 });
         });
-        it('A working code', function(done){
+
+        it('An expired code', function(done) {
+            var expected = {
+                "authStatus":true,
+                "device":'VIVALDI-1',
+                "store":'VIVALDI-1',
+                "points":startPoints,
+                "success": false,
+                "error": {'type' : 'RedeemCodeFailure'}};
+            utils.getUrl('points/redeemCode/1111111111',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.eql(expected);
+                    done();
+                });
+        });
+
+        it('A working code', function(done) {
             var expected = {
                 "authStatus":true,
                 "device": 'VIVALDI-1',
