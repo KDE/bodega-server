@@ -229,7 +229,10 @@ describe('Partner management', function() {
                             email: "aseigo@kde.org",
                             roles: [
                                 "Account Manager",
-                                "Partner Manager"
+                                "Content Creator",
+                                "Partner Manager",
+                                "Store Manager",
+                                "Validator"
                             ]
                         }
                     ]
@@ -574,17 +577,20 @@ describe('Partner management', function() {
                     expected.push(newPartnerJson);
                     expected[2].people = [
                         {
-                            "name": "Aaron Seigo",
-                            "email": "aseigo@kde.org",
-                            "roles": [
+                            name: "Aaron Seigo",
+                            email: "aseigo@kde.org",
+                            roles: [
                                 "Account Manager",
-                                "Partner Manager"
+                                "Content Creator",
+                                "Partner Manager",
+                                "Store Manager",
+                                "Validator"
                             ]
                         },
                         {
-                            "name": "Zack Rusin",
-                            "email": "zack@kde.org",
-                            "roles": [
+                            name: "Zack Rusin",
+                            email: "zack@kde.org",
+                            roles: [
                                 "Account Manager",
                                 "Validator"
                             ]
@@ -608,16 +614,19 @@ describe('Partner management', function() {
                     var expected = existingPartnerJson.slice();
                     expected.push(newPartnerJson);
                     expected[2].people = [{
-                        "name": "Aaron Seigo",
-                        "email": "aseigo@kde.org",
-                        "roles": [
+                        name: "Aaron Seigo",
+                        email: "aseigo@kde.org",
+                        roles: [
                             "Account Manager",
-                            "Partner Manager"
+                            "Content Creator",
+                            "Partner Manager",
+                            "Store Manager",
+                            "Validator"
                         ]
                     }, {
-                        "name": "Zack Rusin",
-                        "email": "zack@kde.org",
-                        "roles": [
+                        name: "Zack Rusin",
+                        email: "zack@kde.org",
+                        roles: [
                             "Account Manager"
                         ]
                     }];
@@ -642,11 +651,14 @@ describe('Partner management', function() {
                         expected.push(newPartnerJson);
                         expected[2].people = [
                             {
-                                "name": "Aaron Seigo",
-                                "email": "aseigo@kde.org",
-                                "roles": [
+                                name: "Aaron Seigo",
+                                email: "aseigo@kde.org",
+                                roles: [
                                     "Account Manager",
-                                    "Partner Manager"
+                                    "Content Creator",
+                                    "Partner Manager",
+                                    "Store Manager",
+                                    "Validator"
                                 ]
                             }
                         ];
