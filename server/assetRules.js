@@ -169,7 +169,13 @@ var icons = [{
 ];
 
 module.exports.images = {
-    generic: icons,
+    generic: [{
+            type: 'screenshot',
+            subtype: 'screen1',
+            name: "Screenshot 1",
+            multi: false,
+            props: imageTypes.screenshot
+        }].concat(icons),
     application : [{
             type: 'screenshot',
             subtype: 'screen1',
