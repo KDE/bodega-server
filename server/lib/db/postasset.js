@@ -248,6 +248,20 @@ function setPosted(db, req, res, assetInfo, cb)
     });
 }
 
+function queueAssetPostedMessage(db, req, res, assetInfo, cb)
+{
+    db.query("INSERT INTO emailQueue (data, template) \
+              VALUES (hstore(Array[['assetid', $1], ['assetname', $2], ['assettype', $3], ['partner', $4]]), 'partner_distributorAssetPosted')",
+             [assetInfo.id, assetInfo.name, assetInfo.assetType, assetInfo.partner],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                 }
+
+                 cb(err, db, req, res, assetInfo);
+             });
+}
+
 
 function postAsset(db, req, res, assetInfo)
 {
@@ -276,6 +290,9 @@ function postAsset(db, req, res, assetInfo)
 
     // mark the asset as posted
     funcs.push(setPosted);
+
+    // send an message to the warehouse team
+    funcs.push(queueAssetPostedMessage);
 
     async.waterfall(funcs, function(err, assetInfo) {
         if (err) {
