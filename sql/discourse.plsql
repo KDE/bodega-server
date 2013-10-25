@@ -169,7 +169,7 @@ BEGIN
         PERFORM dblink_exec('INSERT INTO category_featured_topics (category_id, topic_id, created_at, updated_at, rank)
                             VALUES ('''||categoryId||''', '''||topicId||''', '''||currentTime||''', '''||currentTime||''', 0);');
 
-        someText := 'foo';
+        someText := '''' || NEW.name || ''' has just been published! Share your thoughts on it here.' ;
         PERFORM dblink_exec('INSERT INTO posts (user_id, topic_id, post_number, raw, cooked,
                             created_at, updated_at, last_version_at)
                             VALUES ('''||userId||''', '''||topicId||''', 0, '''||someText||''', '''||someText||''',
