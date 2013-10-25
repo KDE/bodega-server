@@ -458,7 +458,7 @@ function processInfo(assetInfo, db, req, res, opts)
         db, req, res, assetInfo,
         function(err, db, req, res, assetInfo) {
             if (err) {
-                errors.report('PartnerInvalid', req, res, err);
+                errors.report(err.type, req, res, err);
                 return;
             }
             if (isCreating) {

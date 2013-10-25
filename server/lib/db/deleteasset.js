@@ -128,7 +128,7 @@ module.exports = function(db, req, res) {
                     db, req, res, assetInfo,
                     function(err, db, req, res, assetInfo) {
                         if (err) {
-                            errors.report('PartnerInvalid', req, res, err);
+                            errors.report(err.type, req, res, err);
                             return;
                         }
 

@@ -282,10 +282,8 @@ function checkCanViewIncoming(db, req, res, assetInfo, cb)
                 createUtils.isValidator(
                     db, req, res, assetInfo,
                     function(err, db, req, res, assetInfo) {
-                        var e;
                         if (err) {
-                            e = errors.create('PartnerInvalid', err.message);
-                            cb(e, db, req, res, assetInfo);
+                            cb(err, db, req, res, assetInfo);
                         } else {
                             assetInfo.validator = true;
                             cb(null, db, req, res, assetInfo);
