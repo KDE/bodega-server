@@ -47,7 +47,8 @@
         "email": "Name <returnaddress@example.org>"
     },
     "addresses": {
-        "partnerRequests": "partnerrequests@example.org"
+        "partnerRequests": "partnerrequests@example.org",
+        "assetRequests": "assetrequests@example.org"
     },
     "storage": {
         "localStorage": {
