@@ -26,7 +26,6 @@ module.exports.sendEmail = function(transport, db, record, cb)
        transport: transport,
        from: app.config.service.email,
        to: record.data.email,
-       bcc: app.config.service.email,
        subject: "Your asset has been published!"
    };
 

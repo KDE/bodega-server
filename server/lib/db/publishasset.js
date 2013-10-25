@@ -364,7 +364,7 @@ function sendAcceptanceEmail(db, req, res, assetInfo, cb)
 {
     db.query("INSERT INTO emailQueue (data, template) \
               VALUES (hstore(Array[['assetid', $1], ['assetname', $2], ['email', $3]]), 'partner_distributor_assetAcceptance')",
-             [assetInfo.id, assetInfo.name, assetInfo.supportemail],
+             [assetInfo.id, assetInfo.name, assetInfo.supportEmail],
              function(err, result) {
                  if (err) {
                      errors.report('Database', req, res, err);
@@ -378,7 +378,7 @@ function sendRejectionEmail(db, req, res, assetInfo, cb)
 {
     db.query("INSERT INTO emailQueue (data, template) \
               VALUES (hstore(Array[['assetid', $1], ['assetname', $2], ['reason', $3], ['email', $4]]), 'partner_distributor_assetRejection')",
-             [assetInfo.id, assetInfo.name, assetInfo.rejectionReason, assetInfo.supportemail],
+             [assetInfo.id, assetInfo.name, assetInfo.rejectionReason, assetInfo.supportEmail],
              function(err, result) {
                  if (err) {
                      errors.report('Database', req, res, err);
