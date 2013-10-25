@@ -817,26 +817,25 @@ var PreviewStore = (function() {
         });
     }
 
-    function generateIconFromPreview(assetInfo, assetPaths, preview, icons, i, cb) {
-        var icon = icons[i];
-        var w = iconSizes[icon.subtype];
-        var h = iconSizes[icon.subtype];
+    function generateIconFromPreview(task, cb) {
+        task.type = 'icon'; // for fullIncomingPath and friends
+        var w = iconSizes[task.subtype];
+        var h = iconSizes[task.subtype];
         var w1, h1;
         var xoffset = 0;
         var yoffset = 0;
-        var fromPath = previewFullPath(assetInfo, preview, true);
-        var fullIncomingPath;
+        var fromPath = previewFullPath(task.assetInfo, task.preview, true);
         var dirname;
 
-        //console.log(preview);
-        icon.file = fromPath;
-        icon.path = iconRelativePath(assetInfo, icon);
+        //console.log(task.preview);
+        task.file = fromPath;
+        task.path = iconRelativePath(task.assetInfo, task);
         //console.log("Cover file = " + icon.file);
         //console.log("Icon path = " + icon.path);
-        updateAssetInfoIcon(assetInfo, icon.subtype, icon.path);
-        icon.file = undefined;
+        updateAssetInfoIcon(task.assetInfo, task.subtype, task.path);
+        task.file = undefined;
 
-        fullIncomingPath = previewFullPath(assetInfo, icon, true);
+        var fullIncomingPath = previewFullPath(task.assetInfo, task, true);
         //console.log('Full from path = ' + fromPath);
         //console.log('Full incoming path = ' + fullIncomingPath);
         dirname = path.dirname(fullIncomingPath);
@@ -845,6 +844,17 @@ var PreviewStore = (function() {
             gm(fromPath)
                 .size(function(err, size) {
                     //console.log(size);
+                    if (err) {
+                        console.log("***************************************************");
+                        console.log("***************************************************");
+                        console.log(dirname + ' ' + fromPath);
+                        console.log("***************************************************");
+                        console.log("***************************************************");
+                        console.log("***************************************************");
+                        cb(err);
+                        return;
+                    }
+
                     if (size.width > size.height) {
                         w1 = w;
                         h1 = Math.floor(size.height * (w/size.width));
@@ -879,7 +889,7 @@ var PreviewStore = (function() {
                         .scale(w1, h1)
                         .noProfile()
                         .write(fullIncomingPath, function(err) {
-                            cb(err, assetInfo, assetPaths, preview, icons, ++i);
+                            cb(err);
                         });
                 });
         });
@@ -888,65 +898,70 @@ var PreviewStore = (function() {
     PreviewStore.prototype.generateCoverIcons = function(assetInfo, fn) {
         var previews = splitPreviews(assetInfo.previews);
         var iconsToGenerate = [];
-        var iconType;
         var assetPaths = fillPathsForAsset(assetInfo);
         var cover = previews.splitCovers.front;
-        var funcs = [function(cb) {
-            cb(null, assetInfo, assetPaths, cover,
-               iconsToGenerate, 0);
-        }];
 
         if (!cover) {
             fn(null);
             return;
         }
 
-        for (iconType in iconSizes) {
-            if (!previews.splitIcons[iconType]) {
+        var count = 0;
+        var size;
+        for (size in iconSizes) {
+            if (!previews.splitIcons[size]) {
                 iconsToGenerate.push({
-                    asset: assetInfo.id,
-                    type : 'icon',
-                    subtype : iconType
+                    assetInfo: assetInfo,
+                    assetPaths: assetPaths,
+                    preview: cover,
+                    subtype: size
                 });
-                funcs.push(generateIconFromPreview);
             }
         }
 
-        async.waterfall(funcs, function(err, assetInfo, icons, i) {
+        if (iconsToGenerate.length === 0) {
+            fn(null);
+            return;
+        }
+
+        var q = async.queue(generateIconFromPreview, 2);
+        q.push(iconsToGenerate);
+        q.drain = function(err) {
+            //console.log('++++++++++++++++++++++++++++++++++++++++++++++++=');
+            //console.log(JSON.stringify(iconsToGenerate));
             fn(err);
-        });
+        };
     };
 
     function generateScreenhotIcons (assetInfo, fn) {
         var previews = splitPreviews(assetInfo.previews);
         var iconsToGenerate = [];
-        var iconType;
         var assetPaths = fillPathsForAsset(assetInfo);
         var shot = previews.screenshots[0];
-        var funcs = [function(cb) {
-            cb(null, assetInfo, assetPaths, shot,
-               iconsToGenerate, 0);
-        }];
 
         if (!shot) {
             fn(null);
             return;
         }
 
-        for (iconType in iconSizes) {
+        var count = 0;
+        var size;
+        for (size in iconSizes) {
             if (!previews.splitIcons[iconType]) {
                 iconsToGenerate.push({
-                    asset: assetInfo.id,
-                    type : 'icon',
-                    subtype : iconType
+                    assetInfo: assetInfo,
+                    assetPaths: assetPaths,
+                    preview: shot,
+                    iconSize: size
                 });
-                funcs.push(generateIconFromPreview);
             }
         }
 
-        async.waterfall(funcs, function(err, assetInfo, icons, i) {
+        var q = async.queue(generateIconFromPreview, 2);
+        q.push(iconsToGenerate);
+        q.drain = function(err) {
             fn(err);
-        });
+        };
     };
 
     function scaleIcon(data, cb) {
@@ -1029,7 +1044,6 @@ var PreviewStore = (function() {
         var iconType, lastIcon;
         var assetPaths = fillPathsForAsset(assetInfo);
         var i;
-        var q = async.queue(scaleIcon, 2);
 
         if ((previews.splitIcons === undefined ||
             Object.keys(previews.splitIcons).length === 0) && previews.screenshots.length > 0) {
@@ -1042,6 +1056,7 @@ var PreviewStore = (function() {
             return;
         }
 
+        var q = async.queue(scaleIcon, 2);
         q.drain = function(err) {
             fn(err);
         };
@@ -1060,7 +1075,7 @@ var PreviewStore = (function() {
                 lastIcon = previews.splitIcons[iconType];
             }
         }
-        //if there is nothing to do, the queue doesn't get execute, just cann the callback
+        //if there is nothing to do, the queue doesn't get execute, just call the callback
         if (q.tasks.length === 0) {
             fn(null);
         }
