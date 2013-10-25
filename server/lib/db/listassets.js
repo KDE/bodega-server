@@ -117,7 +117,7 @@ function findPublishedAssets(db, req, res, assetInfo, assets, totalAssets, cb)
     args.push(assetInfo.partner);
     ++i;
 
-    query += ' limit $' + i + ' offset $' + (++i);
+    query += ' order by name limit $' + i + ' offset $' + (++i);
     //take an arbitrary limit if not specified
     if (req.query.limit) {
         args.push(Math.min(100, utils.parseNumber(req.query.limit)));
@@ -187,7 +187,7 @@ function findIncomingAssets(db, req, res, assetInfo, assets, totalAssets, cb)
         ++i;
     }
 
-    query += ' limit $' + i + ' offset $' + (++i);
+    query += ' order by name limit $' + i + ' offset $' + (++i);
     //take an arbitrary limit if not specified
     if (req.query.limit) {
         args.push(Math.min(100, utils.parseNumber(req.query.limit)));
@@ -355,8 +355,8 @@ module.exports = function(db, req, res) {
 
     switch (req.params.type) {
     case 'all':
-        funcs.push(findPublishedAssets);
         funcs.push(findIncomingAssets);
+        funcs.push(findPublishedAssets);
         break;
     case 'incoming':
         funcs.push(findIncomingAssets);
