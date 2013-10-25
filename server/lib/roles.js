@@ -25,7 +25,7 @@ module.exports.isContentCreator = function(db, req, res, partnerId, fn)
              [partnerId, req.session.user.id],
              function(err, result) {
                  if (err || !result.rows || result.rowCount < 1) {
-                     e = errors.create('PartnerInvalid', err ? err.message : '');
+                     e = errors.create('InvalidRole', err ? err.message : 'Your account is missing the Content Creator role for this partner');
                      fn(e, db, req, res);
                      return;
                  }
@@ -43,8 +43,8 @@ module.exports.isValidator = function(db, req, res, partnerId, fn)
             [partnerId, req.session.user.id],
             function(err, result) {
                 if (err || !result.rows || result.rowCount < 1) {
-                    e = errors.create('PartnerInvalid',
-                        err ? err.message : '');
+                    e = errors.create('InvalidRole',
+                        err ? err.message : 'Your account is missing the Validator role for this partner');
                     fn(e, db, req, res);
                     return;
                 }
