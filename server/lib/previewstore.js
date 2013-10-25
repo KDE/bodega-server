@@ -1050,7 +1050,7 @@ var PreviewStore = (function() {
             Object.keys(previews.splitIcons).length === 0) && previews.screenshots.length > 0) {
             generateScreenhotIcons(assetInfo, fn);
             return;
-        } else if (previews.screenshots.length === 0)  {
+        } else if (Object.keys(previews.splitIcons).length === 0 && previews.screenshots.length === 0)  {
             var e = errors.create('AssetIconMissing',
                               'The asset needs at least one icon.');
             fn(e);
