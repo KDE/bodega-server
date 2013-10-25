@@ -81,8 +81,12 @@ module.exports = function(db, req, res) {
                                  var json = {
                                      success: true,
                                      message: "Password reset email sent!",
-                                     code: resetCode
                                  };
+
+                                 if (!app.production) {
+                                     json.code = resetCode;
+                                 }
+
                                  res.json(json);
                              });
                      });
