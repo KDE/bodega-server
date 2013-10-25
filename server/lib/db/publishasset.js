@@ -325,6 +325,8 @@ function approveAsset(db, req, res, assetInfo)
     funcs.push(deleteIncoming);
     //end transaction
     funcs.push(endTransaction);
+    // send the accept email
+    funcs.push(sendAcceptanceEmail);
 
     async.waterfall(funcs, function(err, assetInfo) {
         if (err) {
@@ -356,6 +358,20 @@ function findPublisher(db, req, res, assetInfo, cb)
         assetInfo.supportEmail = result.rows[0].supportemail;
         cb(null, db, req, res, assetInfo);
     });
+}
+
+function sendAcceptanceEmail(db, req, res, assetInfo, cb)
+{
+    db.query("INSERT INTO emailQueue (data, template) \
+              VALUES (hstore(Array[['assetid', $1], ['assetname', $2], ['email', $3]]), 'partner_distributor_assetAcceptance')",
+             [assetInfo.id, assetInfo.name, assetInfo.supportemail],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                 }
+
+                 cb(err, db, req, res, assetInfo);
+             });
 }
 
 function sendRejectionEmail(db, req, res, assetInfo, cb)

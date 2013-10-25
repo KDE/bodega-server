@@ -1,0 +1,10 @@
+Hello,
+
+We are happy to inform you that your asset '{{data.assetname}}' (id={{data.assetid}}) has been published to the {{warehouse}} warehouse. It will appear immediately in all applicable stores.
+
+If you have any further questions, please feel free to email them to us.
+
+Thank You,
+
+The {{warehouse}} Team
+
