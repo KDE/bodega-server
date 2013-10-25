@@ -32,7 +32,7 @@ function searchAssets(db, req, res, args, json)
                ts_rank_cd(a.en_tagsIndex, plainto_tsquery(\'english\', $1)) as tagrank, \
                ts_rank_cd(a.en_index, plainto_tsquery(\'english\', $1)) + \
                ts_rank_cd(a.en_tagsIndex, plainto_tsquery(\'english\', $1)) as rank, \
-               a.license, partners.id, \
+               a.license, partners.id partner, \
                partners.name, a.version, a.image, a.name, \
                (CASE WHEN p.points IS NULL THEN 0 ELSE p.points END)::int AS points \
         FROM assets a \
