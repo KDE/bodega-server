@@ -118,7 +118,7 @@ function writeAsset(db, req, res, assetInfo, cb)
     var args  = [];
     var fields = ['license', 'partner', 'basePrice',
                   'name', 'description', 'version',
-                  'file', 'image'];
+                  'file', 'image', 'size'];
     var field;
     var i;
     var idx = 1;
