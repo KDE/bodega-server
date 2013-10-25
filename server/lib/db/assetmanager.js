@@ -86,102 +86,31 @@ function setupPreviews(db, req, res, assetInfo, cb)
     }
 }
 
-function addToStr(q, hash, value, isNum)
-{
-    var num;
-
-    if (hash[value] !== undefined && hash[value] !== null) {
-        if (q.inserted) {
-            q.insertStr += ", ";
-            q.valuesStr += ", ";
-        }
-        q.insertStr += value;
-        if (isNum) {
-            num = utils.parseNumber(hash[value], 0);
-            q.valuesStr += "'" + num + "'";
-        } else {
-            q.valuesStr += "'" + hash[value] + "'";
-        }
-        ++q.inserted;
-    }
-}
-
-function buildQueryString(assetInfo)
-{
-    var queryStr = "update incomingAssets set ";
-    var q = {
-        insertStr : "(",
-        valuesStr : "(",
-        inserted  : 0
-    };
-
-    addToStr(q, assetInfo, 'license');
-    addToStr(q, assetInfo, 'baseprice', true);
-    addToStr(q, assetInfo, 'name');
-    addToStr(q, assetInfo, 'description');
-    addToStr(q, assetInfo, 'version');
-    addToStr(q, assetInfo, 'externpath');
-    addToStr(q, assetInfo, 'file');
-    addToStr(q, assetInfo, 'size', true);
-
-    q.insertStr += ")";
-    q.valuesStr += ")";
-
-    queryStr += q.insertStr + " = " + q.valuesStr;
-    queryStr += " where id = " + assetInfo.id;
-    queryStr += " and";
-    queryStr += " partner = " + assetInfo.partner;
-
-    if (!q.inserted) {
-        return null;
-    }
-
-    return queryStr;
-}
-
-function buildCreateQueryString(assetInfo)
-{
-    var queryStr = "insert into incomingAssets ";
-    var q = {
-        insertStr : "(",
-        valuesStr : "(",
-        inserted  : 0
-    };
-
-    addToStr(q, assetInfo, 'id', true);
-    addToStr(q, assetInfo, 'partner');
-    addToStr(q, assetInfo, 'license');
-    addToStr(q, assetInfo, 'baseprice', true);
-    addToStr(q, assetInfo, 'name');
-    addToStr(q, assetInfo, 'description');
-    addToStr(q, assetInfo, 'version');
-    addToStr(q, assetInfo, 'externpath');
-    addToStr(q, assetInfo, 'file');
-    addToStr(q, assetInfo, 'size', true);
-
-    q.insertStr += ")";
-    q.valuesStr += ")";
-
-    queryStr += q.insertStr + " values " + q.valuesStr;
-
-    if (!q.inserted) {
-        return null;
-    }
-
-    return queryStr;
-}
-
-
 function writeIncomingAsset(db, req, res, assetInfo, cb)
 {
-    var queryStr = buildQueryString(assetInfo);
+    var params = [assetInfo.id, assetInfo.partner];
+    var setters = [];
 
-    if (!queryStr) {
+    var attrs = ['license', 'baseprice', 'name', 'description',
+                 'version', 'externpath', 'file', 'size'];
+    var attr;
+    for (var idx in attrs) {
+        attr = attrs[idx];
+        if (assetInfo[attr]) {
+            params.push(assetInfo[attr]);
+            setters.push(attr + " = $" + params.length);
+        }
+    }
+
+    if (setters.length < 1) {
         cb(null, db, req, res, assetInfo);
         return;
     }
 
-    db.query(queryStr, [], function(err, result) {
+    var queryStr = "UPDATE incomingAssets SET " + setters.join(", ") +
+                   " WHERE id = $1 AND partner = $2";
+
+    db.query(queryStr, params, function(err, result) {
         var e;
         if (err) {
             e = errors.create('Database', err.message);
@@ -195,14 +124,32 @@ function writeIncomingAsset(db, req, res, assetInfo, cb)
 
 function writeCreatedAsset(db, req, res, assetInfo, cb)
 {
-    var queryStr = buildCreateQueryString(assetInfo);
+    var params = [];
+    var columns = [];
+    var values= [];
 
-    if (!queryStr) {
+    var attrs = ['id', 'partner', 'license', 'baseprice',
+                 'name', 'description', 'version', 'externpath',
+                 'file', 'size'];
+    var attr;
+    for (var idx in attrs) {
+        attr = attrs[idx];
+        if (assetInfo[attr]) {
+            columns.push(attr);
+            params.push(assetInfo[attr]);
+            values.push("$" + params.length);
+        }
+    }
+
+    if (columns.length < 1) {
         cb(null, db, req, res, assetInfo);
         return;
     }
 
-    db.query(queryStr, [], function(err, result) {
+    var queryStr = "INSERT INTO incomingAssets (" + columns.join(", ") +
+                   ") VALUES (" + values.join(", ") + ")";
+
+    db.query(queryStr, params, function(err, result) {
         var e;
         if (err) {
             e = errors.create('Database', err.message);
