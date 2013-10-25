@@ -1,0 +1,7 @@
+An asset has been posted by partner {{partnerName}} (Partner ID: {{data.partner}}):
+
+  Id: {{data.assetid}}
+Name: {{data.assetname}}
+Type: {{data.assettype}}
+
+Please attend to this request at your earliest convenience.
