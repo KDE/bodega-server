@@ -304,6 +304,8 @@ function approveAsset(db, req, res, assetInfo)
     funcs.push(fetchTags);
     // fetch previews
     funcs.push(fetchPreviews);
+    // find the publisher for the email later
+    funcs.push(findPublisher);
 
     //begin transaction
     funcs.push(beginTransaction);
@@ -345,15 +347,16 @@ function approveAsset(db, req, res, assetInfo)
 
 function findPublisher(db, req, res, assetInfo, cb)
 {
-    var query = "select p.supportemail,ia.name from partners p inner join incomingassets ia on p.id=ia.partner where ia.id=$1;";
+    var query = "select p.supportemail, ia.name from partners p inner join incomingassets ia on p.id = ia.partner where ia.id = $1;";
     var e;
 
     db.query(query, [assetInfo.id], function(err, result) {
-        if (err) {
+        if (err || result.rowCount < 1) {
             e = errors.create('Database', err.message);
             cb(e, db, req, res, assetInfo);
             return;
         }
+
         assetInfo.name = result.rows[0].name;
         assetInfo.supportEmail = result.rows[0].supportemail;
         cb(null, db, req, res, assetInfo);
