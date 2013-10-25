@@ -94,6 +94,7 @@ module.exports.queueAccountActivationMessage = function(db, req, res, userId)
                  }
 
                  var json = { userId: userId,
+                              success: true,
                               message: "Confirmation email sent!"
                             };
                  res.json(json);
