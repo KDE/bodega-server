@@ -948,12 +948,12 @@ var PreviewStore = (function() {
         var count = 0;
         var size;
         for (size in iconSizes) {
-            if (!previews.splitIcons[iconType]) {
+            if (!previews.splitIcons[size]) {
                 iconsToGenerate.push({
                     assetInfo: assetInfo,
                     assetPaths: assetPaths,
                     preview: shot,
-                    iconSize: size
+                    subtype: size
                 });
             }
         }
