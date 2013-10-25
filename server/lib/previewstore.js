@@ -450,7 +450,6 @@ var PreviewStore = (function() {
                                      assetInfo.id.toString(),
                                      iconSizes[preview.subtype].toString(),
                                      path.basename(relPath));
-
             } else {
                 basePath = fullPreviewPaths.icons[preview.subtype];
                 fullPath = path.join(basePath, relPath);
@@ -845,12 +844,14 @@ var PreviewStore = (function() {
                 .size(function(err, size) {
                     //console.log(size);
                     if (err) {
+                        /*
                         console.log("***************************************************");
                         console.log("***************************************************");
                         console.log(dirname + ' ' + fromPath);
                         console.log("***************************************************");
                         console.log("***************************************************");
                         console.log("***************************************************");
+                        */
                         cb(err);
                         return;
                     }
