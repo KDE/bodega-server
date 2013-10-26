@@ -1,0 +1,138 @@
+# High level design 
+
+Bodega is designed around the following key ideas:
+
+    * a warehouse which stores assets
+    * stores which organize those assets into hierarchical arrangements
+    * partners, which people are affiliated with
+    * all assets and stores are owned by a partner
+    * (nearly) everything about an asset is stored using tags
+    * stores are defined using collections of tags
+
+## Asset lifecycle
+
+An asset is always in one of the following states
+
+    * incoming: it is a new asset or is a published asset in the process
+                of being editted
+    * posted: all editing is complete, it is ready to be published by the
+              warehouse team
+    * published: the asset has no edits pending and is in the warehouse
+
+An asset which has been published but which is now sitting in incoming
+or posted is living a double life: there is one version of the asset in
+the warehouse, and another waiting to replace it in the incoming system.
+
+## Transaction records
+
+## Partner alerts, aka "messenging"
+
+## Janitorial duties
+
+# Implementation concepts
+
+Bodega server is a stateless multi-user application. All state between
+public API calls is managed by records kept in the Redis database. *No*
+state is held in the server itself. This allows multiple server nodes
+to be run with multiple users accessing them without data locality
+issues tripping the public service up.
+
+All database queries that change the data stored are atomic. If
+multiple queries are required to complete one action, then these queries
+are either wrapped in a transaction or a stored procedure is created in
+the database which runs all the queries and this stored procedure is
+call from the database.
+
+All return values and results of async code blocks are checked for errors.
+Error reporting borders on the paranoid in place, and this consistency
+produces confidence in the codebase. Standard error handling is provided
+in the errors.js file.
+
+All responses are in JSON format and have standard components in them.
+All JSON returned to the client must use utils.standardJson(req, bool)
+to generate this standard JSON which can then be added to; the bool is
+true on success (the default) and false on failure.
+
+Blocking is bad; one of the reasons to use node.js is its async nature
+that allows for good performance of I/O bound applications like bodega.
+This also can make it trickier to debug and notice sideeffects, which
+is why unit testing is not optional.
+
+When there is a need to control the running of multiple async blocks,
+the async node.js module is used which provides several different
+patterns. The two most often used in bodega are queue and waterfall.
+Documentation on asyn can be found here: https://github.com/caolan/async
+
+# Database
+
+All SQL that is stored in the database appears in the sql/ directory.
+Commands to create tables, indexes, etc. are kept in .sql files. Stored
+procedures are kept in .plsql files.
+
+The files used to populate the database are recorded in server/bodegaDbHelper
+which is a node.js script used to manage the database.
+
+Referential integrity, table normalization (within reason) and policy
+enforcement by the use of triggers helps keep the database in perfect form,
+saving much work in serve code (that in some cases could never be perfect,
+e.g. without race conditions, if done outside the database).
+
+Many complex tasks are also handled by stored procedures which encapsulate
+the functionality for the server code, again making it simpler and more
+reliable.
+
+# Server code
+
+All node.js code is kept in the server directory. The server uses express
+for the application routing and many of the concepts referred to, such as
+routing, come from the express node.js module. You can find more information
+on express here: http://expressjs.com/
+
+## Deployment management
+
+All node.js packages used are listed in package.json. This allows easy
+deployment by just running `npm install`. All new node.js packages that are
+added must be added to this file. Likewise, if the use of a module is
+removed from the sources, it should be removed from package.json.
+
+There is a makefile in server/ as well that offers the following functionality:
+
+    * make sql: dumps the current database and creates a new one. careful!
+    * make test_data: deletes all data in the database and pouplates it with
+                      the test suite data set. careful, again!
+    * make test: runs the entire test suite
+    * make test/<name>: runs the tests in the test/<name>.js file
+    * make codecoverage: uses istanbul to generate a code coverage report
+    * make update_sql: loads any updates to the database (found in sql/updates)
+
+main.sh is used to start the application (preventing having to type the right
+node.js command line) and bodegaDbHelper contains all sql set up and management
+routines.
+
+## Configuration
+
+All configuration entries must appear in config.json.sample. This file is a
+self-documenting configuration template. This config is used by bodegaDbHelper
+as well as the server itself.
+
+## Application core
+
+The only other files in the top level are:
+
+    * app.js: the main file for the application; this is the node app starting
+              point
+    * routes.js: this defines all routes in the application. Most just pass
+                 execution into lib/bodegadb.js
+
+## Application library
+
+The busieness logic of the library is kept under lib/. utils.js and errors.js
+are the two most important files (in terms of how often they are used) after
+bodegadb.js.
+
+bodegadb.js handles the PostgreSQL connection setup and hand-off to the
+functions that do the actual work. All files that touch the database and which
+are loaded by bodegadb.js are kept under lib/db.
+
+All message handlers are kept in lib/messengers; these route emails and other
+messaging in response to specific events triggered in the database.
