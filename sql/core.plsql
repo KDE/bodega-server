@@ -597,6 +597,23 @@ DROP TRIGGER IF EXISTS trg_ct_processNewAsset ON assets;
 CREATE TRIGGER trg_ct_processNewAsset AFTER INSERT ON assets
 FOR EACH ROW EXECUTE PROCEDURE ct_processNewAsset();
 
+CREATE OR REPLACE FUNCTION ct_processDeletedAsset() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    UPDATE channels SET assetCount = tmp.assets from
+        (SELECT channel, count(distinct asset) as assets FROM subChannelAssets
+         WHERE asset != OLD.id AND
+               channel IN (SELECT DISTINCT channel FROM channelAssets WHERE asset = OLD.id)
+               group by channel) AS tmp
+        WHERE tmp.channel = channels.id;
+
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS trg_ct_processDeletedAsset ON assets;
+CREATE TRIGGER trg_ct_processDeletedAsset BEFORE DELETE ON assets
+FOR EACH ROW EXECUTE PROCEDURE ct_processDeletedAsset();
+
 CREATE OR REPLACE function affiliatePerson(text, text, text) returns BOOL
 AS
 $$
