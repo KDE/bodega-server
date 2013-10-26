@@ -963,7 +963,7 @@ var PreviewStore = (function() {
         q.drain = function(err) {
             fn(err);
         };
-    };
+    }
 
     function scaleIcon(data, cb) {
         var assetInfo = data.assetInfo;

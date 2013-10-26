@@ -294,6 +294,38 @@ function publishAsset(db, req, res, assetInfo)
     }];
 }
 
+function findPublisher(db, req, res, assetInfo, cb)
+{
+    var query = "select p.supportemail, ia.name from partners p inner join incomingassets ia on p.id = ia.partner where ia.id = $1;";
+    var e;
+
+    db.query(query, [assetInfo.id], function(err, result) {
+        if (err || result.rowCount < 1) {
+            e = errors.create('Database', err.message);
+            cb(e, db, req, res, assetInfo);
+            return;
+        }
+
+        assetInfo.name = result.rows[0].name;
+        assetInfo.supportEmail = result.rows[0].supportemail;
+        cb(null, db, req, res, assetInfo);
+    });
+}
+
+function sendAcceptanceEmail(db, req, res, assetInfo, cb)
+{
+    db.query("INSERT INTO emailQueue (data, template) \
+              VALUES (hstore(Array[['assetid', $1], ['assetname', $2], ['email', $3]]), 'partner_distributor_assetAcceptance')",
+             [assetInfo.id, assetInfo.name, assetInfo.supportEmail],
+             function(err, result) {
+                 if (err) {
+                     errors.report('Database', req, res, err);
+                 }
+
+                 cb(err, db, req, res, assetInfo);
+             });
+}
+
 function approveAsset(db, req, res, assetInfo)
 {
     var funcs = [function(cb) {
@@ -343,38 +375,6 @@ function approveAsset(db, req, res, assetInfo)
         }
         sendResponse(db, req, res, assetInfo);
     });
-}
-
-function findPublisher(db, req, res, assetInfo, cb)
-{
-    var query = "select p.supportemail, ia.name from partners p inner join incomingassets ia on p.id = ia.partner where ia.id = $1;";
-    var e;
-
-    db.query(query, [assetInfo.id], function(err, result) {
-        if (err || result.rowCount < 1) {
-            e = errors.create('Database', err.message);
-            cb(e, db, req, res, assetInfo);
-            return;
-        }
-
-        assetInfo.name = result.rows[0].name;
-        assetInfo.supportEmail = result.rows[0].supportemail;
-        cb(null, db, req, res, assetInfo);
-    });
-}
-
-function sendAcceptanceEmail(db, req, res, assetInfo, cb)
-{
-    db.query("INSERT INTO emailQueue (data, template) \
-              VALUES (hstore(Array[['assetid', $1], ['assetname', $2], ['email', $3]]), 'partner_distributor_assetAcceptance')",
-             [assetInfo.id, assetInfo.name, assetInfo.supportEmail],
-             function(err, result) {
-                 if (err) {
-                     errors.report('Database', req, res, err);
-                 }
-
-                 cb(err, db, req, res, assetInfo);
-             });
 }
 
 function sendRejectionEmail(db, req, res, assetInfo, cb)
