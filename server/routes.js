@@ -18,7 +18,7 @@
 var utils = require('./lib/utils.js');
 var errors = require('./lib/errors.js');
 var roles = require('./lib/roles.js');
-var assetRules = require('./assetRules.js');
+var assetRules = require('./lib/assetRules.js');
 
 var markdown = require("marked");
 var fs = require('fs');

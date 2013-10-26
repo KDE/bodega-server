@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-var assetRules = require('../../assetRules.js');
+var assetRules = require('../assetRules.js');
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
