@@ -6,10 +6,10 @@ performance? Excellent!
 Other Bodega developers can be found via the following means online:
 
     active@kde.org: Mailing list for discussion of Plasma Active, including Bodega
-    #active on irc.freenode.net
+    #bodega on irc.freenode.net
 
 We use http://bugs.kde.org to track feature and bug reports under the Bodega product
-and http://reviewboard.kde.org to review patches.
+and http://reviewboard.kde.org to review patches using the bodega review group.
 
 # Development Workflow
 
@@ -55,15 +55,42 @@ active@kde.org noting this is the case. You can also post a review request at:
 
     http://reviewboard.kde.org
 
-Typically, branches will first be merged into the *integration* branch by the
-repository maintainer for further testing before being merged into master.
-
 If you need a developer account to push to git.kde.org, visit
 http://identity.kde.org to set up an account and ask one of the other Bodega
 developers for a recommendation for an account upgrade to commiter status.
 
 Of course, we use git which is inherently decentralized, so you can also
 work in a clone hosted elsewhere if that's more your speed.
+
+## The stable branch and bug fixes
+
+Periodically, we create a new stable branch. The nameing of these branches follows
+the following convention: "vX.Y". The first stable branch was v0.1, for instance.
+
+The stable branch is used for bug fixing. While topic branches are used for larger
+change sets (and always for new features, regardless of their size), bug fixes
+which are containable in a small number of isolated commits should be done in the
+most recent stable branch first.
+
+If the bug was related to either input handling or affects output in any way,
+a test should be added to the test suite to both prove the bug is fixed and to
+prevent future regressions.
+
+All bug fix commits should have the following lines in their commit messagse:
+
+    BUG:<number>
+    FIXEDIN:<stable branch>
+
+Once the bug fix is confirmed, it must be merged into master. Cherry-picking is
+discouraged for this.
+
+# Documentation
+
+All new API or changes to existing API must be documented. The API documentation
+is kept in server/doc/bodega.json
+
+Keep the top level headings alphabetized, and keep methods grouped within the
+headings in a logical fashion.
 
 # Coding Style
 
