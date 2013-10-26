@@ -19,9 +19,9 @@ var async = require('async');
 var path = require('path');
 var fs = require('fs');
 
-var errors = require('../errors.js');
-var roles = require('../roles.js');
-var utils = require('../utils.js');
+var errors = require('./errors.js');
+var roles = require('./roles.js');
+var utils = require('./utils.js');
 
 function associateTag(db, req, res, assetInfo, tagInfo, cb)
 {
