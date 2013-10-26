@@ -17,7 +17,7 @@
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
-var createUtils = require('./createutils.js');
+var createUtils = require('../createutils.js');
 var fs = require('fs');
 var path = require('path');
 
