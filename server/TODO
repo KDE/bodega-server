@@ -1,6 +1,6 @@
 Now
 ===
-* list of featured apps
+* list of featured assets
 
 Later
 =====
@@ -40,5 +40,10 @@ SELECT asset, ((positive + 1.9208) / (positive + negative) -
    AS ci_lower_bound FROM rankings ORDER BY ci_lower_bound DESC;
 - we could also replace positive with # of favorites and total with #
    of downloads, which would equal to 'best applications'
-* forums or other ways of letting content creators communicate with
-   users
+* More complete collections support or something akin to support:
+   - Previews for the entire collections (at least an image for
+      audio albums and such)
+   - Purchasing and downloading of entire collections
+* Tip/donate
+* Subscriptions for things like magazines
+* Recommendations
