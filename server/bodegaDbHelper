@@ -174,10 +174,11 @@ if (sql_argument == 'update') {
         if (updates.length < 1) {
             console.log('No updates to apply. Check the updates/completed file if you believe this is in error.');
         } else {
+            var preSeriesUpdates = updates.slice();
             console.log('Applying these updates ' + updates);
             series(updates, function() {
             fs.appendFileSync(updateLogFilename(), "\n" +
-                              updates.join("\n"),
+                              preSeriesUpdates.join("\n"),
                               { encoding: 'utf8' } );
             console.log('----------------------------');
         });
