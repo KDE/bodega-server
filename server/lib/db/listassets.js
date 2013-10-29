@@ -35,10 +35,11 @@ function sendResponse(err, db, req, res, assetInfo, assets, totalAssets)
 
 function assetTagFetcher(asset, cb)
 {
-    asset.db.query('select tags.id, tagtypes.id as typeid, tagtypes.type as type, title \
+    asset.db.query('select tags.id, tagtypes.id as typeid, tagtypes.type as type, tags.title \
           from ' + (asset.published ? 'assettags' : 'incomingassettags') + ' t join tags on t.tag = tags.id \
           join tagtypes on tagtypes.id = tags.type \
-          where asset = $1',
+          where asset = $1 \
+          order by tagtypes.type, tags.title',
         [asset.asset],
         function (err, result) {
             if (err) {
