@@ -74,6 +74,12 @@ BEGIN
                                 WHERE tt.type = 'assetType')
                  GROUP BY at.tag) AS counts ON t.id = counts.tag;
     END LOOP;
+
+    INSERT INTO storeAssetSummary (store, assetType, total)
+        SELECT 'null', t.id, count(distinct a.asset)
+            FROM assetTags a JOIN tags t ON (a.tag = t.id)
+                             JOIN tagTypes tt ON (t.type = tt.id AND tt.type = 'assetType')
+            GROUP BY t.id;
 END;
 $$ LANGUAGE plpgsql;
 

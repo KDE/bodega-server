@@ -23,7 +23,11 @@ describe('Fetch contact information', function() {
         name: app.config.warehouseInfo.name,
         description: app.config.warehouseInfo.description,
         url: app.config.warehouseInfo.url,
-        contact: app.config.warehouseInfo.contact
+        contact: app.config.warehouseInfo.contact,
+        assetSummary: [
+            { type: 'application', total: 1 },
+            { type: 'game', total: 24 }
+        ]
     };
 
     var store = {

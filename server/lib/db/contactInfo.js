@@ -18,28 +18,50 @@
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
-module.exports = function(db, req, res) {
-    var json = {};
-    var warehouse = {
+var async = require('async');
+
+function addAssetSummary(store, db, req, json, jsonObjectName, cb)
+{
+    // and finally we get the asset summary
+    db.query("SELECT t.title as type, sas.total \
+              FROM storeAssetSummary sas JOIN tags t ON (sas.assetType = t.id) \
+              WHERE sas.store = $1",
+            [store],
+            function(err, result) {
+                if (err || result.rowCount > 0) {
+                    json[jsonObjectName].assetSummary = result.rows;
+                } else {
+                    json[jsonObjectName].assetSummary = [];
+                }
+
+                cb(null, db, req, json);
+            });
+}
+
+function addWarehouseInfo(db, req, json, cb)
+{
+    json.warehouse = {
         name: app.config.warehouseInfo.name,
         description: app.config.warehouseInfo.description,
         url: app.config.warehouseInfo.url,
         contact: app.config.warehouseInfo.contact
     };
 
-    // if we are authenticated against a store, fetch store info
+    addAssetSummary("null", db, req, json, 'warehouse', cb);
+}
+
+function addStoreInfo(db, req, json, cb)
+{
+    // if we are authenticated against a store or given a store, fetch store info
     var store;
     if (req.query.store) {
         store = req.query.store;
     } else if (req.session !== undefined && req.session.authorized) {
         store = req.session.user.store;
     } else {
-        json.warehouse = warehouse;
-        res.json(json);
+        cb(null, db, req, json);
         return;
     }
-
-    json.warehouse = warehouse;
 
     db.query(
         "SELECT s.name, s.description, p.name AS owner, \
@@ -48,13 +70,8 @@ module.exports = function(db, req, res) {
                 WHERE s.id = $1",
         [store],
         function(err, result) {
-            if (err) {
-                errors.report('Database', req, res, err);
-                return;
-            }
-
-            if (!result || result.rowCount < 1) {
-                res.json(json);
+            if (err || !result || result.rowCount < 1) {
+                cb(null, db, req, json);
                 return;
             }
 
@@ -75,12 +92,6 @@ module.exports = function(db, req, res) {
                       WHERE partner = $1",
                      [partner],
                      function (err, result) {
-                         if (err) {
-                             errors.report('Database', req, res, err);
-                             return;
-                         }
-
-
                          for (var i = 0; i < result.rowCount; ++i) {
                              var contact = result.rows[i];
                              var url;
@@ -94,20 +105,19 @@ module.exports = function(db, req, res) {
                          }
 
                          // and finally we get the asset summary
-                         db.query("SELECT t.title as type, sas.total \
-                                   FROM storeAssetSummary sas JOIN tags t ON (sas.assetType = t.id) \
-                                   WHERE sas.store = $1",
-                                   [store],
-                                   function(err, result) {
-                                       if (!err && result.rowCount > 0) {
-                                           json.store.assetSummary = result.rows;
-                                       } else {
-                                           json.store.assetSummary = [];
-                                       }
-
-                                       res.json(json);
-                                   });
-
+                         addAssetSummary(store, db, req, json, 'store', cb);
                      });
         });
+}
+
+module.exports = function(db, req, res) {
+    var json = {};
+    var funcs = [
+            function(cb) { cb(null, db, req, json); },
+            addWarehouseInfo,
+            addStoreInfo
+            ];
+
+    async.waterfall(funcs,
+                    function(err, db, req, json) { res.json(json); });
 };
