@@ -73,6 +73,14 @@ app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.session({ secret: app.config.cookieSecret ? app.config.cookieSecret : "love cookies",
                           store: new RedisStore(app.config.service.redis) }));
+// Simple CORS middleware; we don't care where a request comes from
+app.use(function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+    next();
+});
 app.use(app.router);
 app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
