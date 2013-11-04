@@ -1,2 +1,2 @@
-\i core.plsql
+\i maintenance.plsql
 select ct_updateStoreContentSummaries();
