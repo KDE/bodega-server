@@ -657,7 +657,13 @@ app.all(serverPath('*'), function(req, res) {
 //********************************
 // Static content routes
 app.get('/images/*', function(req, res) {
-    res.sendfile(__dirname + '/public' + req.url);
+    res.sendfile(__dirname + '/public' + req.url,
+        function(err) {
+            if (err) {
+            console.log(JSON.stringify(err, 0, 2));
+                utils.render404(res);
+            }
+        });
 });
 
 
@@ -678,10 +684,7 @@ app.get('/api(/?*)', function(req, res) {
 
     fs.readFile(filePath, 'utf8', function(err, data) {
         if (err) {
-            res.render('404.jade', {
-                name: app.config.warehouseInfo.name,
-                url: app.config.warehouseInfo.url
-            });
+            utils.render404(res);
         } else if (filePath.substr(filePath.length - suffix.length) === suffix) {
             res.send(markdown(data));
         } else {
@@ -692,8 +695,5 @@ app.get('/api(/?*)', function(req, res) {
 
 //NOTE: Always has to be the last route
 app.all('/', function(req, res) {
-    res.render('index.jade', {
-        name: app.config.warehouseInfo.name,
-        url: app.config.warehouseInfo.url
-    });
+    res.render('index.jade', utils.indexPageData);;
 });

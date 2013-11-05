@@ -10,7 +10,14 @@
         "name": "My Warehouse",
         "description": "Warehouse description",
         "url": "https://example.org",
-        "contact": "foo@example.gr"
+        "contact": "foo@example.org",
+        "logo": {
+            "large": {
+                "url": "https://example.org/static/logo.png",
+                "width": 331,
+                "height": 31
+            }
+        }
     },
     "anonAccess": {
         "browsing": false

@@ -345,3 +345,18 @@ module.exports.createTagIfMissing = function(partner, type, title, db, req, res,
                         });
              });
 };
+
+module.exports.indexPageData =
+{
+    name: app.config.warehouseInfo.name,
+    url: app.config.warehouseInfo.url,
+    logo: app.config.warehouseInfo.logo.large.url,
+    logoWidth: app.config.warehouseInfo.logo.large.width,
+    logoHeight: app.config.warehouseInfo.logo.large.height
+};
+
+module.exports.render404 = function(res)
+{
+    res.render('404.jade', module.exports.indexPageData);
+};
+

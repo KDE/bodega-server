@@ -87,11 +87,10 @@ app.set('views', __dirname + '/views');
 app.set('trust proxy', app.config.behindProxy);
 
 app.use(express.favicon("public/favicon.ico"));
+
+var utils = require('./lib/utils.js');
 app.use(function(req, res, next) {
-    res.render('404.jade', {
-        name: app.config.warehouseInfo.name,
-        url: app.config.warehouseInfo.url
-    });
+    utils.render404(res);
 });
 
 require('./routes.js');
