@@ -53,6 +53,8 @@ module.exports.mandatoryTags = {
     book: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        descriptive: { name: "Category", type: "descriptive", multi: true, required: true },
+        mimetype: { name: "File Type", type: "mimetype", multi: false, required: true }
     },
     magazine: {
         author: { name: "Author", type: "author", multi: true, required: true },
