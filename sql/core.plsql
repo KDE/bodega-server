@@ -274,9 +274,12 @@ BEGIN
 
     IF processed THEN
         PERFORM ct_markNonExtantPricesDone();
+        -- update the cached assetCount for channels with assets
         UPDATE channels SET assetCount = tmp.assets
             from (SELECT channel, count(distinct asset) as assets FROM subChannelAssets group by channel) as tmp
             where tmp.channel = channels.id;
+        -- update channels with no assets to zero
+        UPDATE channels SET assetCount = 0 WHERE id NOT IN (select channel from subChannelAssets);
     END IF;
 
     DELETE FROM assetsNeedingRefresh;
