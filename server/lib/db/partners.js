@@ -568,27 +568,63 @@ module.exports.requestPublisherStatus = function(db, req, res)
         partner, 'Partner Manager', null);
 };
 
+function checkPartnerIsDeletable(db, req, res, partner, data, cb)
+{
+    db.query("SELECT * from (SELECT count(a.id) as assets FROM assets a WHERE a.partner = $1) as assets, \
+                            (SELECT count(s.id) as stores FROM stores s WHERE s.partner = $1) as stores, \
+                            (SELECT owedPoints as points FROM partners WHERE id = $1) as points",
+            [partner],
+            function(err, result) {
+                var msg = [];
+                if (err) {
+                } else if (result.rows[0].assets > 0) {
+                    msg.push("  * The partner owns assets; the assets must be deleted first");
+                } else if (result.rows[0].stores > 0) {
+                    msg.push("  * The partner owns stores; the stores must be deleted first");
+                } else if (result.rows[0].points > 0) {
+                    msg.push("  * The partner has points owed; the account must be settled first");
+                }
+
+                if (msg.length > 0) {
+                    err = utils.createError("PartnerInvalid",
+                                            "The partner could not be deleted for the following reasons:\n\n" +
+                                            msg.join("\n"));
+                }
+
+                cb(err, db, req, res, partner);
+            });
+}
+
+function performPartnerDeletion(db, req, res, partner, cb)
+{
+    db.query("delete from partners where id = $1",
+            [partner],
+            function(err, result) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+
+                cb(null, req, res);
+            });
+}
+
 module.exports.deletePartner = function(db, req, res)
 {
     var partner = utils.parseNumber(req.params.partner);
     var e;
 
     if (partner < 1) {
-        e = errors.create('AccessDenied', 'Cannot delete the partner 0, "Management"');
+        e = errors.create('PartnerInvalid', 'Cannot delete the management group');
         errors.report(e.name, req, res, e);
         return;
     }
 
-    db.query("delete from partners where id = $1",
-        [partner],
-        function(err, result) {
-            if (err) {
-                e = errors.create('Database', err.message);
-                errors.report(e.name, req, res, e);
-                return;
-            }
-
-            var json = utils.standardJson(req);
-            res.json(json);
-        });
+    utils.wrapInTransactionAndReply(
+    [
+    utils.requireRole,
+    checkPartnerIsDeletable,
+    performPartnerDeletion,
+    sendStandardJson,
+    ], db, req, res, partner, 'Partner Manager', null);
 };
