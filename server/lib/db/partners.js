@@ -586,9 +586,9 @@ function checkPartnerIsDeletable(db, req, res, partner, data, cb)
                 }
 
                 if (msg.length > 0) {
-                    err = utils.createError("PartnerInvalid",
-                                            "The partner could not be deleted for the following reasons:\n\n" +
-                                            msg.join("\n"));
+                    err = errors.create("PartnerInvalid",
+                                        "The partner could not be deleted for the following reasons:\n\n" +
+                                        msg.join("\n"));
                 }
 
                 cb(err, db, req, res, partner);
