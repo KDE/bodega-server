@@ -363,7 +363,7 @@ describe('Store management', function(){
                               "typeid": 9
                             },
                             {
-                              "id": 25,
+                              "id": 29,
                               "title": "application/x-plasma",
                               "type": 'mimetype',
                               "typeid": 7
@@ -384,16 +384,16 @@ describe('Store management', function(){
                                       "typeid": 9
                                     },
                                     {
-                                      "id": 22,
-                                      "title": "Card Game",
-                                      "type": 'category',
-                                      "typeid": 4
-                                    },
-                                    {
-                                      "id": 25,
+                                      "id": 29,
                                       "title": "application/x-plasma",
                                       "type": 'mimetype',
                                       "typeid": 7
+                                    },
+                                    {
+                                      "id": 33,
+                                      "title": "Card Game",
+                                      "type": 'category',
+                                      "typeid": 4
                                     }
                                 ],
                                 "channels": []
@@ -416,9 +416,9 @@ describe('Store management', function(){
                                         },
                                         {
                                             "id": 26,
-                                            "title": "Zack Rusin",
-                                            "type": 'author',
-                                            "typeid": 11
+                                            "title": "Creative Commons Attribution-NonCommercial-ShareAlike",
+                                            "type": 'license',
+                                            "typeid": 23
                                         }
                                         ],
                                         "channels": []
