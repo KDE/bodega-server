@@ -186,7 +186,6 @@ DELETE FROM assetprices WHERE ending is not null;
 DELETE FROM assetRatings;
 DELETE FROM assetRatingAverages;
 DELETE FROM easterEggs;
-DELETE FROM relatedTags;
 SELECT ct_testing_removePriorTestingTags();
 
 SELECT setval('seq_assetsids', 1);
@@ -196,20 +195,6 @@ SELECT setval('seq_peopleids', 1);
 SELECT setval('seq_partnerids', 1005);
 SELECT setval('seq_purchaseids', 1);
 SELECT setval('seq_assetratingsIds', 1);
-
-INSERT INTO tags (type, title) SELECT id, 'application/x-plasma' FROM tagtypes WHERE type = 'mimetype';
-INSERT INTO tags (type, title) SELECT id, titles.*
-    FROM tagTypes,
-    (VALUES
-        ('Vivaldi'),
-        ('Plasma Active - x86')
-    ) AS titles
-    WHERE type = 'platform';
-
-INSERT INTO relatedTags (tag, related)
-    SELECT t.id, r.id FROM tags t, tags r
-        WHERE t.title = 'application'
-              AND r.type IN (SELECT id FROM tagTypes WHERE type = 'contentrating');
 
 -- now start setting up the data
 INSERT INTO people (lastname, firstname, email, points, password, active)
@@ -251,6 +236,16 @@ INSERT INTO tags (type, title) SELECT id, 'Coherent Theory' FROM tagtypes WHERE 
 INSERT INTO tags (type, title) SELECT id, '0123456789' FROM tagtypes WHERE type = 'isbn';
 INSERT INTO tags (type, title) SELECT id, '2013' FROM tagtypes WHERE type = 'created';
 INSERT INTO tags (type, title) SELECT id, 'http://makeplaylive.com' FROM tagtypes WHERE type = 'url';
+INSERT INTO tags (type, title) SELECT id, 'Romance' FROM tagtypes WHERE type = 'descriptive';
+INSERT INTO tags (type, title) SELECT id, 'application/pdf' FROM tagtypes WHERE type = 'mimetype';
+INSERT INTO tags (type, title) SELECT id, titles.*
+    FROM tagTypes,
+    (VALUES
+        ('Vivaldi'),
+        ('Plasma Active - x86')
+    ) AS titles
+    WHERE type = 'platform';
+
 
 INSERT INTO stores (id, partner, name) VALUES ('null', ct_testing_partnerId('Management Group'), 'No Store');
 INSERT INTO stores (id, partner, name, description) VALUES ('VIVALDI-1', ct_testing_partnerId('Make Play Live'), 'Vivaldi', 'Plasma Active tablet from Make Play Live');

@@ -23,6 +23,8 @@
         {"type" : "publisher", "title" : "Coherent Theory" },
         {"type" : "isbn", "title" : "0123456789"},
         {"type" : "created", "title" : "2013"},
-        {"type" : "url", "title" : "http://makeplaylive.com"}
+        {"type" : "url", "title" : "http://makeplaylive.com"},
+        {"type" : "descriptive", "title" : "Romance"},
+        {"type" : "mimetype", "title" : "application/pdf"}
     ]
 }
