@@ -162,6 +162,7 @@ INSERT INTO assetTags (asset, tag)
     VALUES ($1, ct_testing_tagByName('application/x-plasma')),
            ($1, ct_testing_tagByName('Everyone 10+')),
            ($1, ct_testing_tagByName('game')),
+           ($1, ct_testing_tagByName('Card Game')),
            ($1, ct_testing_licenseByName('GPL'));
 END;
 $$ LANGUAGE plpgsql;
@@ -257,18 +258,15 @@ INSERT INTO stores (id, partner, name, description) VALUES ('DD-2', ct_testing_p
 INSERT INTO channels (image, store, active, name, description)
     VALUES ('games.png', 'KDE-1', true, 'Games', 'Fun and amusements');
 INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('game'));
+    VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma')),
+           (currval('seq_channelids'), ct_testing_tagByName('game'));
 
 INSERT INTO channels (image, store, active, name, description, parent)
     VALUES ('cardgames.png', 'KDE-1', true, 'Card Games', 'Bust out the deck of 52!', 2);
 INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('game'));
-INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('Card Game'));
+    VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma')),
+           (currval('seq_channelids'), ct_testing_tagByName('game')),
+           (currval('seq_channelids'), ct_testing_tagByName('Card Game'));
 
 
 INSERT INTO assets (partner, name, description, version, file, image, active)
