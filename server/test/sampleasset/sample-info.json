@@ -1,7 +1,6 @@
 {
     "name" : "Just A Sample",
     "version" : "2.1",
-    "license" : "6",
     "description" : "description of the book",
     "partner" : "1002",
     "basePrice" : "0",
@@ -17,6 +16,7 @@
           "mimetype" : "image/png" }
     ],
     "tags" : [
+        {"type" : "license", "title" : "Creative Commons Attribution-NoDerivs"},
         {"type" : "contentrating", "title" : "Everyone" },
         {"type" : "assetType", "title" : "book" },
         {"type" : "author", "title" : "Zack Rusin"},
