@@ -363,7 +363,7 @@ describe('Store management', function(){
                               "typeid": 9
                             },
                             {
-                              "id": 29,
+                              "id": 33,
                               "title": "application/x-plasma",
                               "type": 'mimetype',
                               "typeid": 7
@@ -384,16 +384,16 @@ describe('Store management', function(){
                                       "typeid": 9
                                     },
                                     {
-                                      "id": 29,
-                                      "title": "application/x-plasma",
-                                      "type": 'mimetype',
-                                      "typeid": 7
-                                    },
-                                    {
-                                      "id": 33,
+                                      "id": 30,
                                       "title": "Card Game",
                                       "type": 'category',
                                       "typeid": 4
+                                    },
+                                    {
+                                      "id": 33,
+                                      "title": "application/x-plasma",
+                                      "type": 'mimetype',
+                                      "typeid": 7
                                     }
                                 ],
                                 "channels": []
