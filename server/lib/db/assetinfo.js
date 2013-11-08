@@ -101,13 +101,12 @@ function findPreviews(db, req, res, assetInfo, cb)
 
 function findTags(db, req, res, assetInfo, cb)
 {
-    //FIXME: listPublicly is gone?
     var tagsQuery =
         "SELECT tagTypes.type, tags.title FROM \
              assetTags a JOIN tags ON (a.tag = tags.id) LEFT JOIN \
              tagTypes ON (tags.type = tagTypes.id) \
          where a.asset = $1 \
-         --AND tagTypes.listPublicly;";
+         AND tagTypes.listPublicly;";
     var incomingTagsQuery =
         "SELECT tagTypes.type, tags.title FROM incomingAssetTags a \
          JOIN tags ON (a.tag = tags.id) LEFT JOIN tagTypes ON \
@@ -137,8 +136,6 @@ function assetFromRow(row, brief)
 {
     var asset = {
         id:          row.id,
-        license:     row.license,
-        licenseText: row.licenseText,
         partnerId:   row.partnerid,
         partner:     row.partnername,
         version:     row.version,
@@ -175,12 +172,10 @@ function findAsset(db, req, res, assetInfo, cb) {
             table = 'assets';
         }
         query =
-        "SELECT a.id, l.name as license, l.text as licenseText, \
-         a.partner as partnerId, p.name as partnername, \
+        "SELECT a.id, a.partner as partnerId, p.name as partnername, \
          a.version, a.file, a.image, a.name, \
          a.description, a.size \
          FROM " + table + " a \
-         LEFT JOIN licenses l ON (a.license = l.id) \
          LEFT JOIN partners p ON (a.partner = p.id) \
          WHERE a.id = $1";
         args = [assetInfo.id];
@@ -192,7 +187,7 @@ function findAsset(db, req, res, assetInfo, cb) {
     } else {
         multi = Array.isArray(assetInfo.id);
         table = 'assets';
-        query = "SELECT a.id, l.name as license, l.text as licenseText, \
+        query = "SELECT a.id, \
             a.partner as partnerId, p.name as partnername, \
             a.version, a.versionTs as created, \
             a.file, a.image, a.name, a.description, a.size";
@@ -203,7 +198,6 @@ function findAsset(db, req, res, assetInfo, cb) {
          }
 
          query += " FROM assets a \
-            LEFT JOIN licenses l ON (a.license = l.id) \
             LEFT JOIN partners p ON (a.partner = p.id) \
             WHERE a.id IN (SELECT ca.asset FROM channelAssets ca \
                            LEFT JOIN channels c ON (ca.channel = c.id) \

@@ -36,7 +36,7 @@ function sendResponse(db, req, res, assetInfo)
         id : assetInfo.id,
         name : assetInfo.name
     };
-    addToJson(json.asset, assetInfo, 'license');
+
     addToJson(json.asset, assetInfo, 'baseprice');
     addToJson(json.asset, assetInfo, 'description');
     addToJson(json.asset, assetInfo, 'version');
@@ -91,7 +91,7 @@ function writeIncomingAsset(db, req, res, assetInfo, cb)
     var params = [assetInfo.id, assetInfo.partner];
     var setters = [];
 
-    var attrs = ['license', 'baseprice', 'name', 'description',
+    var attrs = ['baseprice', 'name', 'description',
                  'version', 'externpath', 'file', 'size'];
     var attr;
     for (var idx in attrs) {
@@ -128,7 +128,7 @@ function writeCreatedAsset(db, req, res, assetInfo, cb)
     var columns = [];
     var values= [];
 
-    var attrs = ['id', 'partner', 'license', 'baseprice',
+    var attrs = ['id', 'partner', 'baseprice',
                  'name', 'description', 'version', 'externpath',
                  'file', 'size'];
     var attr;
@@ -317,7 +317,7 @@ function findPreviews(db, req, res, assetInfo, cb)
 function duplicatePublishedAsset(db, req, res, assetInfo, cb)
 {
     var incomingAssetQuery =
-            "insert into incomingAssets (id, license, partner, baseprice, \
+            "insert into incomingAssets (id, partner, baseprice, \
                                          name, description, version,  \
                                          versionts, externpath, file, \
                                          size, image, posted)\
@@ -325,7 +325,7 @@ function duplicatePublishedAsset(db, req, res, assetInfo, cb)
                                                  $8, $9, $10, $11, $12, false)";
 
     db.query(
-        incomingAssetQuery, [assetInfo.id, assetInfo.license,
+        incomingAssetQuery, [assetInfo.id,
                              assetInfo.partner, assetInfo.baseprice,
                              assetInfo.name, assetInfo.description,
                              assetInfo.version, assetInfo.versionts,

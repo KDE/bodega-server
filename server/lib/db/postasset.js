@@ -51,7 +51,7 @@ function assetHasTag(assetInfo, tagType)
 function validateAssetInfo(db, req, res, assetInfo, cb)
 {
     var e;
-    var fields = ['license', 'partner',
+    var fields = ['partner',
                   'name', 'description',
                   'version', 'file', 'size',
                   'image'];

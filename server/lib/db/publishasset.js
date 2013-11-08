@@ -116,7 +116,7 @@ function writeAsset(db, req, res, assetInfo, cb)
     var fieldsStr = '(';
     var valuesStr = '(';
     var args  = [];
-    var fields = ['license', 'partner', 'basePrice',
+    var fields = ['partner', 'basePrice',
                   'name', 'description', 'version',
                   'file', 'image', 'size'];
     var field;
