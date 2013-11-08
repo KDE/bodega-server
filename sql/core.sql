@@ -25,15 +25,6 @@ create table languages
     name        text
 );
 
-create sequence seq_licenseIds;
-
-create table licenses
-(
-    id          int         primary key default nextval('seq_licenseIds'),
-    name        text        not null,
-    text        text
-);
-
 create sequence seq_partnerIds;
 
 create table partners
@@ -161,7 +152,8 @@ create table tags
     id          int         primary key default nextval('seq_tagIds'),
     partner     int         references partners(id) on delete cascade,
     type        int         references tagTypes(id) on delete cascade,
-    title       text
+    title       text,
+    url         text
 );
 
 create  index idx_tagsByType on tags(type);
@@ -201,7 +193,6 @@ CREATE TABLE storeAssetSummary
 create table assets
 (
     id          int         primary key default nextval('seq_assetsIds'),
-    license     int         references licenses(id),
     partner     int         not null references partners(id),
     basePrice   int         not null default 0 CHECK(basePrice >= 0),
     name        text        not null,

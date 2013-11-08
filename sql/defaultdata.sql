@@ -47,7 +47,8 @@ INSERT INTO tagTypes (type, listPublicly)
         ('easter eggs', false),
         ('language', true),
         ('servicetype', true),
-        ('resolution', true);
+        ('resolution', true),
+        ('license', true);
 
 INSERT INTO tags (type, title)
     SELECT id, titles.*  FROM tagtypes,
@@ -81,18 +82,20 @@ INSERT INTO tags (type, title)
         ) AS titles
         WHERE type = 'assetType';
 
-INSERT INTO licenses (name, text)
-    VALUES
-        ('GPL', ''),
-        ('LGPL', ''),
-        ('BSD', ''),
-        ('Creative Commons Attribution', ''),
-        ('Creative Commons Attribution-ShareAlike', ''),
-        ('Creative Commons Attribution-NoDerivs', ''),
-        ('Creative Commons Attribution-NonCommercial', ''),
-        ('Creative Commons Attribution-NonCommercial-ShareAlike', ''),
-        ('Creative Commons Attribution-NonCommercial-NoDerivs', ''),
-        ('Proprietary / All rights reserved', '');
+INSERT INTO tags (type, title, url)
+    SELECT id, titles.* FROM tagTypes,
+    (VALUES
+        ('GPL', 'http://www.gnu.org/copyleft/gpl.html'),
+        ('LGPL', 'http://www.gnu.org/copyleft/lgpl.html'),
+        ('BSD', 'http://opensource.org/licenses/BSD-2-Clause'),
+        ('Creative Commons Attribution', 'http://creativecommons.org/licenses/by/3.0/deed.en_US'),
+        ('Creative Commons Attribution-ShareAlike', 'http://creativecommons.org/licenses/by-sa/3.0/deed.en_US'),
+        ('Creative Commons Attribution-NoDerivs', 'http://creativecommons.org/licenses/by-nd/3.0/deed.en_US'),
+        ('Creative Commons Attribution-NonCommercial', 'http://creativecommons.org/licenses/by-nc/3.0/deed.en_US'),
+        ('Creative Commons Attribution-NonCommercial-ShareAlike', 'http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US'),
+        ('Creative Commons Attribution-NonCommercial-NoDerivs', 'http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US'),
+        ('Proprietary / All rights reserved', null)) as titles
+    WHERE type = 'license';
 
 -- a "NULL" store for use with e.g. the bodegamarket log ins
 SELECT setval('seq_partnerIds', 1000);
