@@ -46,7 +46,7 @@ describe('License listing', function() {
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('licenses');
                     res.body.licenses.length.should.be.equal(10);
-                    res.body.licenses[0].name.should.be.equal('GPL');
+                    res.body.licenses[0].name.should.be.equal('BSD');
                     done();
                 });
         });
