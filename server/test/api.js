@@ -66,7 +66,7 @@ describe('List api', function() {
         it('should return the 404 page when the file does not exist', function(done) {
             utils.getHtml('/api/wrongPath',
                 function(res) {
-                    res.statusCode.should.equal(200);
+                    res.statusCode.should.equal(404);
                     var pageNotFound = res.body.indexOf('Page Not Found') > -1;
                     assert.equal(pageNotFound, true);
                     done();
