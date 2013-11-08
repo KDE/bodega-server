@@ -24,3 +24,8 @@ INSERT INTO assetTags (asset, tag)
 ALTER TABLE assets DROP COLUMN license;
 DROP TABLE licenses;
 
+INSERT INTO relatedTags (tag, related)
+    SELECT t.id, r.id FROM tags t JOIN tagTypes ttt ON (t.type = ttt.id AND ttt.type = 'assetType'), tags r JOIN tagTypes rtt ON (r.type = rtt.id and rtt.type = 'license');
+
+\i core.plsql
+
