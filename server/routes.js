@@ -695,5 +695,5 @@ app.get('/api(/?*)', function(req, res) {
 
 //NOTE: Always has to be the last route
 app.all('/', function(req, res) {
-    res.render('index.jade', utils.indexPageData);;
+    res.render('index.jade', utils.indexPageData);
 });
