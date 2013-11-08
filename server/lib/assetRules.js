@@ -19,62 +19,75 @@
 module.exports.mandatoryTags = {
     generic: {
         author: { name: "Author", type: "author", multi: true, required: true },
-        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true }
+        contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true }
     },
     application: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true },
         descriptive: { name: "Category", type: "descriptive", multi: true, required: false },
         platform: { name: "Platform", type: "platform", multi: true, required: false }
     },
     widget: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true },
         descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
     },
     game: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true },
         descriptive: { name: "Category", type: "descriptive", multi: true, required: false },
         platform: { name: "Platform", type: "platform", multi: true, required: false }
     },
     article: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true }
     },
     audio: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true }
     },
     audiobook: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true }
     },
     book: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true },
         descriptive: { name: "Category", type: "descriptive", multi: true, required: true },
         mimetype: { name: "File Type", type: "mimetype", multi: false, required: true }
     },
     magazine: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true }
     },
     movie: {
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true }
     },
     tvshow: {
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true }
     },
     wallpaper: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true },
         resolution: { name: "Resolution", type: "resolution", multi: true, required: false },
         descriptive: { name: "Category", type: "descriptive", multi: true, required: false }
     },
     image: {
         author: { name: "Author", type: "author", multi: true, required: true },
         contentrating: { name: 'Content Rating', type: "contentrating", multi: false, required: true },
+        license: { name: "License", type: "license", multi: true, required: true }
     }
 };
 
