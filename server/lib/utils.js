@@ -357,6 +357,6 @@ module.exports.indexPageData =
 
 module.exports.render404 = function(res)
 {
-    res.render('404.jade', module.exports.indexPageData);
+    res.status(404).render('404.jade', module.exports.indexPageData);
 };
 
