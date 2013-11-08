@@ -156,14 +156,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION ct_testing_tagGame(bigint) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION ct_testing_tagGame(assetId bigint, isCardGame bool = true) RETURNS VOID AS $$
 BEGIN
-INSERT INTO assetTags (asset, tag)
-    VALUES ($1, ct_testing_tagByName('application/x-plasma')),
-           ($1, ct_testing_tagByName('Everyone 10+')),
-           ($1, ct_testing_tagByName('game')),
-           ($1, ct_testing_tagByName('Card Game')),
-           ($1, ct_testing_licenseByName('GPL'));
+    INSERT INTO assetTags (asset, tag)
+        VALUES (assetId, ct_testing_tagByName('application/x-plasma')),
+               (assetId, ct_testing_tagByName('Everyone 10+')),
+               (assetId, ct_testing_tagByName('game')),
+               (assetId, ct_testing_licenseByName('GPL'));
+
+    IF isCardGame THEN
+        INSERT INTO assetTags (asset, tag)
+           VALUES (assetId, ct_testing_tagByName('Card Game'));
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -282,23 +286,23 @@ update assetChangelogs set changes = 'Bug fixes' WHERE asset = currval('seq_asse
 
 INSERT INTO assets (partner, name, description, version, file, image, active)
     VALUES (ct_testing_partnerId('KDE'), 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true);
-select ct_testing_tagGame(currval('seq_assetsids'));
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
 INSERT INTO assets (partner, name, description, version, file, image, active)
     VALUES (ct_testing_partnerId('KDE'), 'Diamond Juice', 'Best app from Diamond to date', '0.1', 'com.diamondevices.juice.plasmoid', 'juice.png', true);
-select ct_testing_tagGame(currval('seq_assetsids'));
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
 INSERT INTO assets (partner, name, description, version, file, image, active)
     VALUES (ct_testing_partnerId('KDE'), '15 Puzzle', 'The classic puzzle game', '0.1', 'org.kde.15puzzle.plasmoid', '15puzzle.png', true);
-select ct_testing_tagGame(currval('seq_assetsids'));
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
 INSERT INTO assets (partner, name, description, version, file, image, active)
     VALUES (ct_testing_partnerId('KDE'), 'Tetris', 'Stacking blocks', '0.1', 'org.kde.tetris.plasmoid', 'tetris.png', true);
-select ct_testing_tagGame(currval('seq_assetsids'));
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
 INSERT INTO assets (partner, name, description, version, file, image, active)
     VALUES (ct_testing_partnerId('KDE'), 'Jewels', 'Connect the jewels', '0.1', 'org.kde.jewels.plasmoid', 'jewels.png', true);
-select ct_testing_tagGame(currval('seq_assetsids'));
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
 INSERT INTO assets (partner, name, description, version, file, image, active)
     VALUES (ct_testing_partnerId('KDE'), 'Poker1', 'Poker 1', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true);
@@ -509,5 +513,5 @@ DROP FUNCTION ct_testing_personByEmail(text);
 DROP FUNCTION ct_testing_partnerId(text);
 DROP FUNCTION ct_testing_removePriorTestingTags();
 DROP FUNCTION ct_testing_ratingAttributeByName(text);
-DROP FUNCTION ct_testing_tagGame(bigint);
+DROP FUNCTION ct_testing_tagGame(bigint, bool);
 commit;
