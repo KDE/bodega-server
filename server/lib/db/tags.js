@@ -385,7 +385,7 @@ module.exports.update = function(db, req, res) {
 };
 
 module.exports.listLicenses = function(db, req, res) {
-    db.query("SELECT id, name FROM licenses ORDER BY id", [],
+    db.query("SELECT t.id, title, url FROM tags t JOIN tagTypes tt ON (t.type = tt.id) WHERE tt.type = 'license' ORDER BY title", [],
              function(err, result) {
                  if (err) {
                      errors.report('Database', req, res, err);
@@ -397,3 +397,4 @@ module.exports.listLicenses = function(db, req, res) {
                  res.json(json);
              });
 };
+
