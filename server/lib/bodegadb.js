@@ -51,9 +51,9 @@ var dbUpdates = require('./db/updates.js');
 var dbRatings = require('./db/ratings.js');
 
 var BodegaDb = (function() {
-    var connectionString;
+    BodegaDb.prototype.connectionString;
     function BodegaDb() {
-        connectionString =
+        this.connectionString =
             app.config.service.database.protocol + "://" +
             app.config.service.database.user + ":" + app.config.service.database.password +
             "@" + app.config.service.database.host + "/" +
@@ -61,7 +61,7 @@ var BodegaDb = (function() {
     }
 
     BodegaDb.prototype.dbQuery = function (func, req, res) {
-        pg.connect(connectionString, function(err, client, done) {
+        pg.connect(this.connectionString, function(err, client, done) {
             if (err === null) {
                 func(client, req, res);
             } else if (req) {
