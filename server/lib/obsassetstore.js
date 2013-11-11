@@ -21,14 +21,14 @@ var exec = require('child_process').exec;
 
 var ObsAssetStore = (function() {
     
-    ObsAssetStore.prototype.stream(res, parsedUrl, filename, fn) {
+    ObsAssetStore.prototype.stream = function(res, parsedUrl, filename, fn) {
         fs.stat(parsedUrl.path, function(err, stat) {
             if (err) {
                 fn(err);
                 return;
             }
 
-            var obsDesc = JSON.parse(fs.readFileSync(parsedUrl.path), 'utf8'));
+            var obsDesc = JSON.parse(fs.readFileSync(parsedUrl.path), 'utf8');
 
             if (obsDesc.package && obsDesc.architecture && obsDesc.repository) {
                 child = exec("osc list -b kde:stable:apps " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
