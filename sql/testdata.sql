@@ -198,6 +198,9 @@ INSERT INTO people (lastname, firstname, email, points, password, active)
 INSERT INTO people (lastname, firstname, email, points, password, active)
     VALUES ('Martin', 'Marco', 'mart@kde.org', 10000, '$2a$10$VYBi6invWdeT..wQ5FFXqu67HQI5Y8WVAhN5orzUIsWAeMaAItYrS', true);
 
+INSERT INTO people (lastname, firstname, email, points, password, active)
+    VALUES ('Inactive', 'Mister', 'inactive@kde.org', 10000, '$2a$10$VYBi6invWdeT..wQ5FFXqu67HQI5Y8WVAhN5orzUIsWAeMaAItYrS', false);
+
 INSERT INTO partners (id, name, publisher, distributor) VALUES (0, 'Management Group', true, true);
 INSERT INTO partners (id, name, publisher, distributor, supportEmail) VALUES (1000, 'Make Play Live', true, true, 'support@makeplaylive.com');
 INSERT INTO partnerContacts (partner, service, account, url) VALUES (1000, 'website', null, 'http://makeplaylive.com');
