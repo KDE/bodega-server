@@ -63,3 +63,40 @@ module.exports.stream = function(res, parsedUrl, filename, fn) {
     });
 }
 
+module.exports.size = function(res, parsedUrl, filename, fn) {
+    fs.stat(parsedUrl.path, function(err, stat) {
+        if (err) {
+            fn(err);
+            return;
+        }
+
+        var obsDesc;
+
+        try {
+            obsDesc = JSON.parse(fs.readFileSync(parsedUrl.path), 'utf8');
+        } catch (e) {
+            // An error has occured, handle it, by e.g. logging it
+            console.log(e);
+            return;
+        }
+
+        if (obsDesc.package && obsDesc.architecture && obsDesc.repository) {
+            child = exec("osc list -bl kde:stable:apps " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+
+                if (error !== null) {
+                    console.log('exec error: ' + error);
+                }
+
+                var re = new RegExp("\d*");
+                obsDesc.packageId = stdout.replace(re, "$1" + obsDesc.repository);
+                var answer = JSON.stringify(obsDesc);
+
+
+                fn(size)
+            });
+        }
+                
+    });
+}
