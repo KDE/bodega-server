@@ -60,6 +60,46 @@ describe('Authentication', function(){
         });
     });
 
+    describe('when account does not exist', function(){
+        it('should report error', function(done){
+            var expected = {
+                "authStatus":false,
+                "device":0,
+                "store":0,
+                "points":0,
+                "success":false,
+                "error": {"type" : "NoMatch"}};
+            utils.getUrl('auth?auth_user=noextant&auth_password=nonextant&auth_store=null',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.eql(expected);
+                    done();
+                },
+                { noAuth: true });
+        });
+    });
+
+    describe('when account is inactive', function(){
+        it('should report error', function(done){
+            var expected = {
+                "authStatus":false,
+                "device":0,
+                "store":0,
+                "points":0,
+                "success":false,
+                "error": {"type" : "AccountInactive"}};
+            utils.getUrl('auth?auth_user=inactive@kde.org&auth_password=inactive&auth_store=null',
+                function(res) {
+                    res.statusCode.should.equal(200);
+                    res.headers.should.have.property('content-type');
+                    res.body.should.eql(expected);
+                    done();
+                },
+                { noAuth: true });
+        });
+    });
+
     describe('when username is wrong', function(){
         it('should report error', function(done){
             var expected = {
