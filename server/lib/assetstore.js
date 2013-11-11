@@ -24,6 +24,8 @@ var http = require('http');
 var https = require('https');
 var url = require('url');
 
+var ObsAssetStore = require('./obsassetstore').ObsAssetStore;
+
 var AssetStore = (function() {
     var storageConfig;
     var incomingDirPath;
@@ -247,6 +249,9 @@ var AssetStore = (function() {
         if (parsedUrl.protocol === 'http:' ||
             parsedUrl.protocol === 'https:') {
             httpGetStream(res, parsedUrl, assetInfo.file, fn);
+        //FIXME: better way to decide the proper store
+        } else if (assetInfo.file.indexOf('.desc') !== -1) {
+            ObsAssetStore.stream(res, parsedUrl, assetInfo.file, fn);
         } else {
             localGetStream(res, assetPath, assetInfo.file, fn);
         }
