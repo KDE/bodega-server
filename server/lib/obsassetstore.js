@@ -47,7 +47,7 @@ module.exports.stream = function(res, parsedUrl, filename, fn) {
                     console.log('exec error: ' + error);
                 }
 
-                var re = new RegExp("\([^-]*\)-\(.*\)\.\(" + obsDesc.architecture + "\).rpm");
+                var re = new RegExp("\ ([^-]*\)-\(.*\)\.\(" + obsDesc.architecture + "\).rpm\\n");
                 obsDesc.packageId = stdout.replace(re, "$1;$2;$3;" + obsDesc.repository);
                 var answer = JSON.stringify(obsDesc);
 
