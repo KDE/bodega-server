@@ -19,42 +19,47 @@ var fs = require('fs');
 var sys = require('sys')
 var exec = require('child_process').exec;
 
-var ObsAssetStore = (function() {
-    
-    ObsAssetStore.prototype.stream = function(res, parsedUrl, filename, fn) {
-        fs.stat(parsedUrl.path, function(err, stat) {
-            if (err) {
-                fn(err);
-                return;
-            }
 
-            var obsDesc = JSON.parse(fs.readFileSync(parsedUrl.path), 'utf8');
 
-            if (obsDesc.package && obsDesc.architecture && obsDesc.repository) {
-                child = exec("osc list -b kde:stable:apps " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
-                    console.log('stdout: ' + stdout);
-                    console.log('stderr: ' + stderr);
+module.exports.stream = function(res, parsedUrl, filename, fn) {
+    fs.stat(parsedUrl.path, function(err, stat) {
+        if (err) {
+            fn(err);
+            return;
+        }
 
-                    if (error !== null) {
-                        console.log('exec error: ' + error);
-                    }
+        var obsDesc;
 
-                    var re = new RegExp("s/\([^-]*\)-\(.*\)." + obsDesc.architecture + ".rpm/\\1;\\2;" + obsDesc.repository);
-                    obsDesc.packageId = re.exec(stdout);
-                    var answer = JSON.stringify(obsDesc);
-                    
+        try {
+            obsDesc = JSON.parse(fs.readFileSync(parsedUrl.path), 'utf8');
+        } catch (e) {
+            // An error has occured, handle it, by e.g. logging it
+            console.log(e);
+            return;
+        }
 
-                    res.header('Content-Length', answer.size);
-                    res.header('Content-Type', 'text/plain');
-                    res.attachment(filename);
-                    res.write(answer);
-                    res.end();
-                });
-            }
-                    
-        });
-    }
-    
-});
+        if (obsDesc.package && obsDesc.architecture && obsDesc.repository) {
+            child = exec("osc list -b kde:stable:apps " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
 
-module.exports.ObsAssetStore = ObsAssetStore;
+                if (error !== null) {
+                    console.log('exec error: ' + error);
+                }
+
+                var re = new RegExp("\([^-]*\)-\(.*\)\.\(" + obsDesc.architecture + "\).rpm");
+                obsDesc.packageId = stdout.replace(re, "$1;$2;$3;" + obsDesc.repository);
+                var answer = JSON.stringify(obsDesc);
+
+                res.header('Content-Length', answer.length);
+                res.header('Content-Type', 'text/plain');
+                res.attachment(filename);
+                res.write(answer);
+                res.end();
+                fn(null)
+            });
+        }
+                
+    });
+}
+

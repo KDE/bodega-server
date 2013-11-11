@@ -24,7 +24,7 @@ var http = require('http');
 var https = require('https');
 var url = require('url');
 
-var ObsAssetStore = require('./obsassetstore').ObsAssetStore;
+var ObsAssetStore = require('./obsassetstore.js');
 
 var AssetStore = (function() {
     var storageConfig;
