@@ -345,20 +345,23 @@ BEGIN
         DELETE FROM channelAssets c WHERE c.channel = alteredChannel;
         DELETE FROM subChannelAssets sc WHERE sc.channel = alteredChannel OR sc.leafChannel = alteredChannel;
 
-        FOR assetRow IN SELECT * FROM (SELECT a.asset as id, count(a.tag) = tagCount as matches
+        FOR assetRow IN SELECT * FROM (SELECT a.asset as id, a.basePrice, count(a.tag) = tagCount as matches
                 FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
-            WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp WHERE matches LOOP
+                WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp WHERE matches
+        LOOP
             INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
             PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
-            PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
-            IF NOT FOUND THEN
-                SELECT INTO pricesRow
-                    (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
-                     warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
-                    FROM assets WHERE id = assetRow.id;
-                IF pricesRow.retailpoints > 0 THEN
-                    INSERT INTO assetPrices (asset, store, points, toStore)
+            IF assetRow.basePrice > 0 THEN
+                PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
+                IF NOT FOUND THEN
+                    SELECT INTO pricesRow
+                        (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
+                         warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
+                        FROM assets WHERE id = assetRow.id;
+                    IF pricesRow.retailpoints > 0 THEN
+                        INSERT INTO assetPrices (asset, store, points, toStore)
                            VALUES (assetRow.id, markupRow.store, pricesRow.retailpoints, pricesRow.tostorepoints);
+                    END IF;
                 END IF;
             END IF;
         END LOOP;
