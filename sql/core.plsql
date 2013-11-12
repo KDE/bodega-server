@@ -446,9 +446,9 @@ BEGIN
     SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
     INSERT INTO assetPrices (asset, store, points, tostore)
     SELECT a.id, NEW.id, (ct_calcPoints(a.basePrice, NEW.markup, NEW.minMarkup, NEW.maxMarkup,
-                                       warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
-        FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
-                      LEFT JOIN channels c ON (c.id = sa.channel)
+                                        warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
+        FROM assets a JOIN subChannelAssets sa ON (a.id = sa.asset)
+                      JOIN channels c ON (c.id = sa.channel)
         WHERE c.store = NEW.id AND c.parent IS NULL AND a.basePrice > 0;
     RETURN NEW;
 END;
@@ -467,10 +467,10 @@ BEGIN
 
     INSERT INTO assetPrices (asset, store, points, toStore)
     SELECT DISTINCT a.id, s.id, (ct_calcPoints(a.basePrice, s.markup, s.minMarkup, s.maxMarkup,
-                                                NEW.markup, NEW.minMarkup, NEW.maxMarkup)).*
-        FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
-                      LEFT JOIN channels c ON (c.id = sa.channel)
-                      LEFT JOIN stores s ON (c.store = s.id)
+                                               NEW.markup, NEW.minMarkup, NEW.maxMarkup)).*
+        FROM assets a JOIN subChannelAssets sa ON (a.id = sa.asset)
+                      JOIN channels c ON (c.id = sa.channel)
+                      JOIN stores s ON (c.store = s.id)
         WHERE c.parent IS NULL AND a.basePrice > 0 AND s.id IS NOT NULL;
     RETURN NEW;
 END;
