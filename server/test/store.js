@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright 2013 Coherent Theory LLC
 
     This program is free software; you can redistribute it and/or
@@ -183,7 +183,7 @@ describe('Store management', function(){
                             name: 'Plasma Workspace',
                             desc: 'KDE Plasma user interfaces',
                             partner: { 'id': 1002, 'name': 'KDE' },
-                            markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                            markups: { 'min': 0, 'max': 0, 'markup': 15 },
                             assetSummary: [
                                 { type: 'game', total: 24 }
                             ]
@@ -531,7 +531,7 @@ describe('Store management', function(){
                             name: 'Plasma Workspace',
                             desc: 'KDE Plasma user interfaces',
                             partner: { 'id': 1002, 'name': 'KDE' },
-                            markups: { 'min': 0, 'max': 0, 'markup': 0 },
+                            markups: { 'min': 0, 'max': 0, 'markup': 15 },
                             assetSummary: [
                                 { type: 'game', total: 24 }
                             ]

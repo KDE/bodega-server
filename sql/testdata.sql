@@ -234,7 +234,7 @@ INSERT INTO tags (type, title) SELECT id, 'http://makeplaylive.com' FROM tagtype
 
 INSERT INTO stores (id, partner, name) VALUES ('null', ct_testing_partnerId('Management Group'), 'No Store');
 INSERT INTO stores (id, partner, name, description) VALUES ('VIVALDI-1', ct_testing_partnerId('Make Play Live'), 'Vivaldi', 'Plasma Active tablet from Make Play Live');
-INSERT INTO stores (id, partner, name, description) VALUES ('KDE-1', ct_testing_partnerId('KDE'), 'Plasma Workspace', 'KDE Plasma user interfaces');
+INSERT INTO stores (id, partner, name, description, markup) VALUES ('KDE-1', ct_testing_partnerId('KDE'), 'Plasma Workspace', 'KDE Plasma user interfaces', 15);
 INSERT INTO stores (id, partner, name, description) VALUES ('KDE-2', ct_testing_partnerId('KDE'), 'KDE Applications', 'Variety of tools');
 INSERT INTO stores (id, partner, name, description) VALUES ('DD-1', ct_testing_partnerId('Diamond Devices'), 'Bling Media Center', 'Imaginary hifi for your home');
 INSERT INTO stores (id, partner, name, description) VALUES ('DD-2', ct_testing_partnerId('Diamond Devices'), 'Affordaphone', 'Finally a phone even you can afford');

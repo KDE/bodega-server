@@ -389,6 +389,8 @@ DECLARE
     price int := 0;
     storeCut int := 0;
     wareCut int := 0;
+    actualStoreMarkup float := 0;
+    actualWareMarkup float := 0;
 BEGIN
     IF points < 1 THEN
         retailPoints = storeMinMarkup + wareMinMarkup;
@@ -420,12 +422,12 @@ BEGIN
     END IF;
 
     -- now calc markups based on the actual cut relative to the base points price
-    storeMarkup := ((storeCut / points::float) * 100)::int;
-    wareMarkup := ((wareCut / points::float) * 100)::int;
-    -- raise notice 'final markups are % % % %', storeMarkup, storeCut, wareMarkup, wareCut;
+    actualStoreMarkup := storeCut / points::float;
+    actualWareMarkup := wareCut / points::float;
+    -- raise notice 'final markups are % % % %', actualStoreMarkup, storeCut, actualWareMarkup, wareCut;
 
     toStorePoints := storeCut;
-    retailPoints := (points * (1 + ((storeMarkup + wareMarkup) / 100.0)))::int;
+    retailPoints := ceil(points * (1 + actualStoreMarkup + actualWareMarkup));
 
     -- raise notice 'final price is %', retailPoints;
     -- finally, make sure it is multiple of 10
