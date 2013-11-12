@@ -70,7 +70,7 @@ describe('Purchase Asset', function() {
                                   ORDER BY purchasedOn DESC LIMIT 1", [],
                                  function(err, result) {
                                      assert(!err);
-                                     result.should.have.property.rows;
+                                     result.should.have.property('rows');
                                      result.rows.should.have.property('length', 1);
                                      receipt = result.rows[0];
                                      finis();
@@ -80,7 +80,7 @@ describe('Purchase Asset', function() {
        });
 
        it('should have the correct number of points', function(done) {
-            receipt.should.have.property('points', 1180);
+            receipt.should.have.property('points', 1430);
             done();
        });
 
@@ -90,18 +90,18 @@ describe('Purchase Asset', function() {
        });
 
        it('should have receipt for the distributor', function(done) {
-            receipt.should.have.property('tostore', 0);
+            receipt.should.have.property('tostore', 214);
             done();
        });
 
        it('should have receipt for the warehouse', function(done) {
-            assert(receipt.points - receipt.toparticipant - receipt.tostore == 180);
+            assert.equal(receipt.points - receipt.toparticipant - receipt.tostore, 216);
             done();
        });
     });
 
     describe('Purchase asset which is not valid', function() {
-        it('should be purchased successfully', function(done) {
+        it('should not be purchased successfully', function(done) {
             utils.getUrl('purchase/999',
                 function(res) {
                     res.statusCode.should.equal(200);
