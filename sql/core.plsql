@@ -345,9 +345,11 @@ BEGIN
         DELETE FROM channelAssets c WHERE c.channel = alteredChannel;
         DELETE FROM subChannelAssets sc WHERE sc.channel = alteredChannel OR sc.leafChannel = alteredChannel;
 
-        FOR assetRow IN SELECT * FROM (SELECT a.asset as id, a.basePrice, count(a.tag) = tagCount as matches
-                FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
-                WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp WHERE matches
+        FOR assetRow IN SELECT tmp.*, a.basePrice FROM
+                (SELECT a.asset as id, count(a.tag) = tagCount as matches
+                    FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
+                    WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp
+            JOIN assets a ON (tmp.id = a.id) WHERE tmp.matches
         LOOP
             INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
             PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
