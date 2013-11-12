@@ -18,6 +18,8 @@
 var server = require('../app.js');
 var errors = require('../lib/errors.js');
 var utils = require('./support/utils');
+
+var assert = require('assert');
 var fs = require('fs');
 var path = require('path');
 var pg = require('pg');
@@ -56,6 +58,46 @@ describe('Purchase Asset', function() {
                     done();
                 });
         });
+    });
+
+    describe('Check point distribution', function() {
+        var receipt = {};
+        before(function(done) {
+            pg.connect(utils.dbConnectionString,
+                function(err, client, finis) {
+                    client.query("SELECT points, toParticipant, toStore FROM purchases \
+                                  WHERE asset = 25 AND email = 'zack@kde.org' \
+                                  ORDER BY purchasedOn DESC LIMIT 1", [],
+                                 function(err, result) {
+                                     assert(!err);
+                                     result.should.have.property.rows;
+                                     result.rows.should.have.property('length', 1);
+                                     receipt = result.rows[0];
+                                     finis();
+                                     done();
+                                 });
+                });
+       });
+
+       it('should have the correct number of points', function(done) {
+            receipt.should.have.property('points', 1180);
+            done();
+       });
+
+       it('should have points for the publisher', function(done) {
+            receipt.should.have.property('toparticipant', 1000);
+            done();
+       });
+
+       it('should have receipt for the distributor', function(done) {
+            receipt.should.have.property('tostore', 0);
+            done();
+       });
+
+       it('should have receipt for the warehouse', function(done) {
+            assert(receipt.points - receipt.toparticipant - receipt.tostore == 180);
+            done();
+       });
     });
 
     describe('Purchase asset which is not valid', function() {
