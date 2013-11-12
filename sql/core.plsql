@@ -345,20 +345,25 @@ BEGIN
         DELETE FROM channelAssets c WHERE c.channel = alteredChannel;
         DELETE FROM subChannelAssets sc WHERE sc.channel = alteredChannel OR sc.leafChannel = alteredChannel;
 
-        FOR assetRow IN SELECT * FROM (SELECT a.asset as id, count(a.tag) = tagCount as matches
-                FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
-            WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp WHERE matches LOOP
+        FOR assetRow IN SELECT tmp.*, a.basePrice FROM
+                (SELECT a.asset as id, count(a.tag) = tagCount as matches
+                    FROM assetTags a RIGHT JOIN channelTags c ON (c.tag = a.tag and c.channel = alteredChannel)
+                    WHERE a.asset IS NOT NULL GROUP BY a.asset) as tmp
+            JOIN assets a ON (tmp.id = a.id) WHERE tmp.matches
+        LOOP
             INSERT INTO channelAssets (channel, asset) VALUES (alteredChannel, assetRow.id);
             PERFORM ct_associateAssetWithParentChannel(alteredChannel, alteredChannel, assetRow.id);
-            PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
-            IF NOT FOUND THEN
-                SELECT INTO pricesRow
-                    (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
-                     warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
-                    FROM assets WHERE id = assetRow.id;
-                IF pricesRow.retailpoints > 0 THEN
-                    INSERT INTO assetPrices (asset, store, points, toStore)
+            IF assetRow.basePrice > 0 THEN
+                PERFORM * FROM assetPrices WHERE asset = assetRow.id AND store = markupRow.store AND ending IS NULL;
+                IF NOT FOUND THEN
+                    SELECT INTO pricesRow
+                        (ct_calcPoints(baseprice, markupRow.markup, markupRow.minMarkup, markupRow.maxMarkup,
+                         warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
+                        FROM assets WHERE id = assetRow.id;
+                    IF pricesRow.retailpoints > 0 THEN
+                        INSERT INTO assetPrices (asset, store, points, toStore)
                            VALUES (assetRow.id, markupRow.store, pricesRow.retailpoints, pricesRow.tostorepoints);
+                    END IF;
                 END IF;
             END IF;
         END LOOP;
@@ -443,9 +448,9 @@ BEGIN
     SELECT INTO warehouse markup, minMarkup, maxMarkup FROM warehouses WHERE id = 'main';
     INSERT INTO assetPrices (asset, store, points, tostore)
     SELECT a.id, NEW.id, (ct_calcPoints(a.basePrice, NEW.markup, NEW.minMarkup, NEW.maxMarkup,
-                                       warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
-        FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
-                      LEFT JOIN channels c ON (c.id = sa.channel)
+                                        warehouse.markup, warehouse.minMarkup, warehouse.maxMarkup)).*
+        FROM assets a JOIN subChannelAssets sa ON (a.id = sa.asset)
+                      JOIN channels c ON (c.id = sa.channel)
         WHERE c.store = NEW.id AND c.parent IS NULL AND a.basePrice > 0;
     RETURN NEW;
 END;
@@ -464,10 +469,10 @@ BEGIN
 
     INSERT INTO assetPrices (asset, store, points, toStore)
     SELECT DISTINCT a.id, s.id, (ct_calcPoints(a.basePrice, s.markup, s.minMarkup, s.maxMarkup,
-                                                NEW.markup, NEW.minMarkup, NEW.maxMarkup)).*
-        FROM assets a LEFT JOIN subChannelAssets sa ON (a.id = sa.asset)
-                      LEFT JOIN channels c ON (c.id = sa.channel)
-                      LEFT JOIN stores s ON (c.store = s.id)
+                                               NEW.markup, NEW.minMarkup, NEW.maxMarkup)).*
+        FROM assets a JOIN subChannelAssets sa ON (a.id = sa.asset)
+                      JOIN channels c ON (c.id = sa.channel)
+                      JOIN stores s ON (c.store = s.id)
         WHERE c.parent IS NULL AND a.basePrice > 0 AND s.id IS NOT NULL;
     RETURN NEW;
 END;

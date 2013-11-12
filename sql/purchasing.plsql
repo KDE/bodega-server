@@ -15,28 +15,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-
-CREATE OR REPLACE FUNCTION ct_assetPrice(fromStore text, what int) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION ct_assetPrice(fromStore text, what int,
+                                         OUT retailPoints int,
+                                         OUT toDistributorPoints int, OUT toPublisherPoints int,
+                                         OUT distributor int, OUT publisher int,
+                                         OUT assetName text) AS $$
 DECLARE
-    price   int := -1;
 BEGIN
-    SELECT INTO price points FROM assetPrices ap LEFT JOIN assets a ON (ap.asset = a.id)
+    SELECT INTO retailPoints, toDistributorPoints, toPublisherPoints, distributor, publisher, assetName
+        ap.points, ap.toStore, a.basePrice, s.partner, a.partner, a.name
+            FROM assetPrices ap JOIN assets a ON (ap.asset = a.id)
+                                JOIN stores s ON (ap.store = s.id)
                              WHERE ap.asset = what AND ap.store = fromStore AND
                                    ap.starting <= (current_timestamp AT TIME ZONE 'UTC') AND
                                    (ap.ending IS NULL OR ap.ending >= current_timestamp AT TIME ZONE 'UTC')
                             ORDER BY ap.starting DESC LIMIT 1;
     IF NOT FOUND THEN
-        PERFORM sca.asset FROM subChannelAssets sca LEFT JOIN channels c ON (sca.channel = c.id)
-                                                    LEFT JOIN assets a ON (sca.asset = a.id)
-                                                    WHERE sca.asset = what AND c.parent IS NULL AND c.store = fromStore;
-        IF FOUND THEN
-            price := 0;
-        ELSE
-            price := -1;
+        SELECT INTO retailPoints, toDistributorPoints, toPublisherPoints, distributor, publisher, assetName
+            0, 0, 0, st.partner, a.partner, a.name
+            FROM subChannelAssets sca JOIN channels c ON (sca.channel = c.id)
+                                      JOIN stores st ON (c.store = st.id)
+                                      JOIN assets a ON (sca.asset = a.id)
+                 WHERE sca.asset = what AND c.parent IS NULL AND c.store = fromStore LIMIT 1;
+        IF NOT FOUND THEN
+            retailPoints := -1;
         END IF;
     END IF;
-
-    RETURN price;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -49,21 +53,21 @@ $$ LANGUAGE 'plpgsql';
 --          3 if not enough points
 CREATE OR REPLACE FUNCTION ct_purchase(who int, fromStore text, what int) RETURNS INT AS $$
 DECLARE
-    price   int := 0;
-    participantEarns int := 0;
-    storeEarns int := 0;
-    assetInfo RECORD;
+    pricing   RECORD;
     purchaserEmail   text;
 BEGIN
-    PERFORM * FROM purchases WHERE person = who AND store = fromStore AND asset = what;
+    PERFORM * FROM purchases WHERE person = who AND asset = what;
     IF FOUND THEN
         -- already purchased!
         RETURN 0;
     END IF;
 
-    SELECT INTO price ct_assetPrice(fromStore, what);
-    IF price < 0 THEN
+    SELECT INTO pricing * FROM ct_assetPrice(fromStore, what);
+    IF pricing.retailPoints < 0 THEN
         RETURN 1;
+    ELSIF pricing.retailPoints < 1 THEN
+        -- the item does not cost anything, so just return here
+        RETURN 0;
     END IF;
 
     SELECT INTO purchaserEmail email FROM people WHERE id = who;
@@ -72,24 +76,26 @@ BEGIN
     END IF;
 
     -- note that to avoid problems with multiple simultaneous sales, which can happen
-    -- concurrently, the update must be done in an atomic fashion. fetching points
-    UPDATE people SET points = points - price WHERE id = who AND points >= price;
+    -- concurrently, the update must be done in an atomic fashion.
+    UPDATE people SET points = points - pricing.retailPoints WHERE id = who AND points >= pricing.retailPoints;
     IF NOT FOUND THEN
         RETURN 3;
     END IF;
 
-    -- give the uploader/partner/owner points as a result
-    SELECT INTO assetInfo basePrice, partner, name FROM assets WHERE id = what;
-    IF price > 0 THEN
-        IF price < assetInfo.basePrice THEN
-            assetInfo.basePrice = price;
-        END IF;
-        storeEarns := price - assetInfo.basePrice;
-        UPDATE partners SET earnedPoints = earnedPoints + assetInfo.basePrice, owedPoints = owedPoints + assetInfo.basePrice WHERE id = assetInfo.partner;
-    END IF;
+    -- distribute the earnings!
+    -- credit the publisher
+    UPDATE partners SET earnedPoints = earnedPoints + pricing.toPublisherPoints,
+                        owedPoints = owedPoints + pricing.toPublisherPoints
+        WHERE id = pricing.publisher;
+    -- credit the distributor
+    UPDATE partners SET earnedPoints = earnedPoints + pricing.toDistributorPoints,
+                        owedPoints = owedPoints + pricing.toDistributorPoints
+        WHERE id = pricing.distributor;
 
     -- insert into the purchases recording table
-    INSERT INTO purchases (person, email, store, asset, name, points, toParticipant, toStore) VALUES (who, purchaserEmail, fromStore, what, assetInfo.name, price, assetInfo.basePrice, storeEarns);
+    INSERT INTO purchases (person, email, store, asset, name, points, toParticipant, toStore)
+                   VALUES (who, purchaserEmail, fromStore, what, pricing.assetName,
+                           pricing.retailPoints, pricing.toPublisherPoints, pricing.toDistributorPoints);
     RETURN 0;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -99,10 +105,10 @@ $$ LANGUAGE 'plpgsql';
 -- RETURNS: bool true if can download, false if not
 CREATE OR REPLACE FUNCTION ct_canDownload(who int, fromStore text, what int) RETURNS BOOL AS $$
 DECLARE
-    price   int := 0;
+    pricing RECORD;
     channel int := 0;
 BEGIN
-    PERFORM * FROM purchases WHERE person = who AND store = fromStore AND asset = what;
+    PERFORM * FROM purchases WHERE person = who AND asset = what;
     IF NOT FOUND THEN
         -- you can always download your own stuff
         PERFORM * FROM assets WHERE id = what AND partner = who;
@@ -115,13 +121,10 @@ BEGIN
             RETURN TRUE;
         END IF;
 
-        SELECT INTO price ct_assetPrice(fromStore, what);
-        IF price < 0 THEN
+        SELECT INTO pricing * FROM ct_assetPrice(fromStore, what);
+        IF pricing.retailPoints != 0 THEN
+            -- either doesn't exist or hasn't been purchased
             RETURN FALSE;
-            --RETURN 'Requested asset not found. (ct_candl/01)';
-        ELSIF price > 0 THEN
-            RETURN FALSE;
-            --RETURN 'Requested asset has not been purchased. (ct_candl/02)';
         END IF;
     END IF;
 
