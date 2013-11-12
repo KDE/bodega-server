@@ -236,8 +236,15 @@ var AssetStore = (function() {
                 fn(e);
                 return;
             }
-            assetInfo.size = stat.size;
-            localPutStream(fromFile, assetPath, fn);
+            if (assetInfo.file.indexOf('.desc') !== -1) {
+                ObsAssetStore.size(fromFile, function(size) {
+                    assetInfo.size = size;
+                    localPutStream(fromFile, assetPath, fn);
+                });
+            } else {
+                assetInfo.size = stat.size;
+                localPutStream(fromFile, assetPath, fn);
+            }
         });
     };
 

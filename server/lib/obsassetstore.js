@@ -40,8 +40,6 @@ module.exports.stream = function(res, parsedUrl, filename, fn) {
 
         if (obsDesc.package && obsDesc.architecture && obsDesc.repository) {
             child = exec("osc list -b kde:stable:apps " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
 
                 if (error !== null) {
                     console.log('exec error: ' + error);
@@ -59,44 +57,43 @@ module.exports.stream = function(res, parsedUrl, filename, fn) {
                 fn(null)
             });
         }
-                
     });
 }
 
-module.exports.size = function(res, parsedUrl, filename, fn) {
-    fs.stat(parsedUrl.path, function(err, stat) {
+module.exports.size = function(path, fn) {
+
+    fs.stat(path, function(err, stat) {
         if (err) {
-            fn(err);
+            console.log(err);
+            fn(-1);
             return;
         }
 
         var obsDesc;
 
         try {
-            obsDesc = JSON.parse(fs.readFileSync(parsedUrl.path), 'utf8');
+            obsDesc = JSON.parse(fs.readFileSync(path), 'utf8');
         } catch (e) {
             // An error has occured, handle it, by e.g. logging it
             console.log(e);
+            fn(-1);
             return;
         }
 
-        if (obsDesc.package && obsDesc.architecture && obsDesc.repository) {
+        if (obsDesc.package && obsDesc.architecture) {
             child = exec("osc list -bl kde:stable:apps " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
 
                 if (error !== null) {
                     console.log('exec error: ' + error);
+                    fn(-1);
+                    return;
                 }
 
-                var re = new RegExp("\d*");
-                obsDesc.packageId = stdout.replace(re, "$1" + obsDesc.repository);
-                var answer = JSON.stringify(obsDesc);
-
+                var re = new RegExp(" *([0-9]*).*\n");
+                var size = stdout.replace(re, "$1");
 
                 fn(size)
             });
         }
-                
     });
 }
