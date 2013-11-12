@@ -641,6 +641,11 @@ UPDATE warehouses SET minMarkup = 15;
 
 INSERT INTO easterEggs (phrase, store, egg) VALUES ('test', 'VIVALDI-1', 'correct');
 
+-- now pretend all maintenance is up to date
+select ct_frequentMaintenance();
+select ct_hourlyMaintenance();
+select ct_dailyMaintenance();
+
 -- cleanup
 DROP FUNCTION ct_testing_favoriteBooksByAuthor(email text, author text);
 DROP FUNCTION ct_testing_downloadBooksByAuthor(email text, author text);
