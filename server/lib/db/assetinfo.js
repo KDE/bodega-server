@@ -289,10 +289,6 @@ function checkCanViewIncoming(db, req, res, assetInfo, cb)
         });
 }
 
-function findIsValidator(db, req, res, assetInfo, cb)
-{
-}
-
 function findRatings(db, req, res, assetInfo, cb)
 {
     var query = 'SELECT rating AS averageRating, ratingsCount, attribute \
