@@ -97,3 +97,35 @@ module.exports.size = function(path, fn) {
         }
     });
 }
+
+module.exports.urlToRepoInfo = function(parsedUrl) {
+    var info = {'project': '', 'repository': '', 'architecture': '', 'package': ''};
+    var parts = parsedUrl.path.split('/');
+
+    console.log(parts)
+    if (parts.length != 5) {
+        return info;
+    }
+
+    info.project = parts[1];
+    info.repository = parts[2];
+    info.architecture = parts[3];
+    info.package = parts[4];
+    return info;
+}
+
+module.exports.resolveUrl = function(parsedUrl, fn) {
+    var info = module.exports.urlToRepoInfo(parsedUrl);
+    console.log(info);
+
+    child = exec("osc list -b " + info.project + " " + info.package + "|grep '" + info.package + "-[0-9].*'" + info.architecture, function (error, stdout, stderr) {
+
+        if (error !== null) {
+            console.log('exec error: ' + error);
+            fn(null);
+        }
+
+        fn('http://repo.merproject.org/obs/' + info.project.replace(':', ':/') + '/' + info.repository + '/' + info.architecture + '/' + stdout.substring(1, stdout.length-1));
+    });
+}
+
