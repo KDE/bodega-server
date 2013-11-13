@@ -120,7 +120,7 @@ module.exports.listAssets = function listAssets(db, req, res, args, json)
 {
     /*jshint multistr:true */
     var baseQuery =
-        'SELECT a.id, a.license, partners.id as partnerId, \
+        'SELECT a.id, partners.id as partnerId, \
          partners.name AS partnername, a.version, a.file, a.image, a.name, \
          CASE WHEN p.points IS NULL THEN 0 ELSE p.points END AS points \
          FROM channelAssets s \

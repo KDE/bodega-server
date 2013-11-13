@@ -19,7 +19,6 @@
 create table incomingAssets
 (
     id          int         primary key default nextval('seq_assetsIds'),
-    license     int         references licenses(id),
     partner     int         references partners(id) on delete cascade,
     basePrice   int         default 0 CHECK(basePrice >= 0),
     name        text,

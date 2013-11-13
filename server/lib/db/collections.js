@@ -199,7 +199,7 @@ module.exports.listAssets = function(db, req, res) {
         'SELECT b.id, b.name, b.public, b.type \
          FROM collections b WHERE b.person = $1 AND b.id = $2;';
     var assetsQuery =
-        'SELECT DISTINCT a.id, a.license, partners.id as partnerId, \
+        'SELECT DISTINCT a.id, partners.id as partnerId, \
          partners.name AS partnername, a.version, a.file, a.image, a.name, \
          (CASE WHEN p.points IS NULL THEN 0 ELSE p.points END)::int AS points \
          FROM collectionsContent bc \

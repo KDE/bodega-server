@@ -164,15 +164,16 @@ BEGIN
     END IF;
 
     -- if we have a new asset type, then associate all the content rating tags
+    -- and all the license tags
     IF TG_OP = 'INSERT' OR OLD.type != NEW.type THEN
         PERFORM id FROM tagTypes WHERE type = 'assetType' AND id = NEW.type;
         IF FOUND THEN
             DELETE FROM relatedtags WHERE tag = NEW.id AND related IN
                 (SELECT id FROM tags
-                    WHERE type in (SELECT id FROM tagTypes WHERE type = 'contentrating'));
+                    WHERE type in (SELECT id FROM tagTypes WHERE type IN ('contentrating', 'license')));
             INSERT INTO relatedTags (tag, related)
                 SELECT NEW.id, t.id FROM tags t
-                    WHERE t.type in (SELECT id FROM tagTypes WHERE type = 'contentrating');
+                    WHERE t.type in (SELECT id FROM tagTypes WHERE type IN ('contentrating', 'license'));
         END IF;
     END IF;
     RETURN NEW;

@@ -1,4 +1,5 @@
 node_modules
 packages
+public/js/jquery.min.js
 coverage
 .git

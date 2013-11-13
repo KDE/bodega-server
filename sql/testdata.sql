@@ -95,7 +95,7 @@ CREATE OR REPLACE FUNCTION ct_testing_licenseByName(text) RETURNS INT AS $$
 DECLARE
     licenseId int := -1;
 BEGIN
-    SELECT into licenseId id FROM licenses WHERE name = $1 limit 1;
+    SELECT into licenseId t.id FROM tags t JOIN tagTypes tt ON (t.type = tt.id) WHERE title = $1 AND tt.type = 'license' limit 1;
     RETURN licenseId;
 END;
 $$ LANGUAGE plpgsql;
@@ -139,7 +139,7 @@ $$
 DECLARE
     tagId int;
 BEGIN
-    SELECT INTO tagId ct_testing_tagByName('wallpaper');
+    SELECT INTO tagId ct_testing_tagByName('Proprietary / All rights reserved');
     IF tagId > -1 THEN
         DELETE FROM tags WHERE id > tagId;
         PERFORM setval('seq_tagids', tagId);
@@ -153,6 +153,21 @@ DECLARE
 BEGIN
     SELECT INTO ratingAttributeId id FROM assetRatingAttributes WHERE name = $1 limit 1;
     RETURN ratingAttributeId;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION ct_testing_tagGame(assetId bigint, isCardGame bool = true) RETURNS VOID AS $$
+BEGIN
+    INSERT INTO assetTags (asset, tag)
+        VALUES (assetId, ct_testing_tagByName('application/x-plasma')),
+               (assetId, ct_testing_tagByName('Everyone 10+')),
+               (assetId, ct_testing_tagByName('game')),
+               (assetId, ct_testing_licenseByName('GPL'));
+
+    IF isCardGame THEN
+        INSERT INTO assetTags (asset, tag)
+           VALUES (assetId, ct_testing_tagByName('Card Game'));
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -171,7 +186,6 @@ DELETE FROM assetprices WHERE ending is not null;
 DELETE FROM assetRatings;
 DELETE FROM assetRatingAverages;
 DELETE FROM easterEggs;
-DELETE FROM relatedTags;
 SELECT ct_testing_removePriorTestingTags();
 
 SELECT setval('seq_assetsids', 1);
@@ -180,13 +194,7 @@ SELECT setval('seq_languageids', 1);
 SELECT setval('seq_peopleids', 1);
 SELECT setval('seq_partnerids', 1005);
 SELECT setval('seq_purchaseids', 1);
-SELECT setval('seq_tagids', 20);
 SELECT setval('seq_assetratingsIds', 1);
-
-INSERT INTO relatedTags (tag, related)
-    SELECT t.id, r.id FROM tags t, tags r
-        WHERE t.title = 'application'
-              AND r.type IN (SELECT id FROM tagTypes WHERE type = 'contentrating');
 
 -- now start setting up the data
 INSERT INTO people (lastname, firstname, email, points, password, active)
@@ -231,6 +239,16 @@ INSERT INTO tags (type, title) SELECT id, 'Coherent Theory' FROM tagtypes WHERE 
 INSERT INTO tags (type, title) SELECT id, '0123456789' FROM tagtypes WHERE type = 'isbn';
 INSERT INTO tags (type, title) SELECT id, '2013' FROM tagtypes WHERE type = 'created';
 INSERT INTO tags (type, title) SELECT id, 'http://makeplaylive.com' FROM tagtypes WHERE type = 'url';
+INSERT INTO tags (type, title) SELECT id, 'Romance' FROM tagtypes WHERE type = 'descriptive';
+INSERT INTO tags (type, title) SELECT id, 'application/pdf' FROM tagtypes WHERE type = 'mimetype';
+INSERT INTO tags (type, title) SELECT id, titles.*
+    FROM tagTypes,
+    (VALUES
+        ('Vivaldi'),
+        ('Plasma Active - x86')
+    ) AS titles
+    WHERE type = 'platform';
+
 
 INSERT INTO stores (id, partner, name) VALUES ('null', ct_testing_partnerId('Management Group'), 'No Store');
 INSERT INTO stores (id, partner, name, description) VALUES ('VIVALDI-1', ct_testing_partnerId('Make Play Live'), 'Vivaldi', 'Plasma Active tablet from Make Play Live');
@@ -242,284 +260,123 @@ INSERT INTO stores (id, partner, name, description) VALUES ('DD-2', ct_testing_p
 INSERT INTO channels (image, store, active, name, description)
     VALUES ('games.png', 'KDE-1', true, 'Games', 'Fun and amusements');
 INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('game'));
+    VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma')),
+           (currval('seq_channelids'), ct_testing_tagByName('game'));
 
 INSERT INTO channels (image, store, active, name, description, parent)
     VALUES ('cardgames.png', 'KDE-1', true, 'Card Games', 'Bust out the deck of 52!', 2);
 INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('game'));
-INSERT INTO channelTags (channel, tag)
-    VALUES (currval('seq_channelids'), ct_testing_tagByName('Card Game'));
+    VALUES (currval('seq_channelids'), ct_testing_tagByName('application/x-plasma')),
+           (currval('seq_channelids'), ct_testing_tagByName('game')),
+           (currval('seq_channelids'), ct_testing_tagByName('Card Game'));
 
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true);
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Aquarium', 'Grow an aqarium full of fish!', '0.1', 'org.kde.aquarium.plasmoid', 'fish.png', true);
 INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application'));
+    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma')),
+           (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood')),
+           (currval('seq_assetsids'), ct_testing_tagByName('application')),
+           (currval('seq_assetsids'), ct_testing_licenseByName('GPL'));
+
 update assets set version = '0.2' WHERE id = currval('seq_assetsids');
 update assetChangelogs set changes = 'Bug fixes' WHERE asset = currval('seq_assetsids') AND version = '0.1';
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Everyone 10+'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Dice', 'Roll the dice', '0.1', 'org.kde.dice.plasmoid', 'dice.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Diamond Juice', 'Best app from Diamond to date', '0.1', 'com.diamondevices.juice.plasmoid', 'juice.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Diamond Juice', 'Best app from Diamond to date', '0.1', 'com.diamondevices.juice.plasmoid', 'juice.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), '15 Puzzle', 'The classic puzzle game', '0.1', 'org.kde.15puzzle.plasmoid', '15puzzle.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), '15 Puzzle', 'The classic puzzle game', '0.1', 'org.kde.15puzzle.plasmoid', '15puzzle.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Tetris', 'Stacking blocks', '0.1', 'org.kde.tetris.plasmoid', 'tetris.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Tetris', 'Stacking blocks', '0.1', 'org.kde.tetris.plasmoid', 'tetris.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Jewels', 'Connect the jewels', '0.1', 'org.kde.jewels.plasmoid', 'jewels.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Jewels', 'Connect the jewels', '0.1', 'org.kde.jewels.plasmoid', 'jewels.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'), false);
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker1', 'Poker 1', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker1', 'Poker 1', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker2', 'Poker 2', '0.2', 'org.kde.poker1.plasmoid', 'poker2.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker2', 'Poker 2', '0.2', 'org.kde.poker1.plasmoid', 'poker2.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker3', 'Poker 3', '0.3', 'org.kde.poker1.plasmoid', 'poker3.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker3', 'Poker 3', '0.3', 'org.kde.poker1.plasmoid', 'poker3.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker4', 'Poker 4', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker4', 'Poker 4', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker5', 'Poker 5', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker5', 'Poker 5', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker6', 'Poker 6', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker6', 'Poker 6', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker7', 'Poker 7', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker7', 'Poker 7', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker8', 'Poker 8', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker8', 'Poker 8', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker9', 'Poker 9', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker9', 'Poker 9', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker10', 'Poker 10', '1.0', 'org.kde.poker1.plasmoid', 'poker1.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker10', 'Poker 10', '1.0', 'org.kde.poker1.plasmoid', 'poker1.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker11', 'Poker 11', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker11', 'Poker 11', '0.1', 'org.kde.poker1.plasmoid', 'poker1.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker12', 'Poker 12', '0.2', 'org.kde.poker1.plasmoid', 'poker2.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker12', 'Poker 12', '0.2', 'org.kde.poker1.plasmoid', 'poker2.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker13', 'Poker 13', '0.3', 'org.kde.poker1.plasmoid', 'poker3.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker13', 'Poker 13', '0.3', 'org.kde.poker1.plasmoid', 'poker3.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker14', 'Poker 14', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker14', 'Poker 14', '0.4', 'org.kde.poker1.plasmoid', 'poker4.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker15', 'Poker 15', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker15', 'Poker 15', '0.5', 'org.kde.poker1.plasmoid', 'poker5.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active)
-    VALUES (ct_testing_licenseByName('GPL'), ct_testing_partnerId('KDE'), 'Poker16', 'Poker 16', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker16', 'Poker 16', '0.6', 'org.kde.poker1.plasmoid', 'poker6.png', true);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active, baseprice)
-    VALUES (1, ct_testing_partnerId('KDE'), 'Poker17', 'Poker 17', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true, 500);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active, baseprice)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker17', 'Poker 17', '0.7', 'org.kde.poker1.plasmoid', 'poker7.png', true, 500);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active, baseprice)
-    VALUES (1, ct_testing_partnerId('KDE'), 'Poker18', 'Poker 18', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true, 1000);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Everyone'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active, baseprice)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker18', 'Poker 18', '0.8', 'org.kde.poker1.plasmoid', 'poker8.png', true, 1000);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
-INSERT INTO assets (license, partner, name, description, version, file, image, active, baseprice)
-    VALUES (1, ct_testing_partnerId('KDE'), 'Poker19', 'Poker 19', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true, 20000);
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('application/x-plasma'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Early Childhood'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('game'));
-INSERT INTO assetTags (asset, tag)
-    VALUES (currval('seq_assetsids'), ct_testing_tagByName('Card Game'));
+INSERT INTO assets (partner, name, description, version, file, image, active, baseprice)
+    VALUES (ct_testing_partnerId('KDE'), 'Poker19', 'Poker 19', '0.9', 'org.kde.poker1.plasmoid', 'poker9.png', true, 20000);
+select ct_testing_tagGame(currval('seq_assetsids'));
 
 
 INSERT INTO assetPreviews (asset, path, mimetype, type, subtype) VALUES (2, 'fishswimming.png',
@@ -659,4 +516,5 @@ DROP FUNCTION ct_testing_personByEmail(text);
 DROP FUNCTION ct_testing_partnerId(text);
 DROP FUNCTION ct_testing_removePriorTestingTags();
 DROP FUNCTION ct_testing_ratingAttributeByName(text);
+DROP FUNCTION ct_testing_tagGame(bigint, bool);
 commit;

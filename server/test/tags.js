@@ -98,7 +98,7 @@ describe('Tags manipulation', function(){
                 res.body.should.have.property('tags');
 
                 res.body.tags.length.should.be.above(10);
-                res.body.totalTags.should.equal(33);
+                res.body.totalTags.should.equal(49);
                 done();
             };
             listTags(null, null, null, cb);
@@ -111,7 +111,7 @@ describe('Tags manipulation', function(){
                 res.body.should.have.property('authStatus', true);
                 res.body.should.have.property('tags');
 
-                res.body.tags.length.should.equal(4);
+                res.body.tags.length.should.equal(5);
                 res.body.tags[0].id.should.be.eql(1);
                 res.body.tags[0].typeid.should.be.eql(8);
                 res.body.tags[0].type.should.be.eql('contentrating');
@@ -262,7 +262,7 @@ describe('Tags manipulation', function(){
                     res.body.should.have.property('authStatus', true);
                     res.body.should.have.property('tags');
 
-                    res.body.tags.length.should.equal(11);
+                    res.body.tags.length.should.equal(13);
                     res.body.tags[0].typeid.should.be.eql(9);
                     res.body.tags[0].type.should.be.eql('assetType');
                     res.body.tags[0].title.should.be.eql('new title');

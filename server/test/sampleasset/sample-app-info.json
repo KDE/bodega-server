@@ -1,7 +1,6 @@
 {
     "name" : "Sample Application",
     "version" : "1.0",
-    "license" : "3",
     "description" : "description of an app",
     "partner" : "1002",
     "basePrice" : "0",
@@ -15,6 +14,7 @@
           "mimetype" : "image/jpeg" }
     ],
     "tags" : [
+        {"type" : "license", "title" : "BSD"},
         {"type" : "contentrating", "title" : "Everyone" },
         {"type" : "assetType", "title" : "application" },
         {"type" : "author", "title" : "Zack Rusin"},

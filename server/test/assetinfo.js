@@ -31,7 +31,6 @@ describe('Asset info', function(){
                     res.body.asset.should.have.property('id', 6);
                     res.body.asset.should.have.property('partnerId');
                     res.body.asset.should.have.property('partner');
-                    res.body.asset.should.have.property('license');
                     res.body.asset.should.have.property('version');
                     res.body.asset.should.have.property('created');
                     res.body.asset.should.have.property('filename');
@@ -70,7 +69,6 @@ describe('Asset info', function(){
                     res.body.assets[0].should.have.property('id', 6);
                     res.body.assets[0].should.have.property('partnerId');
                     res.body.assets[0].should.have.property('partner');
-                    res.body.assets[0].should.have.property('license');
                     res.body.assets[0].should.have.property('version');
                     res.body.assets[0].should.have.property('created');
                     res.body.assets[0].should.have.property('filename');
@@ -95,7 +93,6 @@ describe('Asset info', function(){
                     res.body.assets[0].should.have.property('id', 6);
                     res.body.assets[0].should.have.property('partnerId');
                     res.body.assets[0].should.have.property('partner');
-                    res.body.assets[0].should.have.property('license');
                     res.body.assets[0].should.have.property('version');
                     res.body.assets[0].should.have.property('created');
                     res.body.assets[0].should.have.property('filename');
