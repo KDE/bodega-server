@@ -40,7 +40,7 @@ module.exports.stream = function(res, parsedUrl, filename, fn) {
         }
 
         if (obsDesc.package && obsDesc.architecture && obsDesc.repository) {
-            child = exec("osc list -b kde:stable:apps " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
+            child = exec("osc list -b bodega:kde " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
 
                 if (error !== null) {
                     console.log('exec error: ' + error);
@@ -82,7 +82,7 @@ module.exports.size = function(path, fn) {
         }
 
         if (obsDesc.package && obsDesc.architecture) {
-            child = exec("osc list -bl kde:stable:apps " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
+            child = exec("osc list -bl bodega:kde " + obsDesc.package + "|grep '" + obsDesc.package + "-[0-9].*'" + obsDesc.architecture, function (error, stdout, stderr) {
 
                 if (error !== null) {
                     console.log('exec error: ' + error);
@@ -133,14 +133,14 @@ module.exports.publish = function(assetInfo, fn) {
     var info = module.exports.urlToRepoInfo(url.parse(assetInfo.externpath));
 
     //TODO: destination repo configurable
-    child = exec("osc copypac " + info.project + " " + info.package + " kde:stable:apps", function (error, stdout, stderr) {
+    child = exec("osc copypac " + info.project + " " + info.package + " bodega:kde", function (error, stdout, stderr) {
 
         if (error !== null) {
             console.log('exec error: ' + error);
             fn({'message': error}, assetInfo);
         }
 
-        assetInfo.externpath = 'obs://build.merproject.org/kde:stable:apps/latest_' + info.architecture + '/' + info.architecture + '/' + info.package;
+        assetInfo.externpath = 'obs://build.merproject.org/bodega:kde/latest_' + info.architecture + '/' + info.architecture + '/' + info.package;
         fn(null, assetInfo);
     });
 }

@@ -125,6 +125,7 @@ function publishHook(db, req, res, assetInfo, cb)
                 cb(e, db, req, res, assetInfo);
                 return;
             }
+
             cb(null, db, req, res, assetInfo);
         });
 
