@@ -18,6 +18,7 @@
 var fs = require('fs');
 var sys = require('sys')
 var exec = require('child_process').exec;
+var url = require('url');
 
 
 
@@ -116,7 +117,6 @@ module.exports.urlToRepoInfo = function(parsedUrl) {
 
 module.exports.resolveUrl = function(parsedUrl, fn) {
     var info = module.exports.urlToRepoInfo(parsedUrl);
-    console.log(info);
 
     child = exec("osc list -b " + info.project + " " + info.package + "|grep '" + info.package + "-[0-9].*'" + info.architecture, function (error, stdout, stderr) {
 
@@ -125,7 +125,22 @@ module.exports.resolveUrl = function(parsedUrl, fn) {
             fn(null);
         }
 
-        fn('http://repo.merproject.org/obs/' + info.project.replace(':', ':/') + '/' + info.repository + '/' + info.architecture + '/' + stdout.substring(1, stdout.length-1));
+        fn('http://repo.merproject.org/obs/' + info.project.replace(/:/g, ':/') + '/' + info.repository + '/' + info.architecture + '/' + stdout.substring(1, stdout.length-1));
     });
 }
 
+module.exports.publish = function(assetInfo, fn) {
+    var info = module.exports.urlToRepoInfo(url.parse(assetInfo.externpath));
+
+    //TODO: destination repo configurable
+    child = exec("osc copypac " + info.project + " " + info.package + " kde:stable:apps", function (error, stdout, stderr) {
+
+        if (error !== null) {
+            console.log('exec error: ' + error);
+            fn({'message': error}, assetInfo);
+        }
+
+        assetInfo.externpath = 'obs://build.merproject.org/kde:stable:apps/latest_' + info.architecture + '/' + info.architecture + '/' + info.package;
+        fn(null, assetInfo);
+    });
+}
