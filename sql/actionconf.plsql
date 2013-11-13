@@ -33,18 +33,22 @@ $$ LANGUAGE 'plpgsql';
 -- activates an account if the conf code matches
 -- PARAMETERS: int person, text code
 -- RETURNS: bool, true on success
-CREATE OR REPLACE FUNCTION ct_activateAccount(activatePerson int, checkCode text) RETURNS BOOL AS $$
+CREATE OR REPLACE FUNCTION ct_activateAccount(activatePerson int, checkCode text,
+                                              OUT success bool, OUT email text) AS $$
 DECLARE
 BEGIN
     DELETE FROM actionConfCodes WHERE person = activatePerson AND action = 'ACTIVATE'
                                                               AND code = checkCode
                                                               AND issued > current_timestamp - '7 days'::interval;
-    IF NOT FOUND THEN
-        RETURN FALSE;
-    END IF;
 
-    UPDATE people SET active = TRUE WHERE id = activatePerson;
-    RETURN FOUND;
+    success = FALSE;
+    IF FOUND THEN
+        UPDATE people SET active = TRUE WHERE id = activatePerson;
+        IF FOUND THEN
+            success = TRUE;
+            SELECT INTO email p.email FROM people p WHERE id = activatePerson;
+        END IF;
+    END IF;
 END;
 $$ LANGUAGE 'plpgsql';
 
