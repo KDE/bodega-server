@@ -755,6 +755,24 @@ var PreviewStore = (function() {
         }
     };
 
+    PreviewStore.prototype.remove = function(assetInfo, fn) {
+        if (!assetInfo.id) {
+            var err = errors.create('MissingParameters', '');
+            fn(err);
+            return;
+        }
+
+        var queue = async.queue(
+                function(path, cb) {
+                    fs.rmdir(path,
+                             function() {
+                                 cb();
+                             });
+                }, 2);
+        queue.drain = fn;
+        queue.push(fillPathsForAsset(assetInfo));
+    };
+
     PreviewStore.prototype.upload = function(assetInfo, fn) {
         var i;
         var assetPaths;
