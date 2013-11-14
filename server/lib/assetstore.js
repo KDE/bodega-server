@@ -238,7 +238,7 @@ var AssetStore = (function() {
             }
             var parsedRemoteUrl = url.parse(assetInfo.externpath);
             if (parsedRemoteUrl.protocol === 'obs:') {
-                ObsAssetStore.size(fromFile, function(size) {
+                ObsAssetStore.size(parsedRemoteUrl, function(size) {
                     assetInfo.size = size;
                     localPutStream(fromFile, assetPath, fn);
                 });

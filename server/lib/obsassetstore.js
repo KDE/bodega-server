@@ -61,7 +61,7 @@ module.exports.stream = function(res, parsedUrl, filename, fn) {
     });
 }
 
-module.exports.size = function(path, fn) {
+module.exports.sizeFromDescriptor = function(path, fn) {
 
     fs.stat(path, function(err, stat) {
         if (err) {
@@ -97,6 +97,27 @@ module.exports.size = function(path, fn) {
             });
         }
     });
+}
+
+module.exports.size = function(parsedUrl, fn) {
+
+    var info = module.exports.urlToRepoInfo(parsedUrl);
+
+    if (info.package && info.architecture) {
+        child = exec("osc list -bl " + info.project + " " + info.package + "|grep '" + info.package + "-[0-9].*'" + info.architecture, function (error, stdout, stderr) {
+
+            if (error !== null) {
+                console.log('exec error: ' + error);
+                fn(-1);
+                return;
+            }
+
+            var re = new RegExp(" *([0-9]*).*\n");
+            var size = stdout.replace(re, "$1");
+
+            fn(size)
+        });
+    }
 }
 
 module.exports.urlToRepoInfo = function(parsedUrl) {
