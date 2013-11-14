@@ -92,15 +92,12 @@ module.exports = function(db, req, res) {
                             });
                         return;
                     }
-                    var title = 'Password successfully reset!';
-                    var message = 'Password for user ' +
-                        args.userEmail +
-                        ' has been successfully reset.';
+
                     res.render(
                             'passwordresetconfirm.jade',
                             { layout: false,
-                              'title': title,
-                              'message': message,
+                              'title': 'Password successfully reset!',
+                              'message': 'Password for user ' + args.userEmail + ' has been successfully reset.',
                               success: true,
                               storeName: app.config.warehouseInfo.name
                             });
