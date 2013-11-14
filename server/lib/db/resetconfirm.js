@@ -19,9 +19,6 @@ var utils = require('../utils.js');
 var BCrypt = require('bcrypt');
 
 module.exports = function(db, req, res) {
-    var query =
-        "select ct_setPassword($1, $2, $3) as success;";
-
     var args = {
         userId : req.query.id,
         userEmail : req.query.email,
@@ -69,7 +66,7 @@ module.exports = function(db, req, res) {
             }
 
             db.query(
-                query,
+                "select ct_setPassword($1, $2, $3) as success",
                 [args.userId, crypted, args.resetCode],
                 function(err, result) {
                     if (err) {
@@ -84,8 +81,7 @@ module.exports = function(db, req, res) {
                         return;
                     }
 
-                    if (!result.rows || result.rows.length === 0 ||
-                       !result.rows[0].success) {
+                    if (result.rowCount < 1 || !utils.parseBool(result.rows[0].success)) {
                         res.render(
                             'passwordresetconfirm.jade',
                             { layout: false,
