@@ -770,7 +770,13 @@ var PreviewStore = (function() {
                              });
                 }, 2);
         queue.drain = fn;
-        queue.push(fillPathsForAsset(assetInfo));
+
+        var assetPaths = fillPathsForAsset(assetInfo);
+        var paths = assetPaths.previews + assetPaths.incoming;
+        for (var index in assetPaths.icons) {
+            paths += assetPaths.icons[index];
+        }
+        queue.push(paths);
     };
 
     PreviewStore.prototype.upload = function(assetInfo, fn) {
