@@ -26,7 +26,7 @@ module.exports.parseBool = function(string)
         return string;
     }
 
-    return (string === 'true' || string === '1') ? true : false;
+    return (string === 'true' || string === '1' || string === 1) ? true : false;
 };
 
 module.exports.parseNumber = function(string, defaultValue)
