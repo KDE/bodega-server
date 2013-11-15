@@ -31,8 +31,8 @@ module.exports.parseBool = function(string)
 
 module.exports.parseNumber = function(string, defaultValue)
 {
-    if (string === null) {
-        return 0;
+    if (!string || string === null) {
+        return defaultValue ? defaultValue : 0;
     }
 
     var rv = parseInt(string, 10);
