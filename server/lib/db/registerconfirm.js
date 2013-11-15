@@ -38,7 +38,7 @@ module.exports = function(db, req, res) {
     }
 
     db.query(
-        'select ct_activateAccount($1, $2) as activated',
+        'select * from ct_activateAccount($1, $2)',
         [args.userId, args.code],
         function(err, result) {
             if (err) {
