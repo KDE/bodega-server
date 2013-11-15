@@ -62,8 +62,7 @@ function searchAssets(db, req, res, args, json)
 }
 
 module.exports = function(db, req, res) {
-    var defaultPageSize = 25;
-    var pageSize = req.query.pageSize || defaultPageSize;
+    var pageSize = req.query.pageSize || app.config.defaultPageSize;
     var offset = req.query.offset || 0;
 
     var args =  {

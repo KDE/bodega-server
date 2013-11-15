@@ -24,8 +24,7 @@ module.exports.listAll = function(db, req, res) {
         'SELECT b.id, b.name, b.public, b.type \
          FROM collections b WHERE b.person = $1        \
          ORDER BY b.name LIMIT $2 OFFSET $3;';
-    var defaultPageSize = 25;
-    var pageSize = utils.parseNumber(req.query.pageSize) || defaultPageSize;
+    var pageSize = utils.parseNumber(req.query.pageSize) || app.config.defaultPageSize;
     var offset = utils.parseNumber(req.query.offset) || 0;
     var json = utils.standardJson(req);
     json.collections = [];
@@ -55,7 +54,6 @@ module.exports.create = function(db, req, res) {
          VALUES ($1, $2, $3, $4) RETURNING id;';
     var searchQuery =
         'SELECT * FROM collections WHERE person = $1 AND name = $2;';
-    var defaultPageSize = 25;
     var name = req.body.name;
     var isPublic = utils.parseBool(req.body.public);
     var type = req.body.type;
@@ -106,7 +104,6 @@ module.exports.update = function(db, req, res) {
         where id = $4 RETURNING id;';
     var searchQuery =
         'SELECT * FROM collections WHERE person = $1 AND name = $2 AND id != $3;';
-    var defaultPageSize = 25;
     var name = req.body.name;
     var isPublic = utils.parseBool(req.body.public);
     var type = req.body.type;
@@ -158,7 +155,6 @@ module.exports.remove = function(db, req, res) {
         'DELETE FROM collections WHERE person = $1 AND id = $2;';
     var searchQuery =
         'SELECT * FROM collections WHERE person = $1 AND id = $2;';
-    var defaultPageSize = 25;
     var collectionId = utils.parseNumber(req.params.collectionId);
 
     if (!collectionId) {
@@ -209,8 +205,7 @@ module.exports.listAssets = function(db, req, res) {
          INNER JOIN collections b ON (b.person = $2) \
          WHERE bc.collection = $3 \
          ORDER BY a.name LIMIT $4 OFFSET $5';
-    var defaultPageSize = 25;
-    var pageSize = utils.parseNumber(req.query.pageSize) || defaultPageSize;
+    var pageSize = utils.parseNumber(req.query.pageSize) || app.config.defaultPageSize;
     var offset = utils.parseNumber(req.query.offset) || 0;
     var collectionId = req.params.collectionId;
 
