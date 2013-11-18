@@ -51,6 +51,14 @@
             "password": "bodega",
             "externalUrl": ""
         },
+        "userReplication": [
+            {
+                "host": "localhost",
+                "database": "discourse_mpl",
+                "username": "bodega",
+                "password": "bodega"
+            }
+        ],
         "email": "Name <returnaddress@example.org>"
     },
     "addresses": {
