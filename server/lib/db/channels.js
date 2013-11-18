@@ -30,11 +30,10 @@ module.exports = function(db, req, res) {
         "SELECT c.id, c.image, c.name, c.description, c.assetCount FROM channels c \
          WHERE c.store = $1 and c.parent = $2 AND assetCount > 0 \
          ORDER BY c.name LIMIT $3 OFFSET $4";
-    var defaultPageSize = 25;
     var args = {
         channelId: utils.parseNumber(req.params.parentChannel),
         offset: utils.parseNumber(req.query.offset),
-        pageSize: utils.parseNumber(req.query.pageSize, defaultPageSize)
+        pageSize: utils.parseNumber(req.query.pageSize, app.config.defaultPageSize)
     };
 
     var query;

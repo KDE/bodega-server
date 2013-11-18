@@ -28,7 +28,10 @@ process.env.TZ = 'UTC';
 
 GLOBAL.app = app;
 app.config = JSON.parse(fs.readFileSync(argv.config ? argv.config : './config.json', 'utf8'));
+
+// and now our runtime controls that are not set in config.json
 app.config.printErrors = true;
+app.config.defaultPageSize = 25;
 
 if (argv.production) {
     app.config.appkeys.stripe.secretKey = app.config.appkeys.stripe.liveSecretKey;

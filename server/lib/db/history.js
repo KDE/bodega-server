@@ -27,12 +27,11 @@ module.exports = function(db, req, res) {
         UNION \
         SELECT 'Points' AS category, points::text AS what, created AS date, comment FROM pointTransactions WHERE person = $1 \
         ORDER BY date DESC LIMIT $2 OFFSET $3;";
-    var defaultPageSize = 50;
-    var pageSize = (Math.max(utils.parseNumber(req.query.pageSize), 0) || defaultPageSize) + 1;
+    var pageSize = Math.max(utils.parseNumber(req.query.pageSize), 0) || app.config.defaultPageSize;
     var offset = Math.max(utils.parseNumber(req.query.offset), 0);
 
     db.query(
-        historyQuery, [req.session.user.id, pageSize, offset],
+        historyQuery, [req.session.user.id, pageSize + 1, offset],
         function(err, result) {
             if (err) {
                 errors.report('Database', req, res, err);
