@@ -15,42 +15,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
-
-CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION ct_replicateUser(connection text, newUser bool, fullname text, username text, email text, password text) RETURNS BOOL AS $$
 DECLARE
     dupe_count INT := 0;
     baseusername TEXT;
-    username TEXT;
-    fullname TEXT;
-
-    updateEmail TEXT;
-    updatePassword TEXT;
-    usernameLower TEXT;
 BEGIN
-    PERFORM dblink_connect(ct_setting('discourseConnectString'));
+    PERFORM dblink_connect(connection);
 
-    IF TG_OP = 'UPDATE' AND NEW.fullname IS NULL THEN
-        fullname := OLD.fullname;
-    ELSE
-        fullname := NEW.fullname;
-    END IF;
-    fullname := NEW.fullname;
-
-    baseusername := regexp_replace(lower(fullname), '[^a-z0-9]', '_', 'g');
-    -- the user name needs to be lower and 20 chars or less
-    baseusername := lower(substring(baseusername, 1, 20));
-    username := baseusername;
-
-    -- figure out which email to use for the user name collision detection to follow
-    IF TG_OP = 'INSERT' THEN
-        updateEmail := NEW.email;
-    ELSE
-        updateEmail := OLD.email;
-    END IF;
-
+    baseusername = username;
     -- ensure we don't already have this user name
     LOOP
-        PERFORM * FROM dblink('SELECT username FROM users WHERE username = ''' || username || ''' AND email !=  ''' || updateEmail || '''') as t(username text);
+        PERFORM * FROM dblink('SELECT username FROM users WHERE username = ''' || username || ''' AND email !=  ''' || email || '''') as t(username text);
         IF NOT FOUND THEN
             EXIT;
         END IF;
@@ -59,7 +34,7 @@ BEGIN
 
         -- some safety here
         IF dupe_count > 1000 THEN
-            EXIT;
+            RETURN FALSE;
         END IF;
 
         username := substring(baseusername, 1, 19 - char_length(dupe_count::text))
@@ -70,7 +45,7 @@ BEGIN
     fullname := replace(fullname, '''', '''''');
 
     -- NOTE: the ''' are 3 single quotes
-    IF (TG_OP = 'INSERT') THEN
+    IF (newUser) THEN
         PERFORM dblink_exec('INSERT INTO users (name, username, username_lower,
                             email, password_hash,
                             created_at, updated_at,
@@ -78,38 +53,68 @@ BEGIN
                             VALUES
                             (
                             ''' || fullname || ''', ''' || username || ''',''' || username || ''',
-                            ''' || NEW.email || ''', ''' || NEW.password || ''',
+                            ''' || email || ''', ''' || password || ''',
                             current_timestamp, current_timestamp,
                             1, false);');
 
         PERFORM dblink_exec('INSERT INTO user_stats (user_id) VALUES (currval(''users_id_seq''));');
     ELSIF (TG_OP = 'UPDATE') THEN
-        IF NEW.email IS NULL THEN
-            updateEmail := OLD.email;
-        ELSE
-            updateEmail := NEW.email;
-        END IF;
-
-        IF NEW.Password IS NULL THEN
-            updatePassword := OLD.password;
-        ELSE
-            updatePassword := NEW.password;
-        END IF;
-
-
         PERFORM dblink_exec('UPDATE users SET name = ''' || fullname || ''',
                              username = ''' || username || ''',
-                             email = ''' || updateEmail || ''',
-                             password_hash = ''' || updatePassword || ''',
+                             email = ''' || email || ''',
+                             password_hash = ''' || password || ''',
                              updated_at = current_timestamp,
                              username_lower = ''' || username || '''
-                             WHERE email = ''' || OLD.email || ''';');
+                             WHERE email = ''' || email || ''';');
     END IF;
+    RETURN TRUE;
 
     PERFORM dblink_disconnect();
-    RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
     RAISE WARNING 'Discourse user syncronization failed: % %', SQLSTATE, SQLERRM;
+    RETURN FALSE;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
+DECLARE
+    connection TEXT;
+
+    username TEXT;
+    fullname TEXT;
+    email TEXT;
+    password TEXT;
+BEGIN
+    IF TG_OP = 'UPDATE' AND NEW.fullname IS NULL THEN
+        fullname := OLD.fullname;
+    ELSE
+        fullname := NEW.fullname;
+    END IF;
+    fullname := NEW.fullname;
+
+    username := regexp_replace(lower(fullname), '[^a-z0-9]', '_', 'g');
+    -- the user name needs to be lower and 20 chars or less
+    username := lower(substring(username, 1, 20));
+    username := username;
+
+    -- figure out which email to use for the user name collision detection to follow
+    IF TG_OP = 'INSERT' OR NEW.email IS NOT NULL THEN
+        email := NEW.email;
+    ELSE
+        email := OLD.email;
+    END IF;
+
+    IF TG_OP = 'INSERT' OR NEW.password IS NOT NULL THEN
+        password := NEW.password;
+    ELSE
+        password := OLD.password;
+    END IF;
+
+    FOREACH connection IN ARRAY regexp_split_to_array(ct_setting('userReplicationConnectStrings'), ':-:')
+    LOOP
+        PERFORM ct_replicateUser(connection, TG_OP = 'INSERT', fullname, username, email, password);
+    END LOOP;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
