@@ -28,27 +28,36 @@ var Janitor = (function() {
     var dailyPeriod = 24 * 60 * 60 * 1000;
     var dailyRunning = false;
 
+    function buildConnectString(config) {
+        if (!config || !config.database || config.database === '') {
+            return null;
+        }
+
+        var connectString = "dbname=" + config.database;
+
+        if (config.username && config.username !== '') {
+            connectString += " user=" + config.username;
+        }
+
+        if (config.password && config.password !== '') {
+            connectString += " password=" + config.password;
+        }
+
+        if (config.host && config.host !== '') {
+            connectString += " host=" + config.host;
+        }
+
+        return connectString;
+    }
+
     function oneTime()
     {
         // relay the disource settings from the config to the database
+        var userReplicationConnections = [];
         var config = app.config.service.discourse;
-        if (config &&
-            config.database &&
-            config.database !== '') {
-            var connectString = "dbname=" + config.database;
-
-            if (config.username && config.username !== '') {
-                connectString += " user=" + config.username;
-            }
-
-            if (config.password && config.password !== '') {
-                connectString += " password=" + config.password;
-            }
-
-            if (config.host && config.host !== '') {
-                connectString += " host=" + config.host;
-            }
-
+        var connectString = buildConnectString(config);
+        if (connectString) {
+            userReplicationConnections.push(connectString);
             app.db.dbQuery(function(client) {
                 client.query("select ct_createSetting('discourseConnectString', $1);", [connectString],
                              function(err) {
@@ -60,6 +69,25 @@ var Janitor = (function() {
         } else {
             app.db.dbQuery(function(client) {
                 client.query("select ct_removeSetting('discourseConnectString');", [],
+                             function(err) {
+                                 if (err) {
+                                     errors.log(err);
+                                 }
+                             });
+            });
+        }
+
+        for (config in app.config.service.userReplication) {
+            connectString = buildConnectString(app.config.service.userReplication[config]);
+            if (connectString) {
+                userReplicationConnections.push(connectString);
+            }
+        }
+
+        if (userReplicationConnections.length > 0) {
+            var query = "select ct_createSetting('userReplicationConnectStrings', $1)"
+            app.db.dbQuery(function(client) {
+                client.query(query, [userReplicationConnections.join(':-:')],
                              function(err) {
                                  if (err) {
                                      errors.log(err);
