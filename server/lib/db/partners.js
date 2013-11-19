@@ -68,6 +68,41 @@ function affiliationFetcher(task, cb)
              });
 }
 
+function requestFetcher(task, cb)
+{
+    task.db.query("select * from partnerrequests where partner = $1",
+             [task.partner],
+             function (err, result) {
+                 if (err) {
+                     cb(errors.create('Database', err.message));
+                     return;
+                 }
+
+                 var i;
+                 publisherRequest = false;
+                 distributorRequest = false;
+                 for (i = 0; i < result.rowCount; ++i) {
+                     var row = result.rows[i];
+                     console.log(row);
+                     if (row.type == 'publisherRequest') {
+                         publisherRequest = true;
+                     } else if (row.type == 'distributorRequest') {
+                         distributorRequest = true;
+                     }
+                 }
+
+                 for (i = 0; i < task.json.partners.length; ++i) {
+                     console.log(task.json.partners[i])
+                     if (task.json.partners[i].id === task.partner) {
+                         task.json.partners[i]['publisherRequested'] = publisherRequest;
+                         task.json.partners[i]['distributorRequested'] = distributorRequest;
+                     }
+                 }
+
+                 cb();
+             });
+}
+
 function linkFetcher(task, cb)
 {
     task.db.query("select case WHEN p.service IS NULL THEN '' ELSE p.service END,\
@@ -378,7 +413,15 @@ module.exports.list = function(db, req, res)
                             if (error) {
                                 errors.report(error.type, req, res, error);
                             } else {
-                                res.json(json);
+                                var queue = async.queue(requestFetcher, 2);
+                                queue.drain = function() {
+                                    if (error) {
+                                        errors.report(error.type, req, res, error);
+                                    } else {
+                                        res.json(json);
+                                    }
+                                }
+                                queue.push(tasks, errorReporter);
                             }
                         };
                         queue.push(tasks, errorReporter);
