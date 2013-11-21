@@ -529,6 +529,12 @@ app.get(serverPath('partner/list'), isAuthorized,
     }
 );
 
+app.get(serverPath('partner/:partner/info'), isAuthorized,
+    function(req, res) {
+        app.db.listPartner(req, res);
+    }
+);
+
 app.post(serverPath('partner/create'), isAuthorized,
     function(req, res) {
         app.db.createPartner(req, res);

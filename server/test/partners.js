@@ -389,6 +389,17 @@ describe('Partner management', function() {
             checkPartnerList(expected, done);
         });
 
+        it('should allow listing of single new partner', function(done) {
+            utils.getUrl('partner/' + newPartnerId + '/info',
+                         function(res) {
+                             res.statusCode.should.equal(200);
+                             res.headers.should.have.property('content-type');
+                             res.body.should.have.property('success', true);
+                             res.body.partner.should.eql(newPartnerJson);
+                             //console.log(JSON.stringify(res.body, 0, 2));
+                             done();
+                         });
+        });
         it('should not allow updating a partner we are not a manager for', function(done) {
             var params = { name: 'Sometime', email: 'foo@sometime.org' };
             utils.app.config.printErrors = false;
