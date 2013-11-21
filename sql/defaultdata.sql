@@ -62,6 +62,21 @@ INSERT INTO tags (type, title)
         ) AS titles
         WHERE type = 'contentrating';
 
+INSERT INTO tags (type, title, url)
+    SELECT id, titles.* FROM tagTypes,
+    (VALUES
+        ('GPL', 'http://www.gnu.org/copyleft/gpl.html'),
+        ('LGPL', 'http://www.gnu.org/copyleft/lgpl.html'),
+        ('BSD', 'http://opensource.org/licenses/BSD-2-Clause'),
+        ('Creative Commons Attribution', 'http://creativecommons.org/licenses/by/3.0/deed.en_US'),
+        ('Creative Commons Attribution-ShareAlike', 'http://creativecommons.org/licenses/by-sa/3.0/deed.en_US'),
+        ('Creative Commons Attribution-NoDerivs', 'http://creativecommons.org/licenses/by-nd/3.0/deed.en_US'),
+        ('Creative Commons Attribution-NonCommercial', 'http://creativecommons.org/licenses/by-nc/3.0/deed.en_US'),
+        ('Creative Commons Attribution-NonCommercial-ShareAlike', 'http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US'),
+        ('Creative Commons Attribution-NonCommercial-NoDerivs', 'http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US'),
+        ('Proprietary / All rights reserved', null)) as titles
+    WHERE type = 'license';
+
 -- IMPORTANT NOTE: if you add to the assetType set you MUST also add an entry in the
 --                 mandatoryTags object in assetRules.js
 INSERT INTO tags (type, title)
@@ -81,21 +96,6 @@ INSERT INTO tags (type, title)
             ('image')
         ) AS titles
         WHERE type = 'assetType';
-
-INSERT INTO tags (type, title, url)
-    SELECT id, titles.* FROM tagTypes,
-    (VALUES
-        ('GPL', 'http://www.gnu.org/copyleft/gpl.html'),
-        ('LGPL', 'http://www.gnu.org/copyleft/lgpl.html'),
-        ('BSD', 'http://opensource.org/licenses/BSD-2-Clause'),
-        ('Creative Commons Attribution', 'http://creativecommons.org/licenses/by/3.0/deed.en_US'),
-        ('Creative Commons Attribution-ShareAlike', 'http://creativecommons.org/licenses/by-sa/3.0/deed.en_US'),
-        ('Creative Commons Attribution-NoDerivs', 'http://creativecommons.org/licenses/by-nd/3.0/deed.en_US'),
-        ('Creative Commons Attribution-NonCommercial', 'http://creativecommons.org/licenses/by-nc/3.0/deed.en_US'),
-        ('Creative Commons Attribution-NonCommercial-ShareAlike', 'http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US'),
-        ('Creative Commons Attribution-NonCommercial-NoDerivs', 'http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US'),
-        ('Proprietary / All rights reserved', null)) as titles
-    WHERE type = 'license';
 
 -- a "NULL" store for use with e.g. the bodegamarket log ins
 SELECT setval('seq_partnerIds', 1000);
