@@ -139,7 +139,7 @@ $$
 DECLARE
     tagId int;
 BEGIN
-    SELECT INTO tagId ct_testing_tagByName('Proprietary / All rights reserved');
+    SELECT INTO tagId ct_testing_tagByName('image');
     IF tagId > -1 THEN
         DELETE FROM tags WHERE id > tagId;
         PERFORM setval('seq_tagids', tagId);
