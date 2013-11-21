@@ -712,6 +712,18 @@ describe('Partner management', function() {
 
             var requests = 0;
 
+            it('should show "requested" as both publisher and distributor status', function(done) {
+                utils.getUrl('partner/' + newPartnerId + '/info',
+                            function(res) {
+                                res.statusCode.should.equal(200);
+                                res.headers.should.have.property('content-type');
+                                res.body.should.have.property('success', true);
+                                res.body.partner.publisher.should.eql('requested');
+                                res.body.partner.distributor.should.eql('requested');
+                                done();
+                            });
+            });
+
             it('should list both requests for aaron (Management Group Validator)', function(done) {
                 utils.getUrl('partner/request/list',
                     function(res) {
