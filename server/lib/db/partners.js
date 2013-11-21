@@ -386,7 +386,7 @@ module.exports.list = function(db, req, res)
                             if (error) {
                                 errors.report(error.type, req, res, error);
                             } else {
-                                if (partnerId > 0) {
+                                if (partnerId > -1) {
                                     json.partner = json.partners[0];
                                     json.partners = null;
                                 }
