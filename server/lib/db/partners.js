@@ -94,8 +94,12 @@ function requestFetcher(task, cb)
                  for (i = 0; i < task.json.partners.length; ++i) {
                      console.log(task.json.partners[i])
                      if (task.json.partners[i].id === task.partner) {
-                         task.json.partners[i]['publisherRequested'] = publisherRequest;
-                         task.json.partners[i]['distributorRequested'] = distributorRequest;
+                         if (publisherRequest && !task.json.partners[i]['publisher']) {
+                             task.json.partners[i]['publisher'] = 'requested';
+                         }
+                         if (distributorRequest && !task.json.partners[i]['distributor']) {
+                             task.json.partners[i]['distributor'] = 'requested';
+                         }
                      }
                  }
 
