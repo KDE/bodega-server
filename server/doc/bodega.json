@@ -887,8 +887,23 @@
             "MethodName": "List",
             "Synopsis": "Lists all partners the authenticated account is associated with",
             "HTTPMethod": "GET",
-            "URI": "/partner/update",
+            "URI": "/partner/list",
             "parameters": []
+        },
+        {
+            "MethodName": "Info",
+            "Synopsis": "Gets info on a single partner the authenticated account is associated with",
+            "HTTPMethod": "GET",
+            "URI": "/partner/:partner/info",
+            "parameters": [
+            {
+                "Name": "partner",
+                "Location": "URL",
+                "Description": "The id of the partner",
+                "Required": "Y",
+                "Type": "number"
+            }
+            ]
         },
         {
             "MethodName": "Create",

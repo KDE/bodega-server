@@ -346,8 +346,16 @@ function requestPublisherStatus(db, req, res, partner, data, cb)
 
 module.exports.list = function(db, req, res)
 {
-    db.query("select distinct p.id, p.name, p.supportEmail as email, p.publisher, p.distributor, p.owedPoints as points from partners p join affiliations a on (p.id = a.partner and a.person = $1) order by id",
-            [req.session.user.id],
+    var where;
+    var partnerId = utils.parseNumber(req.params.partner);
+    if (partnerId > 0) {
+        where = ' WHERE partner = $2 ';
+    } else {
+        where = ' WHERE $2 = $2 ';
+    }
+
+    db.query("select distinct p.id, p.name, p.supportEmail as email, p.publisher, p.distributor, p.owedPoints as points from partners p join affiliations a on (p.id = a.partner and a.person = $1) " + where + " order by id",
+            [req.session.user.id, partnerId],
             function (err, result) {
                 if (err) {
                     errors.report('Database', req, res, err);
@@ -378,6 +386,11 @@ module.exports.list = function(db, req, res)
                             if (error) {
                                 errors.report(error.type, req, res, error);
                             } else {
+                                if (partnerId > 0) {
+                                    json.partner = json.partners[0];
+                                    json.partners = null;
+                                }
+
                                 res.json(json);
                             }
                         };
