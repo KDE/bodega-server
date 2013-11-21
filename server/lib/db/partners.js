@@ -347,8 +347,8 @@ function requestPublisherStatus(db, req, res, partner, data, cb)
 module.exports.list = function(db, req, res)
 {
     var where;
-    var partnerId = utils.parseNumber(req.params.partner);
-    if (partnerId > 0) {
+    var partnerId = utils.parseNumber(req.params.partner, -1);
+    if (partnerId > -1) {
         where = ' WHERE partner = $2 ';
     } else {
         where = ' WHERE $2 = $2 ';
