@@ -35,6 +35,9 @@ package.json file. Simply run:
 
    $ npm install
 
+You may need to install the nodejs-devel package for your operating system to build some of
+the modules, such as bcrypt and pg.
+
 ## Database setup
 
 * Start the redis daemon (e.g.: /etc/init.d/redis start)
