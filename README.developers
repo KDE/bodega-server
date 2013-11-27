@@ -11,6 +11,18 @@ Other Bodega developers can be found via the following means online:
 We use http://bugs.kde.org to track feature and bug reports under the Bodega product
 and http://reviewboard.kde.org to review patches using the bodega review group.
 
+# A note on quirks when not running in production mode
+
+When the server is not run in production mode, no emails are sent; rather, they
+are logged. So all account activations and permissions for partners need to be
+manually completed in the database. Usually it's a simple matter of things like:
+
+    bodega# update users set active = true;
+
+and
+
+    bodega# update partners set publisher = true, distributor = true;
+
 # Development Workflow
 
 The goal is simple: the master branch should always be usable to host a Bodega

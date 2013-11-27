@@ -22,7 +22,11 @@ Copy the config.json.sample file to config.json and customize the values within 
 keys should be self-explanatory, and if you do not use a given service (e.g. Stripe) you can
 safely ignore those blocks completely.
 
-Most (often, all) of the default settings should work.
+Most of the default settings should work as-is, though some such as the hostname and external URL
+settings probably need to be changed for production use. Email settings also need changing for
+email to be sent out; the email block follows the options for nodemailer:
+
+    https://github.com/andris9/Nodemailer
 
 To adjust the type of content and rules for assets you can make adjustments to the definitions in
 server/assetRules.js as well as in the default dataset in sql/detaulData.sql. The latter must be
