@@ -48,14 +48,14 @@ BEGIN
     IF (newUser) THEN
         PERFORM dblink_exec('INSERT INTO users (name, username, username_lower,
                             email, password_hash,
-                            created_at, updated_at,
+                            created_at, updated_at, auth_token,
                             trust_level, email_digests, active, approved)
                             VALUES
                             (
                             ''' || fullname || ''', ''' || username || ''',''' || username || ''',
                             ''' || email || ''', ''' || password || ''',
                             current_timestamp, current_timestamp,
-                            1, false, true, true);');
+                            ''0a039e7e16bc5a0ee0b7d7f102a4e6c1'', 1, false, true, true);');
 
         PERFORM dblink_exec('INSERT INTO user_stats (user_id) VALUES (currval(''users_id_seq''));');
     ELSE
