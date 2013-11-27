@@ -58,7 +58,7 @@ BEGIN
                             1, false);');
 
         PERFORM dblink_exec('INSERT INTO user_stats (user_id) VALUES (currval(''users_id_seq''));');
-    ELSIF (TG_OP = 'UPDATE') THEN
+    ELSE
         PERFORM dblink_exec('UPDATE users SET name = ''' || fullname || ''',
                              username = ''' || username || ''',
                              email = ''' || email || ''',
@@ -80,13 +80,15 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION ct_createUserInDiscourse() RETURNS TRIGGER AS $$
 DECLARE
     connection TEXT;
+    insertion BOOL;
 
     username TEXT;
     fullname TEXT;
     email TEXT;
     password TEXT;
 BEGIN
-    IF TG_OP = 'UPDATE' AND NEW.fullname IS NULL THEN
+    insertion := TG_OP = 'INSERT';
+    IF NOT insertion AND NEW.fullname IS NULL THEN
         fullname := OLD.fullname;
     ELSE
         fullname := NEW.fullname;
@@ -99,13 +101,13 @@ BEGIN
     username := username;
 
     -- figure out which email to use for the user name collision detection to follow
-    IF TG_OP = 'INSERT' OR NEW.email IS NOT NULL THEN
+    IF insertion OR NEW.email IS NOT NULL THEN
         email := NEW.email;
     ELSE
         email := OLD.email;
     END IF;
 
-    IF TG_OP = 'INSERT' OR NEW.password IS NOT NULL THEN
+    IF insertion OR NEW.password IS NOT NULL THEN
         password := NEW.password;
     ELSE
         password := OLD.password;
@@ -113,7 +115,7 @@ BEGIN
 
     FOREACH connection IN ARRAY regexp_split_to_array(ct_setting('userReplicationConnectStrings'), ':-:')
     LOOP
-        PERFORM ct_replicateUser(connection, TG_OP = 'INSERT', fullname, username, email, password);
+        PERFORM ct_replicateUser(connection, insertion, fullname, username, email, password);
     END LOOP;
     RETURN NEW;
 END;
