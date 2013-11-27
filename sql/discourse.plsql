@@ -49,13 +49,13 @@ BEGIN
         PERFORM dblink_exec('INSERT INTO users (name, username, username_lower,
                             email, password_hash,
                             created_at, updated_at,
-                            trust_level, email_digests)
+                            trust_level, email_digests, active, approved)
                             VALUES
                             (
                             ''' || fullname || ''', ''' || username || ''',''' || username || ''',
                             ''' || email || ''', ''' || password || ''',
                             current_timestamp, current_timestamp,
-                            1, false);');
+                            1, false, true, true);');
 
         PERFORM dblink_exec('INSERT INTO user_stats (user_id) VALUES (currval(''users_id_seq''));');
     ELSE
