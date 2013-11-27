@@ -55,7 +55,7 @@ BEGIN
                             ''' || fullname || ''', ''' || username || ''',''' || username || ''',
                             ''' || email || ''', ''' || password || ''',
                             current_timestamp, current_timestamp,
-                            ''0a039e7e16bc5a0ee0b7d7f102a4e6c1'', 1, false, true, true);');
+                            '''', 1, false, true, true);');
 
         PERFORM dblink_exec('INSERT INTO user_stats (user_id) VALUES (currval(''users_id_seq''));');
     ELSE
