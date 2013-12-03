@@ -52,7 +52,7 @@ module.exports.listAttributes = function(db, req, res) {
 module.exports.asset = function(db, req, res) {
     /*jshint multistr:true */
     var ratingsQuery = 'SELECT ar.attribute, attr.name as attributename, ar.person, p.fullname, \
-                        ar.rating, extract(epoch from ar.created) \
+                        ar.rating, extract(epoch from ar.created) as created \
                         FROM assetRatings ar \
                              JOIN assetRatingAttributes attr ON (ar.attribute = attr.id) \
                              LEFT JOIN people p ON (ar.person = p.id) \
@@ -82,7 +82,41 @@ module.exports.asset = function(db, req, res) {
                 return;
             }
 
-            json.ratings = result.rows;
+            if (result.rowsCount > pageSize) {
+                json.hasMoreRatings = true;
+                result.rows.pop();
+            }
+
+            json.ratings = [];
+
+            // now we're going to batch up the results nicely into an array of people objects
+            var currentPerson;
+            var person = null;
+            for (var i = 0; i < result.rowCount; ++i) {
+                var row = result.rows[i];
+                if (currentPerson !== row.person) {
+                    if (i > 0) {
+                        // add the person to the ratings
+                        json.ratings.push(person);
+                    }
+
+                    currentPerson = row.person;
+                    person = {
+                        person: row.person,
+                        name: row.fullname,
+                        rated: row.created,
+                        ratings: []
+                    };
+                }
+
+                person.ratings.push({attribute: row.attribute, name: row.attributename, rating: row.rating });
+            }
+
+            if (person) {
+                json.ratings.push(person);
+            }
+
+            console.log(JSON.stringify(json.ratings));
             res.json(json);
     });
 };
@@ -126,7 +160,7 @@ module.exports.participant = function(db, req, res) {
 
             // now we're going to batch up the results nicely into an array of asset objects
             var currentAsset;
-            var asset = {};
+            var asset = null;
             for (var i = 0; i < result.rowCount; ++i) {
                 var row = result.rows[i];
                 if (currentAsset !== row.assetid) {
@@ -149,7 +183,9 @@ module.exports.participant = function(db, req, res) {
                 asset.ratings.push({attribute: row.attribute, name: row.attributename, rating: row.rating });
             }
 
-            json.ratings.push(asset);
+            if (asset) {
+                json.ratings.push(asset);
+            }
             res.json(json);
     });
 };
