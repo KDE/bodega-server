@@ -162,7 +162,7 @@ module.exports.participant = function(db, req, res) {
 
             // now we're going to batch up the results nicely into an array of asset objects
             var currentAsset;
-            var asset = {};
+            var asset = null;
             for (var i = 0; i < result.rowCount; ++i) {
                 var row = result.rows[i];
                 if (currentAsset !== row.assetid) {
@@ -185,7 +185,9 @@ module.exports.participant = function(db, req, res) {
                 asset.ratings.push({attribute: row.attribute, name: row.attributename, rating: row.rating });
             }
 
-            json.ratings.push(asset);
+            if (asset) {
+                json.ratings.push(asset);
+            }
             res.json(json);
     });
 };
