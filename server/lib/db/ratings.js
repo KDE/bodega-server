@@ -117,7 +117,6 @@ module.exports.asset = function(db, req, res) {
                 json.ratings.push(person);
             }
 
-            console.log(JSON.stringify(json.ratings));
             res.json(json);
     });
 };
