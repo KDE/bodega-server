@@ -83,7 +83,7 @@ function requestFetcher(task, cb)
                  distributorRequest = false;
                  for (i = 0; i < result.rowCount; ++i) {
                      var row = result.rows[i];
-                     console.log(row);
+                     //console.log(row);
                      if (row.type == 'publisherRequest') {
                          publisherRequest = true;
                      } else if (row.type == 'distributorRequest') {
@@ -92,7 +92,7 @@ function requestFetcher(task, cb)
                  }
 
                  for (i = 0; i < task.json.partners.length; ++i) {
-                     console.log(task.json.partners[i])
+                     //console.log(task.json.partners[i])
                      if (task.json.partners[i].id === task.partner) {
                          if (publisherRequest && !task.json.partners[i]['publisher']) {
                              task.json.partners[i]['publisher'] = 'requested';
