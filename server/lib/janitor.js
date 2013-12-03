@@ -77,10 +77,11 @@ var Janitor = (function() {
             });
         }
 
+        var replicationString
         for (config in app.config.service.userReplication) {
-            connectString = buildConnectString(app.config.service.userReplication[config]);
+            replicationString = buildConnectString(app.config.service.userReplication[config]);
             if (connectString) {
-                userReplicationConnections.push(connectString);
+                userReplicationConnections.push(replicationString);
             }
         }
 

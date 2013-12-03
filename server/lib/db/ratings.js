@@ -51,9 +51,13 @@ module.exports.listAttributes = function(db, req, res) {
 
 module.exports.asset = function(db, req, res) {
     /*jshint multistr:true */
-    var ratingsQuery = 'SELECT attribute, person, rating, extract(epoch from created) \
-                        FROM assetRatings WHERE asset = $1 \
-                        ORDER BY created desc, person LIMIT $2 OFFSET $3;';
+    var ratingsQuery = 'SELECT ar.attribute, attr.name as attributename, ar.person, p.fullname, \
+                        ar.rating, extract(epoch from ar.created) \
+                        FROM assetRatings ar \
+                             JOIN assetRatingAttributes attr ON (ar.attribute = attr.id) \
+                             LEFT JOIN people p ON (ar.person = p.id) \
+                        WHERE ar.asset = $1 \
+                        ORDER BY ar.created desc, p.fullname LIMIT $2 OFFSET $3;';
 
     var pageSize = utils.parseNumber(req.query.pageSize) || app.config.defaultPageSize;
     var offset = utils.parseNumber(req.query.offset) || 0;
