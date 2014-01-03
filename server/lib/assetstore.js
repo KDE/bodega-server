@@ -236,8 +236,19 @@ var AssetStore = (function() {
                 fn(e);
                 return;
             }
-            var parsedRemoteUrl = url.parse(assetInfo.externpath);
-            if (parsedRemoteUrl.protocol === 'obs:') {
+            var parsedRemoteUrl;
+            if (assetInfo.externpath) {
+                try {
+                    parsedRemoteUrl = url.parse(assetInfo.externpath);
+                //only when externpath exists but is not a valid url
+                } catch (err) {
+                    if (!fs.existsSync(dirpath)) {
+                        fn(err);
+                        return;
+                    }
+                }
+            }
+            if (parsedRemoteUrl && parsedRemoteUrl.protocol === 'obs:') {
                 ObsAssetStore.size(parsedRemoteUrl, function(size) {
                     assetInfo.size = size;
                     localPutStream(fromFile, assetPath, fn);
@@ -253,13 +264,25 @@ var AssetStore = (function() {
     AssetStore.prototype.download = function(res, assetInfo, fn) {
         var assetPath = pathForAsset(assetInfo);
         var parsedUrl = url.parse(assetPath);
-        var parsedRemoteUrl = url.parse(assetInfo.externpath);
 
-        if (parsedUrl.protocol === 'http:' ||
-            parsedUrl.protocol === 'https:') {
+        var parsedRemoteUrl;
+        if (assetInfo.externpath) {
+            try {
+                parsedRemoteUrl = url.parse(assetInfo.externpath);
+            //only when externpath exists but is not a valid url
+            } catch (err) {
+                if (!fs.existsSync(dirpath)) {
+                    fn(err);
+                    return;
+                }
+            }
+        }
+
+        if (parsedUrl && (parsedUrl.protocol === 'http:' ||
+            parsedUrl.protocol === 'https:')) {
             httpGetStream(res, parsedUrl, assetInfo.file, fn);
         //FIXME: better way to decide the proper store
-        } else if (parsedRemoteUrl.protocol === 'obs:') {
+        } else if (parsedRemoteUrl && parsedRemoteUrl.protocol === 'obs:') {
             ObsAssetStore.resolveUrl(parsedRemoteUrl, function(finalUrl) {
                 var parsedFinalUrl = url.parse(finalUrl);
                 httpGetStream(res, parsedFinalUrl, parsedFinalUrl.path.substring(parsedFinalUrl.path.lastIndexOf('/')), fn);

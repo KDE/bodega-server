@@ -117,8 +117,19 @@ function publishHook(db, req, res, assetInfo, cb)
 {
     var e;
 
-    parsedRemoteUrl = url.parse(assetInfo.externpath);
-    if (parsedRemoteUrl.protocol === 'obs:') {
+    var parsedRemoteUrl;
+    if (assetInfo.externpath) {
+        try {
+            parsedRemoteUrl = url.parse(assetInfo.externpath);
+        //only when externpath exists but is not a valid url
+        } catch (err) {
+            if (!fs.existsSync(dirpath)) {
+                fn(err);
+                return;
+            }
+        }
+    }
+    if (parsedRemoteUrl && parsedRemoteUrl.protocol === 'obs:') {
         ObsAssetStore.publish(assetInfo, function(err, assetInfo) {
             if (err) {
                 e = errors.create('PublishHook', err.message);
