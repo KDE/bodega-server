@@ -107,7 +107,9 @@ var ErrorType = {
     "RatingExists"           : 94,//rating already exists
     "UploadMissingTag"       : 95,//The asset doesn't have a required tag
     "AssetIconMissing"       : 96,//The asset Doesn't have any icon
-    "RatingAttributeInvalid" : 97//The reating attribute passed was invalid
+    "RatingAttributeInvalid" : 97,//The reating attribute passed was invalid
+
+    "PublishHook"            : 100//Something failed in the publish hook process
 };
 
 var DbErrorType = {

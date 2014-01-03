@@ -20,9 +20,12 @@ var utils = require('../utils.js');
 var roles = require('../roles.js');
 var createUtils = require('../createutils.js');
 
+var ObsAssetStore = require('../obsassetstore.js');
+
 var fs = require('fs');
 var path = require('path');
 var async = require('async');
+var url = require('url');
 
 function sendResponse(db, req, res, assetInfo)
 {
@@ -110,6 +113,28 @@ function beginTransaction(db, req, res, assetInfo, cb)
     });
 }
 
+function publishHook(db, req, res, assetInfo, cb)
+{
+    var e;
+
+    parsedRemoteUrl = url.parse(assetInfo.externpath);
+    if (parsedRemoteUrl.protocol === 'obs:') {
+        ObsAssetStore.publish(assetInfo, function(err, assetInfo) {
+            if (err) {
+                e = errors.create('PublishHook', err.message);
+                cb(e, db, req, res, assetInfo);
+                return;
+            }
+
+            cb(null, db, req, res, assetInfo);
+        });
+
+    //default do nothing
+    } else {
+        cb(null, db, req, res, assetInfo);
+    }
+}
+
 function writeAsset(db, req, res, assetInfo, cb)
 {
     var query;
@@ -118,7 +143,7 @@ function writeAsset(db, req, res, assetInfo, cb)
     var args  = [];
     var fields = ['partner', 'basePrice',
                   'name', 'description', 'version',
-                  'file', 'image', 'size'];
+                  'externpath', 'file', 'image', 'size'];
     var field;
     var i;
     var idx = 1;
@@ -338,6 +363,9 @@ function approveAsset(db, req, res, assetInfo)
     funcs.push(fetchPreviews);
     // find the publisher for the email later
     funcs.push(findPublisher);
+
+    // Hook to do on publish
+    funcs.push(publishHook);
 
     //begin transaction
     funcs.push(beginTransaction);

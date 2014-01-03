@@ -24,6 +24,8 @@ var http = require('http');
 var https = require('https');
 var url = require('url');
 
+var ObsAssetStore = require('./obsassetstore.js');
+
 var AssetStore = (function() {
     var storageConfig;
     var incomingDirPath;
@@ -185,7 +187,7 @@ var AssetStore = (function() {
             'path': parsedUrl.path
         };
 
-        (isSecure ? http : https).get(options, function(downRes) {
+        (isSecure ? https : http).get(options, function(downRes) {
             //console.log("statusCode: ", downRes.statusCode);
             //console.log("headers: ", downRes.headers);
             downRes.header = keysToLowerCase(downRes.header);
@@ -234,8 +236,16 @@ var AssetStore = (function() {
                 fn(e);
                 return;
             }
-            assetInfo.size = stat.size;
-            localPutStream(fromFile, assetPath, fn);
+            var parsedRemoteUrl = url.parse(assetInfo.externpath);
+            if (parsedRemoteUrl.protocol === 'obs:') {
+                ObsAssetStore.size(parsedRemoteUrl, function(size) {
+                    assetInfo.size = size;
+                    localPutStream(fromFile, assetPath, fn);
+                });
+            } else {
+                assetInfo.size = stat.size;
+                localPutStream(fromFile, assetPath, fn);
+            }
         });
     };
 
@@ -243,10 +253,17 @@ var AssetStore = (function() {
     AssetStore.prototype.download = function(res, assetInfo, fn) {
         var assetPath = pathForAsset(assetInfo);
         var parsedUrl = url.parse(assetPath);
+        var parsedRemoteUrl = url.parse(assetInfo.externpath);
 
         if (parsedUrl.protocol === 'http:' ||
             parsedUrl.protocol === 'https:') {
             httpGetStream(res, parsedUrl, assetInfo.file, fn);
+        //FIXME: better way to decide the proper store
+        } else if (parsedRemoteUrl.protocol === 'obs:') {
+            ObsAssetStore.resolveUrl(parsedRemoteUrl, function(finalUrl) {
+                var parsedFinalUrl = url.parse(finalUrl);
+                httpGetStream(res, parsedFinalUrl, parsedFinalUrl.path.substring(parsedFinalUrl.path.lastIndexOf('/')), fn);
+            });
         } else {
             localGetStream(res, assetPath, assetInfo.file, fn);
         }

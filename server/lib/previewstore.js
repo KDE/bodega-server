@@ -1109,7 +1109,8 @@ var PreviewStore = (function() {
     function publishIcon(assetInfo, assetPaths, icons, i, cb) {
         var icon = icons[i];
         var dirpath = assetPaths.icons[icon.subtype];
-
+ console.log(icons);
+ console.log(i);
         checkDirectory(dirpath, "0755", function(err) {
             var incomingIconFile;
             var iconFile;
@@ -1201,12 +1202,20 @@ var PreviewStore = (function() {
         var preview;
         var i;
 
+        var iconPreview = null;
+
         for (i = 0; i < assetInfo.previews.length; ++i) {
             preview = assetInfo.previews[i];
             if (preview.type === 'icon') {
-                splitPreviews.icons.push(preview);
+                iconPreview = preview;
             } else {
                 splitPreviews.others.push(preview);
+            }
+        }
+        if (iconPreview !== null) {
+            for (i in iconSizes) {
+                var newPreview = {path: preview.path, type: 'icon', subtype: i};
+                splitPreviews.icons.push(newPreview);
             }
         }
 
