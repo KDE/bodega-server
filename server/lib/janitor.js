@@ -77,7 +77,7 @@ var Janitor = (function() {
             });
         }
 
-        var replicationString
+        var replicationString;
         for (config in app.config.service.userReplication) {
             replicationString = buildConnectString(app.config.service.userReplication[config]);
             if (connectString) {
@@ -86,7 +86,7 @@ var Janitor = (function() {
         }
 
         if (userReplicationConnections.length > 0) {
-            var query = "select ct_createSetting('userReplicationConnectStrings', $1)"
+            var query = "select ct_createSetting('userReplicationConnectStrings', $1)";
             app.db.dbQuery(function(client) {
                 client.query(query, [userReplicationConnections.join(':-:')],
                              function(err) {
