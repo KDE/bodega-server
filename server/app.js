@@ -16,7 +16,12 @@
 */
 
 var express = require('express');
-var RedisStore = require('connect-redis')(express);
+var errorhandler = require('errorhandler');
+var session = require('express-session');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var favicon = require('serve-favicon');
+var RedisStore = require('connect-redis')(session);
 var fs = require('fs');
 var https = require('https');
 var http = require('http');
@@ -69,13 +74,14 @@ if (argv.production) {
         console.log(err.stack);
     });
 } else {
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+    app.use(errorhandler({ dumpExceptions: true, showStack: true }));
 }
 
-app.use(express.bodyParser());
-app.use(express.cookieParser());
-app.use(express.session({ secret: app.config.cookieSecret ? app.config.cookieSecret : "love cookies",
+app.use(bodyParser());
+app.use(cookieParser());
+app.use(session({ secret: app.config.cookieSecret ? app.config.cookieSecret : "love cookies",
                           store: new RedisStore(app.config.service.redis) }));
+//app.use(session({ store: new RedisStore(options), secret: 'keyboard cat' }))
 // Simple CORS middleware; we don't care where a request comes from
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -89,7 +95,7 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('trust proxy', app.config.behindProxy);
 
-app.use(express.favicon("public/favicon.ico"));
+app.use(favicon("public/favicon.ico"));
 
 var utils = require('./lib/utils.js');
 app.use(function(req, res, next) {
