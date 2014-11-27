@@ -14,7 +14,7 @@ Bodega is designed around the following key ideas:
 An asset is always in one of the following states
 
     * incoming: it is a new asset or is a published asset in the process
-                of being editted
+                of being edited
     * posted: all editing is complete, it is ready to be published by the
               warehouse team
     * published: the asset has no edits pending and is in the warehouse
@@ -61,7 +61,7 @@ is why unit testing is not optional.
 When there is a need to control the running of multiple async blocks,
 the async node.js module is used which provides several different
 patterns. The two most often used in bodega are queue and waterfall.
-Documentation on asyn can be found here: https://github.com/caolan/async
+Documentation on async can be found here: https://github.com/caolan/async
 
 # Database
 
@@ -74,7 +74,7 @@ which is a node.js script used to manage the database.
 
 Referential integrity, table normalization (within reason) and policy
 enforcement by the use of triggers helps keep the database in perfect form,
-saving much work in serve code (that in some cases could never be perfect,
+saving much work in server code (that in some cases could never be perfect,
 e.g. without race conditions, if done outside the database).
 
 Many complex tasks are also handled by stored procedures which encapsulate

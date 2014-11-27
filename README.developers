@@ -110,7 +110,7 @@ We use the [KDE Library coding style](http://techbase.kde.org/Policies/Kdelibs_C
 adapted for Javascript. In brief, that means:
 
     * Indentation: 4 spaces (no tabs)
-    * All blocks gets {}, even one liners
+    * All blocks get {}, even one liners
     * CamelCase is in effect
 
 Consistency is of vital importance to future maintenance of the codebase

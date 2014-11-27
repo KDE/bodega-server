@@ -29,12 +29,12 @@ email to be sent out; the email block follows the options for nodemailer:
     https://github.com/andris9/Nodemailer
 
 To adjust the type of content and rules for assets you can make adjustments to the definitions in
-server/assetRules.js as well as in the default dataset in sql/detaulData.sql. The latter must be
+server/assetRules.js as well as in the default dataset in sql/defaultdata.sql. The latter must be
 done before running `make sql` or else be loaded by hand.
 
 ## Node setup and module Installation
 
-The npm application takes care of install all the required modules, which are listed in the
+The npm application takes care of installation of all the required modules, which are listed in the
 package.json file. Simply run:
 
    $ npm install
@@ -141,7 +141,7 @@ updates are usually fine and simply mean that the changes were already found in 
 ## Testing
 
 To set up the server for running the tests, first ensure that you have a database set up just for
-testing as the tests rely on a test data set which replaces whatever data may otherwise be in the
+testing as the tests rely on test data set which replaces whatever data may otherwise be in the
 database. In other words: do not run the tests on a production system and expect things to go well.
 
 To load the testing data set:
