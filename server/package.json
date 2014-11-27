@@ -7,7 +7,7 @@
         "bcrypt": ">= 0.5.0",
         "connect-redis": "latest",
         "email-template": "latest",
-        "express": "> 2.4.6",
+        "express": ">= 4.10",
         "express-session": "latest",
         "errorhandler": "latest",
         "body-parser": "latest",
