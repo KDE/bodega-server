@@ -77,10 +77,12 @@ if (argv.production) {
     app.use(errorhandler({ dumpExceptions: true, showStack: true }));
 }
 
-app.use(bodyParser());
+app.use(bodyParser);
 app.use(cookieParser());
 app.use(session({ secret: app.config.cookieSecret ? app.config.cookieSecret : "love cookies",
-                          store: new RedisStore(app.config.service.redis) }));
+                  resave: false,
+                  saveUninitialized: false,
+                  store: new RedisStore(app.config.service.redis) }));
 //app.use(session({ store: new RedisStore(options), secret: 'keyboard cat' }))
 // Simple CORS middleware; we don't care where a request comes from
 app.use(function(req, res, next) {
@@ -90,7 +92,6 @@ app.use(function(req, res, next) {
 
     next();
 });
-app.use(app.router);
 app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('trust proxy', app.config.behindProxy);
