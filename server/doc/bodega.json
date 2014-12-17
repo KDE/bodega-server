@@ -373,7 +373,7 @@
         },
         {
           "MethodName": "Purchase",
-          "Synopsis": "Attempts to purchase an asset; if the asset is not available in the store currently authenticated against or the account does not have enough ponts, an error with that information is returned",
+          "Synopsis": "Attempts to purchase an asset; if the asset is not available in the store currently authenticated against or the account does not have enough points, an error with that information is returned",
           "HTTPMethod": "Get",
           "URI": "/asset/purchase/:assetId",
           "parameters": [
