@@ -77,7 +77,9 @@ if (argv.production) {
     app.use(errorhandler({ dumpExceptions: true, showStack: true }));
 }
 
-app.use(bodyParser);
+app.use(bodyParser.urlencoded({
+  extended: true}));
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(session({ secret: app.config.cookieSecret ? app.config.cookieSecret : "love cookies",
                   resave: false,
