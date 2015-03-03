@@ -101,11 +101,10 @@ app.set('trust proxy', app.config.behindProxy);
 app.use(favicon("public/favicon.ico"));
 
 var utils = require('./lib/utils.js');
+require('./routes.js');
 app.use(function(req, res, next) {
     utils.render404(res);
 });
-
-require('./routes.js');
 
 if (fs.existsSync('cert/key.pem')) {
     // https
