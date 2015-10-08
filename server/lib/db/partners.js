@@ -16,8 +16,7 @@
 */
 
 var async = require('async');
-var check = require('validator').check;
-var sanitize = require('validator').sanitize;
+var validator = require('validator');
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
@@ -252,7 +251,7 @@ function requireAccountOrUrl(db, req, res, partner, cb)
 
     if (req.body.url) {
         try {
-            check(req.body.url).isUrl();
+            validator.isUrl(req.body.url);
         } catch(e) {
             cb(errors.create('InvalidUrl'));
             return;
@@ -468,16 +467,16 @@ module.exports.list = function(db, req, res)
 
 module.exports.create = function(db, req, res)
 {
-    var name = sanitize(req.body.name).trim();
+    var name = validator.trim(req.body.name);
     if (name === '') {
         errors.report('MissingParameters', req, res);
         return;
     }
 
-    var email = sanitize(req.body.email).trim();
+    var email = validator.normalizeEmail(req.body.email);
     if (email !== '') {
         try {
-            check(email).isEmail();
+            validator.isEmail(email);
         } catch (e) {
             errors.report('InvalidEmailAddress', req, res, e);
             return;
@@ -501,16 +500,16 @@ module.exports.update = function(db, req, res)
         params: []
     };
 
-    var name = sanitize(req.body.name).trim();
+    var name = validator.trim(req.body.name);
     if (name !== '') {
         data.params.push(name);
         data.columns.push('name = $' + data.params.length);
     }
 
-    var email = sanitize(req.body.email).trim();
+    var email = validator.trim(req.body.email);
     if (email !== '') {
         try {
-            check(email).isEmail();
+            validator.isEmail(email);
             data.params.push(email);
             data.columns.push('supportEmail = $' + data.params.length);
         } catch (e) {

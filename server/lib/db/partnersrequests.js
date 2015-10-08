@@ -16,8 +16,7 @@
 */
 
 var async = require('async');
-var check = require('validator').check;
-var sanitize = require('validator').sanitize;
+var validator = require('validator');
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');

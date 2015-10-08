@@ -19,7 +19,7 @@ var assetRules = require('../assetRules.js');
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 
-var sanitize = require('validator').sanitize;
+var validator = require('validator');
 
 module.exports.listAssetTypeTags = function(db, req, res) {
     if (!req.params.assetType) {
@@ -272,7 +272,7 @@ module.exports.listTags = function(db, req, res) {
 
 function create(partner, db, req, res) {
 
-    var title = sanitize(req.body.title).trim();
+    var title = validator.trim(req.body.title);
     if (title === '') {
         errors.report('MissingParameters', req, res);
         return;
@@ -340,7 +340,7 @@ function update(partner, db, req, res) {
         return;
     }
 
-    var title = sanitize(req.body.title).trim();
+    var title = validator.trim(req.body.title);
     if (title === '') {
         errors.report('MissingParameters', req, res);
         return;

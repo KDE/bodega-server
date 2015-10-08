@@ -18,8 +18,7 @@
 var utils = require('../utils.js');
 var errors = require('../errors.js');
 var payments = require('../payments.js');
-var check = require('validator').check;
-var sanitize = require('validator').sanitize;
+var validator = require('validator');
 
 function series(callbacks, errHandler, db, req, res) {
     function next(err) {
@@ -55,7 +54,7 @@ function performUpdate(db, field, value, user, next)
 
 function performFirstNameUpdate(db, req, res, next)
 {
-    var firstName = sanitize(req.body.firstName).trim();
+    var firstName = validator.trim(req.body.firstName);
 
     if (firstName !== '') {
         performUpdate(db, 'firstName', firstName, req.session.user.id, next);
@@ -66,7 +65,7 @@ function performFirstNameUpdate(db, req, res, next)
 
 function performMiddleNameUpdate(db, req, res, next)
 {
-    var middleNames = sanitize(req.body.middleNames).trim();
+    var middleNames = validator.trim(req.body.middleNames);
 
     // middleNames can be null, so we don't check if middelNames !== ''
     performUpdate(db, 'middleNames', middleNames, req.session.user.id, next);
@@ -74,7 +73,7 @@ function performMiddleNameUpdate(db, req, res, next)
 
 function performLastNameUpdate(db, req, res, next)
 {
-    var lastName = sanitize(req.body.lastName).trim();
+    var lastName = validator.trim(req.body.lastName);
 
     if (lastName !== '') {
         performUpdate(db, 'lastName', lastName, req.session.user.id, next);
@@ -85,11 +84,11 @@ function performLastNameUpdate(db, req, res, next)
 
 function performEmailUpdate(db, req, res, next)
 {
-    var email = sanitize(req.body.email).trim();
+    var email = validator.trim(req.body.email);
 
     if (email !== '') {
         try {
-            check(email).isEmail();
+            validator.isEmail(email);
         } catch (e) {
             next(errors.create('InvalidEmailAddress', e.message));
             return;

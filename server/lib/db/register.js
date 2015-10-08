@@ -16,7 +16,7 @@
 */
 
 var BCrypt = require('bcrypt');
-var check = require('validator').check;
+var validator = require('validator');
 
 var utils = require('../utils.js');
 var errors = require('../errors.js');
@@ -102,7 +102,7 @@ module.exports = function(db, req, res) {
     }
 
     try {
-        check(args.email).isEmail();
+        validator.isEmail(args.email);
     } catch (e) {
         errors.report('InvalidEmailAddress', req, res, e);
         return;

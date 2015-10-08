@@ -16,7 +16,7 @@
 */
 
 var async = require('async');
-var sanitize = require('validator').sanitize;
+var validator = require('validator');
 var errors = require('../errors.js');
 var utils = require('../utils.js');
 
@@ -174,13 +174,13 @@ function updateStore(store, db, req, res)
     var params = [];
     var count = 0;
 
-    var name = sanitize(req.body.name).trim();
+    var name = validator.trim(req.body.name);
     if (name.length > 0) {
         updates.push("name = $" + (++count));
         params.push(name);
     }
 
-    var description = sanitize(req.body.desc).trim();
+    var description = validator.trim(req.body.desc);
     if (description.length > 0) {
         updates.push("description = $" + (++count));
         params.push(description);
